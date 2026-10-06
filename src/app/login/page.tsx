@@ -77,7 +77,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-md rounded-2xl border-0 shadow-2xl">
         <CardHeader className='space-y-1 pt-8'>
           <div className='mx-auto mb-3 h-16 w-16 overflow-hidden rounded-2xl bg-white shadow-lg ring-2 ring-indigo-500/20'>
-            <Image src='/image/logo2.jpg' alt='Khandaq Madresah logo' width={64} height={64} className='h-full w-full object-cover' />
+            <Image src='/image/khandaq-log.jpg' alt='Khandaq Madresah logo' width={64} height={64} className='h-full w-full object-cover' />
           </div>
           <CardTitle className="text-2xl font-bold text-center">
             Khandaq Madresah Attendance

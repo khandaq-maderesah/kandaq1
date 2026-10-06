@@ -39,7 +39,7 @@ export default function Home() {
 
         <div className="relative mx-auto max-w-5xl px-6 py-24 text-center">
           <div className="mx-auto mb-6 h-20 w-20 overflow-hidden rounded-2xl shadow-lg ring-2 ring-white/40">
-            <Image src="/image/logo2.jpg" alt="Khandaq Madresah logo" width={80} height={80} className="h-full w-full object-cover" />
+            <Image src="/image/khandaq-log.jpg" alt="Khandaq Madresah logo" width={80} height={80} className="h-full w-full object-cover" />
           </div>
           <h1 className="mb-6 text-4xl font-extrabold tracking-tight md:text-6xl">
             Khandaq Madresah <span className="text-indigo-200">Attendance</span>

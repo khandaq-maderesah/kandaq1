@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   keywords: ["attendance", "school", "students", "teachers", "madresah", "management"],
   manifest: "/manifest.webmanifest",
   icons: {
-    icon: "/image/logo2.jpg",
+    icon: "/image/khandaq-log.jpg",
     apple: "/icons/icon-192.png",
   },
   appleWebApp: {
