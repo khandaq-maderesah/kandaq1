@@ -8,7 +8,8 @@ export const metadata: Metadata = {
     default: "Khandaq Madresah",
     template: "%s | Khandaq Madresah",
   },
-  description: "Madresah attendance management system for Khandaq Madresah.",
+  // No description on purpose: it is what link previews (Telegram, WhatsApp)
+  // show under the title when sharing the URL.
   applicationName: "Khandaq Madresah",
   keywords: ["attendance", "school", "students", "teachers", "madresah", "management"],
   manifest: "/manifest.webmanifest",

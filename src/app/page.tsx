@@ -5,7 +5,6 @@ import { ClipboardCheck, PhoneCall, BarChart3, ArrowRight } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Home',
-  description: 'Sign in to the Khandaq Madresah attendance management system.',
 }
 
 const features = [
