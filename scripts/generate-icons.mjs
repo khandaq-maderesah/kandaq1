@@ -1,4 +1,4 @@
-// Generates PNG app icons for the PWA from public/image/khandaq-log.jpg
+// Generates PNG app icons for the PWA from public/image/khandaq-logo.png
 import sharp from 'sharp'
 import { mkdir } from 'node:fs/promises'
 import path from 'node:path'
@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const root = path.resolve(__dirname, '..')
-const src = path.join(root, 'public', 'image', 'khandaq-log.jpg')
+const src = path.join(root, 'public', 'image', 'khandaq-logo.png')
 const outDir = path.join(root, 'public', 'icons')
 
 await mkdir(outDir, { recursive: true })

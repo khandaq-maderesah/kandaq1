@@ -55,7 +55,7 @@ export function DashboardNav({ userRole }: DashboardNavProps) {
         <div className="flex justify-between items-center h-16">
           {/* Logo/Brand */}
           <Link href="/dashboard" className="flex items-center space-x-2 flex-shrink-0">
-            <Image src="/image/khandaq-log.jpg" alt="Khandaq Madresah logo" width={36} height={36} className="h-9 w-9 rounded-full object-cover ring-2 ring-white/70 shadow-md" />
+            <Image src="/image/khandaq-logo.png" alt="Khandaq Madresah logo" width={36} height={36} className="h-9 w-9 rounded-full object-cover ring-2 ring-white/70 shadow-md" />
             <span className="font-bold text-xl text-white drop-shadow-sm">
               Khandaq Madresah
             </span>
