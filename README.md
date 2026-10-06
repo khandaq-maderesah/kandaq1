@@ -1,6 +1,6 @@
-# Ansar Madresah Attendance
+# Khandaq Madresah Attendance
 
-A school attendance management system for Ansar Madresah, built with **Next.js 15 (App Router)**, **React**, **Tailwind CSS**, and **Firebase (Authentication + Realtime Database)**.
+A school attendance management system for Khandaq Madresah, built with **Next.js 15 (App Router)**, **React**, **Tailwind CSS**, and **Firebase (Authentication + Realtime Database)**.
 
 ## ✨ Features
 

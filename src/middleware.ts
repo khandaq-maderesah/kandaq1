@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 
-export const SESSION_COOKIE = 'ansar_session'
+export const SESSION_COOKIE = 'khandaq_session'
 
 const PROTECTED_PREFIXES = ['/admin', '/teacher', '/dashboard', '/profile']
 

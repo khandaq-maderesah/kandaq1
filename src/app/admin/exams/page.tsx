@@ -289,7 +289,7 @@ export default function AdminExamsPage() {
           </CardHeader>
           <CardContent className="print-area overflow-x-auto">
             <div className="mb-3 border-b-2 border-slate-800 pb-2">
-              <h2 className="text-lg font-bold text-slate-900">Ansar Madresah — Overall Result</h2>
+              <h2 className="text-lg font-bold text-slate-900">Khandaq Madresah — Overall Result</h2>
               <p className="text-sm text-slate-600">
                 {classes.find((c) => c.id === classId)?.name || classId} • {yearFilter ? yearFilter : 'All years'} •{' '}
                 {filteredExams.map((e) => EXAM_TYPE_LABELS[e.type]).join(', ')}

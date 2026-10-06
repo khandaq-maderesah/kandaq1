@@ -11,33 +11,33 @@
 
 ### 2. Project Structure Created
 ```
-ansar-madresah-attendance/
+khandaq-a-system/
 +-- Configuration Files
-¦   +-- package.json          # Dependencies & scripts
-¦   +-- tsconfig.json         # TypeScript configuration
-¦   +-- tailwind.config.ts    # Tailwind CSS setup
-¦   +-- postcss.config.mjs    # PostCSS configuration
-¦   +-- next.config.ts        # Next.js configuration
-¦   +-- eslint.config.mjs     # ESLint rules
-¦   +-- .env.local            # Environment variables template
-¦   +-- .gitignore            # Git ignore rules
-¦
+ï¿½   +-- package.json          # Dependencies & scripts
+ï¿½   +-- tsconfig.json         # TypeScript configuration
+ï¿½   +-- tailwind.config.ts    # Tailwind CSS setup
+ï¿½   +-- postcss.config.mjs    # PostCSS configuration
+ï¿½   +-- next.config.ts        # Next.js configuration
+ï¿½   +-- eslint.config.mjs     # ESLint rules
+ï¿½   +-- .env.local            # Environment variables template
+ï¿½   +-- .gitignore            # Git ignore rules
+ï¿½
 +-- Source Code
-¦   +-- src/app/              # App Router pages
-¦   ¦   +-- layout.tsx        # Root layout with Inter font
-¦   ¦   +-- page.tsx          # Homepage
-¦   ¦   +-- globals.css       # Global styles
-¦   ¦
-¦   +-- src/components/       # Components (ready for Shadcn UI)
-¦   ¦
-¦   +-- src/lib/              # Utilities
-¦   ¦   +-- utils.ts          # cn() helper function
-¦   ¦   +-- firebase/
-¦   ¦       +-- config.ts     # Firebase initialization
-¦   ¦
-¦   +-- src/types/            # TypeScript definitions
-¦       +-- index.ts          # All entity interfaces
-¦
+ï¿½   +-- src/app/              # App Router pages
+ï¿½   ï¿½   +-- layout.tsx        # Root layout with Inter font
+ï¿½   ï¿½   +-- page.tsx          # Homepage
+ï¿½   ï¿½   +-- globals.css       # Global styles
+ï¿½   ï¿½
+ï¿½   +-- src/components/       # Components (ready for Shadcn UI)
+ï¿½   ï¿½
+ï¿½   +-- src/lib/              # Utilities
+ï¿½   ï¿½   +-- utils.ts          # cn() helper function
+ï¿½   ï¿½   +-- firebase/
+ï¿½   ï¿½       +-- config.ts     # Firebase initialization
+ï¿½   ï¿½
+ï¿½   +-- src/types/            # TypeScript definitions
+ï¿½       +-- index.ts          # All entity interfaces
+ï¿½
 +-- Documentation
     +-- README.md             # Project overview
     +-- PROJECT_STRUCTURE.md  # Detailed structure

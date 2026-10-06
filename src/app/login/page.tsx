@@ -77,10 +77,10 @@ export default function LoginPage() {
       <Card className="w-full max-w-md rounded-2xl border-0 shadow-2xl">
         <CardHeader className='space-y-1 pt-8'>
           <div className='mx-auto mb-3 h-16 w-16 overflow-hidden rounded-2xl bg-white shadow-lg ring-2 ring-indigo-500/20'>
-            <Image src='/image/logo2.jpg' alt='Ansar Madresah logo' width={64} height={64} className='h-full w-full object-cover' />
+            <Image src='/image/logo2.jpg' alt='Khandaq Madresah logo' width={64} height={64} className='h-full w-full object-cover' />
           </div>
           <CardTitle className="text-2xl font-bold text-center">
-            Ansar Madresah Attendance
+            Khandaq Madresah Attendance
           </CardTitle>
           <CardDescription className="text-center">
             {forgotMode ? 'Reset your password' : 'Sign in to your account to continue'}
@@ -160,7 +160,7 @@ export default function LoginPage() {
                     <Input
                       id="email"
                       type="email"
-                      placeholder="admin@ansarmadresah.com"
+                      placeholder="admin@khandaqmadresah.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="pl-10"

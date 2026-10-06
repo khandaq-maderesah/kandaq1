@@ -62,8 +62,8 @@ const firebaseConfig = {
 // Migration must run as the admin account (the DB rules only let an admin
 // write /studentPhotos and edit students). Override with env vars if the seed
 // account differs.
-const ADMIN_EMAIL = process.env.SEED_ADMIN_EMAIL || 'ansarmadresah@gmail.com'
-const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD || 'Ansarm@1234'
+const ADMIN_EMAIL = process.env.SEED_ADMIN_EMAIL || 'khandaqmadresah1234@gmail.com'
+const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD || 'KH1234'
 
 const app = initializeApp(firebaseConfig)
 const db = getDatabase(app)

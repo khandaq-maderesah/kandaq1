@@ -46,8 +46,8 @@ function loadEnvFile(filePath) {
 }
 loadEnvFile(join(root, '.env.local'))
 
-const ADMIN_EMAIL = process.env.SEED_ADMIN_EMAIL || 'ansarmadresah@gmail.com'
-const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD || 'Ansarm@1234'
+const ADMIN_EMAIL = process.env.SEED_ADMIN_EMAIL || 'khandaqmadresah1234@gmail.com'
+const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD || 'KH1234'
 
 const app = initializeApp({
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,

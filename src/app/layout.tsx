@@ -5,11 +5,11 @@ import { InstallAppPrompt } from "@/components/InstallAppPrompt"
 
 export const metadata: Metadata = {
   title: {
-    default: "Ansar Madresah",
-    template: "%s | Ansar Madresah",
+    default: "Khandaq Madresah",
+    template: "%s | Khandaq Madresah",
   },
-  description: "Madresah attendance management system for Ansar Madresah.",
-  applicationName: "Ansar Madresah",
+  description: "Madresah attendance management system for Khandaq Madresah.",
+  applicationName: "Khandaq Madresah",
   keywords: ["attendance", "school", "students", "teachers", "madresah", "management"],
   manifest: "/manifest.webmanifest",
   icons: {
@@ -18,11 +18,11 @@ export const metadata: Metadata = {
   },
   appleWebApp: {
     capable: true,
-    title: "Ansar Madresah",
+    title: "Khandaq Madresah",
     statusBarStyle: "default",
   },
   openGraph: {
-    title: "Ansar Madresah",
+    title: "Khandaq Madresah",
     description: "Track attendance, manage students and keep parents informed.",
     type: "website",
   },

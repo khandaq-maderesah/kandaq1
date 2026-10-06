@@ -12,7 +12,7 @@ interface BeforeInstallPromptEvent extends Event {
 const IOS_HINTS = [
   'Tap the Share button in Safari.',
   'Scroll down and tap "Add to Home Screen".',
-  'Tap "Add" and Ansar Madresah will appear on your home screen.',
+  'Tap "Add" and Khandaq Madresah will appear on your home screen.',
 ]
 
 export function InstallAppPrompt() {
@@ -25,7 +25,7 @@ export function InstallAppPrompt() {
   const lastUid = useRef<string | null>(null)
 
   // Return a per-user flag so the banner resets on a new login.
-  const storageKey = user ? `ansar_install_dismissed_${user.uid}` : null
+  const storageKey = user ? `khandaq_install_dismissed_${user.uid}` : null
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -94,14 +94,14 @@ export function InstallAppPrompt() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/icons/icon-192.png"
-            alt="Ansar Madresah logo"
+            alt="Khandaq Madresah logo"
             className="h-12 w-12 shrink-0 rounded-xl object-cover"
           />
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-slate-900">Install Ansar Madresah</p>
+            <p className="text-sm font-semibold text-slate-900">Install Khandaq Madresah</p>
             <p className="mt-0.5 text-xs leading-relaxed text-slate-500">
               {isIos
-                ? 'Add Ansar Madresah to your home screen to use it like an app.'
+                ? 'Add Khandaq Madresah to your home screen to use it like an app.'
                 : 'Install the app on your device for quicker access and offline support.'}
             </p>
           </div>

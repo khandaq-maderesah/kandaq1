@@ -1,4 +1,4 @@
-# Ansar Madresah Attendance - REALTIME DATABASE SETUP
+# Khandaq Madresah Attendance - REALTIME DATABASE SETUP
 
 ## ✅ Successfully Switched to Realtime Database!
 
@@ -12,7 +12,7 @@ Your application has been converted from **Firestore** to **Realtime Database**.
 
 1. **Go to Firebase Console:**
    - Visit: https://console.firebase.google.com
-   - Select project: `ansar-madresah-attendance`
+   - Select project: `khandaq-a-system`
 
 2. **Create Database:**
    - Click **"Build"** in left sidebar

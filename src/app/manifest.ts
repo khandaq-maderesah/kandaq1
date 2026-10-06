@@ -2,9 +2,9 @@ import type { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Ansar Madresah',
-    short_name: 'Ansar Madresah',
-    description: 'Madresah attendance management system for Ansar Madresah.',
+    name: 'Khandaq Madresah',
+    short_name: 'Khandaq Madresah',
+    description: 'Madresah attendance management system for Khandaq Madresah.',
     id: '/',
     start_url: '/',
     scope: '/',

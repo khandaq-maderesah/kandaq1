@@ -5,7 +5,7 @@ import { ClipboardCheck, PhoneCall, BarChart3, ArrowRight } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Home',
-  description: 'Sign in to the Ansar Madresah attendance management system.',
+  description: 'Sign in to the Khandaq Madresah attendance management system.',
 }
 
 const features = [
@@ -39,10 +39,10 @@ export default function Home() {
 
         <div className="relative mx-auto max-w-5xl px-6 py-24 text-center">
           <div className="mx-auto mb-6 h-20 w-20 overflow-hidden rounded-2xl shadow-lg ring-2 ring-white/40">
-            <Image src="/image/logo2.jpg" alt="Ansar Madresah logo" width={80} height={80} className="h-full w-full object-cover" />
+            <Image src="/image/logo2.jpg" alt="Khandaq Madresah logo" width={80} height={80} className="h-full w-full object-cover" />
           </div>
           <h1 className="mb-6 text-4xl font-extrabold tracking-tight md:text-6xl">
-            Ansar Madresah <span className="text-indigo-200">Attendance</span>
+            Khandaq Madresah <span className="text-indigo-200">Attendance</span>
           </h1>
           <p className="mx-auto mb-10 max-w-2xl text-lg text-indigo-100 md:text-xl">
             Track attendance, manage students, and keep parents informed —
@@ -89,7 +89,7 @@ export default function Home() {
       </section>
 
       <footer className="border-t border-gray-200 bg-white py-8 text-center text-sm text-gray-500">
-        © {new Date().getFullYear()} Ansar Madresah Attendance. All rights reserved.
+        © {new Date().getFullYear()} Khandaq Madresah Attendance. All rights reserved.
       </footer>
     </main>
   )

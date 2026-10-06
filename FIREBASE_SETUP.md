@@ -1,10 +1,10 @@
-# Firebase Setup Guide for Ansar Madresah Attendance
+# Firebase Setup Guide for Khandaq Madresah Attendance
 
 ## Step 1: Create Firebase Project
 
 1. Go to https://console.firebase.google.com
 2. Click 'Add project' or 'Create a project'
-3. Enter project name: 'ansar-madresah-attendance'
+3. Enter project name: 'khandaq-a-system'
 4. Disable Google Analytics (optional, can enable later)
 5. Click 'Create project'
 
@@ -30,7 +30,7 @@
 1. Go to Project Settings (gear icon near project name)
 2. Scroll down to 'Your apps' section
 3. Click '</>' (Web icon) to add a web app
-4. Enter app name: 'ansar-madresah-web'
+4. Enter app name: 'khandaq-madresah-web'
 5. Click 'Register app'
 6. Copy the firebaseConfig object values
 

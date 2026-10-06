@@ -38,7 +38,7 @@ If Option 1 doesn't work, install them one by one:
 
 1. Go to https://console.firebase.google.com
 2. Click 'Add project'
-3. Name it: 'ansar-madresah-attendance'
+3. Name it: 'khandaq-a-system'
 4. Disable Google Analytics (optional)
 5. Click 'Create project'
 
@@ -64,7 +64,7 @@ If Option 1 doesn't work, install them one by one:
 1. Click the gear icon (Project Settings)
 2. Scroll to 'Your apps' section
 3. Click '</>' (Web icon)
-4. App name: 'ansar-madresah-web'
+4. App name: 'khandaq-madresah-web'
 5. Click 'Register app'
 6. Copy the firebaseConfig values
 

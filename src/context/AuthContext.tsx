@@ -41,7 +41,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       if (fbUser) {
         // Let server-side middleware know the user is signed in (non-httpOnly defense-in-depth)
-        document.cookie = 'ansar_session=true; path=/; SameSite=Lax; Max-Age=86400'
+        document.cookie = 'khandaq_session=true; path=/; SameSite=Lax; Max-Age=86400'
         // Fetch user data from Realtime Database
         try {
           const userRef = ref(db, 'users/' + fbUser.uid)
@@ -57,7 +57,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           console.error('Error fetching user data:', error)
         }
       } else {
-        document.cookie = 'ansar_session=; path=/; Max-Age=0'
+        document.cookie = 'khandaq_session=; path=/; Max-Age=0'
         setUser(null)
       }
       
@@ -74,7 +74,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // based on this cookie, and it is NOT guaranteed to be written yet when
     // `onAuthStateChanged` fires. Setting it here prevents a logged-in user from
     // being bounced straight back to /login right after signing in.
-    document.cookie = 'ansar_session=true; path=/; SameSite=Lax; Max-Age=86400'
+    document.cookie = 'khandaq_session=true; path=/; SameSite=Lax; Max-Age=86400'
     setFirebaseUser(result.user)
 
     // Load the profile immediately so the caller can redirect straight to the
@@ -98,7 +98,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const logout = async () => {
-    document.cookie = 'ansar_session=; path=/; Max-Age=0'
+    document.cookie = 'khandaq_session=; path=/; Max-Age=0'
     await signOut(auth)
     setUser(null)
     setFirebaseUser(null)

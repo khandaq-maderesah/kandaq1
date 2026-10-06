@@ -15,7 +15,7 @@
 ## Directory Structure
 
 ```
-ansar-madresah-attendance/
+khandaq-a-system/
 +-- .env.local                    # Environment variables (Firebase config)
 +-- .gitignore                    # Git ignore rules
 +-- eslint.config.mjs             # ESLint configuration
@@ -27,28 +27,28 @@ ansar-madresah-attendance/
 +-- tsconfig.json                 # TypeScript configuration
 +-- README.md                     # Project documentation
 +-- PROJECT_STRUCTURE.md          # This file
-¦
+ï¿½
 +-- public/                       # Static assets (images, icons, etc.)
-¦
+ï¿½
 +-- src/
     +-- app/                      # Next.js App Router
-    ¦   +-- globals.css           # Global styles
-    ¦   +-- layout.tsx            # Root layout
-    ¦   +-- page.tsx              # Home page
-    ¦
+    ï¿½   +-- globals.css           # Global styles
+    ï¿½   +-- layout.tsx            # Root layout
+    ï¿½   +-- page.tsx              # Home page
+    ï¿½
     +-- components/               # React components (to be created)
-    ¦   +-- ui/                   # Shadcn UI components
-    ¦   +-- forms/                # Form components
-    ¦   +-- charts/               # Recharts components
-    ¦   +-- layout/               # Layout components
-    ¦
+    ï¿½   +-- ui/                   # Shadcn UI components
+    ï¿½   +-- forms/                # Form components
+    ï¿½   +-- charts/               # Recharts components
+    ï¿½   +-- layout/               # Layout components
+    ï¿½
     +-- lib/                      # Utilities and configurations
-    ¦   +-- utils.ts              # Helper functions (cn, etc.)
-    ¦   +-- firebase/
-    ¦   ¦   +-- config.ts         # Firebase initialization
-    ¦   +-- hooks/                # Custom React hooks (to be created)
-    ¦   +-- services/             # API services (to be created)
-    ¦
+    ï¿½   +-- utils.ts              # Helper functions (cn, etc.)
+    ï¿½   +-- firebase/
+    ï¿½   ï¿½   +-- config.ts         # Firebase initialization
+    ï¿½   +-- hooks/                # Custom React hooks (to be created)
+    ï¿½   +-- services/             # API services (to be created)
+    ï¿½
     +-- types/                    # TypeScript definitions
         +-- index.ts              # All TypeScript interfaces
 ```

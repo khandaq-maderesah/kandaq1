@@ -45,7 +45,7 @@ export function AdminNav() {
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           <Link href="/dashboard" className="flex items-center space-x-2 flex-shrink-0">
-            <Image src="/image/logo2.jpg" alt="Ansar Madresah logo" width={36} height={36} className="h-9 w-9 rounded-full object-cover ring-2 ring-white/70 shadow-md" />
+            <Image src="/image/logo2.jpg" alt="Khandaq Madresah logo" width={36} height={36} className="h-9 w-9 rounded-full object-cover ring-2 ring-white/70 shadow-md" />
             <span className="font-bold text-xl text-white drop-shadow-sm">
               Admin Panel
             </span>

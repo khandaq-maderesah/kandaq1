@@ -1,4 +1,4 @@
-# ?? Complete Setup Summary - Ansar Madresah Attendance
+# ?? Complete Setup Summary - Khandaq Madresah Attendance
 
 ## ? Everything is Ready!
 
@@ -92,7 +92,7 @@ npm run dev
 ## ?? Project Structure
 
 `
-ansar-madresah-attendance/
+khandaq-a-system/
 +-- Configuration Files
 �   +-- .env.local (Firebase credentials configured)
 �   +-- package.json (All dependencies)
@@ -216,7 +216,7 @@ Check the documentation files:
 
 ## ?? You're All Set!
 
-Your Ansar Madresah Attendance system is ready to use!
+Your Khandaq Madresah Attendance system is ready to use!
 
 Just enable Firebase services and run: npm run dev
 
