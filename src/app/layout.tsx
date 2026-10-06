@@ -21,9 +21,10 @@ export const metadata: Metadata = {
     title: "Khandaq Madresah",
     statusBarStyle: "default",
   },
+  // No openGraph.description on purpose: link previews (Telegram, WhatsApp,
+  // etc.) would otherwise show this text when sharing the URL.
   openGraph: {
     title: "Khandaq Madresah",
-    description: "Track attendance, manage students and keep parents informed.",
     type: "website",
   },
 }
