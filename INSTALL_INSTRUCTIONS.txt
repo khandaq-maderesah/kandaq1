@@ -1,0 +1,31 @@
+==========================================
+Installing Firebase and Dependencies
+==========================================
+
+This may take a few minutes...
+
+Run these commands in your terminal:
+
+1. npm install firebase@^10.7.0
+2. npm install recharts@^2.10.0 lucide-react@^0.294.0
+3. npm install class-variance-authority@^0.7.0 clsx@^2.0.0 tailwind-merge@^2.0.0
+4. npm install zod@^3.22.0 date-fns@^2.30.0 react-hook-form@^7.48.0 @hookform/resolvers@^3.3.0
+
+Or install all at once:
+npm install
+
+==========================================
+Firebase Setup Steps
+==========================================
+
+1. Go to https://console.firebase.google.com
+2. Create a new project
+3. Enable Authentication > Email/Password
+4. Create Firestore Database (start in test mode)
+5. Copy your Firebase config from Project Settings
+6. Update .env.local with your Firebase credentials
+7. Copy firestore.rules to Firebase Console > Firestore > Rules
+8. Publish the rules
+
+==========================================
+

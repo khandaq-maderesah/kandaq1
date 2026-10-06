@@ -1,0 +1,55 @@
+{
+  "name": "khandaq-a-system",
+  "version": "1.0.0",
+  "description": "Attendance and school management system for Khandaq",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "prebuild": "node scripts/backup-db.mjs",
+    "build:backedup": "node scripts/backup-db.mjs && next build",
+    "seed:admin": "node scripts/seed-admin.mjs",
+    "icons": "node scripts/generate-icons.mjs",
+    "backup:db": "node scripts/backup-db.mjs",
+    "recover:students": "node scripts/recover-students.mjs",
+    "migrate:photos": "node scripts/migrate-photos.mjs",
+    "restore:students": "node scripts/restore-students-from-backup.mjs",
+    "export:students": "node scripts/export-students.mjs",
+    "apply:students": "node scripts/apply-student-csv.mjs",
+    "export:photos": "node scripts/export-photos.mjs",
+    "backfill:creator": "node scripts/backfill-createdByName.mjs"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^3.3.0",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.0.0",
+    "date-fns": "^2.30.0",
+    "ethiopian-calendar-date-converter": "^2.1.6",
+    "firebase": "^10.7.0",
+    "firebase-admin": "^14.2.0",
+    "lucide-react": "^0.294.0",
+    "next": "^15.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hook-form": "^7.48.0",
+    "recharts": "^2.10.0",
+    "tailwind-merge": "^2.0.0",
+    "tailwindcss-animate": "^1.0.7",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "autoprefixer": "^10.4.0",
+    "eslint": "^8.54.0",
+    "eslint-config-next": "^15.0.0",
+    "postcss": "^8.4.0",
+    "tailwindcss": "^3.3.0",
+    "typescript": "^5.3.0"
+  },
+  "overrides": {
+    "jose": "^4.15.5"
+  }
+}

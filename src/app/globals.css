@@ -1,0 +1,165 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+html {
+  scroll-behavior: smooth;
+}
+
+::selection {
+  background: rgba(59, 130, 246, 0.2);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* ── Print support ────────────────────────────────────────────
+   Two print scenarios exist on the overall results page:
+   1. Printing the merged results TABLE  (.print-area)
+   2. Printing a single student CERTIFICATE (.cert-print)
+
+   When a certificate is open, we must hide the results table and
+   the modal backdrop so only the certificate itself is captured.
+   ─────────────────────────────────────────────────────────────── */
+@media print {
+  /* Ensure background images (like the certificate) are printed */
+  body,
+  .cert-print,
+  .cert-print * {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+loo  /* Make printable areas visible by default. A targeted exam print adds
+     .print-target so only that exam is shown. */
+  .print-area,
+  .print-area *,
+  .cert-print,
+  .cert-print * {
+    visibility: visible;
+  }
+
+  body:has(.print-target) .print-area {
+    display: none !important;
+  }
+
+  body:has(.print-target) .print-target .print-area {
+    display: block !important;
+  }
+
+  body:has(.print-target) .print-target,
+  body:has(.print-target) .print-target * {
+    visibility: visible;
+  }
+
+  /* Default: show the results table */
+  .print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    padding: 0;
+  }
+
+  /* Certificate: full bleed, no margins, no backdrop.
+     Do NOT set background: transparent here — CertificateOverlay
+     applies its background image via inline style and this would
+     wipe it out during print. */
+  .cert-print {
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-area table {
+    font-size: 11px;
+  }
+
+  /* When a certificate modal is open, hide the results table */
+  .cert-print ~ .print-area,
+  .cert-print + .print-area,
+  body:has(.cert-print) .print-area:not(.cert-print) {
+    display: none !important;
+  }
+}

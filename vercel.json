@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/missing-attendance",
+      "schedule": "30 15 * * *"
+    }
+  ]
+}
