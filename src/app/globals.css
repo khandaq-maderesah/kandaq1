@@ -62,6 +62,27 @@ html {
   scroll-behavior: smooth;
 }
 
+/* ── NeonWaveBackground animation ────────────────────────────
+   Slow, subtle horizontal drift so the light ribbons feel alive. */
+.nw-drift-a { animation: nwDriftA 24s ease-in-out infinite alternate; }
+.nw-drift-b { animation: nwDriftB 32s ease-in-out infinite alternate; }
+.nw-drift-c { animation: nwDriftC 28s ease-in-out infinite alternate; }
+.nw-drift-d { animation: nwDriftD 36s ease-in-out infinite alternate; }
+.nw-orb { animation: nwOrb 6s ease-in-out infinite alternate; }
+
+@keyframes nwDriftA { from { transform: translateX(0); }    to { transform: translateX(-48px); } }
+@keyframes nwDriftB { from { transform: translateX(-30px); } to { transform: translateX(30px); } }
+@keyframes nwDriftC { from { transform: translateX(0); }    to { transform: translateX(40px); } }
+@keyframes nwDriftD { from { transform: translateX(24px); }  to { transform: translateX(-24px); } }
+@keyframes nwOrb    { from { opacity: 0.35; }                to { opacity: 0.9; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .nw-drift-a, .nw-drift-b, .nw-drift-c, .nw-drift-d, .nw-orb {
+    animation: none;
+  }
+}
+
+
 ::selection {
   background: rgba(22, 101, 52, 0.2);
 }

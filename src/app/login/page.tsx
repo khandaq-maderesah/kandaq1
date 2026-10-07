@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { sendPasswordResetEmail } from 'firebase/auth'
 import { auth } from '@/lib/firebase/config'
 import { useLogin } from '@/hooks/useAuth'
+import NeonWaveBackground from '@/components/NeonWaveBackground'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -73,8 +74,9 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-700 via-green-600 to-amber-700 p-4">
-      <Card className="w-full max-w-md rounded-2xl border-0 shadow-2xl">
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden p-4" style={{ background: '#0a0518' }}>
+      <NeonWaveBackground />
+      <Card className="relative w-full max-w-md rounded-2xl border-0 shadow-2xl">
         <CardHeader className='space-y-1 pt-8'>
           <div className='mx-auto mb-3 h-16 w-16 overflow-hidden rounded-2xl bg-white shadow-lg ring-2 ring-green-500/20'>
             <Image src='/image/khandaq-logo.png' alt='Khandaq Madresah logo' width={64} height={64} className='h-full w-full object-cover' />

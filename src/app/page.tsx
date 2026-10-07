@@ -2,6 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import type { Metadata } from 'next'
 import { ClipboardCheck, PhoneCall, BarChart3, ArrowRight } from 'lucide-react'
+import NeonWaveBackground from '@/components/NeonWaveBackground'
 
 export const metadata: Metadata = {
   title: 'Home',
@@ -31,10 +32,8 @@ const features = [
 export default function Home() {
   return (
     <main className="min-h-screen bg-slate-50">
-      <section className="relative overflow-hidden bg-gradient-to-br from-green-600 via-green-600 to-amber-700 text-white">
-        <div className="pointer-events-none absolute -top-24 -left-24 h-80 w-80 rounded-full bg-white/10 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-32 -right-16 h-96 w-96 rounded-full bg-white/10 blur-3xl" />
-        <div className="pointer-events-none absolute top-1/3 right-1/4 h-40 w-40 rounded-full bg-green-400/20 blur-2xl" />
+      <section className="relative overflow-hidden text-white">
+        <NeonWaveBackground />
 
         <div className="relative mx-auto max-w-5xl px-6 py-24 text-center">
           <div className="mx-auto mb-6 h-20 w-20 overflow-hidden rounded-2xl shadow-lg ring-2 ring-white/40">
