@@ -93,7 +93,7 @@ export default function TeacherPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <Loader2 className="h-8 w-8 animate-spin text-green-600" />
       </div>
     )
   }
@@ -133,7 +133,7 @@ export default function TeacherPage() {
       {/* KPI cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <Card className="border-0 shadow-md">
-          <div className="bg-gradient-to-br from-indigo-600 to-blue-700 p-5">
+          <div className="bg-gradient-to-br from-green-600 to-green-700 p-5">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-white/90">Total Students</span>
               <div className="rounded-lg bg-white/20 p-2"><Users className="h-5 w-5 text-white" /></div>
@@ -193,7 +193,7 @@ export default function TeacherPage() {
                 type="checkbox"
                 checked={showAllDates}
                 onChange={(e) => setShowAllDates(e.target.checked)}
-                className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
               />
               All dates
             </label>
@@ -255,7 +255,7 @@ export default function TeacherPage() {
                       <td className="py-3 pr-4">{r.date}</td>
                       <td className="py-3 pr-4 font-medium text-gray-900">{r.studentName}</td>
                       <td className="py-3 pr-4">
-                        <span className="inline-flex rounded-md bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-700">
+                        <span className="inline-flex rounded-md bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700">
                           {r.className}
                           {r.section ? ` • ${r.section}` : ''}
                         </span>
@@ -264,7 +264,7 @@ export default function TeacherPage() {
                         {r.parentPhone ? (
                           <a
                             href={`tel:${r.parentPhone}`}
-                            className="inline-flex items-center gap-1.5 rounded-lg bg-blue-50 px-2.5 py-1 font-medium text-blue-700 transition hover:bg-blue-100"
+                            className="inline-flex items-center gap-1.5 rounded-lg bg-green-50 px-2.5 py-1 font-medium text-green-700 transition hover:bg-green-100"
                           >
                             <Phone className="h-3.5 w-3.5" /> {r.parentPhone}
                           </a>
@@ -296,8 +296,8 @@ export default function TeacherPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardContent className="pt-6 flex items-center gap-3">
-            <span className="inline-flex items-center justify-center rounded-lg bg-blue-100 p-2">
-              <Users className="h-5 w-5 text-blue-600" />
+            <span className="inline-flex items-center justify-center rounded-lg bg-green-100 p-2">
+              <Users className="h-5 w-5 text-green-600" />
             </span>
             <div>
               <p className="text-sm text-gray-500">My Classes</p>

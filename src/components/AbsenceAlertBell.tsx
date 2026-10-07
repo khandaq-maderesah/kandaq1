@@ -218,7 +218,7 @@ export function AbsenceAlertBell({
       >
         <Bell className="h-5 w-5" />
         {displayAlerts.length > 0 && (
-          <span className={`absolute -right-1 -top-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white ring-2 ${dark ? 'ring-indigo-700' : 'ring-white'}`}>
+          <span className={`absolute -right-1 -top-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white ring-2 ${dark ? 'ring-green-700' : 'ring-white'}`}>
             {displayAlerts.length}
           </span>
         )}
@@ -301,7 +301,7 @@ export function AbsenceAlertBell({
                   {a.parentPhone ? (
                     <a
                       href={`tel:${a.parentPhone}`}
-                      className="inline-flex items-center gap-1 rounded-lg bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 transition hover:bg-blue-100"
+                      className="inline-flex items-center gap-1 rounded-lg bg-green-50 px-2 py-1 text-xs font-medium text-green-700 transition hover:bg-green-100"
                     >
                       <Phone className="h-3 w-3" /> Call
                     </a>

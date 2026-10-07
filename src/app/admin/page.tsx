@@ -294,7 +294,7 @@ export default function AdminPage() {
 if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <Loader2 className="h-8 w-8 animate-spin text-green-600" />
       </div>
     )
   }
@@ -403,7 +403,7 @@ if (loading) {
           <p className="text-gray-500 mt-1">Overview of students, teachers and attendance</p>
         </div>
         <div className="inline-flex items-center gap-3 self-start md:self-auto rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-600 shadow-sm">
-          <Calendar className="h-4 w-4 text-blue-600" />
+          <Calendar className="h-4 w-4 text-green-600" />
           {new Date().toLocaleDateString(undefined, {
             weekday: 'long',
             year: 'numeric',
@@ -424,7 +424,7 @@ if (loading) {
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <button type="button" className="block w-full text-left" onClick={() => showSection('students')}>
           <div className="group relative rounded-xl shadow-md transition hover:shadow-xl cursor-pointer overflow-hidden ring-0">
-            <div className={`${activeSection === 'students' ? 'ring-4 ring-indigo-300' : ''} bg-gradient-to-br from-indigo-600 to-blue-700 p-5`}>
+            <div className={`${activeSection === 'students' ? 'ring-4 ring-green-300' : ''} bg-gradient-to-br from-green-600 to-green-700 p-5`}>
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-white/90">Total Students</span>
                 <div className="rounded-lg bg-white/20 p-2"><Users className="h-5 w-5 text-white" /></div>
@@ -468,8 +468,8 @@ if (loading) {
           </div>
         </button>
         <button type="button" className="block w-full text-left" onClick={() => showSection('classes')}>
-          <div className={`rounded-xl shadow-md transition hover:shadow-xl cursor-pointer overflow-hidden ring-0 ${activeSection === 'classes' ? 'ring-4 ring-violet-300' : ''}`}>
-            <div className="bg-gradient-to-br from-violet-600 to-purple-800 p-5">
+          <div className={`rounded-xl shadow-md transition hover:shadow-xl cursor-pointer overflow-hidden ring-0 ${activeSection === 'classes' ? 'ring-4 ring-amber-300' : ''}`}>
+            <div className="bg-gradient-to-br from-amber-600 to-amber-800 p-5">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-white/90">Classes</span>
                 <div className="rounded-lg bg-white/20 p-2"><GraduationCap className="h-5 w-5 text-white" /></div>
@@ -497,12 +497,12 @@ if (loading) {
           <CardHeader className="space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <CardTitle className="flex items-center gap-2 text-lg">
-                <span className="inline-flex items-center justify-center rounded-lg bg-indigo-100 p-2">
-                  <Users className="h-5 w-5 text-indigo-600" />
+                <span className="inline-flex items-center justify-center rounded-lg bg-green-100 p-2">
+                  <Users className="h-5 w-5 text-green-600" />
                 </span>
                 Student List
               </CardTitle>
-              <span className="rounded-full bg-indigo-100 px-3 py-1 text-xs font-medium text-indigo-700">
+              <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
                 {filteredStudents.length} students
               </span>
             </div>
@@ -536,7 +536,7 @@ if (loading) {
                       <tr
                         key={s.id}
                         onClick={() => setViewStudent(s)}
-                        className="cursor-pointer hover:bg-indigo-50/60"
+                        className="cursor-pointer hover:bg-green-50/60"
                       >
                         <td className="p-3">
                           <StudentAvatar photoUrl={s.photoUrl} studentId={s.id} name={s.name} size="sm" />
@@ -619,12 +619,12 @@ if (loading) {
           <CardHeader className="space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <CardTitle className="flex items-center gap-2 text-lg">
-                <span className="inline-flex items-center justify-center rounded-lg bg-violet-100 p-2">
-                  <GraduationCap className="h-5 w-5 text-violet-600" />
+                <span className="inline-flex items-center justify-center rounded-lg bg-amber-100 p-2">
+                  <GraduationCap className="h-5 w-5 text-amber-600" />
                 </span>
                 Classes
               </CardTitle>
-              <span className="rounded-full bg-violet-100 px-3 py-1 text-xs font-medium text-violet-700">
+              <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-700">
                 {filteredClasses.length} classes
               </span>
             </div>
@@ -655,7 +655,7 @@ if (loading) {
                     const teacher = usersAll.find((u: any) => u.uid === c.teacherId)
                     const count = studentsAll.filter((s: any) => s.classId === c.id).length
                     return (
-                      <tr key={c.id} className="hover:bg-violet-50/60">
+                      <tr key={c.id} className="hover:bg-amber-50/60">
                         <td className="p-3 font-medium text-gray-900">
                           {c.name}
                           {c.isActive === false ? ' (inactive)' : ''}
@@ -688,7 +688,7 @@ if (loading) {
                   type="checkbox"
                   checked={showAllDates}
                   onChange={(e) => setShowAllDates(e.target.checked)}
-                  className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                  className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
                 />
                 All dates
               </label>
@@ -780,14 +780,14 @@ if (loading) {
                       <td className="py-3 pr-4">{r.date}</td>
                       <td className="py-3 pr-4 font-medium text-gray-900">{r.studentName}</td>
                       <td className="py-3 pr-4">
-                        <span className="inline-flex rounded-md bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-700">{r.className}</span>
+                        <span className="inline-flex rounded-md bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700">{r.className}</span>
                       </td>
                       <td className="py-3 pr-4">{r.section || '—'}</td>
                       <td className="py-3">
                         {r.parentPhone !== '—' ? (
                           <a
                             href={`tel:${r.parentPhone}`}
-                            className="inline-flex items-center gap-1.5 rounded-lg bg-blue-50 px-2.5 py-1 font-medium text-blue-700 transition hover:bg-blue-100"
+                            className="inline-flex items-center gap-1.5 rounded-lg bg-green-50 px-2.5 py-1 font-medium text-green-700 transition hover:bg-green-100"
                           >
                             <Phone className="h-3.5 w-3.5" /> {r.parentPhone}
                           </a>
@@ -829,7 +829,7 @@ if (loading) {
 
 <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Bar chart: Male / Female per class */}
-        <Card className="border-0 shadow-md bg-gradient-to-br from-indigo-50 to-indigo-100/70">
+        <Card className="border-0 shadow-md bg-gradient-to-br from-green-50 to-green-100/70">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">Students by Class</CardTitle>
             <CardDescription>Male vs Female students per class</CardDescription>
@@ -923,7 +923,7 @@ if (loading) {
             )}
           </CardContent>
         </Card>
-<Card className="border-0 shadow-md bg-gradient-to-br from-violet-50 to-violet-100/70">
+<Card className="border-0 shadow-md bg-gradient-to-br from-amber-50 to-amber-100/70">
           <CardHeader className="space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <CardTitle className="text-lg">Student Status</CardTitle>
@@ -970,7 +970,7 @@ if (loading) {
                             <p className="text-green-600">Present: {present}</p>
                             <p className="text-red-600">Absent: {absent}</p>
                             <p className="text-amber-600">Late: {late}</p>
-                            <p className="text-violet-600">Excused: {excused}</p>
+                            <p className="text-amber-600">Excused: {excused}</p>
                             <p className="mt-1 border-t border-gray-100 pt-1 font-medium text-gray-700">
                               Total: {present + absent + late + excused}
                             </p>

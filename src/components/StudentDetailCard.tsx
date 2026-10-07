@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useEffect, useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
@@ -66,7 +66,7 @@ function statusBadgeClasses(status: string) {
     case 'late':
       return 'bg-amber-100 text-amber-700'
     case 'excused':
-      return 'bg-blue-100 text-blue-700'
+      return 'bg-green-100 text-green-700'
     default:
       return 'bg-gray-100 text-gray-600'
   }
@@ -208,7 +208,7 @@ export function StudentDetailCard({ student, classes = [], users, onClose, onEdi
           />
         </div>
       )}
-      <CardHeader className="relative rounded-t-xl bg-gradient-to-r from-indigo-600 to-blue-600 text-white">
+      <CardHeader className="relative rounded-t-xl bg-gradient-to-r from-green-700 to-emerald-800 text-white">
         {onClose && (
           <button
             type="button"
@@ -238,7 +238,7 @@ export function StudentDetailCard({ student, classes = [], users, onClose, onEdi
           )}
           <div>
             <CardTitle className="text-2xl">{student.name}</CardTitle>
-            <p className="mt-1 text-sm text-indigo-100">
+            <p className="mt-1 text-sm text-green-100">
               {classLabel || 'Class not assigned'}
               {student.rollNumber ? ` • Roll ${student.rollNumber}` : ''}
             </p>
@@ -262,7 +262,7 @@ export function StudentDetailCard({ student, classes = [], users, onClose, onEdi
           <Field label="Section" value={student.section || cls?.section} />
           <Field label="Student ID" value={student.id} />
         </div>
-        <h3 className="mt-6 border-t border-gray-100 pt-4 text-xs font-semibold uppercase tracking-wide text-indigo-600">
+        <h3 className="mt-6 border-t border-gray-100 pt-4 text-xs font-semibold uppercase tracking-wide text-green-600">
           Phone
         </h3>
         <div className="mt-3 grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3">
@@ -270,7 +270,7 @@ export function StudentDetailCard({ student, classes = [], users, onClose, onEdi
             <dt className="text-xs font-medium uppercase tracking-wide text-gray-400">Parent Phone</dt>
             <dd className="mt-1 text-sm text-gray-800">
               {student.parentPhone ? (
-                <a href={`tel:${student.parentPhone}`} className="inline-flex items-center gap-1 font-medium text-blue-600 hover:underline">
+                <a href={`tel:${student.parentPhone}`} className="inline-flex items-center gap-1 font-medium text-green-600 hover:underline">
                   <Phone className="h-3.5 w-3.5" /> {student.parentPhone}
                 </a>
               ) : (
@@ -292,7 +292,7 @@ export function StudentDetailCard({ student, classes = [], users, onClose, onEdi
           </div>
         </div>
 
-        <h3 className="mt-6 border-t border-gray-100 pt-4 text-xs font-semibold uppercase tracking-wide text-indigo-600">
+        <h3 className="mt-6 border-t border-gray-100 pt-4 text-xs font-semibold uppercase tracking-wide text-green-600">
           Registration
         </h3>
         <div className="mt-3 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-3">
@@ -301,7 +301,7 @@ export function StudentDetailCard({ student, classes = [], users, onClose, onEdi
           <Field label="Created By" value={creatorLabel(student, cls, users)} />
         </div>
 
-        <h3 className="mt-6 border-t border-gray-100 pt-4 text-xs font-semibold uppercase tracking-wide text-indigo-600">
+        <h3 className="mt-6 border-t border-gray-100 pt-4 text-xs font-semibold uppercase tracking-wide text-green-600">
           Attendance History
         </h3>
 
@@ -406,7 +406,7 @@ export function StudentDetailCard({ student, classes = [], users, onClose, onEdi
                             <CalendarDays className="h-3.5 w-3.5 shrink-0 text-gray-400" />
                             {formatDate(r.date)}
                           </div>
-                          <div className="text-xs font-medium text-indigo-600">
+                          <div className="text-xs font-medium text-green-600">
                             {ethiopianDateLabel(r.date) || '—'} <span className="text-gray-400">(Ethiopian)</span>
                           </div>
                         </div>

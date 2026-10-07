@@ -156,7 +156,7 @@ export default function AdminExamsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <Loader2 className="h-8 w-8 animate-spin text-green-600" />
       </div>
     )
   }
@@ -214,7 +214,7 @@ export default function AdminExamsPage() {
                       ) : (
                         <ChevronDown className="h-4 w-4 text-gray-400" />
                       )}
-                      <FileText className="h-4 w-4 text-indigo-600" />
+                      <FileText className="h-4 w-4 text-green-600" />
                       <span className="font-medium text-gray-900">{e.title}</span>
                       <span className="text-xs text-slate-500">{EXAM_TYPE_LABELS[e.type]}</span>
                       <span className="text-xs text-slate-400">

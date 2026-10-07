@@ -140,7 +140,7 @@ export default function ClassesPage() {
 if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <Loader2 className="h-8 w-8 animate-spin text-green-600" />
       </div>
     )
   }
@@ -254,7 +254,7 @@ if (loading) {
                             type="button"
                             onClick={() => setStudentsOfClass(c)}
                             title="View students in this class"
-                            className="inline-flex items-center gap-1 rounded-lg bg-blue-50 px-2.5 py-1 font-medium text-blue-700 transition hover:bg-blue-100"
+                            className="inline-flex items-center gap-1 rounded-lg bg-green-50 px-2.5 py-1 font-medium text-green-700 transition hover:bg-green-100"
                           >
                             <Users className="h-3.5 w-3.5" /> {count}
                           </button>
@@ -299,7 +299,7 @@ if (loading) {
                 <X className="h-5 w-5" />
               </button>
               <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-indigo-600" /> {studentsOfClass.name} — Students ({classStudents.length})
+                <Users className="h-5 w-5 text-green-600" /> {studentsOfClass.name} — Students ({classStudents.length})
               </CardTitle>
               <CardDescription>
                 {studentsOfClass.academicYear} • {studentsOfClass.section || 'No section'} •{' '}

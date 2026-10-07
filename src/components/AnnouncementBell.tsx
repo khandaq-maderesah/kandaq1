@@ -214,13 +214,13 @@ export function AnnouncementBell({ dark = true }: { dark?: boolean }) {
         title="Announcements"
         className={`relative inline-flex h-9 w-9 items-center justify-center rounded-full shadow-sm transition ${
           dark
-            ? 'bg-white/15 text-white hover:bg-white hover:text-indigo-600'
+            ? 'bg-white/15 text-white hover:bg-white hover:text-green-600'
             : 'border border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
         }`}
       >
         <Megaphone className="h-4 w-4" />
         {count > 0 && (
-          <span className="absolute -right-1 -top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-indigo-600 px-1 text-[10px] font-bold text-white">
+          <span className="absolute -right-1 -top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-green-600 px-1 text-[10px] font-bold text-white">
             {count}
           </span>
         )}
@@ -229,8 +229,8 @@ export function AnnouncementBell({ dark = true }: { dark?: boolean }) {
       {open && (
         <div className="fixed right-2 top-16 z-50 w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-2xl">
           <div className="flex items-center gap-2 border-b border-gray-100 bg-gray-50 px-4 py-3">
-            <span className="inline-flex items-center justify-center rounded-lg bg-indigo-100 p-1.5">
-              <Megaphone className="h-4 w-4 text-indigo-600" />
+            <span className="inline-flex items-center justify-center rounded-lg bg-green-100 p-1.5">
+              <Megaphone className="h-4 w-4 text-green-600" />
             </span>
             <div>
               <p className="text-sm font-semibold text-gray-900">Announcements</p>
@@ -258,7 +258,7 @@ export function AnnouncementBell({ dark = true }: { dark?: boolean }) {
                     <p className="text-sm font-semibold text-gray-900">{a.title}</p>
                     <span className="flex items-center gap-2">
                       {a.audience && a.audience !== 'everyone' && (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2 py-0.5 text-[10px] font-medium text-indigo-600">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 text-[10px] font-medium text-green-600">
                           {a.audience === 'teachers' ? (
                             <GraduationCap className="h-3 w-3" />
                           ) : (
@@ -295,7 +295,7 @@ export function AnnouncementBell({ dark = true }: { dark?: boolean }) {
                           className="inline-flex items-center gap-2 rounded-md border border-gray-200 bg-gray-50 px-2 py-1.5 text-xs text-gray-700 hover:bg-gray-100"
                         >
                           {attachment.type === 'image' ? (
-                            <ImageIcon className="h-3.5 w-3.5 text-indigo-600" />
+                            <ImageIcon className="h-3.5 w-3.5 text-green-600" />
                           ) : (
                             <FileText className="h-3.5 w-3.5 text-gray-500" />
                           )}
@@ -324,7 +324,7 @@ export function AnnouncementBell({ dark = true }: { dark?: boolean }) {
                   setError('')
                 }}
                 placeholder="Announcement title"
-                className="h-9 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                className="h-9 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
               />
               <textarea
                 value={message}
@@ -334,7 +334,7 @@ export function AnnouncementBell({ dark = true }: { dark?: boolean }) {
                 }}
                 rows={2}
                 placeholder="Write the message..."
-                className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 resize-y"
+                className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 resize-y"
               />
 
               {attachments.length > 0 && (
@@ -347,7 +347,7 @@ export function AnnouncementBell({ dark = true }: { dark?: boolean }) {
                         className="inline-flex items-center gap-2 rounded-md border border-gray-200 bg-gray-50 px-2 py-1 text-[11px] text-gray-700"
                       >
                         {attachment.type === 'image' ? (
-                          <ImageIcon className="h-3.5 w-3.5 text-indigo-600" />
+                          <ImageIcon className="h-3.5 w-3.5 text-green-600" />
                         ) : (
                           <FileText className="h-3.5 w-3.5 text-gray-500" />
                         )}
@@ -378,7 +378,7 @@ export function AnnouncementBell({ dark = true }: { dark?: boolean }) {
                         onClick={() => setAudience(opt)}
                         className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium transition ${
                           audience === opt
-                            ? 'bg-indigo-600 text-white'
+                            ? 'bg-green-600 text-white'
                             : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                         }`}
                       >

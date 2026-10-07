@@ -121,7 +121,7 @@ export function InstallAppPrompt() {
               <button
                 type="button"
                 onClick={() => setShowIosHints(true)}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-700"
               >
                 <Share className="h-4 w-4" /> How to add to home screen
               </button>
@@ -129,7 +129,7 @@ export function InstallAppPrompt() {
               <ol className="space-y-1.5 text-xs text-slate-600">
                 {IOS_HINTS.map((hint, i) => (
                   <li key={i} className="flex gap-2">
-                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-[10px] font-bold text-indigo-700">
+                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green-100 text-[10px] font-bold text-green-700">
                       {i + 1}
                     </span>
                     {hint}
@@ -143,7 +143,7 @@ export function InstallAppPrompt() {
             <button
               type="button"
               onClick={handleInstall}
-              className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700"
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-700"
             >
               <Smartphone className="h-4 w-4" /> Install App
             </button>

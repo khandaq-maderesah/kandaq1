@@ -317,7 +317,7 @@ export function CertificateOverlay({
            Approx: top 26–30%, right 2–5%, width 52–55% — adjust to align —
       ═══════════════════════════════════════════════════════════ */}
       <div
-        className={cn('absolute top-[30%] right-[5%] w-[52%]', dbg('bg-blue-500/20'))}
+        className={cn('absolute top-[30%] right-[5%] w-[52%]', dbg('bg-green-500/20'))}
       >
         <div className="grid grid-cols-[0.9fr_1.5fr_repeat(4,_1fr)] gap-y-[2.2%] text-xs font-medium text-gray-800">
           {grades.map((g) => (
@@ -394,7 +394,7 @@ export function CertificateOverlay({
       <div
         className={cn(
           'absolute top-[15%] left-[5%] w-[30%]',
-          dbg('bg-purple-500/20')
+          dbg('bg-amber-500/20')
         )}
       >
         <table className="w-full text-[11px] font-medium text-gray-800">

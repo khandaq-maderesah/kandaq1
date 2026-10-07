@@ -73,10 +73,10 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-700 via-blue-600 to-purple-700 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-700 via-green-600 to-amber-700 p-4">
       <Card className="w-full max-w-md rounded-2xl border-0 shadow-2xl">
         <CardHeader className='space-y-1 pt-8'>
-          <div className='mx-auto mb-3 h-16 w-16 overflow-hidden rounded-2xl bg-white shadow-lg ring-2 ring-indigo-500/20'>
+          <div className='mx-auto mb-3 h-16 w-16 overflow-hidden rounded-2xl bg-white shadow-lg ring-2 ring-green-500/20'>
             <Image src='/image/khandaq-logo.png' alt='Khandaq Madresah logo' width={64} height={64} className='h-full w-full object-cover' />
           </div>
           <CardTitle className="text-2xl font-bold text-center">
@@ -139,7 +139,7 @@ export default function LoginPage() {
                       setResetMsg('')
                       setResetError('')
                     }}
-                    className="text-blue-600 hover:underline"
+                    className="text-green-600 hover:underline"
                   >
                     Back to sign in
                   </button>
@@ -175,7 +175,7 @@ export default function LoginPage() {
                     <button
                       type="button"
                       onClick={() => setForgotMode(true)}
-                      className="text-sm text-blue-600 hover:underline"
+                      className="text-sm text-green-600 hover:underline"
                     >
                       Forgot password?
                     </button>

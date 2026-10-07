@@ -194,7 +194,7 @@ export default function TeacherClassesPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <Loader2 className="h-8 w-8 animate-spin text-green-600" />
       </div>
     )
   }
@@ -237,7 +237,7 @@ export default function TeacherClassesPage() {
                 return (
                   <Card key={c.id}>
                     <CardHeader>
-                      <div className="w-12 h-12 rounded-lg bg-blue-500 flex items-center justify-center mb-4">
+                      <div className="w-12 h-12 rounded-lg bg-green-500 flex items-center justify-center mb-4">
                         <GraduationCap className="h-6 w-6 text-white" />
                       </div>
                       <CardTitle>{c.name}</CardTitle>
@@ -262,8 +262,8 @@ export default function TeacherClassesPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
-                  <span className="inline-flex items-center justify-center rounded-lg bg-indigo-100 p-2">
-                    {editingId ? <Pencil className="h-5 w-5 text-indigo-600" /> : <UserPlus className="h-5 w-5 text-indigo-600" />}
+                  <span className="inline-flex items-center justify-center rounded-lg bg-green-100 p-2">
+                    {editingId ? <Pencil className="h-5 w-5 text-green-600" /> : <UserPlus className="h-5 w-5 text-green-600" />}
                   </span>
                   {editingId ? 'Edit Student' : 'Register Student'}
                 </CardTitle>
@@ -400,8 +400,8 @@ export default function TeacherClassesPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
-                  <span className="inline-flex items-center justify-center rounded-lg bg-indigo-100 p-2">
-                    <Users className="h-5 w-5 text-indigo-600" />
+                  <span className="inline-flex items-center justify-center rounded-lg bg-green-100 p-2">
+                    <Users className="h-5 w-5 text-green-600" />
                   </span>
                   Registered Students
                   <span className="text-sm font-normal text-gray-500">

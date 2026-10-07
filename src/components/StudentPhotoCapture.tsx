@@ -128,7 +128,7 @@ export function StudentPhotoCapture({ value, onChange }: StudentPhotoCaptureProp
             <img
               src={value}
               alt="Captured student photo"
-              className="h-20 w-20 shrink-0 rounded-full object-cover ring-2 ring-indigo-200"
+              className="h-20 w-20 shrink-0 rounded-full object-cover ring-2 ring-green-200"
             />
             <div className="flex flex-col gap-1.5">
               <Button type="button" variant="outline" size="sm" onClick={() => startCamera(facing)}>
@@ -172,8 +172,8 @@ export function StudentPhotoCapture({ value, onChange }: StudentPhotoCaptureProp
           </>
         ) : (
           <>
-            <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full border-2 border-dashed border-indigo-200 bg-indigo-50">
-              <Camera className="h-7 w-7 text-indigo-400" />
+            <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full border-2 border-dashed border-green-200 bg-green-50">
+              <Camera className="h-7 w-7 text-green-400" />
             </div>
             <div className="flex flex-col gap-1.5">
               <Button

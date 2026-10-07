@@ -204,7 +204,7 @@ export default function TeachersPage() {
 if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <Loader2 className="h-8 w-8 animate-spin text-green-600" />
       </div>
     )
   }
@@ -297,7 +297,7 @@ if (loading) {
                                 checked ? prev.filter((x) => x !== c.id) : [...prev, c.id]
                               )
                             }
-                            className="h-4 w-4 rounded border-gray-300 text-indigo-600"
+                            className="h-4 w-4 rounded border-gray-300 text-green-600"
                           />
                           {c.name}
                           {c.section ? ` • ${c.section}` : ''}
@@ -364,7 +364,7 @@ if (loading) {
                       <td className="py-3 pr-4">
                         <span
                           className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
-                            t.role === 'admin' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'
+                            t.role === 'admin' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
                           }`}
                         >
                           {t.role}
@@ -456,7 +456,7 @@ if (loading) {
                               checked ? prev.filter((id) => id !== c.id) : [...prev, c.id]
                             )
                           }
-                          className="h-4 w-4 rounded border-gray-300 text-indigo-600"
+                          className="h-4 w-4 rounded border-gray-300 text-green-600"
                         />
                         <span>
                           {c.name}

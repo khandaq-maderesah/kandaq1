@@ -74,7 +74,7 @@ export default function TeacherStudentsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <Loader2 className="h-8 w-8 animate-spin text-green-600" />
       </div>
     )
   }
@@ -96,11 +96,11 @@ export default function TeacherStudentsPage() {
         <CardHeader className="space-y-3">
           <div className="flex flex-col sm:flex-row sm:items-center sm:gap-3">
             <CardTitle className="flex items-center gap-2 text-lg">
-              <span className="inline-flex items-center justify-center rounded-lg bg-indigo-100 p-2">
-                <Users className="h-5 w-5 text-indigo-600" />
+              <span className="inline-flex items-center justify-center rounded-lg bg-green-100 p-2">
+                <Users className="h-5 w-5 text-green-600" />
               </span>
               Student List
-              <span className="rounded-full bg-indigo-100 px-2.5 py-0.5 text-sm font-semibold text-indigo-600">
+              <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-sm font-semibold text-green-600">
                 {filtered.length}
               </span>
             </CardTitle>
@@ -165,7 +165,7 @@ export default function TeacherStudentsPage() {
                           <button
                             type="button"
                             onClick={() => setViewingStudent(s)}
-                            className="text-left font-medium text-gray-900 cursor-pointer hover:text-indigo-600 hover:underline"
+                            className="text-left font-medium text-gray-900 cursor-pointer hover:text-green-600 hover:underline"
                           >
                             {s.name}
                           </button>
@@ -173,7 +173,7 @@ export default function TeacherStudentsPage() {
                         <td className="py-3 pr-4">{s.rollNumber || '—'}</td>
                         <td className="py-3 pr-4">{s.age ?? '—'}</td>
                         <td className="py-3 pr-4">
-                          <span className="inline-flex rounded-md bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-700">
+                          <span className="inline-flex rounded-md bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700">
                             {cls?.name || s.className || '—'}
                             {cls?.section ? ` • ${cls.section}` : ''}
                           </span>
@@ -183,7 +183,7 @@ export default function TeacherStudentsPage() {
                           {s.parentPhone ? (
                             <a
                               href={`tel:${s.parentPhone}`}
-                              className="inline-flex items-center gap-1.5 rounded-lg bg-blue-50 px-2.5 py-1 font-medium text-blue-700 transition hover:bg-blue-100"
+                              className="inline-flex items-center gap-1.5 rounded-lg bg-green-50 px-2.5 py-1 font-medium text-green-700 transition hover:bg-green-100"
                             >
                               <Phone className="h-3.5 w-3.5" /> {s.parentPhone}
                             </a>

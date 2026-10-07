@@ -47,12 +47,12 @@ export function generateSmsMessage(
     const oromoSubjectName = isVowel ? `${latinName}n` : latinName
 
     return isFemale
-      ? `Madarasaa Ansaar irraa\n\nKabajamtoota maatii barattuu ${latinName}, guyyaa har'aa ${oromoSubjectName} madarasaa akka hin dhufne isin beeksifna.`
-      : `Madarasaa Ansaar irraa\n\nKabajamtoota maatii barataa ${latinName}, guyyaa har'aa ${oromoSubjectName} madarasaa akka hin dhufne isin beeksifna.`
+      ? `Madarasaa Khandaq irraa\n\nKabajamtoota maatii barattuu ${latinName}, guyyaa har'aa ${oromoSubjectName} madarasaa akka hin dhufne isin beeksifna.`
+      : `Madarasaa Khandaq irraa\n\nKabajamtoota maatii barataa ${latinName}, guyyaa har'aa ${oromoSubjectName} madarasaa akka hin dhufne isin beeksifna.`
   }
 
   // Default language: Amharic (the name is used as-is, no suffix rule)
   return isFemale
-    ? `ከአንሳር መድረሳ\n\nየተከበራችሁ የ${studentName} ወላጆች፣ ዛሬ ${studentName} መድረሳ አለመምጣቷን እናሳውቃለን።`
-    : `ከአንሳር መድረሳ\n\nየተከበራችሁ የ${studentName} ወላጆች፣ ዛሬ ${studentName} መድረሳ አለመምጣቱን እናሳውቃለን።`
+    ? `ከ ኸንደቅ መድረሳ\n\nየተከበራችሁ የ${studentName} ወላጆች፣ ዛሬ ${studentName} መድረሳ አለመምጣቷን እናሳውቃለን።`
+    : `ከ ኸንደቅ መድረሳ\n\nየተከበራችሁ የ${studentName} ወላጆች፣ ዛሬ ${studentName} መድረሳ አለመምጣቱን እናሳውቃለን።`
 }

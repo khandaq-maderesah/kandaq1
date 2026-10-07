@@ -124,7 +124,7 @@ export default function TeacherAttendancePage() {
 if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <Loader2 className="h-8 w-8 animate-spin text-green-600" />
       </div>
     )
   }
@@ -185,7 +185,7 @@ if (loading) {
         </Card>
       ) : loadingStudents ? (
         <div className="flex items-center justify-center h-48">
-          <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+          <Loader2 className="h-8 w-8 animate-spin text-green-600" />
         </div>
       ) : students.length === 0 ? (
         <Card>
@@ -267,8 +267,8 @@ if (loading) {
                               onClick={() => setStatus(s.id, 'excused')}
                               className={`inline-flex items-center gap-1 px-3 py-1 rounded-md text-xs font-medium border ${
                                 status === 'excused'
-                                  ? 'bg-violet-500 text-white border-violet-500'
-                                  : 'bg-white text-violet-600 border-violet-300 hover:bg-violet-50'
+                                  ? 'bg-amber-500 text-white border-amber-500'
+                                  : 'bg-white text-amber-600 border-amber-300 hover:bg-amber-50'
                               }`}
                             >
                               <ShieldCheck className="h-3.5 w-3.5" /> Excused

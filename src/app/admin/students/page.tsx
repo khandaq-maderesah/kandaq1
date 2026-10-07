@@ -505,7 +505,7 @@ export default function StudentsPage() {
 if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <Loader2 className="h-8 w-8 animate-spin text-green-600" />
       </div>
     )
   }
@@ -690,7 +690,7 @@ if (loading) {
             </div>
           </div>
           <CardDescription className="flex items-start gap-2">
-            <Info className="mt-0.5 h-4 w-4 shrink-0 text-indigo-500" />
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-green-500" />
             <span>
               CSV columns: <b>Name, Roll Number, Gender, Age, Class Name, Section, Parent Phone, Alternative Phone</b>.
               Roll numbers and blank ages are auto-filled. Imports only <b>add</b> students — existing data is never
@@ -882,7 +882,7 @@ if (loading) {
                           <button
                             type="button"
                             onClick={() => setViewingStudent(s)}
-                            className="text-left font-medium text-gray-900 cursor-pointer hover:text-indigo-600 hover:underline"
+                            className="text-left font-medium text-gray-900 cursor-pointer hover:text-green-600 hover:underline"
                           >
                             {s.name}
                           </button>
@@ -895,7 +895,7 @@ if (loading) {
                         {s.parentPhone ? (
                           <a
                             href={`tel:${s.parentPhone}`}
-                            className="inline-flex items-center gap-1.5 rounded-lg bg-blue-50 px-2.5 py-1 font-medium text-blue-700 transition hover:bg-blue-100"
+                            className="inline-flex items-center gap-1.5 rounded-lg bg-green-50 px-2.5 py-1 font-medium text-green-700 transition hover:bg-green-100"
                           >
                             <Phone className="h-3.5 w-3.5" /> {s.parentPhone}
                           </a>

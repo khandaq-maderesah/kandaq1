@@ -39,7 +39,7 @@ export function TeacherNav() {
   ]
 
   return (
-    <nav className="bg-gradient-to-r from-sky-100 via-blue-100 to-indigo-100 border-b border-blue-200 shadow-sm sticky top-0 z-30">
+    <nav className="bg-gradient-to-r from-green-100 via-emerald-100 to-amber-100 border-b border-green-200 shadow-sm sticky top-0 z-30">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           {/* Logo/Brand */}
@@ -63,7 +63,7 @@ export function TeacherNav() {
                   className={cn(
                     'flex items-center space-x-1 whitespace-nowrap px-3 py-2 rounded-md text-sm font-medium transition-colors',
                     isActive
-                      ? 'bg-blue-50 text-blue-600'
+                      ? 'bg-green-50 text-green-600'
                       : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                   )}
                 >
@@ -105,7 +105,7 @@ export function TeacherNav() {
                   className={cn(
                     'flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium',
                     isActive
-                      ? 'bg-blue-50 text-blue-600'
+                      ? 'bg-green-50 text-green-600'
                       : 'text-gray-600 hover:bg-gray-50'
                   )}
                 >

@@ -8,7 +8,7 @@ export default function Error({ reset }: { reset: () => void }) {
       <p className="mt-2 text-gray-500">An unexpected error occurred. Please try again.</p>
       <button
         onClick={reset}
-        className="mt-6 inline-flex items-center rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700"
+        className="mt-6 inline-flex items-center rounded-lg bg-green-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-green-700"
       >
         Try again
       </button>

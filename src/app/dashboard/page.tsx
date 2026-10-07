@@ -25,7 +25,7 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
       </div>
     )
   }
@@ -37,7 +37,7 @@ export default function DashboardPage() {
   if (isAdmin) {
     return (
       <div className="flex items-center justify-center h-96">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
       </div>
     )
   }
@@ -52,7 +52,7 @@ export default function DashboardPage() {
       description: 'Add and manage teacher accounts',
       icon: Users,
       href: '/admin/teachers',
-      color: 'bg-blue-500'
+      color: 'bg-green-500'
     },
     {
       title: 'Manage Classes',
@@ -66,7 +66,7 @@ export default function DashboardPage() {
       description: 'Register and manage students',
       icon: Users,
       href: '/admin/students',
-      color: 'bg-purple-500'
+      color: 'bg-amber-500'
     },
     {
       title: 'View Attendance',
@@ -81,7 +81,7 @@ export default function DashboardPage() {
       description: 'View your assigned classes',
       icon: GraduationCap,
       href: '/teacher/classes',
-      color: 'bg-blue-500'
+      color: 'bg-green-500'
     },
     {
       title: 'Take Attendance',
@@ -95,7 +95,7 @@ export default function DashboardPage() {
       description: 'View past attendance records',
       icon: Calendar,
       href: '/teacher/history',
-      color: 'bg-purple-500'
+      color: 'bg-amber-500'
     }
   ]
 

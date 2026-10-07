@@ -100,7 +100,7 @@ export default function ProfilePage() {
   if (loading || !user) {
     return (
       <div className="flex items-center justify-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <Loader2 className="h-8 w-8 animate-spin text-green-600" />
       </div>
     )
   }
@@ -139,7 +139,7 @@ export default function ProfilePage() {
               <p className="text-sm font-medium text-gray-500">Role</p>
               <p className="flex items-center gap-2">
                 <Shield className="h-4 w-4 text-gray-400" />
-                <span className="capitalize inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                <span className="capitalize inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">
                   {user.role}
                 </span>
               </p>

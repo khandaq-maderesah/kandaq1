@@ -153,7 +153,7 @@ export default function ReportsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <Loader2 className="h-8 w-8 animate-spin text-green-600" />
       </div>
     )
   }
@@ -303,7 +303,7 @@ export default function ReportsPage() {
                         <div title={`Present ${d.present}`} className="w-3 rounded-t bg-green-500" style={{ height: `${(d.present / max) * 100}%` }} />
                         <div title={`Late ${d.late}`} className="w-3 rounded-t bg-amber-500" style={{ height: `${(d.late / max) * 100}%` }} />
                         <div title={`Absent ${d.absent}`} className="w-3 rounded-t bg-red-500" style={{ height: `${(d.absent / max) * 100}%` }} />
-                        <div title={`Excused ${d.excused}`} className="w-3 rounded-t bg-violet-500" style={{ height: `${(d.excused / max) * 100}%` }} />
+                        <div title={`Excused ${d.excused}`} className="w-3 rounded-t bg-amber-500" style={{ height: `${(d.excused / max) * 100}%` }} />
                       </div>
                       <span className="text-xs text-gray-500">{d.date.slice(5)}</span>
                     </div>
@@ -314,7 +314,7 @@ export default function ReportsPage() {
                 <span className="flex items-center gap-2"><span className="h-3 w-3 rounded-full bg-green-500" /> Present</span>
                 <span className="flex items-center gap-2"><span className="h-3 w-3 rounded-full bg-amber-500" /> Late</span>
                 <span className="flex items-center gap-2"><span className="h-3 w-3 rounded-full bg-red-500" /> Absent</span>
-                <span className="flex items-center gap-2"><span className="h-3 w-3 rounded-full bg-violet-500" /> Excused</span>
+                <span className="flex items-center gap-2"><span className="h-3 w-3 rounded-full bg-amber-500" /> Excused</span>
               </div>
               </>
             )}
@@ -353,7 +353,7 @@ export default function ReportsPage() {
                       <td className="py-3 pr-4 text-green-700">{r.present}</td>
                       <td className="py-3 pr-4 text-red-700">{r.absent}</td>
                       <td className="py-3 pr-4 text-amber-700">{r.late}</td>
-                      <td className="py-3 pr-4 text-violet-700">{r.excused}</td>
+                      <td className="py-3 pr-4 text-amber-700">{r.excused}</td>
                       <td className="py-3 pr-4">{r.total}</td>
                       <td className="py-3">
                         <span

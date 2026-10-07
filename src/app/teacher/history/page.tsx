@@ -45,7 +45,7 @@ export default function TeacherHistoryPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <Loader2 className="h-8 w-8 animate-spin text-green-600" />
       </div>
     )
   }
@@ -150,7 +150,7 @@ export default function TeacherHistoryPage() {
                               : r.status === 'late'
                               ? 'bg-yellow-100 text-yellow-700 border-yellow-300'
                               : r.status === 'excused'
-                              ? 'bg-violet-100 text-violet-700 border-violet-300'
+                              ? 'bg-amber-100 text-amber-700 border-amber-300'
                               : 'bg-red-100 text-red-700 border-red-300'
                           }`}
                         >

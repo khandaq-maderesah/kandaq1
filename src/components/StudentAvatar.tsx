@@ -44,8 +44,8 @@ export function StudentAvatar({
     )
   }
   return (
-    <div className={`${box} shrink-0 flex items-center justify-center rounded-full bg-indigo-100`}>
-      <User2 className={size === 'lg' ? 'h-10 w-10 text-indigo-300' : 'h-5 w-5 text-indigo-500'} />
+    <div className={`${box} shrink-0 flex items-center justify-center rounded-full bg-green-100`}>
+      <User2 className={size === 'lg' ? 'h-10 w-10 text-green-300' : 'h-5 w-5 text-green-500'} />
     </div>
   )
 }

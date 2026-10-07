@@ -152,7 +152,7 @@ export default function CreateExamPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <Loader2 className="h-8 w-8 animate-spin text-green-600" />
       </div>
     )
   }
@@ -239,7 +239,7 @@ export default function CreateExamPage() {
                               type="checkbox"
                               checked={s.on}
                               onChange={(e) => updateSubject(i, { on: e.target.checked })}
-                              className="h-4 w-4 accent-indigo-600"
+                              className="h-4 w-4 accent-green-600"
                             />
                             <CheckSquare className="h-4 w-4 text-gray-400" />
                             <span className="font-medium text-gray-800">{s.name}</span>

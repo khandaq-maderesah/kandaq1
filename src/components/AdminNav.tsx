@@ -41,7 +41,7 @@ export function AdminNav() {
   ]
 
   return (
-    <nav className="bg-gradient-to-r from-indigo-700 via-blue-700 to-purple-700 shadow-lg sticky top-0 z-30">
+    <nav className="bg-gradient-to-r from-green-700 via-green-700 to-amber-700 shadow-lg sticky top-0 z-30">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           <Link href="/dashboard" className="flex items-center space-x-2 flex-shrink-0">
@@ -65,7 +65,7 @@ export function AdminNav() {
                   className={cn(
                     'group relative flex items-center space-x-1.5 whitespace-nowrap px-3.5 py-2 rounded-full text-sm font-medium transition-all duration-200',
                     isActive
-                      ? 'bg-white text-indigo-700 shadow-md shadow-indigo-900/30 scale-[1.03]'
+                      ? 'bg-white text-green-700 shadow-md shadow-green-900/30 scale-[1.03]'
                       : 'text-white/85 hover:bg-white/15 hover:text-white'
                   )}
                 >
@@ -112,7 +112,7 @@ export function AdminNav() {
                   className={cn(
                     'flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200',
                     isActive
-                      ? 'bg-white text-indigo-700 shadow-sm'
+                      ? 'bg-white text-green-700 shadow-sm'
                       : 'text-white/85 hover:bg-white/15 hover:text-white'
                   )}
                 >

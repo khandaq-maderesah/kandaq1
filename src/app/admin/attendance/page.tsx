@@ -150,7 +150,7 @@ export default function AttendancePage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <Loader2 className="h-8 w-8 animate-spin text-green-600" />
       </div>
     )
   }
@@ -240,7 +240,7 @@ export default function AttendancePage() {
           <CardContent>
             {loadingStudents ? (
               <div className="flex items-center justify-center h-40">
-                <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+                <Loader2 className="h-6 w-6 animate-spin text-green-600" />
               </div>
             ) : students.length === 0 ? (
               <p className="text-gray-500 text-center py-16">No active students in this class.</p>
@@ -332,8 +332,8 @@ export default function AttendancePage() {
               <CardHeader><CardTitle className="text-yellow-700">Late</CardTitle></CardHeader>
               <CardContent><p className="text-3xl font-bold">{late}</p></CardContent>
             </Card>
-            <Card className="border-violet-200">
-              <CardHeader><CardTitle className="text-violet-700">Excused</CardTitle></CardHeader>
+            <Card className="border-amber-200">
+              <CardHeader><CardTitle className="text-amber-700">Excused</CardTitle></CardHeader>
               <CardContent><p className="text-3xl font-bold">{excused}</p></CardContent>
             </Card>
           </div>
@@ -376,7 +376,7 @@ export default function AttendancePage() {
                                   : r.status === 'late'
                                   ? 'inline-flex px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700'
                                   : r.status === 'excused'
-                                  ? 'inline-flex px-2 py-1 rounded-full text-xs font-medium bg-violet-100 text-violet-700'
+                                  ? 'inline-flex px-2 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700'
                                   : 'inline-flex px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700'
                               }
                             >
@@ -399,7 +399,7 @@ export default function AttendancePage() {
 
 function cn_tab(active: boolean): string {
   return active
-    ? 'inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium bg-indigo-600 text-white shadow'
+    ? 'inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium bg-green-600 text-white shadow'
     : 'inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100'
 }
 
@@ -417,8 +417,8 @@ function cn_status(status: AttendanceStatus, current?: AttendanceStatus): string
   }
   if (status === 'excused') {
     return current === status
-      ? base + 'bg-violet-500 text-white border-violet-500'
-      : base + 'bg-white text-violet-600 border-violet-300 hover:bg-violet-50'
+      ? base + 'bg-amber-500 text-white border-amber-500'
+      : base + 'bg-white text-amber-600 border-amber-300 hover:bg-amber-50'
   }
   return current === status
     ? base + 'bg-yellow-500 text-white border-yellow-500'

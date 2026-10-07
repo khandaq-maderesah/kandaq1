@@ -24,33 +24,33 @@ const features = [
     icon: BarChart3,
     title: 'Reports & Analytics',
     description: 'Beautiful charts for grades, gender balance and daily attendance trends.',
-    color: 'bg-purple-500',
+    color: 'bg-amber-500',
   },
 ]
 
 export default function Home() {
   return (
     <main className="min-h-screen bg-slate-50">
-      <section className="relative overflow-hidden bg-gradient-to-br from-indigo-600 via-blue-600 to-purple-700 text-white">
+      <section className="relative overflow-hidden bg-gradient-to-br from-green-600 via-green-600 to-amber-700 text-white">
         <div className="pointer-events-none absolute -top-24 -left-24 h-80 w-80 rounded-full bg-white/10 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-32 -right-16 h-96 w-96 rounded-full bg-white/10 blur-3xl" />
-        <div className="pointer-events-none absolute top-1/3 right-1/4 h-40 w-40 rounded-full bg-indigo-400/20 blur-2xl" />
+        <div className="pointer-events-none absolute top-1/3 right-1/4 h-40 w-40 rounded-full bg-green-400/20 blur-2xl" />
 
         <div className="relative mx-auto max-w-5xl px-6 py-24 text-center">
           <div className="mx-auto mb-6 h-20 w-20 overflow-hidden rounded-2xl shadow-lg ring-2 ring-white/40">
             <Image src="/image/khandaq-logo.png" alt="Khandaq Madresah logo" width={80} height={80} className="h-full w-full object-cover" />
           </div>
           <h1 className="mb-6 text-4xl font-extrabold tracking-tight md:text-6xl">
-            Khandaq Madresah <span className="text-indigo-200">Attendance</span>
+            Khandaq Madresah <span className="text-green-200">Attendance</span>
           </h1>
-          <p className="mx-auto mb-10 max-w-2xl text-lg text-indigo-100 md:text-xl">
+          <p className="mx-auto mb-10 max-w-2xl text-lg text-green-100 md:text-xl">
             Track attendance, manage students, and keep parents informed —
             all in one beautiful place.
           </p>
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
               href="/login"
-              className="group inline-flex items-center gap-2 rounded-xl bg-white px-8 py-3.5 font-semibold text-indigo-700 shadow-lg transition hover:bg-indigo-50"
+              className="group inline-flex items-center gap-2 rounded-xl bg-white px-8 py-3.5 font-semibold text-green-700 shadow-lg transition hover:bg-green-50"
             >
               Login
               <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
