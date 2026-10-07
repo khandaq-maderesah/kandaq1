@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import {
   Loader2,
   Users,
+  User,
   GraduationCap,
   UserX,
   Calendar,
@@ -395,6 +396,9 @@ if (loading) {
     })
   }
 
+  const malePct = data.totalStudents ? Math.round((data.maleStudents / data.totalStudents) * 100) : 0
+  const femalePct = data.totalStudents ? Math.round((data.femaleStudents / data.totalStudents) * 100) : 0
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -421,7 +425,7 @@ if (loading) {
 
 
       {/* KPI cards - click to show the matching list right below (no redirect) */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
         <button type="button" className="block w-full text-left" onClick={() => showSection('students')}>
           <div className="group relative rounded-xl shadow-md transition hover:shadow-xl cursor-pointer overflow-hidden ring-0">
             <div className={`${activeSection === 'students' ? 'ring-4 ring-green-300' : ''} bg-gradient-to-br from-green-600 to-green-700 p-5`}>
@@ -453,6 +457,30 @@ if (loading) {
                   <span className="font-bold">{data.totalStudents - data.maleStudents - data.femaleStudents}</span>
                 </div>
               </div>
+            </div>
+          </div>
+        </button>
+        <button type="button" className="block w-full text-left" onClick={() => showSection('students')}>
+          <div className="rounded-xl shadow-md transition hover:shadow-xl cursor-pointer overflow-hidden ring-0">
+            <div className="bg-gradient-to-br from-blue-600 to-blue-800 p-5">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-white/90">Male Students</span>
+                <div className="rounded-lg bg-white/20 p-2"><User className="h-5 w-5 text-white" /></div>
+              </div>
+              <p className="mt-3 text-4xl font-extrabold text-white">{data.maleStudents}</p>
+              <p className="mt-1 text-xs font-medium text-white/70">{malePct}% of total students</p>
+            </div>
+          </div>
+        </button>
+        <button type="button" className="block w-full text-left" onClick={() => showSection('students')}>
+          <div className="rounded-xl shadow-md transition hover:shadow-xl cursor-pointer overflow-hidden ring-0">
+            <div className="bg-gradient-to-br from-pink-500 to-pink-700 p-5">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-white/90">Female Students</span>
+                <div className="rounded-lg bg-white/20 p-2"><User className="h-5 w-5 text-white" /></div>
+              </div>
+              <p className="mt-3 text-4xl font-extrabold text-white">{data.femaleStudents}</p>
+              <p className="mt-1 text-xs font-medium text-white/70">{femalePct}% of total students</p>
             </div>
           </div>
         </button>
