@@ -40,7 +40,7 @@ export default function Home() {
             <Image src="/image/khandaq-logo.png" alt="Khandaq Madresah logo" width={80} height={80} className="h-full w-full object-cover" />
           </div>
           <h1 className="mb-6 text-4xl font-extrabold tracking-tight md:text-6xl">
-            Khandaq Madresah <span className="text-green-200">Attendance</span>
+            Khandaq Madresah <span className="text-green-200">Students Management System</span>
           </h1>
           <p className="mx-auto mb-10 max-w-2xl text-lg text-green-100 md:text-xl">
             Track attendance, manage students, and keep parents informed —
@@ -87,7 +87,7 @@ export default function Home() {
       </section>
 
       <footer className="border-t border-gray-200 bg-white py-8 text-center text-sm text-gray-500">
-        © {new Date().getFullYear()} Khandaq Madresah Attendance. All rights reserved.
+        © {new Date().getFullYear()} Khandaq Madresah Students Management System. All rights reserved.
       </footer>
     </main>
   )

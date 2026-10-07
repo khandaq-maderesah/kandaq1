@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'Khandaq Madresah',
     short_name: 'Khandaq Madresah',
-    description: 'Madresah attendance management system for Khandaq Madresah.',
+    description: 'Students management system for Khandaq Madresah.',
     id: '/',
     start_url: '/',
     scope: '/',

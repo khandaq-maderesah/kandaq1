@@ -82,7 +82,7 @@ export default function LoginPage() {
             <Image src='/image/khandaq-logo.png' alt='Khandaq Madresah logo' width={64} height={64} className='h-full w-full object-cover' />
           </div>
           <CardTitle className="text-2xl font-bold text-center">
-            Khandaq Madresah Attendance
+            Khandaq Madresah Students Management System
           </CardTitle>
           <CardDescription className="text-center">
             {forgotMode ? 'Reset your password' : 'Sign in to your account to continue'}

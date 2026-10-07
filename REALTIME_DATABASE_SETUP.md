@@ -1,4 +1,4 @@
-# Khandaq Madresah Attendance - REALTIME DATABASE SETUP
+# Khandaq Madresah Students Management System - REALTIME DATABASE SETUP
 
 ## ✅ Successfully Switched to Realtime Database!
 
