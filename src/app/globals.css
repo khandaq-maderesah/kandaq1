@@ -146,6 +146,26 @@ button:not(:disabled):hover::before {
   }
 }
 
+/* ── Feature cards: gentle continuous bounce (faster on hover) ── */
+.card-bounce {
+  animation: cardBounce 2.4s ease-in-out infinite;
+}
+.card-bounce:hover {
+  animation: cardBounce 0.9s ease-in-out infinite;
+}
+
+@keyframes cardBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-bounce,
+  .card-bounce:hover {
+    animation: none;
+  }
+}
+
 
 ::selection {
   background: rgba(22, 101, 52, 0.2);

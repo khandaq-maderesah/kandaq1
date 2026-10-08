@@ -36,8 +36,15 @@ export default function Home() {
         <NeonWaveBackground />
 
         <div className="relative mx-auto max-w-5xl px-6 py-24 text-center">
-          <div className="mx-auto mb-6 h-20 w-20 overflow-hidden rounded-2xl shadow-lg ring-2 ring-white/40">
-            <Image src="/image/khandaq-logo.png" alt="Khendeq Medresah logo" width={80} height={80} className="h-full w-full object-cover" />
+          <div className="mx-auto mb-8 flex justify-center">
+            <Image
+              src="/image/khandaq-logo.png"
+              alt="Khendeq Medresah logo"
+              width={200}
+              height={200}
+              priority
+              className="h-auto w-40 rounded-full shadow-2xl ring-1 ring-white/25 md:w-52"
+            />
           </div>
           <h1 className="mb-6 text-4xl font-extrabold tracking-tight md:text-6xl">
             Khendeq Medresah <span className="text-green-200">Students Management System</span>
@@ -55,18 +62,6 @@ export default function Home() {
               <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
             </Link>
           </div>
-
-          {/* Emblem below the login button */}
-          <div className="mt-14 flex justify-center">
-            <Image
-              src="/image/khandaq-logo.png"
-              alt="Khendeq Medresah logo"
-              width={200}
-              height={200}
-              priority
-              className="h-auto w-40 rounded-full shadow-2xl ring-1 ring-white/25 md:w-52"
-            />
-          </div>
         </div>
 
         <svg className="absolute bottom-0 left-0 right-0 w-full text-slate-50" viewBox="0 0 1440 60" fill="currentColor" preserveAspectRatio="none">
@@ -74,7 +69,11 @@ export default function Home() {
         </svg>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-16">
+      {/* Everything you need — modern gradient background */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-indigo-50 via-white to-fuchsia-50">
+        <div aria-hidden="true" className="pointer-events-none absolute -top-16 right-0 h-64 w-64 rounded-full bg-purple-300/30 blur-3xl" />
+        <div aria-hidden="true" className="pointer-events-none absolute -bottom-20 left-0 h-72 w-72 rounded-full bg-cyan-300/30 blur-3xl" />
+        <div className="relative mx-auto max-w-6xl px-6 py-20">
         <h2 className="mb-4 text-center text-3xl font-bold text-gray-900">Everything you need</h2>
         <p className="mb-12 text-center text-lg text-gray-500">
           A complete attendance management solution for your madresah. From real-time attendance tracking to parent notifications and insightful reports, we&apos;ve got you covered.
@@ -85,16 +84,19 @@ export default function Home() {
             return (
               <div
                 key={f.title}
-                className="group rounded-2xl border border-gray-200 bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+                className="card-bounce h-full rounded-2xl bg-gradient-to-br from-cyan-400 via-purple-500 to-pink-500 p-[2px] shadow-[0_0_24px_rgba(168,85,247,0.35)] transition-shadow hover:shadow-[0_0_40px_rgba(236,72,153,0.6)]"
               >
-                <div className={`mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl ${f.color} text-white shadow-md`}>
-                  <Icon className="h-6 w-6" />
+                <div className="h-full rounded-[14px] bg-white p-8">
+                  <div className={`mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl ${f.color} text-white shadow-md`}>
+                    <Icon className="h-6 w-6" />
+                  </div>
+                  <h3 className="mb-2 text-xl font-semibold text-gray-900">{f.title}</h3>
+                  <p className="text-gray-600">{f.description}</p>
                 </div>
-                <h3 className="mb-2 text-xl font-semibold text-gray-900">{f.title}</h3>
-                <p className="text-gray-600">{f.description}</p>
               </div>
             )
           })}
+        </div>
         </div>
       </section>
 
