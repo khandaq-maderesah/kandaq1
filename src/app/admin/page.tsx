@@ -73,6 +73,9 @@ export default function AdminPage() {
   const [activeSection, setActiveSection] = useState<'students' | 'teachers' | 'classes' | 'absent'>('absent')
   const [viewStudent, setViewStudent] = useState<any | null>(null)
   const [studentsSearch, setStudentsSearch] = useState('')
+  // Which gender the inline Student List shows — driven by the KPI cards
+  // (Total = all, Male = boys, Female = girls).
+  const [studentGenderFilter, setStudentGenderFilter] = useState<'all' | 'male' | 'female'>('all')
   const [teachersSearch, setTeachersSearch] = useState('')
   const [classesSearch, setClassesSearch] = useState('')
 
@@ -250,6 +253,7 @@ export default function AdminPage() {
     })
     return studentsAll
       .filter((s: any) => s.isActive !== false)
+      .filter((s: any) => studentGenderFilter === 'all' || s.gender === studentGenderFilter)
       .filter((s: any) => {
         if (!q) return true
         const cls = classById[s.classId]
@@ -261,7 +265,7 @@ export default function AdminPage() {
         )
       })
       .sort((a: any, b: any) => (a.rollNumber || '').localeCompare(b.rollNumber || ''))
-  }, [studentsAll, classesAll, studentsSearch])
+  }, [studentsAll, classesAll, studentsSearch, studentGenderFilter])
 
   const filteredTeachers = useMemo(() => {
     const q = teachersSearch.trim().toLowerCase()
@@ -396,6 +400,15 @@ if (loading) {
     })
   }
 
+  // KPI gender cards: apply the filter AND open the Student List below.
+  const showStudents = (gender: 'all' | 'male' | 'female') => {
+    setStudentGenderFilter(gender)
+    setActiveSection('students')
+    requestAnimationFrame(() => {
+      document.getElementById('dash-students')?.scrollIntoView({ behavior: 'smooth' })
+    })
+  }
+
   const malePct = data.totalStudents ? Math.round((data.maleStudents / data.totalStudents) * 100) : 0
   const femalePct = data.totalStudents ? Math.round((data.femaleStudents / data.totalStudents) * 100) : 0
 
@@ -426,9 +439,9 @@ if (loading) {
 
       {/* KPI cards - click to show the matching list right below (no redirect) */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
-        <button type="button" className="block w-full text-left" onClick={() => showSection('students')}>
+        <button type="button" className="block w-full text-left" onClick={() => showStudents('all')}>
           <div className="group relative rounded-xl shadow-md transition hover:shadow-xl cursor-pointer overflow-hidden ring-0">
-            <div className={`${activeSection === 'students' ? 'ring-4 ring-green-300' : ''} bg-gradient-to-br from-green-600 to-green-700 p-5`}>
+            <div className={`${activeSection === 'students' && studentGenderFilter === 'all' ? 'ring-4 ring-green-300' : ''} bg-gradient-to-br from-green-600 to-green-700 p-5`}>
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-white/90">Total Students</span>
                 <div className="rounded-lg bg-white/20 p-2"><Users className="h-5 w-5 text-white" /></div>
@@ -460,8 +473,8 @@ if (loading) {
             </div>
           </div>
         </button>
-        <button type="button" className="block w-full text-left" onClick={() => showSection('students')}>
-          <div className="rounded-xl shadow-md transition hover:shadow-xl cursor-pointer overflow-hidden ring-0">
+        <button type="button" className="block w-full text-left" onClick={() => showStudents('male')}>
+          <div className={`rounded-xl shadow-md transition hover:shadow-xl cursor-pointer overflow-hidden ring-0 ${studentGenderFilter === 'male' ? 'ring-4 ring-blue-300' : ''}`}>
             <div className="bg-gradient-to-br from-blue-600 to-blue-800 p-5">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-white/90">Male Students</span>
@@ -472,8 +485,8 @@ if (loading) {
             </div>
           </div>
         </button>
-        <button type="button" className="block w-full text-left" onClick={() => showSection('students')}>
-          <div className="rounded-xl shadow-md transition hover:shadow-xl cursor-pointer overflow-hidden ring-0">
+        <button type="button" className="block w-full text-left" onClick={() => showStudents('female')}>
+          <div className={`rounded-xl shadow-md transition hover:shadow-xl cursor-pointer overflow-hidden ring-0 ${studentGenderFilter === 'female' ? 'ring-4 ring-pink-300' : ''}`}>
             <div className="bg-gradient-to-br from-pink-500 to-pink-700 p-5">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-white/90">Female Students</span>
@@ -531,7 +544,12 @@ if (loading) {
                 Student List
               </CardTitle>
               <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
-                {filteredStudents.length} students
+                {filteredStudents.length}{' '}
+                {studentGenderFilter === 'all'
+                  ? 'students'
+                  : studentGenderFilter === 'male'
+                  ? 'male students'
+                  : 'female students'}
               </span>
             </div>
             <CardDescription>Click any student to see their full details.</CardDescription>
