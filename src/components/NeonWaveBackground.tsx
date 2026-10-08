@@ -77,7 +77,7 @@ export default function NeonWaveBackground() {
     <div
       aria-hidden="true"
       className="pointer-events-none absolute inset-0 overflow-hidden"
-      style={{ background: 'radial-gradient(120% 120% at 50% 0%, #14083a 0%, #0b0520 55%, #070316 100%)' }}
+      style={{ background: 'linear-gradient(135deg, #070316 0%, #14083a 30%, #312e81 55%, #4c1d95 75%, #12071f 100%)' }}
     >
       <svg
         className="absolute inset-0 h-full w-full"
