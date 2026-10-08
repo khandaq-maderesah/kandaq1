@@ -1,7 +1,7 @@
 {
   "name": "khandaq-a-system",
   "version": "1.0.0",
-  "description": "Attendance and school management system for Khandaq",
+  "description": "Students management system for Khendeq Medresah",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

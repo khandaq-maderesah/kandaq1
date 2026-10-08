@@ -116,7 +116,7 @@ export default function SettingsPage() {
                 <School className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
                   id="schoolName"
-                  placeholder="e.g. Khandaq Madresah"
+                  placeholder="e.g. Khendeq Medresah"
                   value={schoolName}
                   onChange={(e) => setSchoolName(e.target.value)}
                   className="pl-10"

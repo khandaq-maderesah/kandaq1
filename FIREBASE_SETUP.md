@@ -1,4 +1,4 @@
-# Firebase Setup Guide for Khandaq Madresah Students Management System
+# Firebase Setup Guide for Khendeq Medresah Students Management System
 
 ## Step 1: Create Firebase Project
 

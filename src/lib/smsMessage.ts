@@ -47,8 +47,8 @@ export function generateSmsMessage(
     const oromoSubjectName = isVowel ? `${latinName}n` : latinName
 
     return isFemale
-      ? `Madarasaa Khandaq irraa\n\nKabajamtoota maatii barattuu ${latinName}, guyyaa har'aa ${oromoSubjectName} madarasaa akka hin dhufne isin beeksifna.`
-      : `Madarasaa Khandaq irraa\n\nKabajamtoota maatii barataa ${latinName}, guyyaa har'aa ${oromoSubjectName} madarasaa akka hin dhufne isin beeksifna.`
+      ? `Madarasaa Khendeq irraa\n\nKabajamtoota maatii barattuu ${latinName}, guyyaa har'aa ${oromoSubjectName} madarasaa akka hin dhufne isin beeksifna.`
+      : `Madarasaa Khendeq irraa\n\nKabajamtoota maatii barataa ${latinName}, guyyaa har'aa ${oromoSubjectName} madarasaa akka hin dhufne isin beeksifna.`
   }
 
   // Default language: Amharic (the name is used as-is, no suffix rule)

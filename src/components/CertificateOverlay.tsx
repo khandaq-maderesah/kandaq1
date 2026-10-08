@@ -6,7 +6,7 @@ import type { Student, Class, Exam } from '@/types'
 
 /**
  * ──────────────────────────────────────────────────────────────────────
- * Khandaq Madresah — Printable Student Certificate
+ * Khendeq Medresah — Printable Student Certificate
  * ──────────────────────────────────────────────────────────────────────
    * Background image: public/image/2 page [Recovered]-11.jpg
  *

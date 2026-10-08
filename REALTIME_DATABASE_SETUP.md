@@ -1,4 +1,4 @@
-# Khandaq Madresah Students Management System - REALTIME DATABASE SETUP
+# Khendeq Medresah Students Management System - REALTIME DATABASE SETUP
 
 ## ✅ Successfully Switched to Realtime Database!
 

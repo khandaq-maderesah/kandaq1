@@ -1,4 +1,4 @@
-# ?? Complete Setup Summary - Khandaq Madresah Students Management System
+# ?? Complete Setup Summary - Khendeq Medresah Students Management System
 
 ## ? Everything is Ready!
 
@@ -216,7 +216,7 @@ Check the documentation files:
 
 ## ?? You're All Set!
 
-Your Khandaq Madresah Students Management System is ready to use!
+Your Khendeq Medresah Students Management System is ready to use!
 
 Just enable Firebase services and run: npm run dev
 

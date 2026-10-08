@@ -2,7 +2,7 @@
 // Strategy: network-first for same-origin GET requests (excluding /api),
 // falling back to a cached copy only when offline. Cross-origin (Firebase)
 // and API requests are left untouched to avoid serving stale data.
-const CACHE = 'khandaq-madresah-v1'
+const CACHE = 'khendeq-medresah-v1'
 
 self.addEventListener('install', () => {
   self.skipWaiting()

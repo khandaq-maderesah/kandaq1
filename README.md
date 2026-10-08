@@ -1,6 +1,6 @@
-# Khandaq Madresah Students Management System
+# Khendeq Medresah Students Management System
 
-A students management system (with attendance tracking) for Khandaq Madresah, built with **Next.js 15 (App Router)**, **React**, **Tailwind CSS**, and **Firebase (Authentication + Realtime Database)**.
+A students management system (with attendance tracking) for Khendeq Medresah, built with **Next.js 15 (App Router)**, **React**, **Tailwind CSS**, and **Firebase (Authentication + Realtime Database)**.
 
 ## ✨ Features
 

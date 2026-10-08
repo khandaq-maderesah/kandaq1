@@ -46,7 +46,7 @@ loadEnvFile(join(root, '.env.local'))
 
 const EMAIL = process.env.SEED_ADMIN_EMAIL || 'khandaqmadresah1234@gmail.com'
 const PASSWORD = process.env.SEED_ADMIN_PASSWORD || 'KH1234'
-const NAME = process.env.SEED_ADMIN_NAME || 'Khandaq Madresah Admin'
+const NAME = process.env.SEED_ADMIN_NAME || 'Khendeq Medresah Admin'
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,

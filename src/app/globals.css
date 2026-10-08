@@ -82,6 +82,61 @@ html {
   }
 }
 
+/* ── Glowing rainbow hover for buttons ────────────────────────
+   Applied to EVERY <button> automatically, plus any element with
+   the .btn class (e.g. links styled as buttons).
+   From the requested .btn spec — note: margin-left:50% was a demo
+   artifact and is deliberately omitted (it would break layouts). */
+.btn,
+button:not(:disabled) {
+  position: relative;
+  z-index: 0;
+}
+
+.btn::before,
+button:not(:disabled)::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(
+    45deg,
+    #ff0000,
+    #ff7300,
+    #fffb00,
+    #48ff00,
+    #0000ff,
+    #00ffb2,
+    #ff00c8,
+    #ff0000
+  );
+  background-size: 500px;
+  filter: blur(8px);
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  pointer-events: none;
+}
+
+.btn:hover::before,
+button:not(:disabled):hover::before {
+  opacity: 1;
+  animation: glowing 20s linear infinite;
+}
+
+@keyframes glowing {
+  0% { background-position: 0 0; }
+  50% { background-position: 400% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn:hover::before,
+  button:not(:disabled):hover::before {
+    animation: none;
+  }
+}
+
 
 ::selection {
   background: rgba(22, 101, 52, 0.2);

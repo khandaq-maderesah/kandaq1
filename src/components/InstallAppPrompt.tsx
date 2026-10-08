@@ -12,7 +12,7 @@ interface BeforeInstallPromptEvent extends Event {
 const IOS_HINTS = [
   'Tap the Share button in Safari.',
   'Scroll down and tap "Add to Home Screen".',
-  'Tap "Add" and Khandaq Madresah will appear on your home screen.',
+  'Tap "Add" and Khendeq Medresah will appear on your home screen.',
 ]
 
 export function InstallAppPrompt() {
@@ -94,14 +94,14 @@ export function InstallAppPrompt() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/icons/icon-192.png"
-            alt="Khandaq Madresah logo"
+            alt="Khendeq Medresah logo"
             className="h-12 w-12 shrink-0 rounded-xl object-cover"
           />
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-slate-900">Install Khandaq Madresah</p>
+            <p className="text-sm font-semibold text-slate-900">Install Khendeq Medresah</p>
             <p className="mt-0.5 text-xs leading-relaxed text-slate-500">
               {isIos
-                ? 'Add Khandaq Madresah to your home screen to use it like an app.'
+                ? 'Add Khendeq Medresah to your home screen to use it like an app.'
                 : 'Install the app on your device for quicker access and offline support.'}
             </p>
           </div>

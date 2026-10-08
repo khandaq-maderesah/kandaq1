@@ -44,7 +44,7 @@ export function TeacherNav() {
         <div className="flex justify-between items-center h-16">
           {/* Logo/Brand */}
           <Link href="/dashboard" className="flex items-center space-x-2 flex-shrink-0">
-            <Image src="/image/khandaq-logo.png" alt="Khandaq Madresah logo" width={32} height={32} className="h-8 w-8 rounded-full object-cover" />
+            <Image src="/image/khandaq-logo.png" alt="Khendeq Medresah logo" width={32} height={32} className="h-8 w-8 rounded-full object-cover" />
             <span className="font-bold text-xl text-gray-900">
               Teacher Panel
             </span>

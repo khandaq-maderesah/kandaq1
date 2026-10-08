@@ -5,12 +5,12 @@ import { InstallAppPrompt } from "@/components/InstallAppPrompt"
 
 export const metadata: Metadata = {
   title: {
-    default: "Khandaq Madresah",
-    template: "%s | Khandaq Madresah",
+    default: "Khendeq Medresah",
+    template: "%s | Khendeq Medresah",
   },
   // No description on purpose: it is what link previews (Telegram, WhatsApp)
   // show under the title when sharing the URL.
-  applicationName: "Khandaq Madresah",
+  applicationName: "Khendeq Medresah",
   keywords: ["attendance", "school", "students", "teachers", "madresah", "management"],
   manifest: "/manifest.webmanifest",
   icons: {
@@ -19,13 +19,13 @@ export const metadata: Metadata = {
   },
   appleWebApp: {
     capable: true,
-    title: "Khandaq Madresah",
+    title: "Khendeq Medresah",
     statusBarStyle: "default",
   },
   // No openGraph.description on purpose: link previews (Telegram, WhatsApp,
   // etc.) would otherwise show this text when sharing the URL.
   openGraph: {
-    title: "Khandaq Madresah",
+    title: "Khendeq Medresah",
     type: "website",
   },
 }

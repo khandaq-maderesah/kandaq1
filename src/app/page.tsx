@@ -37,10 +37,10 @@ export default function Home() {
 
         <div className="relative mx-auto max-w-5xl px-6 py-24 text-center">
           <div className="mx-auto mb-6 h-20 w-20 overflow-hidden rounded-2xl shadow-lg ring-2 ring-white/40">
-            <Image src="/image/khandaq-logo.png" alt="Khandaq Madresah logo" width={80} height={80} className="h-full w-full object-cover" />
+            <Image src="/image/khandaq-logo.png" alt="Khendeq Medresah logo" width={80} height={80} className="h-full w-full object-cover" />
           </div>
           <h1 className="mb-6 text-4xl font-extrabold tracking-tight md:text-6xl">
-            Khandaq Madresah <span className="text-green-200">Students Management System</span>
+            Khendeq Medresah <span className="text-green-200">Students Management System</span>
           </h1>
           <p className="mx-auto mb-10 max-w-2xl text-lg text-green-100 md:text-xl">
             Track attendance, manage students, and keep parents informed —
@@ -49,7 +49,7 @@ export default function Home() {
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
               href="/login"
-              className="group inline-flex items-center gap-2 rounded-xl bg-white px-8 py-3.5 font-semibold text-green-700 shadow-lg transition hover:bg-green-50"
+              className="group btn inline-flex items-center gap-2 rounded-xl bg-white px-8 py-3.5 font-semibold text-green-700 shadow-lg transition hover:bg-green-50"
             >
               Login
               <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
@@ -87,7 +87,7 @@ export default function Home() {
       </section>
 
       <footer className="border-t border-gray-200 bg-white py-8 text-center text-sm text-gray-500">
-        © {new Date().getFullYear()} Khandaq Madresah Students Management System. All rights reserved.
+        © {new Date().getFullYear()} Khendeq Medresah Students Management System. All rights reserved.
       </footer>
     </main>
   )
