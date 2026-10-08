@@ -38,7 +38,7 @@ function loadEnvFile(filePath) {
 }
 loadEnvFile(join(root, '.env.local'))
 
-const ADMIN_EMAIL = process.env.SEED_ADMIN_EMAIL || 'khandaqmadresah1234@gmail.com'
+const ADMIN_EMAIL = process.env.SEED_ADMIN_EMAIL || 'khendeqmedresah1@gmail.com'
 const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD || 'KH1234'
 
 const app = initializeApp({
