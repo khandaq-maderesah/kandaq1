@@ -121,13 +121,22 @@ button:not(:disabled)::before {
 .btn:hover::before,
 button:not(:disabled):hover::before {
   opacity: 1;
-  animation: glowing 20s linear infinite;
+  /* Glow shows for 5 seconds, then fades out even while still hovering;
+     moving the mouse away and back restarts it. */
+  animation: glowing 20s linear infinite, glowFadeOut 5s linear forwards;
 }
 
 @keyframes glowing {
   0% { background-position: 0 0; }
   50% { background-position: 400% 0; }
   100% { background-position: 200% 0; }
+}
+
+@keyframes glowFadeOut {
+  0% { opacity: 0; }
+  8% { opacity: 1; }
+  75% { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {

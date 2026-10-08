@@ -55,6 +55,7 @@ interface DashboardData {
   totalClasses: number
   absentCount: number
   weeklyAbsentCount: number
+  todayAbsentCount: number
   classGender: { name: string; male: number; female: number; teacherName?: string }[]
   classes: { id: string; name: string; section?: string }[]
   classDailyStatus: Record<string, { date: string; present: number; absent: number; late: number; excused: number }[]>
@@ -68,7 +69,10 @@ export default function AdminPage() {
   const [selectedClass, setSelectedClass] = useState('')
   const [dateFilter, setDateFilter] = useState(() => new Date().toISOString().slice(0, 10))
   const [showAllDates, setShowAllDates] = useState(false)
-  const [weeklyOnly, setWeeklyOnly] = useState(false)
+  // Period filter for the absent list (dropdown below the card buttons).
+  const [absentRange, setAbsentRange] = useState<
+    'today' | 'this-week' | 'last-week' | 'last-2-weeks' | 'last-3-weeks' | 'this-month'
+  >('today')
   // Which list is currently shown under the KPI cards (inline, no redirect).
   const [activeSection, setActiveSection] = useState<'students' | 'teachers' | 'classes' | 'absent'>('absent')
   const [viewStudent, setViewStudent] = useState<any | null>(null)
@@ -220,6 +224,10 @@ export default function AdminPage() {
     const weeklyAbsentCount = attendance.filter(
       (a: any) => a.status === 'absent' && a.date >= weekStartStr
     ).length
+    const todayStr = today.toISOString().slice(0, 10)
+    const todayAbsentCount = attendance.filter(
+      (a: any) => a.status === 'absent' && a.date === todayStr
+    ).length
 
     return {
       totalStudents: activeStudents.length,
@@ -229,6 +237,7 @@ export default function AdminPage() {
       totalClasses: classes.length,
       absentCount: absentStudents.length,
       weeklyAbsentCount,
+      todayAbsentCount,
       classGender,
       classes: classList,
       classDailyStatus,
@@ -304,16 +313,35 @@ if (loading) {
     )
   }
 
-  const nowDate = new Date()
-  const weekStart = new Date(nowDate)
-  weekStart.setDate(nowDate.getDate() - 6)
-  const weekStartStr = weekStart.toISOString().slice(0, 10)
+  // Inclusive ISO date bounds for the period dropdown.
+  const absentRangeBounds = (range: string): [string, string] => {
+    const base = new Date()
+    const iso = (d: Date) => d.toISOString().slice(0, 10)
+    const daysAgo = (n: number) => {
+      const d = new Date(base)
+      d.setDate(base.getDate() - n)
+      return iso(d)
+    }
+    if (range === 'this-week') return [daysAgo(6), iso(base)]
+    if (range === 'last-week') return [daysAgo(13), daysAgo(7)]
+    if (range === 'last-2-weeks') return [daysAgo(13), iso(base)]
+    if (range === 'last-3-weeks') return [daysAgo(20), iso(base)]
+    if (range === 'this-month')
+      return [iso(new Date(Date.UTC(base.getUTCFullYear(), base.getUTCMonth(), 1))), iso(base)]
+    return ['', ''] // 'today' follows the date picker below
+  }
 
   const filteredAbsent = data.absentStudents.filter((r) => {
-    // Weekly view (triggered by clicking the "Absent (This Week)" KPI card).
-    if (weeklyOnly && r.date < weekStartStr) return false
-    // Default view: current day only. Toggle "All dates" to browse history.
-    if (!showAllDates && r.date !== dateFilter) return false
+    // Period dropdown (this week / last week / last 2–3 weeks / this month);
+    // "Today" follows the date picker. "All dates" overrides the period.
+    if (!showAllDates) {
+      if (absentRange === 'today') {
+        if (r.date !== dateFilter) return false
+      } else {
+        const [from, to] = absentRangeBounds(absentRange)
+        if (r.date < from || r.date > to) return false
+      }
+    }
     const q = search.trim().toLowerCase()
     if (!q) return true
     return (
@@ -383,12 +411,14 @@ if (loading) {
   const dailyStatus = data.classDailyStatus[selectedClass] || []
   const selectedName = data.classes.find((c) => c.id === selectedClass)?.name || 'Class'
 
-  // Clicking the "Absent (This Week)" KPI card jumps to the absent list filtered
-  // down to the last 7 days.
-  const handleShowWeeklyAbsent = () => {
-    setWeeklyOnly(true)
-    setShowAllDates(true)
-    document.getElementById('absent-students')?.scrollIntoView({ behavior: 'smooth' })
+  // Clicking the "Absent (Today)" KPI card jumps to today's absence list.
+  const handleShowTodayAbsent = () => {
+    setAbsentRange('today')
+    setShowAllDates(false)
+    setActiveSection('absent')
+    requestAnimationFrame(() => {
+      document.getElementById('absent-students')?.scrollIntoView({ behavior: 'smooth' })
+    })
   }
 
   // Clicking the Students/Teachers/Classes cards reveals their list right here
@@ -441,7 +471,7 @@ if (loading) {
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
         <button type="button" className="block w-full text-left" onClick={() => showStudents('all')}>
           <div className="group relative rounded-xl shadow-md transition hover:shadow-xl cursor-pointer overflow-hidden ring-0">
-            <div className={`${activeSection === 'students' && studentGenderFilter === 'all' ? 'ring-4 ring-green-300' : ''} bg-gradient-to-br from-green-600 to-green-700 p-5`}>
+            <div className={`${activeSection === 'students' && studentGenderFilter === 'all' ? 'ring-4 ring-green-300' : ''} bg-gradient-to-br from-green-600 to-green-700 p-5 active:bg-none active:bg-transparent`}>
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-white/90">Total Students</span>
                 <div className="rounded-lg bg-white/20 p-2"><Users className="h-5 w-5 text-white" /></div>
@@ -475,7 +505,7 @@ if (loading) {
         </button>
         <button type="button" className="block w-full text-left" onClick={() => showStudents('male')}>
           <div className={`rounded-xl shadow-md transition hover:shadow-xl cursor-pointer overflow-hidden ring-0 ${studentGenderFilter === 'male' ? 'ring-4 ring-blue-300' : ''}`}>
-            <div className="bg-gradient-to-br from-blue-600 to-blue-800 p-5">
+            <div className="bg-gradient-to-br from-blue-600 to-blue-800 p-5 active:bg-none active:bg-transparent">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-white/90">Male Students</span>
                 <div className="rounded-lg bg-white/20 p-2"><User className="h-5 w-5 text-white" /></div>
@@ -487,7 +517,7 @@ if (loading) {
         </button>
         <button type="button" className="block w-full text-left" onClick={() => showStudents('female')}>
           <div className={`rounded-xl shadow-md transition hover:shadow-xl cursor-pointer overflow-hidden ring-0 ${studentGenderFilter === 'female' ? 'ring-4 ring-pink-300' : ''}`}>
-            <div className="bg-gradient-to-br from-pink-500 to-pink-700 p-5">
+            <div className="bg-gradient-to-br from-fuchsia-500 to-purple-600 p-5 active:bg-none active:bg-transparent">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-white/90">Female Students</span>
                 <div className="rounded-lg bg-white/20 p-2"><User className="h-5 w-5 text-white" /></div>
@@ -499,7 +529,7 @@ if (loading) {
         </button>
         <button type="button" className="block w-full text-left" onClick={() => showSection('teachers')}>
           <div className={`rounded-xl shadow-md transition hover:shadow-xl cursor-pointer overflow-hidden ring-0 ${activeSection === 'teachers' ? 'ring-4 ring-emerald-300' : ''}`}>
-            <div className="bg-gradient-to-br from-emerald-600 to-teal-700 p-5">
+            <div className="bg-gradient-to-br from-emerald-600 to-teal-700 p-5 active:bg-none active:bg-transparent">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-white/90">Total Teachers</span>
                 <div className="rounded-lg bg-white/20 p-2"><GraduationCap className="h-5 w-5 text-white" /></div>
@@ -510,7 +540,7 @@ if (loading) {
         </button>
         <button type="button" className="block w-full text-left" onClick={() => showSection('classes')}>
           <div className={`rounded-xl shadow-md transition hover:shadow-xl cursor-pointer overflow-hidden ring-0 ${activeSection === 'classes' ? 'ring-4 ring-amber-300' : ''}`}>
-            <div className="bg-gradient-to-br from-amber-600 to-amber-800 p-5">
+            <div className="bg-gradient-to-br from-amber-600 to-amber-800 p-5 active:bg-none active:bg-transparent">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-white/90">Classes</span>
                 <div className="rounded-lg bg-white/20 p-2"><GraduationCap className="h-5 w-5 text-white" /></div>
@@ -519,14 +549,14 @@ if (loading) {
             </div>
           </div>
         </button>
-        <button type="button" className="block w-full text-left" onClick={handleShowWeeklyAbsent}>
+        <button type="button" className="block w-full text-left" onClick={handleShowTodayAbsent}>
           <div className={`rounded-xl shadow-md transition hover:shadow-xl cursor-pointer overflow-hidden ring-0 ${activeSection === 'absent' ? 'ring-4 ring-rose-300' : ''}`}>
-            <div className="bg-gradient-to-br from-rose-600 to-red-800 p-5">
+            <div className="bg-gradient-to-br from-rose-600 to-red-800 p-5 active:bg-none active:bg-transparent">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-white/90">Absent (This Week)</span>
+                <span className="text-sm font-medium text-white/90">Absent (Today)</span>
                 <div className="rounded-lg bg-white/20 p-2"><UserX className="h-5 w-5 text-white" /></div>
               </div>
-              <p className="mt-3 text-4xl font-extrabold text-white">{data.weeklyAbsentCount}</p>
+              <p className="mt-3 text-4xl font-extrabold text-white">{data.todayAbsentCount}</p>
             </div>
           </div>
         </button>
@@ -742,18 +772,18 @@ if (loading) {
                 type="date"
                 value={dateFilter}
                 onChange={(e) => setDateFilter(e.target.value)}
-                disabled={showAllDates}
+                disabled={showAllDates || absentRange !== 'today'}
                 className="h-9 rounded-lg border border-input bg-white px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
               />
-              {weeklyOnly && (
+              {!showAllDates && absentRange !== 'today' && (
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => setWeeklyOnly(false)}
+                  onClick={() => setAbsentRange('today')}
                   className="whitespace-nowrap text-rose-600"
                 >
-                  This week • Show all history
+                  Period filter • Reset
                 </Button>
               )}
               <div className="relative w-full sm:w-64">
@@ -787,9 +817,35 @@ if (loading) {
               </Button>
             </div>
           </div>
+          <div className="flex flex-wrap items-center gap-2 pt-1">
+            <label htmlFor="absent-period" className="text-sm font-medium text-gray-600">
+              Period
+            </label>
+            <select
+              id="absent-period"
+              value={absentRange}
+              onChange={(e) => {
+                setAbsentRange(e.target.value as typeof absentRange)
+                setShowAllDates(false)
+              }}
+              className="h-9 rounded-lg border border-input bg-white px-3 text-sm text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <option value="today">Today</option>
+              <option value="this-week">This week</option>
+              <option value="last-week">Last week</option>
+              <option value="last-2-weeks">Last 2 weeks</option>
+              <option value="last-3-weeks">Last 3 weeks</option>
+              <option value="this-month">This month</option>
+            </select>
+            {showAllDates && (
+              <span className="text-xs text-gray-500">&quot;All dates&quot; overrides the period.</span>
+            )}
+          </div>
           <CardDescription>
             {showAllDates
               ? 'Absent students collected from saved attendance across all classes, with parent contact details.'
+              : absentRange !== 'today'
+              ? 'Absent students for the selected period, with parent contact details.'
               : `Absent students for ${dateFilter}, with parent contact details. Pick a date or tick "All dates" to see previous absences.`}
           </CardDescription>
         </CardHeader>
@@ -805,6 +861,8 @@ if (loading) {
                 ? 'No absent students match your search.'
                 : showAllDates
                 ? 'No absent students recorded yet.'
+                : absentRange !== 'today'
+                ? 'No absent students in the selected period.'
                 : `No absent students recorded for ${dateFilter}.`}
             </p>
           ) : (
