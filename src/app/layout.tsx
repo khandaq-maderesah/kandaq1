@@ -37,8 +37,8 @@ export const metadata: Metadata = {
   keywords: ["attendance", "school", "students", "teachers", "madresah", "management"],
   manifest: "/manifest.webmanifest",
   icons: {
-    icon: "/image/khandaq-logo.png",
-    apple: "/icons/icon-192.png",
+    icon: "/icons/favicon-64.png",
+    apple: "/icons/apple-touch-icon.png",
   },
   appleWebApp: {
     capable: true,

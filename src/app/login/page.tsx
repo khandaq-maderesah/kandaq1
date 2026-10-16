@@ -107,12 +107,12 @@ export default function LoginPage() {
         <Card className="w-full max-w-md">
           <CardHeader className="items-center pt-8 text-center">
             <Image
-              src="/image/khandaq-logo.png"
+              src="/image/logo-full.png"
               alt=""
-              width={56}
-              height={56}
+              width={540}
+              height={715}
               priority
-              className="mb-2 h-14 w-14 rounded-xl border object-cover"
+              className="mb-3 h-28 w-auto object-contain"
             />
             <p className="text-sm font-medium text-muted-foreground">{tc('appName')}</p>
             <CardTitle className="text-2xl">{forgotMode ? t('forgot.title') : t('title')}</CardTitle>

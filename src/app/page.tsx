@@ -36,12 +36,12 @@ export default function Home() {
         <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-3 px-4 sm:px-6">
           <Link href="/" className="flex min-w-0 items-center gap-3">
             <Image
-              src="/image/khandaq-logo.png"
+              src="/image/logo-mark.png"
               alt=""
-              width={36}
-              height={36}
+              width={40}
+              height={40}
               priority
-              className="h-9 w-9 shrink-0 rounded-lg object-cover"
+              className="h-10 w-10 shrink-0 object-contain"
             />
             <span className="truncate font-semibold text-foreground">{tc('appName')}</span>
           </Link>
@@ -58,6 +58,14 @@ export default function Home() {
       <main className="flex-1">
         <section className="border-b bg-card">
           <div className="mx-auto flex max-w-6xl flex-col items-center px-4 py-16 text-center sm:px-6 sm:py-24">
+            <Image
+              src="/image/logo-full.png"
+              alt={tc('appName')}
+              width={540}
+              height={715}
+              priority
+              className="mb-8 h-44 w-auto object-contain sm:h-56"
+            />
             <span className="mb-5 inline-flex items-center rounded-full border bg-accent px-3 py-1 text-xs font-medium text-accent-foreground">
               {t('hero.eyebrow')}
             </span>

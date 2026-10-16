@@ -37,7 +37,7 @@ function Brand({ subtitle }: { subtitle?: string }) {
   const t = useTranslations('common')
   return (
     <div className="flex min-w-0 items-center gap-3">
-      <Image src="/image/khandaq-logo.png" alt="" width={36} height={36} className="h-9 w-9 shrink-0 rounded-lg object-cover" />
+      <Image src="/image/logo-mark.png" alt="" width={40} height={40} className="h-10 w-10 shrink-0 object-contain" />
       <div className="min-w-0 leading-tight">
         <p className="truncate font-semibold text-foreground">{t('appName')}</p>
         <p className="truncate text-xs text-muted-foreground">{subtitle ?? t('appTagline')}</p>

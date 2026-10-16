@@ -10,7 +10,7 @@
     "prebuild": "node scripts/backup-db.mjs",
     "build:backedup": "node scripts/backup-db.mjs && next build",
     "seed:admin": "node scripts/seed-admin.mjs",
-    "icons": "node scripts/generate-icons.mjs",
+    "icons": "python scripts/generate-logo.py",
     "backup:db": "node scripts/backup-db.mjs",
     "recover:students": "node scripts/recover-students.mjs",
     "migrate:photos": "node scripts/migrate-photos.mjs",
