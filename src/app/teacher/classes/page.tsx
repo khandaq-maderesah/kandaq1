@@ -150,6 +150,13 @@ export default function TeacherClassesPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user])
 
+  // "Add student" buttons on other pages link to #student-form: open the form ready to type.
+  useEffect(() => {
+    if (loading || window.location.hash !== '#student-form') return
+    focusAddForm()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading])
+
   // Archived (deleted) students never appear in the teacher area.
   const activeStudents = useMemo(() => students.filter((s) => s.isActive !== false), [students])
 
@@ -189,6 +196,15 @@ export default function TeacherClassesPage() {
     setEditingId(null)
     setEditingName('')
     setFormError('')
+  }
+
+  /** Scrolls to the add-student form (leaving edit mode) and focuses the name field. */
+  const focusAddForm = () => {
+    if (editingId) resetRegisterForm()
+    requestAnimationFrame(() => {
+      document.getElementById('student-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      document.getElementById('name')?.focus({ preventScroll: true })
+    })
   }
 
   const reloadStudents = async () => {
@@ -312,7 +328,15 @@ export default function TeacherClassesPage() {
 
   return (
     <div>
-      <PageHeader title={t('title')} description={t('description')} />
+      <PageHeader
+        title={t('title')}
+        description={t('description')}
+        actions={
+          <Button onClick={focusAddForm} disabled={formDisabled}>
+            <UserPlus /> {t('form.submitAdd')}
+          </Button>
+        }
+      />
 
       {/* Class picker cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

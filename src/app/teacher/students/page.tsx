@@ -4,12 +4,12 @@ import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
-import { ArrowRightLeft, Clock, MoreVertical, Phone, Search, Trash2, Users } from 'lucide-react'
+import { ArrowRightLeft, Clock, MoreVertical, Phone, Search, Trash2, UserPlus, Users } from 'lucide-react'
 import { rtdb } from '@/lib/database'
 import { useAuth } from '@/context/AuthContext'
 import { useLiveData } from '@/lib/dataStore'
 import { useMyRequests } from '@/hooks/useRequestBadges'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
@@ -91,6 +91,7 @@ function PhoneLink({ phone }: { phone?: string }) {
 
 export default function TeacherStudentsPage() {
   const t = useTranslations('teacherStudents')
+  const tAdd = useTranslations('teacherClasses')
   const tc = useTranslations('common')
   const { user } = useAuth()
   const [classes, setClasses] = useState<Class[]>([])
@@ -179,7 +180,15 @@ export default function TeacherStudentsPage() {
 
   return (
     <div>
-      <PageHeader title={t('title')} description={t('description')} />
+      <PageHeader
+        title={t('title')}
+        description={t('description')}
+        actions={
+          <Link href="/teacher/classes#student-form" className={buttonVariants()}>
+            <UserPlus /> {tAdd('form.submitAdd')}
+          </Link>
+        }
+      />
 
       <div className="mb-6 grid gap-4 rounded-xl border bg-card p-4 shadow-sm sm:grid-cols-[1fr_16rem] sm:p-5">
         <div className="space-y-2">

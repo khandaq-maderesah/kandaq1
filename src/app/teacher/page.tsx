@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useFormatter, useTranslations } from 'next-intl'
 import { toast } from 'sonner'
-import { ChevronRight, ClipboardList, GraduationCap, Phone, Search, UserCheck, Users, UserX } from 'lucide-react'
+import { ChevronRight, ClipboardList, GraduationCap, Phone, Search, UserCheck, UserPlus, Users, UserX } from 'lucide-react'
 import { rtdb } from '@/lib/database'
 import { useAuth } from '@/context/AuthContext'
 import { useMyRequests } from '@/hooks/useRequestBadges'
@@ -23,6 +23,7 @@ const todayIso = () => new Date().toISOString().slice(0, 10)
 
 export default function TeacherPage() {
   const t = useTranslations('teacherDashboard')
+  const tAdd = useTranslations('teacherClasses')
   const tr = useTranslations('requests')
   const format = useFormatter()
   const { user } = useAuth()
@@ -187,7 +188,15 @@ export default function TeacherPage() {
 
   return (
     <div>
-      <PageHeader title={t('title')} description={t('description')} />
+      <PageHeader
+        title={t('title')}
+        description={t('description')}
+        actions={
+          <Link href="/teacher/classes#student-form" className={buttonVariants()}>
+            <UserPlus /> {tAdd('form.submitAdd')}
+          </Link>
+        }
+      />
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label={t('stats.students')} value={totalStudents} icon={Users} />
