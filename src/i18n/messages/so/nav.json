@@ -1,9 +1,9 @@
 {
   "dashboard": "Bogga guud",
-  "schools": "Dugsiyada",
-  "allSchools": "Dhammaan dugsiyada",
+  "schools": "Madrasadaha",
+  "allSchools": "Dhammaan madrasadaha",
   "users": "Isticmaalayaasha",
-  "teachers": "Macallimiinta",
+  "teachers": "Ustaadyada",
   "classes": "Fasallada",
   "students": "Ardayda",
   "attendance": "Xaadiriska",
@@ -20,7 +20,7 @@
   "openMenu": "Fur liiska",
   "closeMenu": "Xir liiska",
   "notifications": "Ogeysiisyada",
-  "switchSchool": "Beddel dugsiga",
+  "switchSchool": "Beddel madrasada",
   "sections": {
     "overview": "Guudmar",
     "people": "Dadka",

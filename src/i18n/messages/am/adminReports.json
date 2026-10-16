@@ -1,6 +1,6 @@
 {
   "title": "ሪፖርቶች",
-  "description": "የትምህርት ቤትዎ የመገኘት አጠቃላይ እይታ",
+  "description": "የመድረሳዎ የመገኘት አጠቃላይ እይታ",
   "actions": {
     "studentCsv": "የተማሪዎች CSV",
     "summaryCsv": "የማጠቃለያ CSV"
@@ -17,7 +17,7 @@
   "kpi": {
     "students": "ንቁ ተማሪዎች",
     "classes": "ክፍሎች",
-    "teachers": "መምህራን",
+    "teachers": "ኡስታዞች",
     "records": "የመገኘት መዝገቦች",
     "rateHint": "{percent}% ተገኝተዋል"
   },
@@ -57,7 +57,7 @@
     "value": "ዋጋ",
     "totalStudents": "ንቁ ተማሪዎች",
     "totalClasses": "ክፍሎች",
-    "totalTeachers": "መምህራን",
+    "totalTeachers": "ኡስታዞች",
     "records": "የመገኘት መዝገቦች (በክልሉ)",
     "present": "የተገኘ",
     "absent": "ቀሪ",

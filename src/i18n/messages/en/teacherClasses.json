@@ -45,14 +45,14 @@
   },
   "empty": {
     "noClasses": "No classes assigned to you yet.",
-    "noClassesHint": "Ask a school admin to assign you a class."
+    "noClassesHint": "Ask a madrasa admin to assign you a class."
   },
   "toast": {
     "loadFailed": "Could not load your classes.",
     "added": "{name} was added with roll number {roll}.",
     "updated": "{name} was updated.",
     "saveFailed": "Could not save the student. Please try again.",
-    "registrationClosed": "Student registration is closed. A school admin must open it in Settings.",
+    "registrationClosed": "Student registration is closed. A madrasa admin must open it in Settings.",
     "rollTaken": "Roll number {roll} is already used in this class."
   }
 }

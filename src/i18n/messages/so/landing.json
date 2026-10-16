@@ -3,18 +3,18 @@
     "signIn": "Gal"
   },
   "hero": {
-    "eyebrow": "Madal maamulka dugsiyada",
-    "title": "Dugsigaaga oo dhan ka maamul hal meel",
-    "subtitle": "Khendeq wuxuu dugsiyada ka caawiyaa qaadashada xaadiriska, maamulka ardayda iyo macallimiinta, qabashada imtixaannada iyo la socodsiinta waalidka, adigoo isticmaalaya luqadda aad doorbiddo.",
+    "eyebrow": "Madal maamulka madrasadaha",
+    "title": "Madrasadaada oo dhan ka maamul hal meel",
+    "subtitle": "Khendeq wuxuu madrasadaha ka caawiyaa qaadashada xaadiriska, maamulka ardayda iyo ustaadyada, qabashada imtixaannada iyo la socodsiinta waalidka, adigoo isticmaalaya luqadda aad doorbiddo.",
     "cta": "Gal",
     "secondary": "Eeg waxa ku jira"
   },
   "features": {
-    "title": "Wax kasta oo dugsi u baahan yahay",
-    "subtitle": "Qalab fudud oo loogu talagalay maamulayaasha iyo macallimiinta, kuna shaqeeya si fiican taleefan kasta.",
+    "title": "Wax kasta oo madrasad u baahan tahay",
+    "subtitle": "Qalab fudud oo loogu talagalay maamulayaasha iyo ustaadyada, kuna shaqeeya si fiican taleefan kasta.",
     "attendance": {
       "title": "Xaadiriska maalinlaha ah",
-      "description": "Macallimiintu ilbiriqsiyo gudahood ayay ku calaamadeeyaan jooga, maqan ama daahay. Maamulayaashuna isla markiiba waxay arkaan xaaladda oo dhan."
+      "description": "Ustaadyadu ilbiriqsiyo gudahood ayay ku calaamadeeyaan jooga, maqan ama daahay. Maamulayaashuna isla markiiba waxay arkaan xaaladda oo dhan."
     },
     "students": {
       "title": "Diiwaanka ardayda",
@@ -33,8 +33,8 @@
       "description": "Jaantusyada isbeddelka xaadiriska, buundooyinka iyo tirada fasallada ayaa kaa caawinaya inaad dhibaatooyinka goor hore ogaato."
     },
     "languages": {
-      "title": "Dugsiyo badan, luqado badan",
-      "description": "Dugsi kastaa wuxuu leeyahay meel u gaar ah oo qarsoon, isticmaale kastaana wuxuu dooran karaa luqaddiisa."
+      "title": "Madrasado badan, luqado badan",
+      "description": "Madrasad kastaa waxay leedahay meel u gaar ah oo qarsoon, isticmaale kastaana wuxuu dooran karaa luqaddiisa."
     }
   },
   "footer": {

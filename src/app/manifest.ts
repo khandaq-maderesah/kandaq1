@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'Khendeq',
     short_name: 'Khendeq',
-    description: 'School management platform: attendance, students, teachers, exams and reports.',
+    description: 'Madrasa management platform: attendance, students, ustazes, exams and reports.',
     id: '/',
     start_url: '/',
     scope: '/',

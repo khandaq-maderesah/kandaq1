@@ -1,6 +1,6 @@
 {
   "title": "Barattoota",
-  "description": "Barattoota mana barumsaa hojii irra jiran galmeessaa, gulaalaa fi dabarsaa.",
+  "description": "Barattoota madarasaa hojii irra jiran galmeessaa, gulaalaa fi dabarsaa.",
   "add": "Barataa dabali",
   "import": "CSV galchi",
   "importing": "Galchaa jira…",
@@ -35,7 +35,7 @@
     "edit": "Gulaali ykn dabarsi",
     "delete": "Barataa haqi",
     "more": "Gochaalee dabalataa {name}",
-    "pendingTitle": "Gaaffiin barsiisaa barataa kanaaf dhiyaate raggaasisa keessan eeggachaa jira"
+    "pendingTitle": "Gaaffiin ustaaz barataa kanaaf dhiyaate raggaasisa keessan eeggachaa jira"
   },
   "form": {
     "createTitle": "Barataa dabali",

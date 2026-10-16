@@ -1,6 +1,6 @@
 {
   "title": "ዳሽቦርድ",
-  "description": "የተማሪዎች፣ የመምህራን እና የመገኘት አጠቃላይ እይታ",
+  "description": "የተማሪዎች፣ የኡስታዞች እና የመገኘት አጠቃላይ እይታ",
   "todayDate": "{gregorian} · {ethiopian}",
   "kpi": {
     "totalStudents": "ጠቅላላ ተማሪዎች",
@@ -8,7 +8,7 @@
     "maleStudents": "ወንድ ተማሪዎች",
     "femaleStudents": "ሴት ተማሪዎች",
     "percentOfTotal": "ከሁሉም ተማሪዎች {percent}%",
-    "teachers": "መምህራን",
+    "teachers": "ኡስታዞች",
     "classes": "ክፍሎች",
     "absentToday": "ዛሬ ቀሪ",
     "absentWeekHint": "{count, plural, =0 {ባለፉት 7 ቀናት ምንም} one {ባለፉት 7 ቀናት #} other {ባለፉት 7 ቀናት #}}"
@@ -32,11 +32,11 @@
     }
   },
   "teachers": {
-    "title": "መምህራን",
-    "description": "ሁሉም የመምህራን መለያዎች።",
+    "title": "ኡስታዞች",
+    "description": "ሁሉም የኡስታዞች መለያዎች።",
     "searchPlaceholder": "በስም፣ በኢሜይል ወይም በስልክ ይፈልጉ",
-    "searchLabel": "መምህራንን ፈልግ",
-    "empty": "ምንም መምህር አልተገኘም",
+    "searchLabel": "ኡስታዞችን ፈልግ",
+    "empty": "ምንም ኡስታዝ አልተገኘም",
     "table": {
       "name": "ስም",
       "email": "ኢሜይል",
@@ -47,15 +47,15 @@
   },
   "classes": {
     "title": "ክፍሎች",
-    "description": "ሁሉም ክፍሎች እና የተመደቡላቸው መምህራን።",
-    "searchPlaceholder": "ክፍል ወይም መምህር ይፈልጉ",
+    "description": "ሁሉም ክፍሎች እና የተመደቡላቸው ኡስታዞች።",
+    "searchPlaceholder": "ክፍል ወይም ኡስታዝ ይፈልጉ",
     "searchLabel": "ክፍሎችን ፈልግ",
     "empty": "ምንም ክፍል አልተገኘም",
     "table": {
       "class": "ክፍል",
       "grade": "ደረጃ",
       "section": "ሴክሽን",
-      "teacher": "መምህር",
+      "teacher": "ኡስታዝ",
       "students": "ተማሪዎች",
       "academicYear": "የትምህርት ዘመን"
     }

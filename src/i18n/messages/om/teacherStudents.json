@@ -1,6 +1,6 @@
 {
   "title": "Barattoota koo",
-  "description": "Barattoota kutaalee isinitti kennaman keessa jiran. Barataa haquuf ykn dabarsuuf bulchaa mana barumsaatiif gaaffii ergaa.",
+  "description": "Barattoota kutaalee isinitti kennaman keessa jiran. Barataa haquuf ykn dabarsuuf bulchaa madarasaatiif gaaffii ergaa.",
   "filters": {
     "search": "Barattoota barbaadi",
     "searchPlaceholder": "Maqaa, lakkoofsa tartiibaa ykn bilbila",
@@ -26,7 +26,7 @@
   "callNumber": "{phone} bilbili",
   "empty": {
     "noClasses": "Hanga ammaatti kutaan isinitti kenname hin jiru.",
-    "noClassesHint": "Akka kutaan isiniif kennamu bulchaa mana barumsaa gaafadhaa.",
+    "noClassesHint": "Akka kutaan isiniif kennamu bulchaa madarasaa gaafadhaa.",
     "noStudents": "Barataan hin argamne.",
     "noStudentsHint": "Barattoota fuula Kutaalee koo irraa dabalaa."
   },

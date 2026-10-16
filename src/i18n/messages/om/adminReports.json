@@ -1,6 +1,6 @@
 {
   "title": "Gabaasota",
-  "description": "Waliigala argamaa mana barumsaa keessanii",
+  "description": "Waliigala argamaa madarasaa keessanii",
   "actions": {
     "studentCsv": "CSV barattootaa",
     "summaryCsv": "CSV cuunfaa"
@@ -17,7 +17,7 @@
   "kpi": {
     "students": "Barattoota hojii irra jiran",
     "classes": "Kutaalee",
-    "teachers": "Barsiisota",
+    "teachers": "Ustaazota",
     "records": "Galmeewwan argamaa",
     "rateHint": "{percent}% argame"
   },
@@ -57,7 +57,7 @@
     "value": "Gatii",
     "totalStudents": "Barattoota hojii irra jiran",
     "totalClasses": "Kutaalee",
-    "totalTeachers": "Barsiisota",
+    "totalTeachers": "Ustaazota",
     "records": "Galmeewwan argamaa (daangaa)",
     "present": "Argame",
     "absent": "Hafe",

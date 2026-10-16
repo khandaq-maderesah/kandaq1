@@ -1,6 +1,6 @@
 {
   "title": "Reports",
-  "description": "Attendance overview for your school",
+  "description": "Attendance overview for your madrasa",
   "actions": {
     "studentCsv": "Student CSV",
     "summaryCsv": "Summary CSV"
@@ -17,7 +17,7 @@
   "kpi": {
     "students": "Active students",
     "classes": "Classes",
-    "teachers": "Teachers",
+    "teachers": "Ustazes",
     "records": "Attendance records",
     "rateHint": "{percent}% present"
   },
@@ -57,7 +57,7 @@
     "value": "Value",
     "totalStudents": "Active students",
     "totalClasses": "Classes",
-    "totalTeachers": "Teachers",
+    "totalTeachers": "Ustazes",
     "records": "Attendance records (range)",
     "present": "Present",
     "absent": "Absent",

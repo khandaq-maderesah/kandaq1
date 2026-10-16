@@ -1,9 +1,9 @@
 {
   "dashboard": "Dashboard",
-  "schools": "Schools",
-  "allSchools": "All schools",
+  "schools": "Madrasas",
+  "allSchools": "All madrasas",
   "users": "Users",
-  "teachers": "Teachers",
+  "teachers": "Ustazes",
   "classes": "Classes",
   "students": "Students",
   "attendance": "Attendance",
@@ -20,7 +20,7 @@
   "openMenu": "Open menu",
   "closeMenu": "Close menu",
   "notifications": "Notifications",
-  "switchSchool": "Switch school",
+  "switchSchool": "Switch madrasa",
   "sections": {
     "overview": "Overview",
     "people": "People",

@@ -81,7 +81,7 @@ export function detectMissingAttendance(
       className: c.name,
       section: c.section || '',
       teacherId: c.teacherId,
-      teacherName: c.teacherName || teacher?.name || 'Unknown teacher',
+      teacherName: c.teacherName || teacher?.name || 'Unknown ustaz',
     })
   }
   return missing

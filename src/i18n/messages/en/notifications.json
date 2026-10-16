@@ -38,7 +38,7 @@
     "audience": {
       "label": "Who can see this",
       "everyone": "Everyone",
-      "teachers": "Teachers only",
+      "teachers": "Ustazes only",
       "admins": "Admins only"
     },
     "form": {

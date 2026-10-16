@@ -1,6 +1,6 @@
 {
   "title": "Students",
-  "description": "Register, edit and move the school's active students.",
+  "description": "Register, edit and move the madrasa's active students.",
   "add": "Add student",
   "import": "Import CSV",
   "importing": "Importing…",
@@ -35,7 +35,7 @@
     "edit": "Edit or move",
     "delete": "Delete student",
     "more": "More actions for {name}",
-    "pendingTitle": "A teacher's request for this student is waiting for your approval"
+    "pendingTitle": "An ustaz's request for this student is waiting for your approval"
   },
   "form": {
     "createTitle": "Add student",

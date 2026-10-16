@@ -1,6 +1,6 @@
 {
   "title": "Warbixinnada",
-  "description": "Guudmarka xaadiriska dugsigaaga",
+  "description": "Guudmarka xaadiriska madrasadaada",
   "actions": {
     "studentCsv": "CSV ardayda",
     "summaryCsv": "CSV soo koobidda"
@@ -17,7 +17,7 @@
   "kpi": {
     "students": "Ardayda firfircoon",
     "classes": "Fasallada",
-    "teachers": "Macallimiinta",
+    "teachers": "Ustaadyada",
     "records": "Diiwaannada xaadiriska",
     "rateHint": "{percent}% jooga"
   },
@@ -57,7 +57,7 @@
     "value": "Qiime",
     "totalStudents": "Ardayda firfircoon",
     "totalClasses": "Fasallada",
-    "totalTeachers": "Macallimiinta",
+    "totalTeachers": "Ustaadyada",
     "records": "Diiwaannada xaadiriska (muddada)",
     "present": "Jooga",
     "absent": "Maqan",

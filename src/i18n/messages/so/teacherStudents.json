@@ -1,6 +1,6 @@
 {
   "title": "Ardaydayda",
-  "description": "Ardayda fasallada laguu qoondeeyay. Si aad arday u tirtirto ama u wareejiso, codsi u dir maamulaha dugsiga.",
+  "description": "Ardayda fasallada laguu qoondeeyay. Si aad arday u tirtirto ama u wareejiso, codsi u dir maamulaha madrasada.",
   "filters": {
     "search": "Raadi arday",
     "searchPlaceholder": "Magac, lambarka taxanaha ama taleefan",
@@ -26,7 +26,7 @@
   "callNumber": "Wac {phone}",
   "empty": {
     "noClasses": "Weli laguuma qoondayn wax fasal ah.",
-    "noClassesHint": "Fadlan maamulaha dugsiga ka codso inuu fasal kuu qoondeeyo.",
+    "noClassesHint": "Fadlan maamulaha madrasada ka codso inuu fasal kuu qoondeeyo.",
     "noStudents": "Arday lama helin.",
     "noStudentsHint": "Ardayda ku dar bogga Fasalladayda."
   },

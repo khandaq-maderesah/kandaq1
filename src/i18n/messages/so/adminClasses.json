@@ -1,15 +1,15 @@
 {
   "title": "Fasallada",
-  "description": "Samee oo wax ka beddel fasallada. Macallimiinta waxaa laga qoondeeyaa bogga Isticmaalayaasha.",
+  "description": "Samee oo wax ka beddel fasallada. Ustaadyada waxaa laga qoondeeyaa bogga Isticmaalayaasha.",
   "add": "Ku dar fasal",
-  "searchPlaceholder": "Ku raadi fasal, macallin ama sannad",
+  "searchPlaceholder": "Ku raadi fasal, ustaad ama sannad",
   "searchLabel": "Raadi fasallada",
   "summary": "{shown, plural, one {Waxaa muuqda # fasal} other {Waxaa muuqda # fasal}} oo ka mid ah {total}",
   "table": {
     "class": "Fasalka",
     "section": "Qaybta",
-    "teacher": "Macallinka",
-    "year": "Sannad-dugsiyeedka",
+    "teacher": "Ustaadka",
+    "year": "Sannadka waxbarashada",
     "students": "Ardayda",
     "actions": "Ficillo"
   },
@@ -21,7 +21,7 @@
   "deleteClass": "Tirtir {name}",
   "form": {
     "createTitle": "Ku dar fasal",
-    "createDescription": "Macallimiinta waxaa la qoondeeyaa marka aad diiwaangeliso ama wax ka beddesho bogga Isticmaalayaasha.",
+    "createDescription": "Ustaadyada waxaa la qoondeeyaa marka aad diiwaangeliso ama wax ka beddesho bogga Isticmaalayaasha.",
     "editTitle": "Wax ka beddel fasalka",
     "editDescription": "Cusboonaysii xogta fasalka.",
     "name": "Magaca fasalka",
@@ -30,7 +30,7 @@
     "gradePlaceholder": "Tusaale: 5",
     "section": "Qaybta",
     "sectionPlaceholder": "Tusaale: A",
-    "year": "Sannad-dugsiyeedka",
+    "year": "Sannadka waxbarashada",
     "yearPlaceholder": "Tusaale: 2026-2027",
     "create": "Samee fasal"
   },

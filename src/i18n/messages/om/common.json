@@ -1,6 +1,6 @@
 {
   "appName": "Khendeq",
-  "appTagline": "Waltajjii bulchiinsa mana barumsaa",
+  "appTagline": "Waltajjii bulchiinsa madarasaa",
   "actions": {
     "save": "Olkaa'i",
     "saveChanges": "Jijjiirama olkaa'i",
@@ -47,8 +47,8 @@
   },
   "roles": {
     "superadmin": "Bulchaa waltajjii",
-    "admin": "Bulchaa mana barumsaa",
-    "teacher": "Barsiisaa"
+    "admin": "Bulchaa madarasaa",
+    "teacher": "Ustaaz"
   },
   "gender": {
     "male": "Dhiira",
@@ -86,8 +86,8 @@
       "weakPassword": "Jechi icciitii yoo xiqqaate qubee 6 qabaachuu qaba.",
       "sessionExpired": "Yeroon seensa keessanii xumurameera. Maaloo irra deebi'aa seenaa.",
       "forbidden": "Kana gochuuf hayyama hin qabdan.",
-      "schoolSuspended": "Manni barumsaa kun dhorkameera.",
-      "otherSchool": "Namoota mana barumsaa keessanii qofa bulchuu dandeessu.",
+      "schoolSuspended": "Madarasaan kun dhorkameera.",
+      "otherSchool": "Namoota madarasaa keessanii qofa bulchuu dandeessu.",
       "notFound": "Herregni kun kana booda hin jiru.",
       "cannotDeleteSelf": "Herrega mataa keessanii haquu hin dandeessan.",
       "invalid": "Odeeffannoon tokko tokko hin guutamne ykn sirrii miti.",
@@ -100,7 +100,7 @@
   },
   "count": {
     "students": "{count, plural, =0 {Barataan hin jiru} one {Barataa tokko} other {Barattoota #}}",
-    "teachers": "{count, plural, =0 {Barsiisaan hin jiru} one {Barsiisaa tokko} other {Barsiisota #}}",
+    "teachers": "{count, plural, =0 {Ustaazni hin jiru} one {Ustaaz tokko} other {Ustaazota #}}",
     "classes": "{count, plural, =0 {Kutaan hin jiru} one {Kutaa tokko} other {Kutaalee #}}"
   },
   "language": "Afaan",

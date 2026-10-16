@@ -1,6 +1,6 @@
 {
   "title": "Fayyadamtoota",
-  "description": "Herrega bulchaa mana barumsaa fi barsiisotaa uumaa, bulchaas.",
+  "description": "Herrega bulchaa madarasaa fi ustaazotaa uumaa, bulchaas.",
   "add": "Fayyadamaa dabali",
   "searchPlaceholder": "Maqaa, imeelii ykn bilbilaan barbaadi",
   "searchLabel": "Fayyadamtoota barbaadi",
@@ -29,27 +29,27 @@
   },
   "form": {
     "createTitle": "Fayyadamaa dabali",
-    "createDescription": "Herrega bulchaa mana barumsaa ykn barsiisaa odeeffannoo seensaa waliin uumaa.",
+    "createDescription": "Herrega bulchaa madarasaa ykn ustaaz odeeffannoo seensaa waliin uumaa.",
     "name": "Maqaa guutuu",
     "namePlaceholder": "Fakkeenyaaf: Ahmed Ali",
     "email": "Imeelii",
-    "emailPlaceholder": "teacher@school.com",
+    "emailPlaceholder": "ustaz@madrasa.com",
     "phone": "Lakk. bilbilaa (dirqama miti)",
     "phonePlaceholder": "Fakkeenyaaf: 0911 223344",
     "password": "Jecha icciitii yeroo",
     "passwordPlaceholder": "Yoo xiqqaate qubee 6",
     "role": "Gahee",
-    "roleHint": "Bulchitoonni mana barumsaa hayyama guutuu qabu; fayyadamtoota biroos bulchuu danda'u.",
+    "roleHint": "Bulchitoonni madarasaa hayyama guutuu qabu; fayyadamtoota biroos bulchuu danda'u.",
     "classes": "Kutaalee kenni",
-    "classesHint": "Kutaalee barsiisaan kun barsiisu filadhaa.",
-    "noClassesYet": "Ammaaf kutaan hin jiru. Dursa kutaalee uumaatii booda barsiisaa ramadaa.",
+    "classesHint": "Kutaalee ustaazni kun barsiisu filadhaa.",
+    "noClassesYet": "Ammaaf kutaan hin jiru. Dursa kutaalee uumaatii booda ustaaz ramadaa.",
     "create": "Fayyadamaa uumi"
   },
   "assign": {
     "title": "Kutaalee kennaman gulaali",
     "description": "Kutaalee {name} barsiisu filadhaa. Barattoonni kutaalee isaanii keessa turu.",
     "currentlyAssigned": "{name}f kennameera",
-    "currentlyAssignedOther": "Barsiisaa biraaf kennameera",
+    "currentlyAssignedOther": "Ustaaz biraaf kennameera",
     "save": "Ramaddii olkaa'i"
   },
   "delete": {
@@ -58,8 +58,8 @@
     "confirm": "Fayyadamaa haqi"
   },
   "toast": {
-    "adminCreated": "Herregni bulchaa mana barumsaa uumameera.",
-    "teacherCreated": "Herregni barsiisaa uumameera.",
+    "adminCreated": "Herregni bulchaa madarasaa uumameera.",
+    "teacherCreated": "Herregni ustaaz uumameera.",
     "assigned": "Kutaaleen {name} haaromfameera.",
     "activated": "Herregni {name} hojiirra ooleera.",
     "deactivated": "Herregni {name} hojii irraa dhaabbateera.",
@@ -69,7 +69,7 @@
   },
   "empty": {
     "title": "Ammaaf fayyadamaan hin jiru",
-    "description": "Akka seenuu danda'aniif barsiisotaa fi bulchitoota mana barumsaa dabalaa.",
+    "description": "Akka seenuu danda'aniif ustaazotaa fi bulchitoota madarasaa dabalaa.",
     "search": "Fayyadamaan barbaacha keessaniin wal simu hin jiru."
   },
   "csv": {

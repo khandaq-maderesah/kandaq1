@@ -69,7 +69,7 @@ export function generateSmsMessage(
     case 'Somali': {
       // Plural "idin" addresses the family respectfully; uusan/aysan = he/she did not.
       const name = latin(studentName)
-      return `Ka socota ${schoolName}\n\nWaalidka sharafta leh ee ${isFemale ? 'ardayda' : 'ardayga'} ${name}, waxaan idin ogeysiinaynaa in ${name} ${isFemale ? 'aysan' : 'uusan'} maanta dugsiga iman.`
+      return `Ka socota ${schoolName}\n\nWaalidka sharafta leh ee ${isFemale ? 'ardayda' : 'ardayga'} ${name}, waxaan idin ogeysiinaynaa in ${name} ${isFemale ? 'aysan' : 'uusan'} maanta madrasada iman.`
     }
 
     case 'Arabic':
@@ -80,7 +80,7 @@ export function generateSmsMessage(
 
     case 'English': {
       const name = latin(studentName)
-      return `From ${schoolName}\n\nDear parent or guardian of ${name}, we would like to let you know that ${name} was absent from school today.`
+      return `From ${schoolName}\n\nDear parent or guardian of ${name}, we would like to let you know that ${name} was absent from the madrasa today.`
     }
 
     default: {

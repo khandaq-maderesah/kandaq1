@@ -10,7 +10,7 @@
     "title": "Qormaata olkaa'aman",
     "count": "{count, plural, =0 {Kutaa kanaaf qormaanni olkaa'ame hin jiru} one {Kutaa kanaaf qormaata olkaa'ame tokko} other {Kutaa kanaaf qormaata olkaa'aman #}}",
     "empty": "Ammaaf kutaa kanaaf qormaanni olkaa'ame hin jiru.",
-    "emptyHint": "Erga barsiisaan bu'aa olkaa'ee booda qormaanni as mul'ata.",
+    "emptyHint": "Erga ustaazni bu'aa olkaa'ee booda qormaanni as mul'ata.",
     "selectClass": "Qormaata ilaaluuf kutaa filadhaa.",
     "updated": "Kan haaromfame: {date}",
     "showResults": "Bu'aa agarsiisi",

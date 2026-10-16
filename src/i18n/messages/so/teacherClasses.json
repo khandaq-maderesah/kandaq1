@@ -45,14 +45,14 @@
   },
   "empty": {
     "noClasses": "Weli laguuma qoondayn wax fasal ah.",
-    "noClassesHint": "Fadlan maamulaha dugsiga ka codso inuu fasal kuu qoondeeyo."
+    "noClassesHint": "Fadlan maamulaha madrasada ka codso inuu fasal kuu qoondeeyo."
   },
   "toast": {
     "loadFailed": "Fasalladaada lama soo rari karin.",
     "added": "{name} waxaa lagu daray lambarka taxanaha {roll}.",
     "updated": "Xogta {name} waa la cusboonaysiiyay.",
     "saveFailed": "Ardayga lama kaydin karin. Fadlan isku day mar kale.",
-    "registrationClosed": "Diiwaangelinta ardayda waa xiran tahay. Waa in maamulaha dugsigu ka furo Dejinta.",
+    "registrationClosed": "Diiwaangelinta ardayda waa xiran tahay. Waa in maamulaha madrasadu ka furo Dejinta.",
     "rollTaken": "Lambarka taxanaha {roll} horay ayaa loogu isticmaalay fasalkan."
   }
 }

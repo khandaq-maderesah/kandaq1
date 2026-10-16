@@ -1,9 +1,9 @@
 {
   "dashboard": "ዳሽቦርድ",
-  "schools": "ትምህርት ቤቶች",
-  "allSchools": "ሁሉም ትምህርት ቤቶች",
+  "schools": "መድረሳዎች",
+  "allSchools": "ሁሉም መድረሳዎች",
   "users": "ተጠቃሚዎች",
-  "teachers": "መምህራን",
+  "teachers": "ኡስታዞች",
   "classes": "ክፍሎች",
   "students": "ተማሪዎች",
   "attendance": "መገኘት",
@@ -20,7 +20,7 @@
   "openMenu": "ምናሌ ክፈት",
   "closeMenu": "ምናሌ ዝጋ",
   "notifications": "ማሳወቂያዎች",
-  "switchSchool": "ትምህርት ቤት ቀይር",
+  "switchSchool": "መድረሳ ቀይር",
   "sections": {
     "overview": "አጠቃላይ እይታ",
     "people": "ሰዎች",

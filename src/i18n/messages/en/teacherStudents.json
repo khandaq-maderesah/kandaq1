@@ -1,6 +1,6 @@
 {
   "title": "My students",
-  "description": "Students in your assigned classes. To delete or move a student, send a request to the school admin.",
+  "description": "Students in your assigned classes. To delete or move a student, send a request to the madrasa admin.",
   "filters": {
     "search": "Search students",
     "searchPlaceholder": "Name, roll number or phone",
@@ -26,7 +26,7 @@
   "callNumber": "Call {phone}",
   "empty": {
     "noClasses": "No classes have been assigned to you yet.",
-    "noClassesHint": "Ask a school admin to assign you a class.",
+    "noClassesHint": "Ask a madrasa admin to assign you a class.",
     "noStudents": "No students found.",
     "noStudentsHint": "Add students from My classes."
   },

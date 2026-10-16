@@ -10,7 +10,7 @@
     "title": "Saved exams",
     "count": "{count, plural, =0 {No saved exams for this class} one {# saved exam for this class} other {# saved exams for this class}}",
     "empty": "No saved exams for this class yet.",
-    "emptyHint": "Exams appear here after a teacher saves the results.",
+    "emptyHint": "Exams appear here after an ustaz saves the results.",
     "selectClass": "Select a class to see its exams.",
     "updated": "Updated {date}",
     "showResults": "Show results",

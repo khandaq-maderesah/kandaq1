@@ -3,18 +3,18 @@
     "signIn": "Seeni"
   },
   "hero": {
-    "eyebrow": "Waltajjii bulchiinsa mana barumsaa",
-    "title": "Mana barumsaa keessan guutuu bakka tokkoo bulchaa",
-    "subtitle": "Khendeq manneen barumsaa argama akka galmeessan, barattootaa fi barsiisota akka bulchan, qormaata akka geggeessan fi maatii akka beeksisan, afaan isin filattaniin gargaara.",
+    "eyebrow": "Waltajjii bulchiinsa madarasaa",
+    "title": "Madarasaa keessan guutuu bakka tokkoo bulchaa",
+    "subtitle": "Khendeq madarasaalee argama akka galmeessan, barattootaa fi ustaazota akka bulchan, qormaata akka geggeessan fi maatii akka beeksisan, afaan isin filattaniin gargaara.",
     "cta": "Seeni",
     "secondary": "Waan keessatti argamu ilaali"
   },
   "features": {
-    "title": "Wanta mana barumsaaf barbaachisu hunda",
-    "subtitle": "Meeshaalee salphaa bulchitootaa fi barsiisotaaf, bilbila kamiin iyyuu akka gaariitti akka hojjetaniif qophaa'an.",
+    "title": "Wanta madarasaaf barbaachisu hunda",
+    "subtitle": "Meeshaalee salphaa bulchitootaa fi ustaazotaaf, bilbila kamiin iyyuu akka gaariitti akka hojjetaniif qophaa'an.",
     "attendance": {
       "title": "Argama guyyaa guyyaa",
-      "description": "Barsiisonni argame, hafe ykn booda dhufe sekondii muraasa keessatti mallatteessu. Bulchitoonni haala guutuu battalumatti argu."
+      "description": "Ustaazonni argame, hafe ykn booda dhufe sekondii muraasa keessatti mallatteessu. Bulchitoonni haala guutuu battalumatti argu."
     },
     "students": {
       "title": "Galmee barattootaa",
@@ -33,8 +33,8 @@
       "description": "Chaartiin adeemsa argamaa, qabxii fi baay'ina kutaalee rakkoo dafanii akka adda baastan isin gargaara."
     },
     "languages": {
-      "title": "Manneen barumsaa hedduu, afaanota hedduu",
-      "description": "Manni barumsaa tokkoon tokkoon bakka dhuunfaa mataa isaa qaba; fayyadamaan hundi immoo afaan mataa isaa filachuu danda'a."
+      "title": "Madarasaalee hedduu, afaanota hedduu",
+      "description": "Madarasaan tokkoon tokkoon bakka dhuunfaa mataa isaa qaba; fayyadamaan hundi immoo afaan mataa isaa filachuu danda'a."
     }
   },
   "footer": {

@@ -10,7 +10,7 @@
     "title": "Imtixaannada la kaydiyay",
     "count": "{count, plural, =0 {Fasalkan ma laha imtixaan la kaydiyay} one {# imtixaan oo la kaydiyay} other {# imtixaan oo la kaydiyay}}",
     "empty": "Weli fasalkan ma laha imtixaan la kaydiyay.",
-    "emptyHint": "Imtixaannadu halkan ayay ka soo muuqanayaan marka macallin kaydiyo natiijooyinka.",
+    "emptyHint": "Imtixaannadu halkan ayay ka soo muuqanayaan marka ustaad kaydiyo natiijooyinka.",
     "selectClass": "Dooro fasal si aad u aragto imtixaannadiisa.",
     "updated": "La cusboonaysiiyay {date}",
     "showResults": "Tus natiijooyinka",

@@ -1,6 +1,6 @@
 {
   "title": "Fuula jalqabaa",
-  "description": "Waliigala barattootaa, barsiisotaa fi argamaa",
+  "description": "Waliigala barattootaa, ustaazotaa fi argamaa",
   "todayDate": "{gregorian} · {ethiopian}",
   "kpi": {
     "totalStudents": "Barattoota waliigalaa",
@@ -8,7 +8,7 @@
     "maleStudents": "Barattoota dhiiraa",
     "femaleStudents": "Barattoota dhalaa",
     "percentOfTotal": "Barattoota hunda keessaa {percent}%",
-    "teachers": "Barsiisota",
+    "teachers": "Ustaazota",
     "classes": "Kutaalee",
     "absentToday": "Har'a kan hafan",
     "absentWeekHint": "{count, plural, =0 {Guyyoota 7 darban keessa hin jiru} one {Guyyoota 7 darban keessa: #} other {Guyyoota 7 darban keessa: #}}"
@@ -32,11 +32,11 @@
     }
   },
   "teachers": {
-    "title": "Barsiisota",
-    "description": "Herrega barsiisotaa hunda.",
+    "title": "Ustaazota",
+    "description": "Herrega ustaazotaa hunda.",
     "searchPlaceholder": "Maqaa, imeelii ykn bilbilaan barbaadi",
-    "searchLabel": "Barsiisota barbaadi",
-    "empty": "Barsiisaan hin argamne",
+    "searchLabel": "Ustaazota barbaadi",
+    "empty": "Ustaazni hin argamne",
     "table": {
       "name": "Maqaa",
       "email": "Imeelii",
@@ -47,15 +47,15 @@
   },
   "classes": {
     "title": "Kutaalee",
-    "description": "Kutaalee hunda fi barsiisota itti ramadaman.",
-    "searchPlaceholder": "Kutaa ykn barsiisaa barbaadi",
+    "description": "Kutaalee hunda fi ustaazota itti ramadaman.",
+    "searchPlaceholder": "Kutaa ykn ustaaz barbaadi",
     "searchLabel": "Kutaalee barbaadi",
     "empty": "Kutaan hin argamne",
     "table": {
       "class": "Kutaa",
       "grade": "Sadarkaa kutaa",
       "section": "Garee",
-      "teacher": "Barsiisaa",
+      "teacher": "Ustaaz",
       "students": "Barattoota",
       "academicYear": "Bara barnootaa"
     }

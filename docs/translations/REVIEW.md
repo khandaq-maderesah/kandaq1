@@ -15,6 +15,8 @@ Please have a native speaker of each language go through the notes below before 
 
 ---
 
+---
+
 ## Amharic (am) translation review
 
 Namespaces done: common, nav, requests
@@ -144,6 +146,32 @@ Status: `node scripts/i18n-sync.mjs --check` shows 0 lines for `am`. I also adde
 
 ---
 
+# Terminology change: madrasa / ustaz (owner's decision)
+
+96 strings in 21 namespaces were changed. Keys, placeholders and plural/select blocks are unchanged.
+
+| Old | New |
+|---|---|
+| ትምህርት ቤት / ቤቱ / ቤቱን / ቤትዎ / ቤትዎን / ቤቶች / ቤቶችን | መድረሳ / መድረሳው / መድረሳውን / መድረሳዎ / መድረሳዎን / መድረሳዎች / መድረሳዎችን |
+| የትምህርት ቤት(ቱ) አስተዳዳሪ | የመድረሳ(ው) አስተዳዳሪ |
+| መምህር / መምህሩ / መምህሩን | ኡስታዝ / ኡስታዙ / ኡስታዙን |
+| መምህራን / መምህራንን / መምህራኑ | ኡስታዞች / ኡስታዞችን / ኡስታዞቹ |
+
+These were not changed:
+- የትምህርት ዘመን (academic year)
+- የትምህርት ዓይነት (subject)
+- ትምህርት አቋርጧል (dropped out)
+- nav.sections.academics "ትምህርት"
+- the platform word መድረክ
+
+None of the changed strings is clearly about a female ustaz, so ኡስታዛ is not used anywhere.
+
+Reviewer check:
+28. The plural ኡስታዞች. Some communities say ኡስታዞች, others use the Arabic-style plural (e.g. አሳቲዝ). መድረሳዎች as the plural of madrasa should be confirmed too.
+29. A few verbs and adjectives now agree with ኡስታዙ (masculine). Examples: adminExams.list.emptyHint "ኡስታዙ ውጤቱን ካስቀመጠ በኋላ" and requests.admin.rejectEffect "ኡስታዙ ማስታወሻዎን ያያል". Both are generic masculine, as before.
+
+---
+
 ## Arabic (ar): term list and review notes
 
 All 26 namespaces are translated. `node scripts/i18n-sync.mjs --check` reports 0 `ar` lines, and all 1,199 ar messages parse with intl-messageformat.
@@ -156,7 +184,7 @@ All 26 namespaces are translated. `node scripts/i18n-sync.mjs --check` reports 0
 | school | مدرسة | |
 | platform | المنصّة | |
 | student / students | طالب / الطلاب; female: طالبة / الطالبات | Masculine plural for mixed groups |
-| teacher / teachers | معلّم / المعلّمون | Ustaz label: الأستاذ {name} |
+| teacher (Ustaz) / teachers | أستاذ / الأساتذة (female: الأستاذة) | Owner decision: replaces معلّم everywhere |
 | school admin | مسؤول المدرسة (short: المسؤول) | Not مدير, not أدمن |
 | platform admin | مسؤول المنصّة | |
 | user(s) | المستخدمون | |
@@ -270,6 +298,12 @@ All 26 namespaces are translated. `node scripts/i18n-sync.mjs --check` reports 0
 21. **requests vs students.** الطلبات (requests) and الطلاب (students) look alike in the sidebar. This is standard Arabic but worth watching.
 22. **`requests.dialog.detailsPlaceholder`** uses a Gregorian month ("12 مارس"), as the English does. An Ethiopian month name (e.g. 12 مسكرم) might suit these schools better.
 23. **`adminClasses.form.sectionPlaceholder` "مثال: A"** keeps the Latin letter, since Ethiopian schools write sections that way. Arabic schools would use أ/ب.
+24. **Terminology change (owner's decision): teacher → Ustaz.**
+   - Every معلّم form was replaced with أستاذ / الأستاذ / الأساتذة, across 44 strings, including roles.teacher and the count plurals (أستاذ واحد / أستاذان / # أساتذة / # أستاذًا / # أستاذ).
+   - Because الأساتذة is a broken plural, the old sound-plural case endings (معلّمون/معلّمين) are gone; ومعلّموها became وأساتذتها.
+   - No string clearly refers to a woman, so الأستاذة is not used yet.
+   - School stays المدرسة throughout. I did not add المدرسة الإسلامية anywhere because no sentence needed it.
+   - Please check that "مسؤول المدرسة" still fits now that the English says "Madrasa admin".
 
 ---
 
@@ -418,6 +452,26 @@ The full `node scripts/i18n-sync.mjs --check` now shows **0 om lines**.
 31. **Spelling fix**: in batch 3 adminDashboard I had written "Herreega"; it is now "Herrega".
 32. **students.detail.studentId = "Eenyummaa barataa (ID)"**: "ID" is kept because users see the raw ID value.
 
+### Terminology change: madrasa / ustaz (owner's decision)
+
+101 strings changed across all om namespaces (100 term replacements plus emailPlaceholder -> "ustaz@madrasa.com"). The full check shows 0 om lines.
+
+| Concept | Old | New (case forms used) |
+|---|---|---|
+| School | mana barumsaa | madarasaa; nominative **madarasaan**; plural **madarasaalee**; dative madarasaaf / madarasaatiif; "madarasaa biraatti", "madarasaa kamittuu" |
+| School admin | Bulchaa mana barumsaa | **Bulchaa madarasaa** |
+| Teacher | barsiisaa | **Ustaaz**; nominative **ustaazni**; dative **ustaaziif** |
+| Teachers | Barsiisota | **Ustaazota**; nominative **ustaazonni**; genitive ustaazotaa; dative ustaazotaaf |
+
+The verb "barsiisuu" (to teach) stays as it is, e.g. "Kutaalee ustaazni kun barsiisu".
+
+### Please double-check
+33. **Plural "Ustaazota" / "Ustaazonni"**: this follows the Oromo -ota plural (like barsiisota). Some communities say "Ustaazoota" (long oo) or use the Arabic-style "Asaatiza". Pick one and keep it everywhere.
+34. **Nominative "ustaazni"**: consonant-final common nouns take -ni ("Ustaazni yaada keessan ni arga"). Some writers leave loanwords unmarked ("Ustaaz ... ni arga"). Genitive positions were left unmarked ("Herregni ustaaz", "Gaaffiin ustaaz").
+35. **Plural "madarasaalee"**: the -lee plural was chosen. "Madrasota" is another option.
+36. **Female ustaz**: the English uses only "Ustaz". If female teachers matter, "Ustaaza" could be added later through a select.
+37. **Brand placeholders** "Fkn. Khendeq Medresah" were left as they are, since that is the brand and English still uses it.
+
 ---
 
 ## Somali (so) translation review
@@ -551,3 +605,16 @@ Namespaces done: all 26 (common, nav, requests, teacher*, admin*, dates, exams, 
 24. **CSV headers** (`adminStudents.csv.*`): Magaca, Lambarka taxanaha, Jinsiga, Da'da, Fasalka, Magaca fasalka, Qaybta, Taleefanka waalidka, Taleefan kale, Luqadda waalidka. "Da'da" has an apostrophe; check that the importer's header matching handles it. `importDialog.columns` lists the same names.
 25. **`teacherExams.mark.invalidToast`:** "{count, plural, one {# buundo ayaa} other {# buundo ayaa}} ka baxsan xadka …". Check the word order once the count is filled in.
 26. **"Wax ka beddel" vs "Cusboonaysii".** "Wax ka beddel" is the Edit button; "Cusboonaysii" (update/refresh) is used in descriptions and toasts. `actions.refresh` also uses "Cusboonaysii", which may be ambiguous next to "Update".
+
+### Terminology change: madrasa / ustaz (owner's decision)
+106 strings changed across 19 `so/*.json` files. The Somali SMS template in `src/lib/smsMessage.ts` now ends "…maanta madrasada iman."
+
+- **School → madrasad** (definite: madrasada; plural: madrasado / madrasadaha). In Somali, "dugsi" most strongly means the traditional Qur'anic school (dugsi Qur'aan) and also ordinary schools. "Madrasad" is the standard, official word for an Islamic madrasa (Arabic loan in established Somali spelling), and it matches the owner's English. School admin → "Maamulaha madrasada".
+  - *Grammar:* madrasad is feminine, so verbs and adjectives agree in the feminine. These sentences were rewritten: auth.subtitle "ay madrasadaadu ku siisay"; superadmin.create.description "Madrasadu waxay ku bilaabmaysaa iyadoo madhan… maamuleheeda"; superadmin.create.created "maamuleheeda"; landing "Madrasad kastaa waxay leedahay…" and "…oo madrasad u baahan tahay"; superadmin.empty "Weli madrasad ma jirto" and "madrasada ugu horreysa".
+  - *Please check:* any sentence where madrasad is the grammatical subject still sounds natural.
+- **Teacher → Ustaad** (definite: ustaadka; subject: ustaadku; plural: ustaadyo / ustaadyada / ustaadyadu). "Macallin" is also traditional for a Qur'an teacher. "Ustaad" is the usual title in madrasas, matches the owner's "Ustaz", and was already used for the teacher-name label.
+  - *Please check:* whether reviewers prefer the Arabic broken plural "asaatiidda" over "ustaadyada". I chose "ustaadyada" because more readers will understand it.
+- **Academic year:** "Sannad-dugsiyeedka" (literally "school year") became "Sannadka waxbarashada" so the word dugsi doesn't remain. "No academic year" is now "Sannad waxbarasho ma leh".
+- **Email placeholder:** `adminTeachers.form.emailPlaceholder` now matches the English: ustaz@madrasa.com.
+- **Reminder line:** `notifications.reminders.adminLine` is now "Ustaad {teacher} …". The same caveat as note 21 applies.
+- **Review notes 1–26:** these still say dugsi/macallin, so read them with the new terms.

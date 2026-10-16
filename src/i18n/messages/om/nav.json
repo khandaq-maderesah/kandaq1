@@ -1,9 +1,9 @@
 {
   "dashboard": "Fuula jalqabaa",
-  "schools": "Manneen barumsaa",
-  "allSchools": "Manneen barumsaa hunda",
+  "schools": "Madarasaalee",
+  "allSchools": "Madarasaalee hunda",
   "users": "Fayyadamtoota",
-  "teachers": "Barsiisota",
+  "teachers": "Ustaazota",
   "classes": "Kutaalee",
   "students": "Barattoota",
   "attendance": "Argama",
@@ -20,7 +20,7 @@
   "openMenu": "Baafata bani",
   "closeMenu": "Baafata cufi",
   "notifications": "Beeksisota",
-  "switchSchool": "Mana barumsaa jijjiiri",
+  "switchSchool": "Madarasaa jijjiiri",
   "sections": {
     "overview": "Waliigala",
     "people": "Namoota",

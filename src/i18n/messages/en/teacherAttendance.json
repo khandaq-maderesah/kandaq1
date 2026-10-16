@@ -32,7 +32,7 @@
   },
   "empty": {
     "noClasses": "No classes assigned to you yet.",
-    "noClassesHint": "Ask a school admin to assign you a class.",
+    "noClassesHint": "Ask a madrasa admin to assign you a class.",
     "noStudents": "No students in this class.",
     "noStudentsHint": "Add students from My classes."
   },

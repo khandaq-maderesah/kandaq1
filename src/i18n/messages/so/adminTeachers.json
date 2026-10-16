@@ -1,6 +1,6 @@
 {
   "title": "Isticmaalayaasha",
-  "description": "Samee oo maamul akoonnada maamulayaasha dugsiga iyo macallimiinta.",
+  "description": "Samee oo maamul akoonnada maamulayaasha madrasada iyo ustaadyada.",
   "add": "Ku dar isticmaale",
   "searchPlaceholder": "Ku raadi magac, iimayl ama taleefan",
   "searchLabel": "Raadi isticmaalayaasha",
@@ -29,27 +29,27 @@
   },
   "form": {
     "createTitle": "Ku dar isticmaale",
-    "createDescription": "Samee akoon maamulaha dugsiga ama macallin, oo leh xogta galitaanka.",
+    "createDescription": "Samee akoon maamulaha madrasada ama ustaad, oo leh xogta galitaanka.",
     "name": "Magaca oo buuxa",
     "namePlaceholder": "Tusaale: Axmed Cali",
     "email": "Iimayl",
-    "emailPlaceholder": "teacher@school.com",
+    "emailPlaceholder": "ustaz@madrasa.com",
     "phone": "Lambarka taleefanka (ikhtiyaari)",
     "phonePlaceholder": "Tusaale: 0911 223344",
     "password": "Furaha sirta ku meel gaarka ah",
     "passwordPlaceholder": "Ugu yaraan 6 xaraf",
     "role": "Doorka",
-    "roleHint": "Maamulayaasha dugsigu waxay leeyihiin awood buuxda, waxayna maamuli karaan isticmaalayaasha kale.",
+    "roleHint": "Maamulayaasha madrasadu waxay leeyihiin awood buuxda, waxayna maamuli karaan isticmaalayaasha kale.",
     "classes": "Qoondee fasallada",
-    "classesHint": "Dooro fasallada uu macallinkani dhigo.",
-    "noClassesYet": "Weli fasal ma jiro. Marka hore samee fasallo, kadibna u qoondee macallinka.",
+    "classesHint": "Dooro fasallada uu ustaadkani dhigo.",
+    "noClassesYet": "Weli fasal ma jiro. Marka hore samee fasallo, kadibna u qoondee ustaadka.",
     "create": "Samee isticmaale"
   },
   "assign": {
     "title": "Wax ka beddel fasallada loo qoondeeyay",
     "description": "Dooro fasallada uu {name} dhigo. Ardaydu fasalladooda ayay ku sii jirayaan.",
     "currentlyAssigned": "Waxaa loo qoondeeyay {name}",
-    "currentlyAssignedOther": "Waxaa loo qoondeeyay macallin kale",
+    "currentlyAssignedOther": "Waxaa loo qoondeeyay ustaad kale",
     "save": "Kaydi qoondaynta"
   },
   "delete": {
@@ -58,8 +58,8 @@
     "confirm": "Tirtir isticmaalaha"
   },
   "toast": {
-    "adminCreated": "Akoonka maamulaha dugsiga waa la sameeyay.",
-    "teacherCreated": "Akoonka macallinka waa la sameeyay.",
+    "adminCreated": "Akoonka maamulaha madrasada waa la sameeyay.",
+    "teacherCreated": "Akoonka ustaadka waa la sameeyay.",
     "assigned": "Fasallada {name} waa la cusboonaysiiyay.",
     "activated": "Akoonka {name} waa la hawlgeliyay.",
     "deactivated": "Akoonka {name} waa la joojiyay.",
@@ -69,7 +69,7 @@
   },
   "empty": {
     "title": "Weli isticmaale ma jiro",
-    "description": "Ku dar macallimiin iyo maamulayaal dugsi si ay u galaan.",
+    "description": "Ku dar ustaadyo iyo maamulayaal madrasad si ay u galaan.",
     "search": "Ma jiro isticmaale u dhigma raadintaada."
   },
   "csv": {

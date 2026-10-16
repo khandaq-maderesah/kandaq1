@@ -1,6 +1,6 @@
 {
   "appName": "Khendeq",
-  "appTagline": "የትምህርት ቤት አስተዳደር መድረክ",
+  "appTagline": "የመድረሳ አስተዳደር መድረክ",
   "actions": {
     "save": "አስቀምጥ",
     "saveChanges": "ለውጦችን አስቀምጥ",
@@ -47,8 +47,8 @@
   },
   "roles": {
     "superadmin": "የመድረክ አስተዳዳሪ",
-    "admin": "የትምህርት ቤት አስተዳዳሪ",
-    "teacher": "መምህር"
+    "admin": "የመድረሳ አስተዳዳሪ",
+    "teacher": "ኡስታዝ"
   },
   "gender": {
     "male": "ወንድ",
@@ -86,8 +86,8 @@
       "weakPassword": "የይለፍ ቃሉ ቢያንስ 6 ፊደላት መሆን አለበት።",
       "sessionExpired": "የመግቢያ ጊዜዎ አልፏል። እባክዎ እንደገና ይግቡ።",
       "forbidden": "ይህን ለማድረግ ፈቃድ የለዎትም።",
-      "schoolSuspended": "ይህ ትምህርት ቤት ታግዷል።",
-      "otherSchool": "ማስተዳደር የሚችሉት በራስዎ ትምህርት ቤት ያሉ ሰዎችን ብቻ ነው።",
+      "schoolSuspended": "ይህ መድረሳ ታግዷል።",
+      "otherSchool": "ማስተዳደር የሚችሉት በራስዎ መድረሳ ያሉ ሰዎችን ብቻ ነው።",
       "notFound": "ይህ መለያ ከእንግዲህ የለም።",
       "cannotDeleteSelf": "የራስዎን መለያ መሰረዝ አይችሉም።",
       "invalid": "አንዳንድ መረጃዎች ጎድለዋል ወይም ትክክል አይደሉም።",
@@ -100,7 +100,7 @@
   },
   "count": {
     "students": "{count, plural, =0 {ምንም ተማሪ የለም} one {# ተማሪ} other {# ተማሪዎች}}",
-    "teachers": "{count, plural, =0 {ምንም መምህር የለም} one {# መምህር} other {# መምህራን}}",
+    "teachers": "{count, plural, =0 {ምንም ኡስታዝ የለም} one {# ኡስታዝ} other {# ኡስታዞች}}",
     "classes": "{count, plural, =0 {ምንም ክፍል የለም} one {# ክፍል} other {# ክፍሎች}}"
   },
   "language": "ቋንቋ",

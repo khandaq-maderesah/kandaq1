@@ -152,7 +152,7 @@ async function checkSchool(
       className: c.name,
       section: c.section || '',
       teacherId: c.teacherId,
-      teacherName: c.teacherName || teacher?.name || 'Unknown teacher',
+      teacherName: c.teacherName || teacher?.name || 'Unknown ustaz',
       adminNotified,
       adminNotifiedAt: adminNotified ? prev?.adminNotifiedAt || nowIso : '',
       teacherNotified,

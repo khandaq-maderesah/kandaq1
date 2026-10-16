@@ -45,14 +45,14 @@
   },
   "empty": {
     "noClasses": "Hanga ammaatti kutaan isinitti kenname hin jiru.",
-    "noClassesHint": "Akka kutaan isiniif kennamu bulchaa mana barumsaa gaafadhaa."
+    "noClassesHint": "Akka kutaan isiniif kennamu bulchaa madarasaa gaafadhaa."
   },
   "toast": {
     "loadFailed": "Kutaalee keessan fe'uun hin danda'amne.",
     "added": "Galmeen {name} lakkoofsa tartiibaa {roll}n dabalameera.",
     "updated": "Odeeffannoon {name} haaromfameera.",
     "saveFailed": "Barataa olkaa'uun hin danda'amne. Maaloo irra deebi'aa yaalaa.",
-    "registrationClosed": "Galmeen barattootaa cufameera. Bulchaan mana barumsaa Qindaa'ina keessatti banuu qaba.",
+    "registrationClosed": "Galmeen barattootaa cufameera. Bulchaan madarasaa Qindaa'ina keessatti banuu qaba.",
     "rollTaken": "Lakkoofsi tartiibaa {roll} kutaa kana keessatti duraanuu qabameera."
   }
 }

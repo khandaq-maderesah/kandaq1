@@ -1,14 +1,14 @@
 {
   "title": "Kutaalee",
-  "description": "Kutaalee uumaa fi gulaalaa. Barsiisonni fuula Fayyadamtootaa irraa ramadamu.",
+  "description": "Kutaalee uumaa fi gulaalaa. Ustaazonni fuula Fayyadamtootaa irraa ramadamu.",
   "add": "Kutaa dabali",
-  "searchPlaceholder": "Kutaa, barsiisaa ykn baraan barbaadi",
+  "searchPlaceholder": "Kutaa, ustaaz ykn baraan barbaadi",
   "searchLabel": "Kutaalee barbaadi",
   "summary": "{total} keessaa {shown, plural, one {kutaan # agarsiifamaa jira} other {kutaaleen # agarsiifamaa jiru}}",
   "table": {
     "class": "Kutaa",
     "section": "Garee",
-    "teacher": "Barsiisaa",
+    "teacher": "Ustaaz",
     "year": "Bara barnootaa",
     "students": "Barattoota",
     "actions": "Gochaalee"
@@ -21,7 +21,7 @@
   "deleteClass": "{name} haqi",
   "form": {
     "createTitle": "Kutaa dabali",
-    "createDescription": "Barsiisonni yeroo isin fuula Fayyadamtootaa irratti galmeessitan ykn gulaaltan ramadamu.",
+    "createDescription": "Ustaazonni yeroo isin fuula Fayyadamtootaa irratti galmeessitan ykn gulaaltan ramadamu.",
     "editTitle": "Kutaa gulaali",
     "editDescription": "Odeeffannoo kutaa haaromsaa.",
     "name": "Maqaa kutaa",

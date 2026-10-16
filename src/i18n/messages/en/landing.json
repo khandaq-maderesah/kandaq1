@@ -3,18 +3,18 @@
     "signIn": "Sign in"
   },
   "hero": {
-    "eyebrow": "School management platform",
-    "title": "Run your whole school from one place",
-    "subtitle": "Khendeq helps schools take attendance, manage students and teachers, run exams and keep parents informed, in the language you prefer.",
+    "eyebrow": "Madrasa management platform",
+    "title": "Run your whole madrasa from one place",
+    "subtitle": "Khendeq helps madrasas take attendance, manage students and ustazes, run exams and keep parents informed, in the language you prefer.",
     "cta": "Sign in",
     "secondary": "See what's included"
   },
   "features": {
-    "title": "Everything a school needs",
-    "subtitle": "Simple tools for administrators and teachers, built to work well on any phone.",
+    "title": "Everything a madrasa needs",
+    "subtitle": "Simple tools for administrators and ustazes, built to work well on any phone.",
     "attendance": {
       "title": "Daily attendance",
-      "description": "Teachers mark present, absent or late in seconds. Administrators see the full picture right away."
+      "description": "Ustazes mark present, absent or late in seconds. Administrators see the full picture right away."
     },
     "students": {
       "title": "Student records",
@@ -33,8 +33,8 @@
       "description": "Charts for attendance trends, grades and class sizes help you spot problems early."
     },
     "languages": {
-      "title": "Many schools, many languages",
-      "description": "Each school has its own private space, and every user can choose their own language."
+      "title": "Many madrasas, many languages",
+      "description": "Each madrasa has its own private space, and every user can choose their own language."
     }
   },
   "footer": {

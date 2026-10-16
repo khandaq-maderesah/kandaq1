@@ -1,39 +1,39 @@
 {
-  "title": "Dugsiyada",
-  "description": "Samee dugsiyo, mid kasta u magacaw maamule, oo fur dugsi kasta si aad u maamusho.",
-  "newSchool": "Dugsi cusub",
+  "title": "Madrasadaha",
+  "description": "Samee madrasado, mid kasta u magacaw maamule, oo fur madrasad kasta si aad u maamusho.",
+  "newSchool": "Madrasad cusub",
   "stats": {
-    "total": "Dugsiyada",
+    "total": "Madrasadaha",
     "active": "Firfircoon",
     "suspended": "La hakiyay",
     "users": "Isticmaalayaasha"
   },
   "empty": {
-    "title": "Weli dugsi ma jiro",
-    "description": "Samee dugsiga ugu horreeya si aad u bilowdo."
+    "title": "Weli madrasad ma jirto",
+    "description": "Samee madrasada ugu horreysa si aad u bilowdo."
   },
   "card": {
     "noContact": "Xog xiriir ma jirto",
     "admins": "{count, plural, =0 {Maamule ma jiro} one {# maamule} other {# maamule}}",
-    "teachers": "{count, plural, =0 {Macallin ma jiro} one {# macallin} other {# macallin}}",
-    "noAdminYet": "Dugsigan weli maamule ma laha.",
+    "teachers": "{count, plural, =0 {Ustaad ma jiro} one {# ustaad} other {# ustaad}}",
+    "noAdminYet": "Madrasadan weli maamule ma laha.",
     "open": "Fur",
     "addAdmin": "Ku dar maamule",
     "suspend": "Hakii",
     "reactivate": "Dib u hawlgeli"
   },
   "create": {
-    "title": "Dugsi cusub",
-    "description": "Dugsigu wuxuu ku bilaabmayaa isagoo madhan. Kadib maamulihiisa ayaa ku dari doona fasallada, macallimiinta iyo ardayda.",
-    "name": "Magaca dugsiga",
+    "title": "Madrasad cusub",
+    "description": "Madrasadu waxay ku bilaabmaysaa iyadoo madhan. Kadib maamuleheeda ayaa ku dari doona fasallada, ustaadyada iyo ardayda.",
+    "name": "Magaca madrasada",
     "namePlaceholder": "Tusaale: Khendeq Medresah",
     "nameAm": "Magaca oo Amxaari ah (SMS-ka)",
     "address": "Cinwaanka",
     "phone": "Lambarka taleefanka",
     "timezone": "Aagga waqtiga",
-    "submit": "Samee dugsiga",
-    "created": "{name} waa la sameeyay. Hadda ku dar akoonka maamulihiisa.",
-    "failed": "Dugsiga lama samayn karin. Fadlan isku day mar kale."
+    "submit": "Samee madrasada",
+    "created": "{name} waa la sameeyay. Hadda ku dar akoonka maamuleheeda.",
+    "failed": "Madrasada lama samayn karin. Fadlan isku day mar kale."
   },
   "admin": {
     "title": "Maamule cusub oo loogu talagalay {school}",
@@ -49,12 +49,12 @@
   },
   "suspend": {
     "title": "Ma hakinaysaa {name}?",
-    "description": "Maamulayaasha iyo macallimiinta dugsigan ma geli karaan ilaa aad dib u hawlgeliso.",
-    "confirm": "Hakii dugsiga"
+    "description": "Maamulayaasha iyo ustaadyada madrasadan ma geli karaan ilaa aad dib u hawlgeliso.",
+    "confirm": "Hakii madrasada"
   },
   "toast": {
     "suspended": "{name} waa la hakiyay.",
     "reactivated": "{name} dib ayaa loo hawlgeliyay.",
-    "updateFailed": "Dugsiga lama cusboonaysiin karin. Fadlan isku day mar kale."
+    "updateFailed": "Madrasada lama cusboonaysiin karin. Fadlan isku day mar kale."
   }
 }

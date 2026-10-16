@@ -1,6 +1,6 @@
 {
   "title": "Bogga guud",
-  "description": "Guudmarka ardayda, macallimiinta iyo xaadiriska",
+  "description": "Guudmarka ardayda, ustaadyada iyo xaadiriska",
   "todayDate": "{gregorian} · {ethiopian}",
   "kpi": {
     "totalStudents": "Wadarta ardayda",
@@ -8,7 +8,7 @@
     "maleStudents": "Ardayda lab",
     "femaleStudents": "Ardayda dheddig",
     "percentOfTotal": "{percent}% dhammaan ardayda",
-    "teachers": "Macallimiinta",
+    "teachers": "Ustaadyada",
     "classes": "Fasallada",
     "absentToday": "Maqan maanta",
     "absentWeekHint": "{count, plural, =0 {Midna 7-dii maalmood ee u dambeeyay} one {# 7-dii maalmood ee u dambeeyay} other {# 7-dii maalmood ee u dambeeyay}}"
@@ -32,11 +32,11 @@
     }
   },
   "teachers": {
-    "title": "Macallimiinta",
-    "description": "Dhammaan akoonnada macallimiinta.",
+    "title": "Ustaadyada",
+    "description": "Dhammaan akoonnada ustaadyada.",
     "searchPlaceholder": "Ku raadi magac, iimayl ama taleefan",
-    "searchLabel": "Raadi macallimiinta",
-    "empty": "Macallin lama helin",
+    "searchLabel": "Raadi ustaadyada",
+    "empty": "Ustaad lama helin",
     "table": {
       "name": "Magaca",
       "email": "Iimayl",
@@ -47,17 +47,17 @@
   },
   "classes": {
     "title": "Fasallada",
-    "description": "Dhammaan fasallada iyo macallimiinta loo qoondeeyay.",
-    "searchPlaceholder": "Raadi fasal ama macallin",
+    "description": "Dhammaan fasallada iyo ustaadyada loo qoondeeyay.",
+    "searchPlaceholder": "Raadi fasal ama ustaad",
     "searchLabel": "Raadi fasallada",
     "empty": "Fasal lama helin",
     "table": {
       "class": "Fasalka",
       "grade": "Heerka",
       "section": "Qaybta",
-      "teacher": "Macallinka",
+      "teacher": "Ustaadka",
       "students": "Ardayda",
-      "academicYear": "Sannad-dugsiyeedka"
+      "academicYear": "Sannadka waxbarashada"
     }
   },
   "absent": {

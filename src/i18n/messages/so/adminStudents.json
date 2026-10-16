@@ -1,6 +1,6 @@
 {
   "title": "Ardayda",
-  "description": "Diiwaangeli, wax ka beddel oo wareeji ardayda firfircoon ee dugsiga.",
+  "description": "Diiwaangeli, wax ka beddel oo wareeji ardayda firfircoon ee madrasada.",
   "add": "Ku dar arday",
   "import": "Soo geli CSV",
   "importing": "Waa la soo gelinayaa…",
@@ -35,7 +35,7 @@
     "edit": "Wax ka beddel ama wareeji",
     "delete": "Tirtir ardayga",
     "more": "Ficillo kale oo {name} ah",
-    "pendingTitle": "Codsi macallin oo ku saabsan ardaygan ayaa sugaya ansixintaada"
+    "pendingTitle": "Codsi ustaad oo ku saabsan ardaygan ayaa sugaya ansixintaada"
   },
   "form": {
     "createTitle": "Ku dar arday",

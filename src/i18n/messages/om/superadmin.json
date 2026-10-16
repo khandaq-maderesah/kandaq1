@@ -1,39 +1,39 @@
 {
-  "title": "Manneen barumsaa",
-  "description": "Manneen barumsaa uumaa, tokkoon tokkoon isaaniitiif bulchaa kennaa, akkasumas bulchuuf mana barumsaa kamiyyuu banaa.",
-  "newSchool": "Mana barumsaa haaraa",
+  "title": "Madarasaalee",
+  "description": "Madarasaalee uumaa, tokkoon tokkoon isaaniitiif bulchaa kennaa, akkasumas bulchuuf madarasaa kamiyyuu banaa.",
+  "newSchool": "Madarasaa haaraa",
   "stats": {
-    "total": "Manneen barumsaa",
+    "total": "Madarasaalee",
     "active": "Hojii irra",
     "suspended": "Dhorkame",
     "users": "Fayyadamtoota"
   },
   "empty": {
-    "title": "Ammaaf manni barumsaa hin jiru",
-    "description": "Jalqabuuf mana barumsaa jalqabaa uumaa."
+    "title": "Ammaaf madarasaan hin jiru",
+    "description": "Jalqabuuf madarasaa jalqabaa uumaa."
   },
   "card": {
     "noContact": "Odeeffannoo quunnamtii hin qabu",
     "admins": "{count, plural, =0 {Bulchaan hin jiru} one {Bulchaa tokko} other {Bulchitoota #}}",
-    "teachers": "{count, plural, =0 {Barsiisaan hin jiru} one {Barsiisaa tokko} other {Barsiisota #}}",
-    "noAdminYet": "Manni barumsaa kun ammaaf bulchaa hin qabu.",
+    "teachers": "{count, plural, =0 {Ustaazni hin jiru} one {Ustaaz tokko} other {Ustaazota #}}",
+    "noAdminYet": "Madarasaan kun ammaaf bulchaa hin qabu.",
     "open": "Bani",
     "addAdmin": "Bulchaa dabali",
     "suspend": "Dhorki",
     "reactivate": "Deebisii hojiirra oolchi"
   },
   "create": {
-    "title": "Mana barumsaa haaraa",
-    "description": "Manni barumsaa duwwaa jalqaba. Achii bulchaan isaa kutaalee, barsiisotaa fi barattoota dabala.",
-    "name": "Maqaa mana barumsaa",
+    "title": "Madarasaa haaraa",
+    "description": "Madarasaan duwwaa jalqaba. Achii bulchaan isaa kutaalee, ustaazotaa fi barattoota dabala.",
+    "name": "Maqaa madarasaa",
     "namePlaceholder": "Fkn. Khendeq Medresah",
     "nameAm": "Maqaa Afaan Amaaraatiin (SMS'f)",
     "address": "Teessoo",
     "phone": "Lakk. bilbilaa",
     "timezone": "Naannoo yeroo",
-    "submit": "Mana barumsaa uumi",
-    "created": "Manni barumsaa {name} uumameera. Amma herrega bulchaa isaa dabalaa.",
-    "failed": "Mana barumsaa uumuun hin danda'amne. Maaloo irra deebi'aa yaalaa."
+    "submit": "Madarasaa uumi",
+    "created": "Madarasaan {name} uumameera. Amma herrega bulchaa isaa dabalaa.",
+    "failed": "Madarasaa uumuun hin danda'amne. Maaloo irra deebi'aa yaalaa."
   },
   "admin": {
     "title": "Bulchaa haaraa {school}f",
@@ -48,13 +48,13 @@
     "failed": "Herrega bulchaa uumuun hin danda'amne."
   },
   "suspend": {
-    "title": "Mana barumsaa {name} dhorkitu?",
-    "description": "Hanga isin deebiftanii hojiirra oolchitanitti bulchitoonni fi barsiisonni isaa seenuu hin danda'an.",
-    "confirm": "Mana barumsaa dhorki"
+    "title": "Madarasaa {name} dhorkitu?",
+    "description": "Hanga isin deebiftanii hojiirra oolchitanitti bulchitoonni fi ustaazonni isaa seenuu hin danda'an.",
+    "confirm": "Madarasaa dhorki"
   },
   "toast": {
-    "suspended": "Manni barumsaa {name} dhorkameera.",
-    "reactivated": "Manni barumsaa {name} deebi'ee hojiirra ooleera.",
-    "updateFailed": "Mana barumsaa haaromsuun hin danda'amne. Maaloo irra deebi'aa yaalaa."
+    "suspended": "Madarasaan {name} dhorkameera.",
+    "reactivated": "Madarasaan {name} deebi'ee hojiirra ooleera.",
+    "updateFailed": "Madarasaa haaromsuun hin danda'amne. Maaloo irra deebi'aa yaalaa."
   }
 }

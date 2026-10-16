@@ -1,6 +1,6 @@
 {
   "title": "Dashboard",
-  "description": "Overview of students, teachers and attendance",
+  "description": "Overview of students, ustazes and attendance",
   "todayDate": "{gregorian} · {ethiopian}",
   "kpi": {
     "totalStudents": "Total students",
@@ -8,7 +8,7 @@
     "maleStudents": "Male students",
     "femaleStudents": "Female students",
     "percentOfTotal": "{percent}% of all students",
-    "teachers": "Teachers",
+    "teachers": "Ustazes",
     "classes": "Classes",
     "absentToday": "Absent today",
     "absentWeekHint": "{count, plural, =0 {None in the last 7 days} one {# in the last 7 days} other {# in the last 7 days}}"
@@ -32,11 +32,11 @@
     }
   },
   "teachers": {
-    "title": "Teachers",
-    "description": "All teacher accounts.",
+    "title": "Ustazes",
+    "description": "All ustaz accounts.",
     "searchPlaceholder": "Search by name, email or phone",
-    "searchLabel": "Search teachers",
-    "empty": "No teachers found",
+    "searchLabel": "Search ustazes",
+    "empty": "No ustazes found",
     "table": {
       "name": "Name",
       "email": "Email",
@@ -47,15 +47,15 @@
   },
   "classes": {
     "title": "Classes",
-    "description": "All classes and their assigned teachers.",
-    "searchPlaceholder": "Search class or teacher",
+    "description": "All classes and their assigned ustazes.",
+    "searchPlaceholder": "Search class or ustaz",
     "searchLabel": "Search classes",
     "empty": "No classes found",
     "table": {
       "class": "Class",
       "grade": "Grade",
       "section": "Section",
-      "teacher": "Teacher",
+      "teacher": "Ustaz",
       "students": "Students",
       "academicYear": "Academic year"
     }

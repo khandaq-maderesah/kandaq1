@@ -22,7 +22,7 @@
     "description": "Fasallada aan xaadiriska laga qaadin",
     "emptyAdmin": "Dhammaan fasallada xaadiriska waa laga qaaday ilaa hadda.",
     "emptyTeacher": "Xaadiriska waad ka qaadday dhammaan fasalladaada.",
-    "adminLine": "Macallin {teacher} weli ma qaadin xaadiriska maanta.",
+    "adminLine": "Ustaad {teacher} weli ma qaadin xaadiriska maanta.",
     "teacherLine": "Fadlan qaado xaadiriska maanta. Weli lama qaadin.",
     "markResolved": "Calaamadee in la xalliyay",
     "resolved": "Xusuusinta waa la xalliyay.",
@@ -38,7 +38,7 @@
     "audience": {
       "label": "Yaa arki kara",
       "everyone": "Qof walba",
-      "teachers": "Macallimiinta oo keliya",
+      "teachers": "Ustaadyada oo keliya",
       "admins": "Maamulayaasha oo keliya"
     },
     "form": {

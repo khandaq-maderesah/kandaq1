@@ -1,14 +1,14 @@
 {
   "title": "ክፍሎች",
-  "description": "ክፍሎችን ይፍጠሩ እና ያስተካክሉ። መምህራን የሚመደቡት ከ«ተጠቃሚዎች» ገጽ ነው።",
+  "description": "ክፍሎችን ይፍጠሩ እና ያስተካክሉ። ኡስታዞች የሚመደቡት ከ«ተጠቃሚዎች» ገጽ ነው።",
   "add": "ክፍል ጨምር",
-  "searchPlaceholder": "በክፍል፣ በመምህር ወይም በዓመት ይፈልጉ",
+  "searchPlaceholder": "በክፍል፣ በኡስታዝ ወይም በዓመት ይፈልጉ",
   "searchLabel": "ክፍሎችን ፈልግ",
   "summary": "ከ{total} ውስጥ {shown, plural, one {# ክፍል ይታያል} other {# ክፍሎች ይታያሉ}}",
   "table": {
     "class": "ክፍል",
     "section": "ሴክሽን",
-    "teacher": "መምህር",
+    "teacher": "ኡስታዝ",
     "year": "የትምህርት ዘመን",
     "students": "ተማሪዎች",
     "actions": "ተግባራት"
@@ -21,7 +21,7 @@
   "deleteClass": "ሰርዝ፦ {name}",
   "form": {
     "createTitle": "ክፍል ጨምር",
-    "createDescription": "መምህራን የሚመደቡት በ«ተጠቃሚዎች» ገጽ ላይ ሲመዘግቧቸው ወይም ሲያስተካክሏቸው ነው።",
+    "createDescription": "ኡስታዞች የሚመደቡት በ«ተጠቃሚዎች» ገጽ ላይ ሲመዘግቧቸው ወይም ሲያስተካክሏቸው ነው።",
     "editTitle": "ክፍል አስተካክል",
     "editDescription": "የክፍሉን መረጃ ያሻሽሉ።",
     "name": "የክፍል ስም",

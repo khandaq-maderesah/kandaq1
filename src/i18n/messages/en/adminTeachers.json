@@ -1,6 +1,6 @@
 {
   "title": "Users",
-  "description": "Create and manage school admin and teacher accounts.",
+  "description": "Create and manage madrasa admin and ustaz accounts.",
   "add": "Add user",
   "searchPlaceholder": "Search by name, email or phone",
   "searchLabel": "Search users",
@@ -29,27 +29,27 @@
   },
   "form": {
     "createTitle": "Add user",
-    "createDescription": "Create a school admin or teacher account with login details.",
+    "createDescription": "Create a madrasa admin or ustaz account with login details.",
     "name": "Full name",
     "namePlaceholder": "For example: Ahmed Ali",
     "email": "Email",
-    "emailPlaceholder": "teacher@school.com",
+    "emailPlaceholder": "ustaz@madrasa.com",
     "phone": "Phone number (optional)",
     "phonePlaceholder": "For example: 0911 223344",
     "password": "Temporary password",
     "passwordPlaceholder": "At least 6 characters",
     "role": "Role",
-    "roleHint": "School admins have full access and can manage other users.",
+    "roleHint": "Madrasa admins have full access and can manage other users.",
     "classes": "Assign classes",
-    "classesHint": "Choose the classes this teacher teaches.",
-    "noClassesYet": "No classes yet. Create classes first, then assign the teacher.",
+    "classesHint": "Choose the classes this ustaz teaches.",
+    "noClassesYet": "No classes yet. Create classes first, then assign the ustaz.",
     "create": "Create user"
   },
   "assign": {
     "title": "Edit assigned classes",
     "description": "Choose the classes {name} teaches. Students stay in their classes.",
     "currentlyAssigned": "Assigned to {name}",
-    "currentlyAssignedOther": "Assigned to another teacher",
+    "currentlyAssignedOther": "Assigned to another ustaz",
     "save": "Save assignments"
   },
   "delete": {
@@ -58,8 +58,8 @@
     "confirm": "Delete user"
   },
   "toast": {
-    "adminCreated": "School admin account created.",
-    "teacherCreated": "Teacher account created.",
+    "adminCreated": "Madrasa admin account created.",
+    "teacherCreated": "Ustaz account created.",
     "assigned": "Classes updated for {name}.",
     "activated": "{name} was activated.",
     "deactivated": "{name} was deactivated.",
@@ -69,7 +69,7 @@
   },
   "empty": {
     "title": "No users yet",
-    "description": "Add teachers and school admins so they can sign in.",
+    "description": "Add ustazes and madrasa admins so they can sign in.",
     "search": "No users match your search."
   },
   "csv": {

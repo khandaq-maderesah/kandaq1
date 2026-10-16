@@ -38,7 +38,7 @@
     "audience": {
       "label": "ማን ማየት ይችላል",
       "everyone": "ሁሉም",
-      "teachers": "መምህራን ብቻ",
+      "teachers": "ኡስታዞች ብቻ",
       "admins": "አስተዳዳሪዎች ብቻ"
     },
     "form": {

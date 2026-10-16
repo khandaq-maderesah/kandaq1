@@ -1,14 +1,14 @@
 {
   "title": "Classes",
-  "description": "Create and edit classes. Teachers are assigned from the Users page.",
+  "description": "Create and edit classes. Ustazes are assigned from the Users page.",
   "add": "Add class",
-  "searchPlaceholder": "Search by class, teacher or year",
+  "searchPlaceholder": "Search by class, ustaz or year",
   "searchLabel": "Search classes",
   "summary": "{shown, plural, one {Showing # class} other {Showing # classes}} of {total}",
   "table": {
     "class": "Class",
     "section": "Section",
-    "teacher": "Teacher",
+    "teacher": "Ustaz",
     "year": "Academic year",
     "students": "Students",
     "actions": "Actions"
@@ -21,7 +21,7 @@
   "deleteClass": "Delete {name}",
   "form": {
     "createTitle": "Add class",
-    "createDescription": "Teachers are assigned when you register or edit them on the Users page.",
+    "createDescription": "Ustazes are assigned when you register or edit them on the Users page.",
     "editTitle": "Edit class",
     "editDescription": "Update the class details.",
     "name": "Class name",

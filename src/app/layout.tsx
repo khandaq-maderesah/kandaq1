@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   // No description on purpose: it is what link previews (Telegram, WhatsApp)
   // show under the title when sharing the URL.
   applicationName: "Khendeq",
-  keywords: ["attendance", "school", "students", "teachers", "madresah", "management"],
+  keywords: ["madrasa", "medresah", "ustaz", "attendance", "students", "management"],
   manifest: "/manifest.webmanifest",
   icons: {
     icon: "/icons/favicon-64.png",

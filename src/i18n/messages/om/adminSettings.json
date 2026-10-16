@@ -1,12 +1,12 @@
 {
   "title": "Qindaa'ina",
-  "description": "Odeeffannoo mana barumsaa keessanii bulchaa.",
+  "description": "Odeeffannoo madarasaa keessanii bulchaa.",
   "school": {
-    "title": "Odeeffannoo mana barumsaa",
+    "title": "Odeeffannoo madarasaa",
     "description": "Odeeffannoon kun sirna guutuu keessattii fi gabaasota maxxanfaman irratti mul'ata.",
-    "name": "Maqaa mana barumsaa",
+    "name": "Maqaa madarasaa",
     "namePlaceholder": "Fkn. Khendeq Medresah",
-    "nameAm": "Maqaa mana barumsaa Afaan Amaaraatiin (SMS keessatti fayyada)",
+    "nameAm": "Maqaa madarasaa Afaan Amaaraatiin (SMS keessatti fayyada)",
     "address": "Teessoo",
     "addressPlaceholder": "Daandii, magaalaa",
     "phone": "Bilbila quunnamtii",
@@ -14,22 +14,22 @@
     "academicYearPlaceholder": "Fkn. 2026-2027",
     "save": "Qindaa'ina olkaa'i",
     "saved": "Qindaa'inni olkaa'ameera.",
-    "nameRequired": "Maqaan mana barumsaa barbaachisaa dha.",
-    "noSchool": "Manni barumsaa hin filatamne.",
+    "nameRequired": "Maqaan madarasaa barbaachisaa dha.",
+    "noSchool": "Madarasaan hin filatamne.",
     "failed": "Qindaa'ina olkaa'uun hin danda'amne. Maaloo irra deebi'aa yaalaa.",
     "loadFailed": "Qindaa'ina fe'uun hin danda'amne. Maaloo fuula haaromsaa."
   },
   "registration": {
     "title": "Galmee barattootaa",
-    "description": "Barsiisonni barattoota haaraa galmeessuu danda'uu fi dhiisuu isaanii to'adhaa.",
+    "description": "Ustaazonni barattoota haaraa galmeessuu danda'uu fi dhiisuu isaanii to'adhaa.",
     "openStatus": "Galmeen banaa dha",
     "closedStatus": "Galmeen cufaa dha",
-    "openHint": "Barsiisonni barattoota haaraa galmeessuu ni danda'u.",
-    "closedHint": "Hanga isin galmee irra deebiftanii bantanitti barsiisonni barattoota haaraa galmeessuu hin danda'an. Galmeewwan barattoota jiranii garuu gulaaluun ni danda'ama.",
+    "openHint": "Ustaazonni barattoota haaraa galmeessuu ni danda'u.",
+    "closedHint": "Hanga isin galmee irra deebiftanii bantanitti ustaazonni barattoota haaraa galmeessuu hin danda'an. Galmeewwan barattoota jiranii garuu gulaaluun ni danda'ama.",
     "close": "Galmee cufi",
     "open": "Galmee bani",
-    "opened": "Galmeen barattootaa baname. Amma barsiisonni barattoota haaraa galmeessuu ni danda'u.",
-    "closed": "Galmeen barattootaa cufame. Barsiisonni kana booda barattoota haaraa galmeessuu hin danda'an.",
+    "opened": "Galmeen barattootaa baname. Amma ustaazonni barattoota haaraa galmeessuu ni danda'u.",
+    "closed": "Galmeen barattootaa cufame. Ustaazonni kana booda barattoota haaraa galmeessuu hin danda'an.",
     "failed": "Galmee haaromsuun hin danda'amne. Maaloo irra deebi'aa yaalaa."
   }
 }
