@@ -2,6 +2,24 @@ import { db } from '@/lib/firebase/config'
 import { ref, get, set, update, remove, onValue, query, orderByChild, equalTo, startAt, type QueryConstraint, type Unsubscribe } from 'firebase/database'
 import type { User, Class, Student, Attendance, AbsentAlert, MissingAttendanceAlert, Exam, Announcement, School, ChangeRequest, DeletionReason, StudentArchive } from '@/types'
 
+/**
+ * Realtime Database rejects `undefined` anywhere in a write (e.g. an empty,
+ * optional "age" field) and NaN. Drop those keys/items, deeply, so optional
+ * form fields can never break a save. (null still means "delete" in update().)
+ */
+function defined<T>(value: T): T {
+  const keep = (v: unknown) => v !== undefined && !(typeof v === 'number' && Number.isNaN(v))
+  if (Array.isArray(value)) return value.filter(keep).map(defined) as T
+  if (value && typeof value === 'object' && Object.getPrototypeOf(value) === Object.prototype) {
+    return Object.fromEntries(
+      Object.entries(value as Record<string, unknown>)
+        .filter(([, v]) => keep(v))
+        .map(([k, v]) => [k, defined(v)])
+    ) as T
+  }
+  return value
+}
+
 // ==================== Current school ====================
 // Every school's data lives under schoolData/{schoolId}/... . The signed-in
 // user's school (or, for a superadmin, the school they opened) is set once by
@@ -37,11 +55,11 @@ export async function getSchool(schoolId: string): Promise<School | null> {
 }
 
 export async function createSchool(schoolId: string, data: Omit<School, 'id'>): Promise<void> {
-  await set(ref(db, `schoolInfo/${schoolId}`), data)
+  await set(ref(db, `schoolInfo/${schoolId}`), defined(data))
 }
 
 export async function updateSchool(schoolId: string, updates: Partial<Omit<School, 'id'>>): Promise<void> {
-  await update(ref(db, `schoolInfo/${schoolId}`), updates)
+  await update(ref(db, `schoolInfo/${schoolId}`), defined(updates))
 }
 
 /** Superadmin only: every school. */
@@ -73,11 +91,11 @@ export async function getUser(userId: string): Promise<User | null> {
 }
 
 export async function createUser(userId: string, data: Partial<User>): Promise<void> {
-  await set(ref(db, `users/${userId}`), data)
+  await set(ref(db, `users/${userId}`), defined(data))
 }
 
 export async function updateUser(userId: string, updates: Partial<User>): Promise<void> {
-  await update(ref(db, `users/${userId}`), updates)
+  await update(ref(db, `users/${userId}`), defined(updates))
 }
 
 export async function deleteUser(userId: string): Promise<void> {
@@ -101,11 +119,11 @@ export async function getClass(classId: string): Promise<Class | null> {
 }
 
 export async function createClass(classId: string, data: Partial<Class>): Promise<void> {
-  await set(sref(`classes/${classId}`), data)
+  await set(sref(`classes/${classId}`), defined(data))
 }
 
 export async function updateClass(classId: string, updates: Partial<Class>): Promise<void> {
-  await update(sref(`classes/${classId}`), updates)
+  await update(sref(`classes/${classId}`), defined(updates))
 }
 
 export async function deleteClass(classId: string): Promise<void> {
@@ -152,11 +170,11 @@ export async function getStudent(studentId: string): Promise<Student | null> {
 }
 
 export async function createStudent(studentId: string, data: Partial<Student>): Promise<void> {
-  await set(sref(`students/${studentId}`), data)
+  await set(sref(`students/${studentId}`), defined(data))
 }
 
 export async function updateStudent(studentId: string, updates: Partial<Student>): Promise<void> {
-  await update(sref(`students/${studentId}`), updates)
+  await update(sref(`students/${studentId}`), defined(updates))
 }
 
 export async function deleteStudent(studentId: string): Promise<void> {
@@ -224,14 +242,14 @@ export async function createAttendance(
   attendanceId: string,
   data: Partial<Attendance>
 ): Promise<void> {
-  await set(sref(`attendance/${attendanceId}`), data)
+  await set(sref(`attendance/${attendanceId}`), defined(data))
 }
 
 export async function updateAttendance(
   attendanceId: string,
   updates: Partial<Attendance>
 ): Promise<void> {
-  await update(sref(`attendance/${attendanceId}`), updates)
+  await update(sref(`attendance/${attendanceId}`), defined(updates))
 }
 
 export async function deleteAttendance(attendanceId: string): Promise<void> {
@@ -310,7 +328,7 @@ export async function acknowledgeAbsentAlert(
   studentId: string,
   data: Partial<AbsentAlert>
 ): Promise<void> {
-  await set(sref(`absentAlerts/${studentId}`), data)
+  await set(sref(`absentAlerts/${studentId}`), defined(data))
 }
 
 // ==================== Missing Attendance Alerts ====================
@@ -329,14 +347,14 @@ export async function setMissingAttendanceAlert(
   id: string,
   data: MissingAttendanceAlert
 ): Promise<void> {
-  await set(sref(`missingAttendanceAlerts/${id}`), data)
+  await set(sref(`missingAttendanceAlerts/${id}`), defined(data))
 }
 
 export async function updateMissingAttendanceAlert(
   id: string,
   updates: Partial<MissingAttendanceAlert>
 ): Promise<void> {
-  await update(sref(`missingAttendanceAlerts/${id}`), updates)
+  await update(sref(`missingAttendanceAlerts/${id}`), defined(updates))
 }
 
 export function subscribeToMissingAttendanceAlerts(
@@ -385,11 +403,11 @@ export async function getExam(examId: string): Promise<Exam | null> {
 }
 
 export async function createExam(examId: string, data: Partial<Exam>): Promise<void> {
-  await set(sref(`exams/${examId}`), data)
+  await set(sref(`exams/${examId}`), defined(data))
 }
 
 export async function updateExam(examId: string, updates: Partial<Exam>): Promise<void> {
-  await update(sref(`exams/${examId}`), updates)
+  await update(sref(`exams/${examId}`), defined(updates))
 }
 
 export async function deleteExam(examId: string): Promise<void> {
@@ -419,7 +437,7 @@ export async function getExamsByClass(classId: string): Promise<Exam[]> {
 // ==================== Announcements ====================
 export async function createAnnouncement(data: Partial<Announcement>): Promise<void> {
   const id = `annc_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
-  await set(sref(`announcements/${id}`), { id, ...data })
+  await set(sref(`announcements/${id}`), defined({ id, ...data }))
 }
 
 export async function deleteAnnouncement(announcementId: string): Promise<void> {
@@ -715,7 +733,7 @@ export async function approveChangeRequest(request: ChangeRequest, reviewer: Act
     updates[`audit/${newId('audit')}`] = auditEntry(reviewer, 'approve_transfer', 'student', request.studentId, `${request.studentName}: ${request.className} -> ${target.name}`)
   }
 
-  await update(ref(db, `schoolData/${requireSchoolId()}`), updates)
+  await update(ref(db, `schoolData/${requireSchoolId()}`), defined(updates))
 }
 
 export async function rejectChangeRequest(request: ChangeRequest, reviewer: Actor, note?: string): Promise<void> {
@@ -728,7 +746,7 @@ export async function rejectChangeRequest(request: ChangeRequest, reviewer: Acto
     [`audit/${newId('audit')}`]: auditEntry(reviewer, 'reject_request', 'student', request.studentId, `${request.type}: ${request.studentName}`),
   }
   if (note) updates[`requests/${request.id}/reviewNote`] = note
-  await update(ref(db, `schoolData/${requireSchoolId()}`), updates)
+  await update(ref(db, `schoolData/${requireSchoolId()}`), defined(updates))
 }
 
 /** Admin deletes a student directly: archived immediately, with a reason. */
