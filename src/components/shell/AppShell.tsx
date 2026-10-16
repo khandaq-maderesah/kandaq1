@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
@@ -20,7 +20,10 @@ import { useAuth } from '@/context/AuthContext'
 import { useLogout } from '@/hooks/useAuth'
 import { useRequestBadges } from '@/hooks/useRequestBadges'
 import { cn } from '@/lib/utils'
+import { signInPath } from '@/lib/brandMemory'
+import { brandingAssetUrl } from '@/lib/branding'
 import { LanguageSwitcher } from './LanguageSwitcher'
+import { ThemeToggle } from '@/components/theme/ThemeToggle'
 import type { NavItem, NavSection } from './nav'
 
 function isActive(pathname: string, item: NavItem) {
@@ -33,17 +36,51 @@ function initials(name: string | undefined) {
   return (parts[0]?.[0] ?? '') + (parts.length > 1 ? parts[parts.length - 1][0] : '')
 }
 
-function Brand({ subtitle }: { subtitle?: string }) {
+/** Logo + app name: the madrasa's own branding when set up, else MMS. */
+function Brand() {
   const t = useTranslations('common')
+  const { school, branding } = useAuth()
+  const logo = brandingAssetUrl(school?.id, branding, 'mark')
   return (
     <div className="flex min-w-0 items-center gap-3">
-      <Image src="/image/logo-mark.png" alt="" width={40} height={40} className="h-10 w-10 shrink-0 object-contain" />
+      {branding?.logoVersion ? (
+        // Madrasa logos come from Firebase Storage.
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={logo} alt="" width={40} height={40} className="h-10 w-10 shrink-0 object-contain" />
+      ) : (
+        <Image src={logo} alt="" width={40} height={40} className="h-10 w-10 shrink-0 object-contain" />
+      )}
       <div className="min-w-0 leading-tight">
-        <p className="truncate font-semibold text-foreground">{t('appName')}</p>
-        <p className="truncate text-xs text-muted-foreground">{subtitle ?? t('appTagline')}</p>
+        <p className="truncate font-semibold text-foreground">{branding?.appName ?? t('appName')}</p>
+        <p className="truncate text-xs text-muted-foreground">{school?.name ?? t('appTagline')}</p>
       </div>
     </div>
   )
+}
+
+function setHeadLink(rel: string, href: string) {
+  let el = document.head.querySelector<HTMLLinkElement>(`link[rel="${rel}"]`)
+  if (!el) {
+    el = document.createElement('link')
+    el.rel = rel
+    document.head.appendChild(el)
+  }
+  if (el.getAttribute('href') !== href) el.href = href
+}
+
+/**
+ * Inside the app, the browser tab icon/title and the install manifest follow
+ * the current madrasa's branding (installing from here gives its own app).
+ */
+function useHeadBranding() {
+  const { school, branding } = useAuth()
+  useEffect(() => {
+    if (!school) return
+    setHeadLink('icon', brandingAssetUrl(school.id, branding, 'favicon'))
+    setHeadLink('apple-touch-icon', brandingAssetUrl(school.id, branding, 'apple'))
+    if (branding?.slug) setHeadLink('manifest', `/m/${branding.slug}/manifest.webmanifest`)
+    document.title = branding?.appName ?? school.name
+  }, [school, branding])
 }
 
 function NavLinks({ sections, onNavigate }: { sections: NavSection[]; onNavigate?: () => void }) {
@@ -98,7 +135,7 @@ function UserMenu() {
 
   const handleLogout = async () => {
     await logout()
-    window.location.href = '/login'
+    window.location.href = signInPath()
   }
 
   if (!user) return null
@@ -149,13 +186,14 @@ export function AppShell({
   const t = useTranslations('nav')
   const { school } = useAuth()
   const [mobileOpen, setMobileOpen] = useState(false)
+  useHeadBranding()
 
   return (
     <div className="min-h-screen bg-background">
       {/* Desktop sidebar */}
       <aside className="fixed inset-y-0 start-0 z-30 hidden w-64 flex-col border-e bg-sidebar lg:flex">
         <div className="flex h-16 items-center border-b px-5">
-          <Brand subtitle={school?.name} />
+          <Brand />
         </div>
         <div className="flex-1 overflow-y-auto px-3 py-5">
           <NavLinks sections={sections} />
@@ -167,7 +205,7 @@ export function AppShell({
         <SheetContent aria-describedby={undefined}>
           <DialogTitle className="sr-only">{t('openMenu')}</DialogTitle>
           <div className="flex h-16 items-center border-b px-5">
-            <Brand subtitle={school?.name} />
+            <Brand />
           </div>
           <div className="flex-1 overflow-y-auto px-3 py-5">
             <NavLinks sections={sections} onNavigate={() => setMobileOpen(false)} />
@@ -186,6 +224,7 @@ export function AppShell({
           <div className="flex items-center gap-1">
             {actions}
             <LanguageSwitcher />
+            <ThemeToggle />
             <UserMenu />
           </div>
         </header>

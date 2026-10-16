@@ -17,6 +17,9 @@ Please have a native speaker of each language go through the notes below before 
 
 ---
 
+
+---
+
 ## Amharic (am) translation review
 
 Namespaces done: common, nav, requests
@@ -172,6 +175,34 @@ Reviewer check:
 
 ---
 
+# Rebrand to MMS and per-madrasa branding
+
+What changed:
+- common.appName is now "MMS".
+- appTagline and the landing footer now read "የመድረሳ አስተዳደር ሥርዓት". I also changed adminSettings ስርዓቱ to ሥርዓቱ so the spelling is consistent.
+- The install strings use {app}.
+- landing has no Khendeq left.
+- The name-field placeholders still give "ኸንደቅ መድረሳ" as an example, because the English source keeps "Khendeq Medresah" there.
+
+New terms:
+
+| English | Amharic |
+|---|---|
+| branding | ስምና አርማ (page title: የመድረሳው ስም፣ አርማ እና ሊንክ) |
+| link / link name | ሊንክ / የሊንክ ስም |
+| logo / default logo | አርማ / ነባሪ አርማ |
+| app icon | የመተግበሪያ አዶ |
+| staff | ሠራተኞች |
+| Appearance / Light / Dark / Device setting | ገጽታ / ብሩህ / ጨለማ / የመሣሪያው ቅንብር |
+
+Reviewer check:
+30. auth.poweredBy "የሚሠራው በMMS — የመድረሳ አስተዳደር ሥርዓት": check the word order.
+31. notifications.install.descriptionIos "{app}ን ...": this adds the ን case ending to an app name that may be in Latin script (see note 25).
+32. branding.slugHint / slugInvalid: these say "ትንንሽ የእንግሊዝኛ ፊደላት" (lowercase English letters) to make it clear that Latin letters are required.
+33. Theme labels ብሩህ / ጨለማ: "ፈካ ያለ" is a possible alternative to ብሩህ.
+
+---
+
 ## Arabic (ar): term list and review notes
 
 All 26 namespaces are translated. `node scripts/i18n-sync.mjs --check` reports 0 `ar` lines, and all 1,199 ar messages parse with intl-messageformat.
@@ -180,7 +211,7 @@ All 26 namespaces are translated. `node scripts/i18n-sync.mjs --check` reports 0
 
 | English | Arabic | Notes |
 |---|---|---|
-| Khendeq (brand) | Khendeq | Kept in Latin script |
+| MMS (brand) | MMS — نظام إدارة المدارس الإسلامية | Latin "MMS"; Khendeq now appears only as the example school name |
 | school | مدرسة | |
 | platform | المنصّة | |
 | student / students | طالب / الطلاب; female: طالبة / الطالبات | Masculine plural for mixed groups |
@@ -304,6 +335,13 @@ All 26 namespaces are translated. `node scripts/i18n-sync.mjs --check` reports 0
    - No string clearly refers to a woman, so الأستاذة is not used yet.
    - School stays المدرسة throughout. I did not add المدرسة الإسلامية anywhere because no sentence needed it.
    - Please check that "مسؤول المدرسة" still fits now that the English says "Madrasa admin".
+25. **MMS rebrand.**
+   - The full name of MMS is translated as "نظام إدارة المدارس الإسلامية". It appears in common.appTagline, auth.poweredBy and landing.footer.copyright.
+   - إسلامية is the one place where I used the explicit Islamic form. This is the brand's own definition, and "نظام إدارة المدارس" alone would read as generic school software. If the owner prefers the shorter form, it changes in those 3 strings.
+   - auth.poweredBy = "بدعم من MMS — …".
+   - Branding is translated as الهوية البصرية, staff as العاملون, and the slug as اسم الرابط ("أحرف إنجليزية صغيرة", i.e. lowercase English letters).
+   - The appNameHint wording "{max} من الأحرف" was chosen so the noun doesn't have to agree with the number.
+   - The name placeholders ("مثال: مدرسة Khendeq" in adminSettings and superadmin) still mirror the English example school name.
 
 ---
 
@@ -472,6 +510,29 @@ The verb "barsiisuu" (to teach) stays as it is, e.g. "Kutaalee ustaazni kun bars
 36. **Female ustaz**: the English uses only "Ustaz". If female teachers matter, "Ustaaza" could be added later through a select.
 37. **Brand placeholders** "Fkn. Khendeq Medresah" were left as they are, since that is the brand and English still uses it.
 
+### Rebrand: MMS, plus branding namespace
+
+The new `branding` namespace is done. Also new: common.theme.*, auth.errors.otherMadrasa, auth.poweredBy, auth.madrasaNotFound.*. The {app} placeholder is now in notifications.install, and landing uses MMS. The check shows 0 om lines.
+
+| English | Oromo |
+|---|---|
+| Madrasa Management System | Sirna Bulchiinsa Madarasaa (capitalised as a product name) |
+| Branding | Mallattoo |
+| Link / link name | Liinkii / Maqaa liinkii |
+| App name / App icon | Maqaa appii / Mallattoo appii |
+| Logo / default logo | Loogoo / Loogoo durtii |
+| Staff | Hojjettoota |
+| Appearance / Light / Dark / Device setting | Bifa / Ifaa / Dukkana / Akka qindaa'ina meeshaa |
+| Powered by | Kan hojjetame: |
+
+### Please double-check
+38. **"Mallattoo"** is used for both "branding" and "icon" (Mallattoo appii). "Eenyummaa daldalaa" (brand identity) is more exact but long.
+39. **Theme**: "Bifa" (appearance) and "Ifaa/Dukkana" (light/dark) need confirming. "Akka qindaa'ina meeshaa" means "as the device setting".
+40. **"Powered by" = "Kan hojjetame: MMS — …"**: literally "made by". An alternative is "Kan MMS — … tiin hojjetame".
+41. **slugHint**: "qubee xixiqqaa" means lowercase letters and "sararoota (-)" means dashes. Oromo users may not know "slug" rules, so the reviewer should check that this is clear.
+42. **"Fkn. Khendeq Medresah"** is kept in the two namePlaceholders, because it is an example madrasa name and English still uses it.
+43. **"Duubbee iftoomaa"** (transparent background) in logoHint: check that it is understandable. "Duubbee hin mul'anne" is an alternative.
+
 ---
 
 ## Somali (so) translation review
@@ -618,3 +679,22 @@ Namespaces done: all 26 (common, nav, requests, teacher*, admin*, dates, exams, 
 - **Email placeholder:** `adminTeachers.form.emailPlaceholder` now matches the English: ustaz@madrasa.com.
 - **Reminder line:** `notifications.reminders.adminLine` is now "Ustaad {teacher} …". The same caveat as note 21 applies.
 - **Review notes 1–26:** these still say dugsi/macallin, so read them with the new terms.
+
+### MMS rebrand and the branding namespace
+- **appTagline / product name:** "Nidaamka Maamulka Madrasadaha" (Madrasa Management System). I used it in common.appTagline, auth.poweredBy and landing.footer.copyright. "MMS" stays in Latin letters.
+- **auth.poweredBy** = "Waxaa bixiya MMS — …" (literally "provided by"). Somali has no fixed equivalent of "Powered by". Please check this phrasing.
+- **New terms:**
+
+| English | Somali |
+|---|---|
+| Link | Xiriiriye / xiriiriyaha (already used for the password-reset link) |
+| Link name (slug) | Magaca xiriiriyaha |
+| Branding | Summadda |
+| Logo | Calaamadda |
+| App icon | Astaanta app-ka |
+| Staff | Shaqaalaha |
+| Appearance / Light / Dark / Device setting | Muuqaalka / Iftiin / Mugdi / Dejinta qalabka |
+
+- **"Summadda" for branding:** "Summad" means a brand or trademark. Please check that it doesn't read too commercial; "Astaanta" is the alternative.
+- **{app} gender:** `notifications.install.iosStep3` uses "{app} ayaa ka soo muuqan doona", which is gender-neutral because a madrasa's app name can be anything.
+- **Name placeholders:** `adminSettings` / `superadmin` namePlaceholder still say "Khendeq Medresah", because the English source still does.

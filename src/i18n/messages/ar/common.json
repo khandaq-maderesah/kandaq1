@@ -1,6 +1,6 @@
 {
-  "appName": "Khendeq",
-  "appTagline": "منصّة لإدارة المدارس",
+  "appName": "MMS",
+  "appTagline": "نظام إدارة المدارس الإسلامية",
   "actions": {
     "save": "حفظ",
     "saveChanges": "حفظ التغييرات",
@@ -104,5 +104,11 @@
     "classes": "{count, plural, =0 {لا توجد فصول} zero {لا توجد فصول} one {فصل واحد} two {فصلان} few {# فصول} many {# فصلًا} other {# فصل}}"
   },
   "language": "اللغة",
-  "today": "اليوم"
+  "today": "اليوم",
+  "theme": {
+    "label": "المظهر",
+    "light": "فاتح",
+    "dark": "داكن",
+    "system": "حسب إعداد الجهاز"
+  }
 }

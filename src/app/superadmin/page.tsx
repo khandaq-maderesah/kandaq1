@@ -1,12 +1,14 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import {
   Building2,
   CheckCircle2,
+  Copy,
+  Link2,
   Loader2,
   LogIn,
   Mail,
@@ -15,6 +17,7 @@ import {
   Phone,
   PlayCircle,
   Plus,
+  Upload,
   UserPlus,
   Users,
 } from 'lucide-react'
@@ -38,6 +41,16 @@ import {
 } from '@/components/ui/dialog'
 import type { School, User } from '@/types'
 import { apiErrorKey } from '@/lib/apiErrors'
+import {
+  APP_NAME_MAX,
+  RESERVED_SLUGS,
+  brandingAssetUrl,
+  isValidSlug,
+  suggestSlug,
+  type BrandingFile,
+  type PublicBranding,
+} from '@/lib/branding'
+import { LOGO_ACCEPT, LogoError, processLogo } from '@/lib/logoProcessing'
 
 const DEFAULT_TIMEZONE = 'Africa/Addis_Ababa'
 
@@ -51,6 +64,8 @@ export default function SuperAdminPage() {
   const router = useRouter()
   const { user, selectSchool } = useAuth()
   const schoolsData = useLiveData<School[]>('schools', (emit) => rtdb.subscribeToSchools(emit))
+  const brandingData = useLiveData<Record<string, PublicBranding>>('allBranding', (emit) => rtdb.subscribeToAllBranding(emit))
+  const tb = useTranslations('branding')
   const usersData = useLiveData<User[]>('allUsers', (emit) => rtdb.subscribeToAllUsers(emit))
 
   // New school form
@@ -61,6 +76,16 @@ export default function SuperAdminPage() {
   const [phone, setPhone] = useState('')
   const [timezone, setTimezone] = useState(DEFAULT_TIMEZONE)
   const [creating, setCreating] = useState(false)
+  // Branding for the new madrasa: link name (suggested from the name until edited), app name, logo.
+  const [slug, setSlug] = useState('')
+  const [slugEdited, setSlugEdited] = useState(false)
+  const [slugError, setSlugError] = useState('')
+  const [appName, setAppName] = useState('')
+  const [appNameEdited, setAppNameEdited] = useState(false)
+  const [logo, setLogo] = useState<Record<BrandingFile, Blob> | null>(null)
+  const [logoName, setLogoName] = useState('')
+  const [logoError, setLogoError] = useState('')
+  const logoInput = useRef<HTMLInputElement>(null)
 
   // New school-admin form (one school at a time)
   const [adminFor, setAdminFor] = useState<string | null>(null)
@@ -101,6 +126,14 @@ export default function SuperAdminPage() {
 
   const resetCreateForm = () => {
     setName('')
+    setSlug('')
+    setSlugEdited(false)
+    setSlugError('')
+    setAppName('')
+    setAppNameEdited(false)
+    setLogo(null)
+    setLogoName('')
+    setLogoError('')
     setNameAm('')
     setAddress('')
     setPhone('')
@@ -114,11 +147,47 @@ export default function SuperAdminPage() {
     setAdminPassword('')
   }
 
+  const onNameChange = (value: string) => {
+    setName(value)
+    if (!slugEdited) setSlug(suggestSlug(value))
+    if (!appNameEdited) setAppName(value.slice(0, APP_NAME_MAX))
+  }
+
+  const chooseLogo = async (file: File | undefined) => {
+    setLogoError('')
+    if (!file) return
+    try {
+      setLogo(await processLogo(file))
+      setLogoName(file.name)
+    } catch (err) {
+      const reason = err instanceof LogoError ? err.reason : 'decode'
+      setLogoError(tb(reason === 'type' ? 'logoErrorType' : reason === 'size' ? 'logoErrorSize' : 'logoErrorDecode'))
+    } finally {
+      if (logoInput.current) logoInput.current.value = ''
+    }
+  }
+
+  const copyLink = async (link: string) => {
+    try {
+      await navigator.clipboard.writeText(link)
+      toast.success(tb('copied'))
+    } catch {
+      /* clipboard unavailable */
+    }
+  }
+
   const handleCreateSchool = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!name.trim()) return
+    const cleanSlug = slug.trim().toLowerCase()
+    if (RESERVED_SLUGS.has(cleanSlug)) return setSlugError(tb('slugReserved'))
+    if (!isValidSlug(cleanSlug)) return setSlugError(tb('slugInvalid'))
     setCreating(true)
     try {
+      if (await rtdb.getSchoolIdBySlug(cleanSlug)) {
+        setSlugError(tb('slugTaken'))
+        return
+      }
       const now = new Date().toISOString()
       const record: Omit<School, 'id'> = {
         name: name.trim(),
@@ -132,7 +201,19 @@ export default function SuperAdminPage() {
       if (address.trim()) record.address = address.trim()
       if (phone.trim()) record.phone = phone.trim()
       const id = newSchoolId()
-      await rtdb.createSchool(id, record)
+      await rtdb.createSchoolWithBranding(id, record, {
+        slug: cleanSlug,
+        name: record.name,
+        appName: (appName.trim() || record.name).slice(0, APP_NAME_MAX),
+      })
+      if (logo) {
+        try {
+          await rtdb.uploadBrandingLogo(id, logo)
+        } catch (err) {
+          console.error('Logo upload failed', err)
+          toast.error(tb('uploadFailed'))
+        }
+      }
       toast.success(t('create.created', { name: record.name }))
       resetCreateForm()
       setShowCreate(false)
@@ -268,13 +349,20 @@ export default function SuperAdminPage() {
             const admins = members.filter((u) => u.role === 'admin')
             const teacherCount = members.filter((u) => u.role === 'teacher').length
             const suspended = school.status === 'suspended'
+            const brand = brandingData.data?.[school.id]
+            const link = brand?.slug && typeof window !== 'undefined' ? `${window.location.origin}/m/${brand.slug}` : null
             return (
               <div key={school.id} className="flex flex-col rounded-xl border bg-card p-5 shadow-sm">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex min-w-0 items-start gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                      <Building2 className="h-5 w-5" />
-                    </div>
+                    {brand?.logoVersion ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={brandingAssetUrl(school.id, brand, 'mark')} alt="" width={40} height={40} className="h-10 w-10 shrink-0 object-contain" />
+                    ) : (
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                        <Building2 className="h-5 w-5" />
+                      </div>
+                    )}
                     <div className="min-w-0">
                       <h2 className="truncate font-semibold text-foreground">{school.name}</h2>
                       {school.nameAm && (
@@ -308,6 +396,22 @@ export default function SuperAdminPage() {
                     </>
                   ) : (
                     <p>{t('card.noContact')}</p>
+                  )}
+                </div>
+
+                <div className="mt-3 flex min-w-0 items-center gap-2 text-sm">
+                  <Link2 className="h-4 w-4 shrink-0 text-muted-foreground" />
+                  {link ? (
+                    <>
+                      <span dir="ltr" className="truncate font-medium text-foreground">
+                        /m/{brand?.slug}
+                      </span>
+                      <Button size="icon-sm" variant="ghost" onClick={() => copyLink(link)} aria-label={tb('copyLink')}>
+                        <Copy />
+                      </Button>
+                    </>
+                  ) : (
+                    <span className="text-muted-foreground">{tb('notSetUp')}</span>
                   )}
                 </div>
 
@@ -380,7 +484,7 @@ export default function SuperAdminPage() {
                   id="school-name"
                   required
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  onChange={(e) => onNameChange(e.target.value)}
                   placeholder={t('create.namePlaceholder')}
                 />
               </div>
@@ -412,6 +516,66 @@ export default function SuperAdminPage() {
                   value={timezone}
                   onChange={(e) => setTimezone(e.target.value)}
                 />
+              </div>
+            </div>
+
+            {/* Branding: the madrasa's own link, app name and logo */}
+            <div className="grid gap-4 border-t pt-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="school-slug">{tb('slug')}</Label>
+                <div dir="ltr" className="flex items-center rounded-lg border border-input bg-card shadow-sm focus-within:ring-2 focus-within:ring-ring">
+                  <span className="ps-3 text-sm text-muted-foreground">/m/</span>
+                  <Input
+                    id="school-slug"
+                    required
+                    maxLength={40}
+                    value={slug}
+                    onChange={(e) => {
+                      setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))
+                      setSlugEdited(true)
+                      setSlugError('')
+                    }}
+                    aria-invalid={!!slugError}
+                    className="border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                  />
+                </div>
+                <p className={slugError ? 'text-xs text-destructive' : 'text-xs text-muted-foreground'}>
+                  {slugError || tb('slugHint')}
+                </p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="school-app-name">{tb('appName')}</Label>
+                <Input
+                  id="school-app-name"
+                  required
+                  maxLength={APP_NAME_MAX}
+                  value={appName}
+                  onChange={(e) => {
+                    setAppName(e.target.value)
+                    setAppNameEdited(true)
+                  }}
+                />
+                <p className="text-xs text-muted-foreground">{tb('appNameHint', { max: APP_NAME_MAX })}</p>
+              </div>
+              <div className="space-y-2 sm:col-span-2">
+                <Label htmlFor="school-logo">{tb('logo')}</Label>
+                <div className="flex flex-wrap items-center gap-3">
+                  <input
+                    ref={logoInput}
+                    id="school-logo"
+                    type="file"
+                    accept={LOGO_ACCEPT}
+                    className="sr-only"
+                    onChange={(e) => chooseLogo(e.target.files?.[0])}
+                  />
+                  <Button type="button" variant="outline" onClick={() => logoInput.current?.click()}>
+                    <Upload /> {logo ? tb('changeLogo') : tb('uploadLogo')}
+                  </Button>
+                  {logoName && <span className="truncate text-sm text-muted-foreground">{logoName}</span>}
+                </div>
+                <p className={logoError ? 'text-xs text-destructive' : 'text-xs text-muted-foreground'}>
+                  {logoError || tb('logoHint')}
+                </p>
               </div>
             </div>
             <DialogFooter>

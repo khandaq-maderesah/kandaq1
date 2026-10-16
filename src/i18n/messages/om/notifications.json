@@ -68,8 +68,8 @@
     }
   },
   "install": {
-    "title": "Khendeq diriirsi",
-    "descriptionIos": "Akka appiitti itti fayyadamuuf Khendeq iskiriinii jalqabaa keessanitti dabalaa.",
+    "title": "{app} diriirsi",
+    "descriptionIos": "Akka appiitti itti fayyadamuuf {app} iskiriinii jalqabaa keessanitti dabalaa.",
     "description": "Saffisaan argachuu fi interneetii malee hojjechuuf appii kana meeshaa keessan irratti diriirsaa.",
     "install": "Appii diriirsi",
     "notNow": "Amma miti",
@@ -77,6 +77,6 @@
     "iosHowTo": "Akkamitti iskiriinii jalqabaatti dabaluu",
     "iosStep1": "Safari keessatti qabduu “Share” tuqaa.",
     "iosStep2": "Gara gadiitti sochoosaatii “Add to Home Screen” tuqaa.",
-    "iosStep3": "“Add” tuqaa. Khendeq iskiriinii jalqabaa keessan irratti ni mul'ata."
+    "iosStep3": "“Add” tuqaa. {app} iskiriinii jalqabaa keessan irratti ni mul'ata."
   }
 }

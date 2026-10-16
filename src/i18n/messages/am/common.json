@@ -1,6 +1,6 @@
 {
-  "appName": "Khendeq",
-  "appTagline": "የመድረሳ አስተዳደር መድረክ",
+  "appName": "MMS",
+  "appTagline": "የመድረሳ አስተዳደር ሥርዓት",
   "actions": {
     "save": "አስቀምጥ",
     "saveChanges": "ለውጦችን አስቀምጥ",
@@ -104,5 +104,11 @@
     "classes": "{count, plural, =0 {ምንም ክፍል የለም} one {# ክፍል} other {# ክፍሎች}}"
   },
   "language": "ቋንቋ",
-  "today": "ዛሬ"
+  "today": "ዛሬ",
+  "theme": {
+    "label": "ገጽታ",
+    "light": "ብሩህ",
+    "dark": "ጨለማ",
+    "system": "የመሣሪያው ቅንብር"
+  }
 }

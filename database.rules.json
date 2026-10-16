@@ -19,6 +19,34 @@
         }
       }
     },
+    "slugs": {
+      ".read": true,
+      "$slug": {
+        ".write": "auth != null && ((!data.exists() && newData.exists() && newData.parent().parent().child('publicBranding/' + newData.val() + '/slug').val() === $slug && (root.child('users/' + auth.uid).child('role').val() === 'superadmin' || (root.child('users/' + auth.uid).child('role').val() === 'admin' && root.child('users/' + auth.uid).child('schoolId').val() != null && root.child('users/' + auth.uid).child('status').val() !== 'inactive' && newData.val() === root.child('users/' + auth.uid).child('schoolId').val()))) || (data.exists() && !newData.exists() && newData.parent().parent().child('publicBranding/' + data.val() + '/slug').val() !== $slug && (root.child('users/' + auth.uid).child('role').val() === 'superadmin' || (root.child('users/' + auth.uid).child('role').val() === 'admin' && root.child('users/' + auth.uid).child('schoolId').val() != null && root.child('users/' + auth.uid).child('status').val() !== 'inactive' && data.val() === root.child('users/' + auth.uid).child('schoolId').val()))))",
+        ".validate": "!newData.exists() || ($slug.matches(/^[a-z0-9][a-z0-9-]{1,38}[a-z0-9]$/) && newData.isString())"
+      }
+    },
+    "publicBranding": {
+      ".read": true,
+      "$schoolId": {
+        ".write": "auth != null && newData.exists() && (root.child('users/' + auth.uid).child('role').val() === 'superadmin' || ((root.child('users/' + auth.uid).child('schoolId').val() === $schoolId && root.child('users/' + auth.uid).child('status').val() !== 'inactive' && root.child('schoolInfo/' + $schoolId + '/status').val() === 'active') && root.child('users/' + auth.uid).child('role').val() === 'admin'))",
+        "slug": {
+          ".validate": "newData.isString() && newData.parent().parent().parent().child('slugs/' + newData.val()).val() === $schoolId"
+        },
+        "name": {
+          ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 100"
+        },
+        "appName": {
+          ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 30"
+        },
+        "logoVersion": {
+          ".validate": "newData.isNumber()"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
     "schoolInfo": {
       ".read": "auth != null && root.child('users/' + auth.uid).child('role').val() === 'superadmin'",
       "$schoolId": {

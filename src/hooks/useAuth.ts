@@ -6,9 +6,9 @@ import { getAuthErrorKey } from '@/lib/firebase/authErrors'
 export function useLogin() {
   const { login } = useAuth()
   
-  const loginUser = async (email: string, password: string) => {
+  const loginUser = async (email: string, password: string, opts?: { schoolId?: string }) => {
     try {
-      const { credential, profile } = await login(email, password)
+      const { credential, profile } = await login(email, password, opts)
       return { success: true as const, user: credential.user, profile }
     } catch (error) {
       const info = getAuthErrorKey(error)

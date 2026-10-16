@@ -68,8 +68,8 @@
     }
   },
   "install": {
-    "title": "Ku rakib Khendeq",
-    "descriptionIos": "Ku dar Khendeq shaashadda hore si aad ugu isticmaasho sida app oo kale.",
+    "title": "Ku rakib {app}",
+    "descriptionIos": "Ku dar {app} shaashadda hore si aad ugu isticmaasho sida app oo kale.",
     "description": "Ku rakib app-ka qalabkaaga si aad si degdeg ah ugu gasho, internet la'aanna ugu isticmaasho.",
     "install": "Ku rakib app-ka",
     "notNow": "Hadda maya",
@@ -77,6 +77,6 @@
     "iosHowTo": "Sida loogu daro shaashadda hore",
     "iosStep1": "Safari gudihiisa, taabo badhanka Share.",
     "iosStep2": "Hoos u dhaadhac oo taabo “Add to Home Screen”.",
-    "iosStep3": "Taabo “Add”. Khendeq wuxuu ka soo muuqan doonaa shaashaddaada hore."
+    "iosStep3": "Taabo “Add”. {app} ayaa ka soo muuqan doona shaashaddaada hore."
   }
 }

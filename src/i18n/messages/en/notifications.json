@@ -68,8 +68,8 @@
     }
   },
   "install": {
-    "title": "Install Khendeq",
-    "descriptionIos": "Add Khendeq to your home screen to use it like an app.",
+    "title": "Install {app}",
+    "descriptionIos": "Add {app} to your home screen to use it like an app.",
     "description": "Install the app on your device for quicker access and offline support.",
     "install": "Install app",
     "notNow": "Not now",
@@ -77,6 +77,6 @@
     "iosHowTo": "How to add to home screen",
     "iosStep1": "Tap the Share button in Safari.",
     "iosStep2": "Scroll down and tap “Add to Home Screen”.",
-    "iosStep3": "Tap “Add”. Khendeq will appear on your home screen."
+    "iosStep3": "Tap “Add”. {app} will appear on your home screen."
   }
 }

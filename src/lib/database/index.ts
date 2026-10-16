@@ -1,4 +1,6 @@
-import { db } from '@/lib/firebase/config'
+import { app, db } from '@/lib/firebase/config'
+import { getStorage, ref as storageRef, uploadBytes, deleteObject } from 'firebase/storage'
+import { BRANDING_FILES, brandingStoragePath, type BrandingFile, type PublicBranding } from '@/lib/branding'
 import { ref, get, set, update, remove, onValue, query, orderByChild, equalTo, startAt, type QueryConstraint, type Unsubscribe } from 'firebase/database'
 import type { User, Class, Student, Attendance, AbsentAlert, MissingAttendanceAlert, Exam, Announcement, School, ChangeRequest, DeletionReason, StudentArchive } from '@/types'
 
@@ -56,6 +58,90 @@ export async function getSchool(schoolId: string): Promise<School | null> {
 
 export async function createSchool(schoolId: string, data: Omit<School, 'id'>): Promise<void> {
   await set(ref(db, `schoolInfo/${schoolId}`), defined(data))
+}
+
+// ==================== Branding (public) ====================
+// publicBranding/{schoolId} and slugs/{slug} are readable without signing in
+// (the branded sign-in page at /m/{slug} needs them). Database rules keep the
+// slug index and publicBranding.slug consistent, so links can't be hijacked.
+
+export async function getSchoolIdBySlug(slug: string): Promise<string | null> {
+  const snap = await get(ref(db, `slugs/${slug}`))
+  return snap.exists() ? String(snap.val()) : null
+}
+
+export async function getPublicBranding(schoolId: string): Promise<PublicBranding | null> {
+  const snap = await get(ref(db, `publicBranding/${schoolId}`))
+  return snap.exists() ? (snap.val() as PublicBranding) : null
+}
+
+/** Every madrasa's public branding (platform console). */
+export function subscribeToAllBranding(cb: (branding: Record<string, PublicBranding>) => void): Unsubscribe {
+  return onValue(ref(db, 'publicBranding'), (snap) => cb((snap.val() as Record<string, PublicBranding>) ?? {}))
+}
+
+/** Superadmin: creates a madrasa together with its public branding and link. */
+export async function createSchoolWithBranding(
+  schoolId: string,
+  data: Omit<School, 'id'>,
+  branding: Omit<PublicBranding, 'logoVersion'>
+): Promise<void> {
+  await update(ref(db), defined({
+    [`schoolInfo/${schoolId}`]: data,
+    [`publicBranding/${schoolId}`]: branding,
+    [`slugs/${branding.slug}`]: schoolId,
+  }))
+}
+
+/**
+ * Saves a madrasa's name / app name / link. Changing the link releases the old
+ * one in the same atomic write.
+ */
+export async function saveBranding(
+  schoolId: string,
+  next: { name: string; appName: string; slug: string },
+  previousSlug?: string | null
+): Promise<void> {
+  const updates: Record<string, unknown> = {
+    [`publicBranding/${schoolId}/name`]: next.name,
+    [`publicBranding/${schoolId}/appName`]: next.appName,
+    [`publicBranding/${schoolId}/slug`]: next.slug,
+  }
+  if (previousSlug !== next.slug) {
+    updates[`slugs/${next.slug}`] = schoolId
+    if (previousSlug) updates[`slugs/${previousSlug}`] = null
+  }
+  await update(ref(db), updates)
+}
+
+/** Uploads the generated logo images, then switches the madrasa to them. */
+export async function uploadBrandingLogo(schoolId: string, files: Record<BrandingFile, Blob>): Promise<number> {
+  const storage = getStorage(app)
+  await Promise.all(
+    (Object.keys(BRANDING_FILES) as BrandingFile[]).map((key) =>
+      uploadBytes(storageRef(storage, brandingStoragePath(schoolId, key)), files[key], {
+        contentType: 'image/png',
+        // URLs carry ?v=<version>, so files can be cached for a long time.
+        cacheControl: 'public, max-age=31536000',
+      })
+    )
+  )
+  const version = Date.now()
+  await set(ref(db, `publicBranding/${schoolId}/logoVersion`), version)
+  return version
+}
+
+/** Goes back to the default MMS logo. */
+export async function removeBrandingLogo(schoolId: string): Promise<void> {
+  await remove(ref(db, `publicBranding/${schoolId}/logoVersion`))
+  const storage = getStorage(app)
+  await Promise.all(
+    (Object.keys(BRANDING_FILES) as BrandingFile[]).map((key) =>
+      deleteObject(storageRef(storage, brandingStoragePath(schoolId, key))).catch(() => {
+        /* already gone */
+      })
+    )
+  )
 }
 
 export async function updateSchool(schoolId: string, updates: Partial<Omit<School, 'id'>>): Promise<void> {
@@ -808,6 +894,13 @@ export async function logAction(data: {
 
 // ==================== Exported API ====================
 export const rtdb = {
+  getSchoolIdBySlug,
+  getPublicBranding,
+  subscribeToAllBranding,
+  createSchoolWithBranding,
+  saveBranding,
+  uploadBrandingLogo,
+  removeBrandingLogo,
   createChangeRequest,
   cancelChangeRequest,
   subscribeToChangeRequests,

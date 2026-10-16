@@ -1,6 +1,12 @@
 {
-  "appName": "Khendeq",
-  "appTagline": "Madal maamulka madrasadaha",
+  "appName": "MMS",
+  "appTagline": "Nidaamka Maamulka Madrasadaha",
+  "theme": {
+    "label": "Muuqaalka",
+    "light": "Iftiin",
+    "dark": "Mugdi",
+    "system": "Dejinta qalabka"
+  },
   "actions": {
     "save": "Kaydi",
     "saveChanges": "Kaydi isbeddellada",

@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import { buttonVariants } from '@/components/ui/button'
 import { LanguageSwitcher } from '@/components/shell/LanguageSwitcher'
+import { ThemeToggle } from '@/components/theme/ThemeToggle'
 
 const FEATURES: { key: 'attendance' | 'students' | 'exams' | 'parents' | 'reports' | 'languages'; icon: LucideIcon }[] = [
   { key: 'attendance', icon: ClipboardCheck },
@@ -47,6 +48,7 @@ export default function Home() {
           </Link>
           <div className="flex items-center gap-1 sm:gap-2">
             <LanguageSwitcher showLabel />
+            <ThemeToggle />
             <Link href="/login" className={buttonVariants({ size: 'sm' })}>
               <LogIn className="rtl:rotate-180" />
               {t('nav.signIn')}

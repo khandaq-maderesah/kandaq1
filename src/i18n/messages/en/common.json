@@ -1,6 +1,6 @@
 {
-  "appName": "Khendeq",
-  "appTagline": "Madrasa management platform",
+  "appName": "MMS",
+  "appTagline": "Madrasa Management System",
   "actions": {
     "save": "Save",
     "saveChanges": "Save changes",
@@ -104,5 +104,11 @@
     "classes": "{count, plural, =0 {No classes} one {# class} other {# classes}}"
   },
   "language": "Language",
-  "today": "Today"
+  "today": "Today",
+  "theme": {
+    "label": "Appearance",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "Device setting"
+  }
 }

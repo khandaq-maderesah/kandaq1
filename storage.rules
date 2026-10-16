@@ -26,6 +26,16 @@ service firebase.storage {
         && (isSuper() || (inSchool(schoolId) && request.auth.token.role == 'admin'));
     }
 
+    // branding/{schoolId}/{file}: logo images generated in the browser.
+    // Public (the branded sign-in page and app icons need them before login);
+    // only the platform admin or that madrasa's admin may change them.
+    match /branding/{schoolId}/{file} {
+      allow read: if true;
+      allow write: if (isSuper() || (inSchool(schoolId) && request.auth.token.role == 'admin'))
+        && (request.resource == null
+          || (request.resource.size < 2 * 1024 * 1024 && request.resource.contentType == 'image/png'));
+    }
+
     match /{allPaths=**} {
       allow read, write: if false;
     }

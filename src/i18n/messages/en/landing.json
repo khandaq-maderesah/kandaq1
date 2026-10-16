@@ -5,7 +5,7 @@
   "hero": {
     "eyebrow": "Madrasa management platform",
     "title": "Run your whole madrasa from one place",
-    "subtitle": "Khendeq helps madrasas take attendance, manage students and ustazes, run exams and keep parents informed, in the language you prefer.",
+    "subtitle": "MMS helps madrasas take attendance, manage students and ustazes, run exams and keep parents informed, in the language you prefer.",
     "cta": "Sign in",
     "secondary": "See what's included"
   },
@@ -38,7 +38,7 @@
     }
   },
   "footer": {
-    "copyright": "© {year} Khendeq. All rights reserved."
+    "copyright": "© {year} MMS — Madrasa Management System. All rights reserved."
   },
   "errorPage": {
     "title": "Something went wrong",

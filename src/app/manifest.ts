@@ -2,8 +2,8 @@ import type { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Khendeq',
-    short_name: 'Khendeq',
+    name: 'MMS — Madrasa Management System',
+    short_name: 'MMS',
     description: 'Madrasa management platform: attendance, students, ustazes, exams and reports.',
     id: '/',
     start_url: '/',

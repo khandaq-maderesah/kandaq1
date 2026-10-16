@@ -1,11 +1,12 @@
 import type { Metadata, Viewport } from "next"
 import { Inter, Noto_Sans_Ethiopic, Noto_Sans_Arabic } from "next/font/google"
-import { Toaster } from "sonner"
 import "./globals.css"
 import { AuthProvider } from "@/context/AuthContext"
 import { InstallAppPrompt } from "@/components/InstallAppPrompt"
 import { I18nProvider } from "@/i18n/I18nProvider"
 import { LOCALE_STORAGE_KEY } from "@/i18n/config"
+import { ThemeProvider, THEME_STORAGE_KEY } from "@/components/theme/ThemeProvider"
+import { ThemedToaster } from "@/components/theme/ThemeToggle"
 
 // Latin (English, Afaan Oromoo, Somali), Ethiopic (Amharic) and Arabic.
 // Script fonts are not preloaded: the browser fetches them only when a page
@@ -28,12 +29,12 @@ const arabic = Noto_Sans_Arabic({
 
 export const metadata: Metadata = {
   title: {
-    default: "Khendeq",
-    template: "%s | Khendeq",
+    default: "MMS — Madrasa Management System",
+    template: "%s | MMS",
   },
   // No description on purpose: it is what link previews (Telegram, WhatsApp)
   // show under the title when sharing the URL.
-  applicationName: "Khendeq",
+  applicationName: "MMS",
   keywords: ["madrasa", "medresah", "ustaz", "attendance", "students", "management"],
   manifest: "/manifest.webmanifest",
   icons: {
@@ -42,26 +43,30 @@ export const metadata: Metadata = {
   },
   appleWebApp: {
     capable: true,
-    title: "Khendeq",
+    title: "MMS",
     statusBarStyle: "default",
   },
   // No openGraph.description on purpose: link previews (Telegram, WhatsApp,
   // etc.) would otherwise show this text when sharing the URL.
   openGraph: {
-    title: "Khendeq",
+    title: "MMS — Madrasa Management System",
     type: "website",
   },
 }
 
 export const viewport: Viewport = {
-  themeColor: "#f5f6f8",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f5f6f8" },
+    { media: "(prefers-color-scheme: dark)", color: "#0e1117" },
+  ],
   width: "device-width",
   initialScale: 1,
 }
 
-// Applies the saved language + text direction before first paint, so Arabic
-// users never see a left-to-right flash.
-const localeBootScript = `try{var l=localStorage.getItem(${JSON.stringify(LOCALE_STORAGE_KEY)});if(l){document.documentElement.lang=l;document.documentElement.dir=l==='ar'?'rtl':'ltr'}}catch(e){}`
+// Applies the saved language + text direction and the light/dark theme before
+// first paint, so Arabic users never see a left-to-right flash and night-mode
+// users never see a white flash.
+const bootScript = `try{var d=document.documentElement;var l=localStorage.getItem(${JSON.stringify(LOCALE_STORAGE_KEY)});if(l){d.lang=l;d.dir=l==='ar'?'rtl':'ltr'}var t=localStorage.getItem(${JSON.stringify(THEME_STORAGE_KEY)});if(t==='dark'||(t!=='light'&&matchMedia('(prefers-color-scheme: dark)').matches))d.classList.add('dark')}catch(e){}`
 
 export default function RootLayout({
   children,
@@ -71,16 +76,18 @@ export default function RootLayout({
   return (
     <html lang="en" dir="ltr" suppressHydrationWarning className={`${latin.variable} ${ethiopic.variable} ${arabic.variable}`}>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: localeBootScript }} />
+        <script dangerouslySetInnerHTML={{ __html: bootScript }} />
       </head>
       <body className="antialiased">
-        <I18nProvider>
-          <AuthProvider>
-            {children}
-            <InstallAppPrompt />
-          </AuthProvider>
-          <Toaster position="top-center" richColors closeButton />
-        </I18nProvider>
+        <ThemeProvider>
+          <I18nProvider>
+            <AuthProvider>
+              {children}
+              <InstallAppPrompt />
+            </AuthProvider>
+            <ThemedToaster />
+          </I18nProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

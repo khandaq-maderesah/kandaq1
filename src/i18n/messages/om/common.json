@@ -1,6 +1,6 @@
 {
-  "appName": "Khendeq",
-  "appTagline": "Waltajjii bulchiinsa madarasaa",
+  "appName": "MMS",
+  "appTagline": "Sirna Bulchiinsa Madarasaa",
   "actions": {
     "save": "Olkaa'i",
     "saveChanges": "Jijjiirama olkaa'i",
@@ -104,5 +104,11 @@
     "classes": "{count, plural, =0 {Kutaan hin jiru} one {Kutaa tokko} other {Kutaalee #}}"
   },
   "language": "Afaan",
-  "today": "Har'a"
+  "today": "Har'a",
+  "theme": {
+    "label": "Bifa",
+    "light": "Ifaa",
+    "dark": "Dukkana",
+    "system": "Akka qindaa'ina meeshaa"
+  }
 }

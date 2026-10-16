@@ -34,6 +34,20 @@ REQ_STUDENT = "root.child('schoolData/' + $schoolId + '/students/' + newData.chi
 REQ_STUDENT_TEACHER = class_teacher(f"{REQ_STUDENT}.child('classId').val()")
 REQ_STUDENT_ACTIVE = f"{REQ_STUDENT}.child('isActive').val() !== false"
 
+# --- Branding: slugs/{slug} -> schoolId and publicBranding/{schoolId} are public.
+# A slug may only be claimed or released together with publicBranding.slug in
+# the same (atomic) write, by the platform admin or that madrasa's admin.
+NEW_ROOT = "newData.parent().parent()"
+SLUG_CLAIM = (
+    f"(!data.exists() && newData.exists() && {NEW_ROOT}.child('publicBranding/' + newData.val() + '/slug').val() === $slug"
+    f" && ({SUPER} || ({SCHOOL_ADMIN_USER} && newData.val() === {MYSCHOOL})))"
+)
+SLUG_RELEASE = (
+    f"(data.exists() && !newData.exists() && {NEW_ROOT}.child('publicBranding/' + data.val() + '/slug').val() !== $slug"
+    f" && ({SUPER} || ({SCHOOL_ADMIN_USER} && data.val() === {MYSCHOOL})))"
+)
+BRANDING_SLUG_VALID = f"{NEW_ROOT}.parent().child('slugs/' + newData.val()).val() === $schoolId"
+
 rules = {
   "users": {
     ".read": f"auth != null && ({SUPER} || ({SCHOOL_ADMIN_USER} && query.orderByChild === 'schoolId' && query.equalTo === {MYSCHOOL}))",
@@ -44,6 +58,24 @@ rules = {
       "role": {".validate": f"newData.val() === data.val() || {SUPER} || ({SCHOOL_ADMIN_USER} && auth.uid !== $userId && data.val() !== 'superadmin' && newData.val() !== 'superadmin')"},
       "schoolId": {".validate": f"newData.val() === data.val() || {SUPER}"},
       "status": {".validate": f"newData.val() === data.val() || {SUPER} || ({SCHOOL_ADMIN_USER} && auth.uid !== $userId)"}
+    }
+  },
+  "slugs": {
+    ".read": True,
+    "$slug": {
+      ".write": f"auth != null && ({SLUG_CLAIM} || {SLUG_RELEASE})",
+      ".validate": "!newData.exists() || ($slug.matches(/^[a-z0-9][a-z0-9-]{1,38}[a-z0-9]$/) && newData.isString())"
+    }
+  },
+  "publicBranding": {
+    ".read": True,
+    "$schoolId": {
+      ".write": f"auth != null && newData.exists() && ({SUPER} || {school_admin(S)})",
+      "slug": {".validate": f"newData.isString() && {BRANDING_SLUG_VALID}"},
+      "name": {".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 100"},
+      "appName": {".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 30"},
+      "logoVersion": {".validate": "newData.isNumber()"},
+      "$other": {".validate": False}
     }
   },
   "schoolInfo": {

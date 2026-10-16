@@ -68,8 +68,8 @@
     }
   },
   "install": {
-    "title": "Khendeq መተግበሪያን ይጫኑ",
-    "descriptionIos": "Khendeq እንደ መተግበሪያ እንዲጠቀሙበት ወደ መነሻ ገጽዎ ያክሉት።",
+    "title": "{app} መተግበሪያን ይጫኑ",
+    "descriptionIos": "{app}ን እንደ መተግበሪያ እንዲጠቀሙበት ወደ መነሻ ገጽዎ ያክሉት።",
     "description": "በፍጥነት ለመክፈትና ያለ ኢንተርኔት ለመጠቀም መተግበሪያውን በመሣሪያዎ ላይ ይጫኑ።",
     "install": "መተግበሪያውን ጫን",
     "notNow": "አሁን አይደለም",
@@ -77,6 +77,6 @@
     "iosHowTo": "ወደ መነሻ ገጽ እንዴት እንደሚጨመር",
     "iosStep1": "በSafari ውስጥ የ«Share» ቁልፍን ይንኩ።",
     "iosStep2": "ወደ ታች ይውረዱና «Add to Home Screen»ን ይንኩ።",
-    "iosStep3": "«Add»ን ይንኩ። Khendeq በመነሻ ገጽዎ ላይ ይታያል።"
+    "iosStep3": "«Add»ን ይንኩ። {app} በመነሻ ገጽዎ ላይ ይታያል።"
   }
 }

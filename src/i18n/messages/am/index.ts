@@ -8,6 +8,7 @@ import adminSettings from './adminSettings.json'
 import adminStudents from './adminStudents.json'
 import adminTeachers from './adminTeachers.json'
 import auth from './auth.json'
+import branding from './branding.json'
 import common from './common.json'
 import dates from './dates.json'
 import exams from './exams.json'
@@ -35,6 +36,7 @@ const messages = {
   adminStudents: adminStudents,
   adminTeachers: adminTeachers,
   auth: auth,
+  branding: branding,
   common: common,
   dates: dates,
   exams: exams,

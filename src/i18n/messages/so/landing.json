@@ -5,7 +5,7 @@
   "hero": {
     "eyebrow": "Madal maamulka madrasadaha",
     "title": "Madrasadaada oo dhan ka maamul hal meel",
-    "subtitle": "Khendeq wuxuu madrasadaha ka caawiyaa qaadashada xaadiriska, maamulka ardayda iyo ustaadyada, qabashada imtixaannada iyo la socodsiinta waalidka, adigoo isticmaalaya luqadda aad doorbiddo.",
+    "subtitle": "MMS wuxuu madrasadaha ka caawiyaa qaadashada xaadiriska, maamulka ardayda iyo ustaadyada, qabashada imtixaannada iyo la socodsiinta waalidka, adigoo isticmaalaya luqadda aad doorbiddo.",
     "cta": "Gal",
     "secondary": "Eeg waxa ku jira"
   },
@@ -38,7 +38,7 @@
     }
   },
   "footer": {
-    "copyright": "© {year} Khendeq. Xuquuqda oo dhan way dhowran tahay."
+    "copyright": "© {year} MMS — Nidaamka Maamulka Madrasadaha. Xuquuqda oo dhan way dhowran tahay."
   },
   "errorPage": {
     "title": "Cillad ayaa dhacday",

@@ -5,7 +5,7 @@
   "hero": {
     "eyebrow": "Waltajjii bulchiinsa madarasaa",
     "title": "Madarasaa keessan guutuu bakka tokkoo bulchaa",
-    "subtitle": "Khendeq madarasaalee argama akka galmeessan, barattootaa fi ustaazota akka bulchan, qormaata akka geggeessan fi maatii akka beeksisan, afaan isin filattaniin gargaara.",
+    "subtitle": "MMS madarasaalee argama akka galmeessan, barattootaa fi ustaazota akka bulchan, qormaata akka geggeessan fi maatii akka beeksisan, afaan isin filattaniin gargaara.",
     "cta": "Seeni",
     "secondary": "Waan keessatti argamu ilaali"
   },
@@ -38,7 +38,7 @@
     }
   },
   "footer": {
-    "copyright": "© {year} Khendeq. Mirgi hundi seeraan kan eegame dha."
+    "copyright": "© {year} MMS — Sirna Bulchiinsa Madarasaa. Mirgi hundi seeraan kan eegame dha."
   },
   "errorPage": {
     "title": "Rakkoon uumameera",

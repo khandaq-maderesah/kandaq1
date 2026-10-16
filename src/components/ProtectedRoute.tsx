@@ -4,6 +4,7 @@ import { useAuth } from '@/context/AuthContext'
 import { useRouter, usePathname } from 'next/navigation'
 import { useEffect } from 'react'
 import { UserRole } from '@/types'
+import { signInPath } from '@/lib/brandMemory'
 
 interface ProtectedRouteProps {
   children: React.ReactNode
@@ -22,7 +23,7 @@ export function homePathFor(role: UserRole | undefined, hasSchool: boolean): str
 export function ProtectedRoute({
   children,
   allowedRoles,
-  redirectTo = '/login'
+  redirectTo,
 }: ProtectedRouteProps) {
   const { user, loading, isAdmin, isTeacher, isSuperAdmin, school } = useAuth()
   const router = useRouter()
@@ -44,7 +45,7 @@ export function ProtectedRoute({
     if (loading) return
 
     if (!user) {
-      router.push(redirectTo)
+      router.push(redirectTo ?? signInPath())
       return
     }
 

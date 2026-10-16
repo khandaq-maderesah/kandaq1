@@ -14,11 +14,12 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Skeleton } from '@/components/ui/skeleton'
 import { PageHeader } from '@/components/ui/page'
 import { cn } from '@/lib/utils'
+import { BrandingEditor } from '@/components/branding/BrandingEditor'
 
 export default function SettingsPage() {
   const t = useTranslations('adminSettings')
   const tc = useTranslations('common')
-  const { school, refreshSchool } = useAuth()
+  const { school, branding, refreshSchool } = useAuth()
   const [schoolName, setSchoolName] = useState('')
   const [schoolNameAm, setSchoolNameAm] = useState('')
   const [address, setAddress] = useState('')
@@ -75,6 +76,14 @@ export default function SettingsPage() {
         updatedAt: new Date().toISOString(),
       })
       await rtdb.updateSettings({ academicYear })
+      // Keep the public name (branded sign-in page, installed app) in sync.
+      if (branding?.slug) {
+        await rtdb.saveBranding(
+          school.id,
+          { name: schoolName.trim(), appName: branding.appName, slug: branding.slug },
+          branding.slug
+        )
+      }
       await refreshSchool()
       toast.success(t('school.saved'))
     } catch (err) {
@@ -234,6 +243,8 @@ export default function SettingsPage() {
             </div>
           </CardContent>
         </Card>
+
+        <BrandingEditor />
       </div>
     </div>
   )

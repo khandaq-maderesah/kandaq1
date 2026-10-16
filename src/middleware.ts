@@ -1,6 +1,9 @@
 import { NextResponse, type NextRequest } from 'next/server'
 
 export const SESSION_COOKIE = 'khandaq_session'
+// Set by the branded sign-in page /m/{slug} (see src/lib/brandMemory.ts).
+const BRAND_COOKIE = 'khandaq_brand'
+const SLUG_PATTERN = /^[a-z0-9][a-z0-9-]{1,38}[a-z0-9]$/
 
 const PROTECTED_PREFIXES = ['/admin', '/teacher', '/dashboard', '/profile', '/superadmin']
 
@@ -11,7 +14,9 @@ export function middleware(req: NextRequest) {
 
   // Unauthenticated users are sent to the login page before protected pages load
   if (isProtected && !hasSession) {
-    const loginUrl = new URL('/login', req.url)
+    // Back to the madrasa's own branded sign-in page when this device uses one.
+    const brand = req.cookies.get(BRAND_COOKIE)?.value
+    const loginUrl = new URL(brand && SLUG_PATTERN.test(brand) ? `/m/${brand}` : '/login', req.url)
     loginUrl.searchParams.set('from', pathname)
     return NextResponse.redirect(loginUrl)
   }

@@ -22,6 +22,7 @@ export type AuthErrorKey =
   | 'accountInactive'
   | 'schoolSuspended'
   | 'noSchool'
+  | 'otherMadrasa'
   | 'unknownWithCode'
   | 'unknown'
 
@@ -73,6 +74,8 @@ function keyForCode(code: string): AuthErrorKey {
       return 'schoolSuspended'
     case 'app/no-school':
       return 'noSchool'
+    case 'app/other-madrasa':
+      return 'otherMadrasa'
     default:
       return code ? 'unknownWithCode' : 'unknown'
   }

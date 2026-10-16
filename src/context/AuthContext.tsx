@@ -10,7 +10,9 @@ import {
 } from 'firebase/auth'
 import { auth, db } from '@/lib/firebase/config'
 import { ref, get, update } from 'firebase/database'
-import { getSchool, setCurrentSchoolId } from '@/lib/database'
+import { getPublicBranding, getSchool, setCurrentSchoolId } from '@/lib/database'
+import type { PublicBranding } from '@/lib/branding'
+import { rememberBrandSlug } from '@/lib/brandMemory'
 import type { School, User } from '@/types'
 import { useLocaleSettings } from '@/i18n/I18nProvider'
 import { isLocale } from '@/i18n/config'
@@ -25,7 +27,11 @@ interface AuthContextType {
   user: User | null
   firebaseUser: FirebaseUser | null
   loading: boolean
-  login: (email: string, password: string) => Promise<LoginResult>
+  /**
+   * Signs in. With `schoolId` (the branded /m/{slug} sign-in page), only that
+   * madrasa's accounts are accepted; a platform admin opens that madrasa.
+   */
+  login: (email: string, password: string, opts?: { schoolId?: string }) => Promise<LoginResult>
   logout: () => Promise<void>
   /** Admin of the current school (a superadmin who opened a school counts too). */
   isAdmin: boolean
@@ -35,8 +41,10 @@ interface AuthContextType {
   school: School | null
   /** Superadmin only: open a school's admin area (null = back to all schools). */
   selectSchool: (schoolId: string | null) => Promise<void>
-  /** Re-read the current school's info (after it is edited). */
+  /** Re-read the current school's info and branding (after they are edited). */
   refreshSchool: () => Promise<void>
+  /** Public branding of the current school (link, app name, logo), if set up. */
+  branding: PublicBranding | null
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -90,6 +98,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null)
   const [school, setSchool] = useState<School | null>(null)
   const [loading, setLoading] = useState(true)
+  const [branding, setBranding] = useState<PublicBranding | null>(null)
+  const [brandingTick, setBrandingTick] = useState(0)
   const { setLocale } = useLocaleSettings()
 
   // A signed-in user's saved language wins over this browser's choice.
@@ -151,7 +161,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => unsubscribe()
   }, [applySchool, applyProfileLocale, clearSession])
 
-  const login = async (email: string, password: string) => {
+  // Load the public branding whenever the current school changes.
+  useEffect(() => {
+    let active = true
+    if (!school) {
+      setBranding(null)
+      return
+    }
+    getPublicBranding(school.id)
+      .then((b) => {
+        if (!active) return
+        setBranding(b)
+        // Staff of a madrasa come back to its branded sign-in page next time.
+        if (b?.slug && user && user.role !== 'superadmin') rememberBrandSlug(b.slug)
+      })
+      .catch(() => active && setBranding(null))
+    return () => {
+      active = false
+    }
+  }, [school, user, brandingTick])
+
+  const login = async (email: string, password: string, opts?: { schoolId?: string }) => {
     const result = await signInWithEmailAndPassword(auth, email, password)
 
     // Set the session cookie *synchronously here* — the middleware decides access
@@ -169,6 +199,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (snapshot.exists()) {
       profile = { ...(snapshot.val() as Omit<User, 'uid'>), uid: result.user.uid } as User
       try {
+        if (opts?.schoolId) {
+          // Branded sign-in: the account must belong to this madrasa.
+          if (profile.role === 'superadmin') writeSelectedSchool(opts.schoolId)
+          else if (profile.schoolId !== opts.schoolId) throw accessError('app/other-madrasa')
+        }
         applySchool(await resolveSchool(profile))
       } catch (err) {
         await clearSession()
@@ -196,6 +231,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const refreshSchool = async () => {
     if (!school) return
     applySchool(await getSchool(school.id))
+    setBrandingTick((n) => n + 1)
   }
 
   const isSuperAdmin = user?.role === 'superadmin'
@@ -215,6 +251,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       school,
       selectSchool,
       refreshSchool,
+      branding,
     }}>
       {children}
     </AuthContext.Provider>

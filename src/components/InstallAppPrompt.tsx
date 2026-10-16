@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import { Smartphone, X, Share } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { Button } from '@/components/ui/button'
+import { brandingAssetUrl, DEFAULT_APP_NAME } from '@/lib/branding'
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>
@@ -15,7 +16,9 @@ const IOS_STEPS = ['iosStep1', 'iosStep2', 'iosStep3'] as const
 
 export function InstallAppPrompt() {
   const t = useTranslations('notifications.install')
-  const { user } = useAuth()
+  const { user, school, branding } = useAuth()
+  // The app being installed: the madrasa's own when it has branding, else MMS.
+  const app = branding?.appName ?? DEFAULT_APP_NAME
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [appInstalled, setAppInstalled] = useState(false)
   const [isIos, setIsIos] = useState(false)
@@ -100,13 +103,13 @@ export function InstallAppPrompt() {
       <div className="overflow-hidden rounded-xl border bg-card shadow-lg">
         <div className="flex items-start gap-3 p-4">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/icons/icon-192.png" alt="" className="h-12 w-12 shrink-0 rounded-xl border object-cover" />
+          <img src={brandingAssetUrl(school?.id, branding, 'icon192')} alt="" className="h-12 w-12 shrink-0 rounded-xl border object-cover" />
           <div className="min-w-0 flex-1">
             <p id="install-app-title" className="text-sm font-semibold text-foreground">
-              {t('title')}
+              {t('title', { app })}
             </p>
             <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
-              {isIos ? t('descriptionIos') : t('description')}
+              {isIos ? t('descriptionIos', { app }) : t('description')}
             </p>
           </div>
           <Button
@@ -134,7 +137,7 @@ export function InstallAppPrompt() {
                     <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
                       {i + 1}
                     </span>
-                    {t(step)}
+                    {t(step, { app })}
                   </li>
                 ))}
               </ol>
