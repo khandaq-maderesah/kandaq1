@@ -1,22 +1,8 @@
 import { NextResponse } from 'next/server'
-import { getAdminApp } from '@/lib/firebase/admin'
+import { requireAdmin, errorStatus } from '@/lib/firebase/admin'
 import { getAuth } from 'firebase-admin/auth'
-import { getDatabase } from 'firebase-admin/database'
 
 export const dynamic = 'force-dynamic'
-
-async function verifyAdmin(request: Request) {
-  const authHeader = request.headers.get('authorization')
-  const idToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : ''
-  const admin = getAdminApp()
-  const decoded = await getAuth(admin).verifyIdToken(idToken)
-  const db = getDatabase(admin)
-  const roleSnap = await db.ref('users/' + decoded.uid + '/role').get()
-  if (roleSnap.val() !== 'admin') {
-    throw new Error('Admin privileges required.')
-  }
-  return { admin, db, callerUid: decoded.uid }
-}
 
 /**
  * PATCH /api/admin/users/[uid]
@@ -31,7 +17,7 @@ export async function PATCH(
 ) {
   const { uid } = await params
   try {
-    const { db, callerUid } = await verifyAdmin(request)
+    const { db, callerUid } = await requireAdmin(request)
     const body = await request.json()
     const assignedClassIds = Array.isArray(body?.assignedClassIds)
       ? [...new Set(body.assignedClassIds.filter((id: unknown): id is string => typeof id === 'string' && id.length > 0))]
@@ -106,7 +92,7 @@ export async function PATCH(
     console.error('Update user assignments failed:', err)
     return NextResponse.json(
       { ok: false, error: err?.message || 'Failed to update user assignments' },
-      { status: 500 }
+      { status: errorStatus(err) }
     )
   }
 }
@@ -126,29 +112,15 @@ export async function DELETE(
   { params }: { params: Promise<{ uid: string }> }
 ) {
   const { uid } = await params
-  const authHeader = request.headers.get('authorization')
-  const idToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : ''
 
   try {
-    const admin = getAdminApp()
-
     // Verify the caller and confirm they are an admin.
-    const decoded = await getAuth(admin).verifyIdToken(idToken)
-    const callerUid = decoded.uid
+    const { admin, db, callerUid } = await requireAdmin(request)
 
     if (callerUid === uid) {
       return NextResponse.json(
         { ok: false, error: 'You cannot delete your own account.' },
         { status: 400 }
-      )
-    }
-
-    const db = getDatabase(admin)
-    const roleSnap = await db.ref('users/' + callerUid + '/role').get()
-    if (roleSnap.val() !== 'admin') {
-      return NextResponse.json(
-        { ok: false, error: 'Admin privileges required.' },
-        { status: 403 }
       )
     }
 
@@ -175,7 +147,7 @@ export async function DELETE(
     console.error('Delete user failed:', err)
     return NextResponse.json(
       { ok: false, error: err?.message || 'Failed to delete user' },
-      { status: 500 }
+      { status: errorStatus(err) }
     )
   }
 }

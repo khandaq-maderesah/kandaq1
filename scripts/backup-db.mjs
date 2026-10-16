@@ -8,7 +8,7 @@
  *   node scripts/backup-db.mjs
  */
 
-import { readFileSync, writeFileSync, mkdirSync } from 'fs'
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs'
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { initializeApp } from 'firebase/app'
@@ -19,10 +19,17 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const root = join(__dirname, '..')
 const BACKUP_DIR = join(root, 'backups')
 
-// Vercel build containers are temporary, so a local database dump would only
-// add upload/build work and would not be retained after the build.
-if (process.env.VERCEL === '1') {
-  console.log('Skipping local database backup during Vercel build.')
+// Cloud build containers (Vercel, Firebase App Hosting / Cloud Build, CI) are
+// temporary, so a local database dump would only add build work, would not be
+// retained, and would copy the whole database into the build. Only back up on a
+// developer machine that has a .env.local.
+if (
+  process.env.VERCEL === '1' ||
+  process.env.CI ||
+  process.env.FIREBASE_CONFIG ||
+  !existsSync(join(root, '.env.local'))
+) {
+  console.log('Skipping local database backup (cloud/CI build or no .env.local).')
   process.exit(0)
 }
 

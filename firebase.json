@@ -1,0 +1,24 @@
+{
+  "database": {
+    "rules": "database.rules.json"
+  },
+  "storage": {
+    "rules": "storage.rules"
+  },
+  "apphosting": {
+    "backendId": "khendeq-medresah",
+    "rootDir": "/",
+    "ignore": [
+      "node_modules",
+      ".git",
+      ".next",
+      ".firebase",
+      ".vercel",
+      "backups",
+      ".env",
+      ".env.*",
+      "*.log",
+      "firebase-debug.log"
+    ]
+  }
+}

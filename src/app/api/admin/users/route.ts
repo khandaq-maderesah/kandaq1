@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
-import { getAdminApp } from '@/lib/firebase/admin'
+import { requireAdmin, errorStatus } from '@/lib/firebase/admin'
 import { getAuth } from 'firebase-admin/auth'
-import { getDatabase } from 'firebase-admin/database'
 
 export const dynamic = 'force-dynamic'
 
@@ -16,9 +15,6 @@ export const dynamic = 'force-dynamic'
  * Body: { name, email, password, phone?, role, assignedClassIds? }
  */
 export async function POST(request: Request) {
-  const authHeader = request.headers.get('authorization')
-  const idToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : ''
-
   let body: any
   try {
     body = await request.json()
@@ -35,18 +31,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const admin = getAdminApp()
-    const decoded = await getAuth(admin).verifyIdToken(idToken)
-    const callerUid = decoded.uid
-
-    const db = getDatabase(admin)
-    const roleSnap = await db.ref('users/' + callerUid + '/role').get()
-    if (roleSnap.val() !== 'admin') {
-      return NextResponse.json(
-        { ok: false, error: 'Admin privileges required.' },
-        { status: 403 }
-      )
-    }
+    const { admin, db, callerUid } = await requireAdmin(request)
 
     // 1) Create the Firebase Auth account.
     const userRecord = await getAuth(admin).createUser({
@@ -104,7 +89,7 @@ export async function POST(request: Request) {
     console.error('Create user failed:', err)
     return NextResponse.json(
       { ok: false, error: err?.message || 'Failed to create user' },
-      { status: 500 }
+      { status: errorStatus(err) }
     )
   }
 }

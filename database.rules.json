@@ -4,7 +4,13 @@
       ".read": "root.child('users/' + auth.uid + '/role').val() === 'admin'",
       "$userId": {
         ".read": "auth.uid === $userId || root.child('users/' + auth.uid + '/role').val() === 'admin'",
-        ".write": "auth.uid === $userId || root.child('users/' + auth.uid + '/role').val() === 'admin'"
+        ".write": "auth.uid === $userId || root.child('users/' + auth.uid + '/role').val() === 'admin'",
+        "role": {
+          ".validate": "newData.val() === data.val() || root.child('users/' + auth.uid + '/role').val() === 'admin'"
+        },
+        "status": {
+          ".validate": "newData.val() === data.val() || root.child('users/' + auth.uid + '/role').val() === 'admin'"
+        }
       }
     },
     "classes": {
@@ -62,7 +68,7 @@
     "audit": {
       ".read": "root.child('users/' + auth.uid + '/role').val() === 'admin'",
       "$id": {
-        ".write": "auth != null"
+        ".write": "auth != null && !data.exists()"
       }
     },
     "settings": {

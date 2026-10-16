@@ -1,0 +1,23 @@
+rules_version = '2';
+
+// Firebase Storage rules.
+// Only announcement attachments live in Storage (student photos are in RTDB).
+service firebase.storage {
+  match /b/{bucket}/o {
+    // announcements/{uploaderUid}/{fileId}
+    // Any signed-in user can view; a user can only upload/delete files under
+    // their own uid folder, up to 25 MB each. (Posting the announcement itself
+    // is admin-only, enforced by database.rules.json.)
+    match /announcements/{uid}/{fileId} {
+      allow read: if request.auth != null;
+      allow create, update: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.size < 25 * 1024 * 1024;
+      allow delete: if request.auth != null && request.auth.uid == uid;
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
