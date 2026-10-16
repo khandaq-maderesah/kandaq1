@@ -1,18 +1,29 @@
 import { NextResponse } from 'next/server'
-import { requireAdmin, errorStatus } from '@/lib/firebase/admin'
+import {
+  requireAdmin,
+  assertCanManageSchool,
+  syncUserClaims,
+  errorStatus,
+  HttpError,
+} from '@/lib/firebase/admin'
 import { getAuth } from 'firebase-admin/auth'
 
 export const dynamic = 'force-dynamic'
 
+const CREATABLE_ROLES = ['admin', 'teacher'] as const
+
 /**
  * POST /api/admin/users
  *
- * Creates a new user (teacher or admin) using the Admin SDK so the client's
- * session is NOT hijacked (which happened with the browser's
- * `createUserWithEmailAndPassword`). Only an admin can do this.
+ * Creates a new user (teacher or school admin) using the Admin SDK so the
+ * client's session is NOT hijacked (which happened with the browser's
+ * `createUserWithEmailAndPassword`).
  *
- * Auth: `Authorization: Bearer <idToken>` of an admin account.
- * Body: { name, email, password, phone?, role, assignedClassIds? }
+ * A school admin can only create users in their own school; a superadmin must
+ * say which school with `schoolId`.
+ *
+ * Auth: `Authorization: Bearer <idToken>` of an admin or superadmin account.
+ * Body: { name, email, password, phone?, role, assignedClassIds?, schoolId? }
  */
 export async function POST(request: Request) {
   let body: any
@@ -29,9 +40,30 @@ export async function POST(request: Request) {
       { status: 400 }
     )
   }
+  if (!CREATABLE_ROLES.includes(role)) {
+    return NextResponse.json({ ok: false, error: 'role must be admin or teacher.' }, { status: 400 })
+  }
 
   try {
-    const { admin, db, callerUid } = await requireAdmin(request)
+    const { admin, db, caller } = await requireAdmin(request)
+
+    // A school admin always creates users in their own school.
+    const schoolId: string | undefined =
+      caller.role === 'superadmin' ? body.schoolId || undefined : caller.schoolId
+    if (!schoolId) throw new HttpError(400, 'schoolId is required.')
+    assertCanManageSchool(caller, schoolId)
+    if (!(await db.ref(`schoolInfo/${schoolId}`).get()).exists()) {
+      throw new HttpError(404, 'School not found.')
+    }
+
+    // Only assign classes that really belong to this school.
+    let classIds: string[] = []
+    if (role === 'teacher' && Array.isArray(assignedClassIds)) {
+      const classesSnap = await db.ref(`schoolData/${schoolId}/classes`).get()
+      classIds = [...new Set<string>(assignedClassIds)].filter(
+        (cid) => typeof cid === 'string' && cid && classesSnap.hasChild(cid)
+      )
+    }
 
     // 1) Create the Firebase Auth account.
     const userRecord = await getAuth(admin).createUser({
@@ -40,48 +72,46 @@ export async function POST(request: Request) {
       displayName: name,
     })
     const uid = userRecord.uid
+    await syncUserClaims(uid, role, schoolId)
 
     // 2) Write the profile (never write "undefined" or null to RTDB).
+    const now = new Date().toISOString()
     const record: Record<string, any> = {
       uid,
       email,
       name,
       role,
+      schoolId,
       status: 'active',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      createdBy: callerUid,
+      createdAt: now,
+      updatedAt: now,
+      createdBy: caller.uid,
     }
     if (phone) record.phone = phone
-    if (role === 'teacher' && Array.isArray(assignedClassIds) && assignedClassIds.length > 0) {
-      record.assignedClassIds = assignedClassIds
-    }
+    if (classIds.length > 0) record.assignedClassIds = classIds
     await db.ref('users/' + uid).set(record)
 
     // 3) Assign classes (teachers).
-    if (role === 'teacher' && Array.isArray(assignedClassIds)) {
+    if (classIds.length > 0) {
       const updates: Record<string, any> = {}
-      for (const cid of assignedClassIds) {
-        if (!cid) continue
-        updates[`classes/${cid}/teacherId`] = uid
-        updates[`classes/${cid}/teacherName`] = name
+      for (const cid of classIds) {
+        updates[`schoolData/${schoolId}/classes/${cid}/teacherId`] = uid
+        updates[`schoolData/${schoolId}/classes/${cid}/teacherName`] = name
       }
-      if (Object.keys(updates).length > 0) {
-        await db.ref().update(updates)
-      }
+      await db.ref().update(updates)
     }
 
     // 4) Audit log.
     await db
-      .ref('audit/audit_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8))
+      .ref(`schoolData/${schoolId}/audit/audit_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`)
       .set({
-        actorId: callerUid,
+        actorId: caller.uid,
         actorName: email,
         action: 'create',
         entity: 'user',
         entityId: uid,
         details: `${name} (${role})`,
-        timestamp: new Date().toISOString(),
+        timestamp: now,
       })
 
     return NextResponse.json({ ok: true, uid })

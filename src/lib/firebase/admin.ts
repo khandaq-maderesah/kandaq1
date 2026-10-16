@@ -40,9 +40,16 @@ export class HttpError extends Error {
   }
 }
 
+export interface Caller {
+  uid: string
+  role: 'superadmin' | 'admin'
+  /** The admin's school; undefined for a superadmin. */
+  schoolId?: string
+}
+
 /**
- * Verifies `Authorization: Bearer <idToken>` and that the caller's
- * `users/{uid}/role` is "admin". Throws HttpError(401/403) otherwise.
+ * Verifies `Authorization: Bearer <idToken>` and that the caller is an active
+ * superadmin or school admin. Throws HttpError(401/403) otherwise.
  */
 export async function requireAdmin(request: Request) {
   const authHeader = request.headers.get('authorization')
@@ -50,17 +57,45 @@ export async function requireAdmin(request: Request) {
   if (!idToken) throw new HttpError(401, 'Missing sign-in token.')
 
   const admin = getAdminApp()
-  let callerUid: string
+  let uid: string
   try {
-    callerUid = (await getAuth(admin).verifyIdToken(idToken)).uid
+    uid = (await getAuth(admin).verifyIdToken(idToken)).uid
   } catch {
     throw new HttpError(401, 'Invalid or expired sign-in. Please sign in again.')
   }
 
   const db = getDatabase(admin)
-  const roleSnap = await db.ref('users/' + callerUid + '/role').get()
-  if (roleSnap.val() !== 'admin') throw new HttpError(403, 'Admin privileges required.')
-  return { admin, db, callerUid }
+  const profile = (await db.ref('users/' + uid).get()).val()
+  if (!profile || profile.status === 'inactive') throw new HttpError(403, 'Account is not active.')
+  if (profile.role !== 'superadmin' && profile.role !== 'admin') {
+    throw new HttpError(403, 'Admin privileges required.')
+  }
+  if (profile.role === 'admin') {
+    if (!profile.schoolId) throw new HttpError(403, 'Admin is not linked to a school.')
+    const status = (await db.ref(`schoolInfo/${profile.schoolId}/status`).get()).val()
+    if (status !== 'active') throw new HttpError(403, 'This school is suspended.')
+  }
+
+  const caller: Caller = { uid, role: profile.role, schoolId: profile.schoolId }
+  return { admin, db, caller }
+}
+
+/** Throws 403 unless the caller may manage users/data of `schoolId`. */
+export function assertCanManageSchool(caller: Caller, schoolId: string | undefined) {
+  if (caller.role === 'superadmin') return
+  if (!schoolId || caller.schoolId !== schoolId) {
+    throw new HttpError(403, 'You can only manage your own school.')
+  }
+}
+
+/**
+ * Mirrors role + school into the user's ID token (custom claims). Storage
+ * rules use these to keep each school's files private.
+ */
+export async function syncUserClaims(uid: string, role: string, schoolId?: string) {
+  const claims: Record<string, string> = { role }
+  if (schoolId) claims.schoolId = schoolId
+  await getAuth(getAdminApp()).setCustomUserClaims(uid, claims)
 }
 
 /** HTTP status for an error caught in an API route. */

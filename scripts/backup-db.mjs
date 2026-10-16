@@ -53,8 +53,15 @@ function loadEnvFile(filePath) {
 }
 loadEnvFile(join(root, '.env.local'))
 
-const ADMIN_EMAIL = process.env.SEED_ADMIN_EMAIL || 'khendeqmedresah1@gmail.com'
-const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD || 'KH1234'
+const ADMIN_EMAIL = process.env.SEED_ADMIN_EMAIL || 'amarsuadbusiness@gmail.com'
+const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD || ''
+
+// `npm run build` runs this as prebuild: without credentials, skip instead of
+// failing the build.
+if (!ADMIN_PASSWORD) {
+  console.log('Skipping database backup: set SEED_ADMIN_PASSWORD (in .env.local) to enable it.')
+  process.exit(0)
+}
 
 const app = initializeApp({
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -70,16 +77,8 @@ const db = getDatabase(app)
 // Top-level nodes to export.
 const NODES = [
   'users',
-  'classes',
-  'students',
-  'studentPhotos',
-  'attendance',
-  'absentAlerts',
-  'missingAttendanceAlerts',
-  'exams',
-  'announcements',
-  'audit',
-  'settings',
+  'schoolInfo',
+  'schoolData', // every school's classes, students, photos, attendance, exams, ...
 ]
 
 async function main() {

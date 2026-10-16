@@ -10,8 +10,10 @@ import { ExamResultsSheet } from '@/components/ExamResultsSheet'
 import type { Class, Exam, Student } from '@/types'
 import { computeExam, computeOverall, fmt, EXAM_TYPE_LABELS, mergedSubjects } from '@/lib/examMath'
 import { exportToCsv, dateStamp } from '@/lib/exportCsv'
+import { useAuth } from '@/context/AuthContext'
 
 export default function AdminExamsPage() {
+  const { school } = useAuth()
   const [classes, setClasses] = useState<Class[]>([])
   const [exams, setExams] = useState<Exam[]>([])
   const [students, setStudents] = useState<Student[]>([])
@@ -289,7 +291,7 @@ export default function AdminExamsPage() {
           </CardHeader>
           <CardContent className="print-area overflow-x-auto">
             <div className="mb-3 border-b-2 border-slate-800 pb-2">
-              <h2 className="text-lg font-bold text-slate-900">Khendeq Medresah — Overall Result</h2>
+              <h2 className="text-lg font-bold text-slate-900">{school?.name} — Overall Result</h2>
               <p className="text-sm text-slate-600">
                 {classes.find((c) => c.id === classId)?.name || classId} • {yearFilter ? yearFilter : 'All years'} •{' '}
                 {filteredExams.map((e) => EXAM_TYPE_LABELS[e.type]).join(', ')}

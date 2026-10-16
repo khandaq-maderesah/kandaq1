@@ -1,5 +1,5 @@
 import { getAdminApp } from '@/lib/firebase/admin'
-import { getDatabase } from 'firebase-admin/database'
+import { getDatabase, type Database } from 'firebase-admin/database'
 import { ADMIN_NOTIFY_TIME, TEACHER_NOTIFY_TIME } from '@/lib/reminderConstants'
 import type { Class, Attendance, User, MissingAttendanceAlert } from '@/types'
 
@@ -24,9 +24,8 @@ function localParts(timeZone: string, now: Date = new Date()) {
   return { date, hhmm, day }
 }
 
-export interface ServerCheckResult {
-  ok: boolean
-  configured: boolean
+export interface SchoolCheckResult {
+  schoolId: string
   date: string
   time: string
   skippedSunday: boolean
@@ -36,21 +35,51 @@ export interface ServerCheckResult {
   missing: number
 }
 
+export interface ServerCheckResult {
+  ok: boolean
+  configured: boolean
+  schools: SchoolCheckResult[]
+}
+
 /**
- * Runs the "teacher did not take attendance" check on the server using the
- * Firebase Admin SDK. Intended to be invoked by a scheduled cron so the admin
- * (18:30) and teacher (18:00) reminders fire even when nobody has the app open.
+ * Runs the "teacher did not take attendance" check for every active school on
+ * the server using the Firebase Admin SDK. Intended to be invoked by a
+ * scheduled cron so the admin (18:30) and teacher (18:00) reminders fire even
+ * when nobody has the app open. Each school uses its own timezone.
  */
 export async function runMissingAttendanceCheckServer(): Promise<ServerCheckResult> {
-  const admin = getAdminApp()
-  const db = getDatabase(admin)
-  const timeZone = process.env.APP_TIMEZONE || DEFAULT_TIMEZONE
+  const db = getDatabase(getAdminApp())
+  const defaultTimeZone = process.env.APP_TIMEZONE || DEFAULT_TIMEZONE
+  const schoolsSnap = await db.ref('schoolInfo').get()
+
+  const schools: SchoolCheckResult[] = []
+  const tasks: Promise<void>[] = []
+  schoolsSnap.forEach((child) => {
+    const info = child.val()
+    if (info?.status !== 'active') return
+    const schoolId = child.key as string
+    tasks.push(
+      checkSchool(db, schoolId, info.timezone || defaultTimeZone).then((r) => {
+        schools.push(r)
+      })
+    )
+  })
+  await Promise.all(tasks)
+
+  return { ok: true, configured: true, schools }
+}
+
+async function checkSchool(
+  db: Database,
+  schoolId: string,
+  timeZone: string
+): Promise<SchoolCheckResult> {
+  const base = `schoolData/${schoolId}`
   const now = new Date()
   const { date, hhmm, day } = localParts(timeZone, now)
 
-  const result: ServerCheckResult = {
-    ok: true,
-    configured: true,
+  const result: SchoolCheckResult = {
+    schoolId,
     date,
     time: hhmm,
     skippedSunday: false,
@@ -65,20 +94,15 @@ export async function runMissingAttendanceCheckServer(): Promise<ServerCheckResu
     return result
   }
 
-  const [classesSnap, attendanceSnap, usersSnap, alertsSnap] = await Promise.all([
-    db.ref('classes').get(),
-    db.ref('attendance').get(),
-    db.ref('users').get(),
-    db.ref('missingAttendanceAlerts').get(),
+  const [classesSnap, alertsSnap, usersSnap] = await Promise.all([
+    db.ref(`${base}/classes`).get(),
+    db.ref(`${base}/missingAttendanceAlerts`).get(),
+    db.ref('users').orderByChild('schoolId').equalTo(schoolId).get(),
   ])
 
   const classes: Class[] = []
   classesSnap.forEach((child) => {
     classes.push({ id: child.key as string, ...child.val() })
-  })
-  const attendance: Attendance[] = []
-  attendanceSnap.forEach((child) => {
-    attendance.push({ id: child.key as string, ...child.val() })
   })
   const users: User[] = []
   usersSnap.forEach((child) => {
@@ -87,6 +111,16 @@ export async function runMissingAttendanceCheckServer(): Promise<ServerCheckResu
   const existing: MissingAttendanceAlert[] = []
   alertsSnap.forEach((child) => {
     existing.push({ id: child.key as string, ...child.val() })
+  })
+
+  // Only download attendance from the oldest still-open alert onwards (indexed
+  // on `date`), not the school's whole history.
+  const openDates = existing.filter((a) => !a.resolved).map((a) => a.date)
+  const since = [date, ...openDates].sort()[0]
+  const attendanceSnap = await db.ref(`${base}/attendance`).orderByChild('date').startAt(since).get()
+  const attendance: Attendance[] = []
+  attendanceSnap.forEach((child) => {
+    attendance.push({ id: child.key as string, ...child.val() })
   })
 
   const userById = new Map(users.map((u) => [u.uid, u]))
@@ -130,7 +164,7 @@ export async function runMissingAttendanceCheckServer(): Promise<ServerCheckResu
       createdAt: prev?.createdAt || nowIso,
       updatedAt: nowIso,
     }
-    await db.ref(`missingAttendanceAlerts/${id}`).set(record)
+    await db.ref(`${base}/missingAttendanceAlerts/${id}`).set(record)
     if (adminDue && !prev?.adminNotified) result.flaggedAdmin++
     if (teacherDue && !prev?.teacherNotified) result.flaggedTeacher++
     result.missing++
@@ -140,7 +174,7 @@ export async function runMissingAttendanceCheckServer(): Promise<ServerCheckResu
   for (const ex of existing) {
     if (ex.resolved) continue
     if (recordedKeys.has(`${ex.classId}_${ex.date}`)) {
-      await db.ref(`missingAttendanceAlerts/${ex.id}`).update({
+      await db.ref(`${base}/missingAttendanceAlerts/${ex.id}`).update({
         resolved: true,
         resolvedAt: nowIso,
         updatedAt: nowIso,

@@ -120,7 +120,7 @@ export function AnnouncementBell({ dark = true }: { dark?: boolean }) {
       for (const file of Array.from(files)) {
         const safeName = file.name.replace(/\s+/g, '_')
         const fileId = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}_${safeName}`
-        const storagePath = `announcements/${user?.uid ?? 'system'}/${fileId}`
+        const storagePath = `schools/${rtdb.getCurrentSchoolId()}/announcements/${user?.uid ?? 'system'}/${fileId}`
         const storageFileRef = storageRef(storage, storagePath)
         await uploadBytes(storageFileRef, file)
         const url = await getDownloadURL(storageFileRef)

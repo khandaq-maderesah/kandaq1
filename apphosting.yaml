@@ -13,19 +13,19 @@ env:
   # not secrets). Needed at BUILD time because Next.js inlines NEXT_PUBLIC_*.
   # Filled in from .env.local by scripts/gcp-setup.ps1.
   - variable: NEXT_PUBLIC_FIREBASE_API_KEY
-    value: REPLACE_ME
+    value: "AIzaSyDKbO-wxs2cRyeJM7v22vZxH4ZiK08hSak"
   - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
-    value: REPLACE_ME
+    value: "khendeq-8e17f.firebaseapp.com"
   - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
-    value: REPLACE_ME
+    value: "khendeq-8e17f"
   - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
-    value: REPLACE_ME
+    value: "khendeq-8e17f.firebasestorage.app"
   - variable: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
-    value: REPLACE_ME
+    value: "81893318100"
   - variable: NEXT_PUBLIC_FIREBASE_APP_ID
-    value: REPLACE_ME
+    value: "1:81893318100:web:e14e416eb367d219880a41"
   - variable: NEXT_PUBLIC_FIREBASE_DATABASE_URL
-    value: REPLACE_ME
+    value: "https://khendeq-8e17f-default-rtdb.europe-west1.firebasedatabase.app"
 
   - variable: APP_TIMEZONE
     value: Africa/Addis_Ababa

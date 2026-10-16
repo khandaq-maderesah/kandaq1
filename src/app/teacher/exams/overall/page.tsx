@@ -18,7 +18,7 @@ import {
 import { exportToCsv, dateStamp } from '@/lib/exportCsv'
 
 export default function OverallResultsPage() {
-  const { user } = useAuth()
+  const { user, school } = useAuth()
   const router = useRouter()
   const [classes, setClasses] = useState<Class[]>([])
   const [exams, setExams] = useState<Exam[]>([])
@@ -221,7 +221,7 @@ export default function OverallResultsPage() {
       {classExams.length > 0 && (
         <div className="print-area overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-md">
           <div className="border-b-2 border-slate-800 p-4 pb-2">
-            <h2 className="text-lg font-bold text-slate-900">Khendeq Medresah — Overall Result</h2>
+            <h2 className="text-lg font-bold text-slate-900">{school?.name} — Overall Result</h2>
             <p className="text-sm text-slate-600">
               {selClass?.name}
               {selClass?.section ? ` • Section ${selClass.section}` : ''} • {yearFilter || 'All years'} •{' '}

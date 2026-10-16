@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useLogout } from '@/hooks/useAuth'
+import { useAuth } from '@/context/AuthContext'
 import { AbsenceAlertBell } from '@/components/AbsenceAlertBell'
 import { AttendanceReminderBell } from '@/components/AttendanceReminderBell'
 import { AnnouncementBell } from '@/components/AnnouncementBell'
@@ -23,6 +24,7 @@ import { AnnouncementBell } from '@/components/AnnouncementBell'
 export function TeacherNav() {
   const pathname = usePathname()
   const logout = useLogout()
+  const { school } = useAuth()
 
   const handleLogout = async () => {
     await logout()
@@ -45,8 +47,11 @@ export function TeacherNav() {
           {/* Logo/Brand */}
           <Link href="/dashboard" className="flex items-center space-x-2 flex-shrink-0">
             <Image src="/image/khandaq-logo.png" alt="Khendeq Medresah logo" width={32} height={32} className="h-8 w-8 rounded-full object-cover" />
-            <span className="font-bold text-xl text-gray-900">
-              Teacher Panel
+            <span className="flex flex-col leading-tight">
+              <span className="font-bold text-xl text-gray-900">Teacher Panel</span>
+              {school && (
+                <span className="max-w-[12rem] truncate text-xs font-medium text-gray-600">{school.name}</span>
+              )}
             </span>
           </Link>
 

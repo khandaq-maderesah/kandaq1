@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { rtdb } from '@/lib/database'
+import { useAuth } from '@/context/AuthContext'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,7 +11,9 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2, Save, School, Phone, MapPin, CalendarDays, UserPlus, Lock } from 'lucide-react'
 
 export default function SettingsPage() {
+  const { school, refreshSchool } = useAuth()
   const [schoolName, setSchoolName] = useState('')
+  const [schoolNameAm, setSchoolNameAm] = useState('')
   const [address, setAddress] = useState('')
   const [phone, setPhone] = useState('')
   const [academicYear, setAcademicYear] = useState('')
@@ -24,10 +27,13 @@ export default function SettingsPage() {
   useEffect(() => {
     ;(async () => {
       try {
+        // Name/contact live on the school record (schoolInfo); the rest are
+        // per-school settings.
         const s = await rtdb.getSettings()
-        setSchoolName(s.schoolName || '')
-        setAddress(s.address || '')
-        setPhone(s.phone || '')
+        setSchoolName(school?.name || '')
+        setSchoolNameAm(school?.nameAm || '')
+        setAddress(school?.address || '')
+        setPhone(school?.phone || '')
         setAcademicYear(s.academicYear || '')
         setRegistrationOpen(s.registrationOpen !== 'false')
       } catch {
@@ -36,6 +42,8 @@ export default function SettingsPage() {
         setLoading(false)
       }
     })()
+    // Load once for the school this page was opened with.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleSave = async (e: React.FormEvent) => {
@@ -44,7 +52,17 @@ export default function SettingsPage() {
     setError('')
     setSuccess('')
     try {
-      await rtdb.updateSettings({ schoolName, address, phone, academicYear })
+      if (!school) throw new Error('No school selected')
+      if (!schoolName.trim()) throw new Error('School name is required')
+      await rtdb.updateSchool(school.id, {
+        name: schoolName.trim(),
+        nameAm: schoolNameAm.trim(),
+        address: address.trim(),
+        phone: phone.trim(),
+        updatedAt: new Date().toISOString(),
+      })
+      await rtdb.updateSettings({ academicYear })
+      await refreshSchool()
       setSuccess('Settings saved successfully')
     } catch (err: any) {
       setError(err.message || 'Failed to save settings')
@@ -119,6 +137,20 @@ export default function SettingsPage() {
                   placeholder="e.g. Khendeq Medresah"
                   value={schoolName}
                   onChange={(e) => setSchoolName(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="schoolNameAm">School Name in Amharic (used in SMS)</Label>
+              <div className="relative">
+                <School className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  id="schoolNameAm"
+                  placeholder="e.g. ኸንደቅ መድረሳ"
+                  value={schoolNameAm}
+                  onChange={(e) => setSchoolNameAm(e.target.value)}
                   className="pl-10"
                 />
               </div>

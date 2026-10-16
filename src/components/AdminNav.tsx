@@ -13,9 +13,11 @@ import {
   User,
   Settings,
   FileText,
+  Building2,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useLogout } from '@/hooks/useAuth'
+import { useAuth } from '@/context/AuthContext'
 import { AbsenceAlertBell } from '@/components/AbsenceAlertBell'
 import { AttendanceReminderBell } from '@/components/AttendanceReminderBell'
 import { AnnouncementBell } from '@/components/AnnouncementBell'
@@ -23,6 +25,7 @@ import { AnnouncementBell } from '@/components/AnnouncementBell'
 export function AdminNav() {
   const pathname = usePathname()
   const logout = useLogout()
+  const { school, isSuperAdmin } = useAuth()
 
   const handleLogout = async () => {
     await logout()
@@ -30,6 +33,7 @@ export function AdminNav() {
   }
 
   const links = [
+    ...(isSuperAdmin ? [{ href: '/superadmin', label: 'All Schools', icon: Building2 }] : []),
     { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/admin/teachers', label: 'Users', icon: Users },
     { href: '/admin/classes', label: 'Classes', icon: GraduationCap },
@@ -46,8 +50,11 @@ export function AdminNav() {
         <div className="flex justify-between items-center h-16">
           <Link href="/dashboard" className="flex items-center space-x-2 flex-shrink-0">
             <Image src="/image/khandaq-logo.png" alt="Khendeq Medresah logo" width={36} height={36} className="h-9 w-9 rounded-full object-cover ring-2 ring-white/70 shadow-md" />
-            <span className="font-bold text-xl text-white drop-shadow-sm">
-              Admin Panel
+            <span className="flex flex-col leading-tight">
+              <span className="font-bold text-xl text-white drop-shadow-sm">Admin Panel</span>
+              {school && (
+                <span className="max-w-[12rem] truncate text-xs font-medium text-white/80">{school.name}</span>
+              )}
             </span>
           </Link>
 

@@ -16,6 +16,7 @@
  */
 
 import { useEffect, useRef, useState } from 'react'
+import { getCurrentSchoolId } from '@/lib/database'
 
 type Listener<T> = (data: T) => void
 
@@ -75,9 +76,12 @@ function getEntry<T>(
  * can be an inline closure capturing the query parameters baked into `key`.
  */
 export function useLiveData<T>(
-  key: string | null,
+  rawKey: string | null,
   startProvider: (emit: (data: T) => void) => () => void
 ): { data: T | undefined } {
+  // Channels are per school, so a superadmin switching schools never sees the
+  // previous school's cached snapshot.
+  const key = rawKey ? `${getCurrentSchoolId() ?? '-'}:${rawKey}` : null
   // `tick` is intentionally unused — it exists only to trigger re-renders when
   // a new snapshot arrives (we read the value from a ref below).
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

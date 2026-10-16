@@ -1,25 +1,32 @@
 /**
- * Seed the initial "super" admin account.
+ * Seed the platform superadmin account.
  *
- * Creates (or updates) the admin user in Firebase Authentication and writes
- * their profile (role: 'admin') to the Realtime Database at /users/{uid}.
+ * Creates (or updates) the user in Firebase Authentication and writes their
+ * profile (role: 'superadmin', no school) to the Realtime Database at
+ * /users/{uid}. The superadmin creates schools and each school's admin from
+ * the /superadmin page.
  *
- * The account has "overall" access and can be used to create other admins
- * and teachers from the /admin/teachers page.
+ * Uses the Firebase Admin SDK with your Google credentials, so no password is
+ * stored or printed: a new account gets a random password and Firebase emails
+ * the admin a "reset password" link to choose their own.
+ *
+ * Prerequisites:
+ *   gcloud auth application-default login   (account with access to the project)
+ *   .env.local with NEXT_PUBLIC_FIREBASE_* values
  *
  * Usage:
  *   node scripts/seed-admin.mjs
  *
- * You can override the account via environment variables:
- *   SEED_ADMIN_EMAIL, SEED_ADMIN_PASSWORD, SEED_ADMIN_NAME
+ * Overrides: SEED_ADMIN_EMAIL, SEED_ADMIN_NAME
  */
 
 import { readFileSync } from 'fs'
+import { randomBytes } from 'crypto'
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
-import { initializeApp } from 'firebase/app'
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
-import { getDatabase, ref, get, set } from 'firebase/database'
+import { initializeApp, applicationDefault } from 'firebase-admin/app'
+import { getAuth } from 'firebase-admin/auth'
+import { getDatabase } from 'firebase-admin/database'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const root = join(__dirname, '..')
@@ -44,62 +51,79 @@ function loadEnvFile(filePath) {
 }
 loadEnvFile(join(root, '.env.local'))
 
-const EMAIL = process.env.SEED_ADMIN_EMAIL || 'khendeqmedresah1@gmail.com'
-const PASSWORD = process.env.SEED_ADMIN_PASSWORD || 'KH1234'
-const NAME = process.env.SEED_ADMIN_NAME || 'Khendeq Medresah Admin'
+const EMAIL = process.env.SEED_ADMIN_EMAIL || 'amarsuadbusiness@gmail.com'
+const NAME = process.env.SEED_ADMIN_NAME || 'Platform Admin'
+const PROJECT_ID = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
+const API_KEY = process.env.NEXT_PUBLIC_FIREBASE_API_KEY
 
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+const app = initializeApp({
+  credential: applicationDefault(),
+  projectId: PROJECT_ID,
   databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-}
-
-const app = initializeApp(firebaseConfig)
+})
 const auth = getAuth(app)
 const db = getDatabase(app)
 
+/** Ask Firebase to email a password-reset link to the admin. */
+async function sendResetEmail(email) {
+  const res = await fetch(
+    `https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${API_KEY}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ requestType: 'PASSWORD_RESET', email }),
+    }
+  )
+  if (!res.ok) throw new Error(`Could not send reset email: ${await res.text()}`)
+}
+
 async function main() {
   try {
-    let uid
-
-    // 1) Create the auth user, or sign in if the email is already registered.
+    // 1) Find or create the auth user.
+    let user
+    let created = false
     try {
-      const cred = await createUserWithEmailAndPassword(auth, EMAIL, PASSWORD)
-      uid = cred.user.uid
-      console.log('✓ Created new auth user:', uid)
+      user = await auth.getUserByEmail(EMAIL)
+      console.log('• Admin auth user already exists:', user.uid)
     } catch (err) {
-      if (err.code === 'auth/email-already-in-use') {
-        const cred = await signInWithEmailAndPassword(auth, EMAIL, PASSWORD)
-        uid = cred.user.uid
-        console.log('• Admin auth user already exists (signed in):', uid)
-      } else {
-        throw err
-      }
+      if (err.code !== 'auth/user-not-found') throw err
+      user = await auth.createUser({
+        email: EMAIL,
+        password: randomBytes(24).toString('base64url'),
+        displayName: NAME,
+      })
+      created = true
+      console.log('✓ Created new auth user:', user.uid)
     }
+    const uid = user.uid
 
     // 2) Write (or refresh) the admin profile in Realtime Database.
-    const userRef = ref(db, `users/${uid}`)
-    const existing = (await get(userRef)).val() || {}
-
-    await set(userRef, {
+    const userRef = db.ref(`users/${uid}`)
+    const existing = (await userRef.get()).val() || {}
+    const { schoolId: _ignored, ...rest } = existing
+    await userRef.set({
+      ...rest,
       uid,
       email: EMAIL,
-      name: NAME,
-      role: 'admin',
+      name: existing.name || NAME,
+      role: 'superadmin',
       status: 'active',
       createdAt: existing.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       createdBy: existing.createdBy || uid,
     })
+    // Mirror the role into the ID token (Storage rules read it).
+    await auth.setCustomUserClaims(uid, { role: 'superadmin' })
+    console.log('✓ Profile written to Realtime Database (role: superadmin)')
 
-    console.log('✓ Admin profile written to Realtime Database (role: admin)')
-    console.log('  Email:    ' + EMAIL)
-    console.log('  Password: ' + PASSWORD)
-    console.log('  You can now sign in at /login with full admin access.')
+    // 3) New account: email a link so the admin sets their own password.
+    if (created) {
+      await sendResetEmail(EMAIL)
+      console.log(`✓ Password setup email sent to ${EMAIL}`)
+      console.log('  Open the link in that email, choose a password, then sign in at /login.')
+    } else {
+      console.log('  Existing password unchanged. Use "Forgot password" on /login if needed.')
+    }
     process.exit(0)
   } catch (err) {
     console.error('✗ Seed failed:', err.message || err)

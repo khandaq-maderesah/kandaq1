@@ -3,24 +3,23 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useUser, useIsAdmin } from '@/hooks/useAuth'
+import { useAuth } from '@/context/AuthContext'
+import { homePathFor } from '@/components/ProtectedRoute'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Users, GraduationCap, ClipboardList, Calendar } from 'lucide-react'
 import Link from 'next/link'
 
 export default function DashboardPage() {
   const { user, loading } = useUser()
+  const { school } = useAuth()
   const isAdmin = useIsAdmin()
   // (unused role hook removed)
   const router = useRouter()
 
   useEffect(() => {
     if (loading || !user) return
-    if (user.role === 'admin') {
-      router.replace('/admin')
-    } else if (user.role === 'teacher') {
-      router.replace('/teacher')
-    }
-  }, [loading, user, router])
+    router.replace(homePathFor(user.role, !!school))
+  }, [loading, user, school, router])
 
   if (loading) {
     return (

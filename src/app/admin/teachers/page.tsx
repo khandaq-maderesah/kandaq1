@@ -81,6 +81,7 @@ export default function TeachersPage() {
           phone: phone || undefined,
           role,
           assignedClassIds: selectedClasses,
+          schoolId: rtdb.getCurrentSchoolId(),
         }),
       })
       const data = await res.json()

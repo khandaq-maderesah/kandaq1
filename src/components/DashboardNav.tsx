@@ -47,7 +47,7 @@ export function DashboardNav({ userRole }: DashboardNavProps) {
     { href: '/profile', label: 'Profile', icon: User },
   ]
 
-  const links = userRole === 'admin' ? adminLinks : teacherLinks
+  const links = userRole === 'teacher' ? teacherLinks : adminLinks
 
   return (
     <nav className="bg-gradient-to-r from-green-700 via-green-700 to-amber-700 shadow-lg sticky top-0 z-30">

@@ -1,6 +1,70 @@
 import { db } from '@/lib/firebase/config'
 import { ref, get, set, update, remove, onValue, query, orderByChild, equalTo, startAt, type QueryConstraint, type Unsubscribe } from 'firebase/database'
-import type { User, Class, Student, Attendance, AbsentAlert, MissingAttendanceAlert, Exam, Announcement } from '@/types'
+import type { User, Class, Student, Attendance, AbsentAlert, MissingAttendanceAlert, Exam, Announcement, School } from '@/types'
+
+// ==================== Current school ====================
+// Every school's data lives under schoolData/{schoolId}/... . The signed-in
+// user's school (or, for a superadmin, the school they opened) is set once by
+// AuthContext, so callers keep using plain collection names.
+let currentSchoolId: string | null = null
+
+export function setCurrentSchoolId(schoolId: string | null): void {
+  currentSchoolId = schoolId
+}
+
+export function getCurrentSchoolId(): string | null {
+  return currentSchoolId
+}
+
+function requireSchoolId(): string {
+  if (!currentSchoolId) throw new Error('No school selected')
+  return currentSchoolId
+}
+
+/** Reference to a path inside the current school's data. */
+function sref(path: string) {
+  return ref(db, `schoolData/${requireSchoolId()}/${path}`)
+}
+
+function schoolUsersQuery() {
+  return query(ref(db, 'users'), orderByChild('schoolId'), equalTo(requireSchoolId()))
+}
+
+// ==================== Schools ====================
+export async function getSchool(schoolId: string): Promise<School | null> {
+  const snap = await get(ref(db, `schoolInfo/${schoolId}`))
+  return snap.exists() ? ({ ...(snap.val() as School), id: schoolId }) : null
+}
+
+export async function createSchool(schoolId: string, data: Omit<School, 'id'>): Promise<void> {
+  await set(ref(db, `schoolInfo/${schoolId}`), data)
+}
+
+export async function updateSchool(schoolId: string, updates: Partial<Omit<School, 'id'>>): Promise<void> {
+  await update(ref(db, `schoolInfo/${schoolId}`), updates)
+}
+
+/** Superadmin only: every school. */
+export function subscribeToSchools(cb: (schools: School[]) => void): Unsubscribe {
+  return onValue(ref(db, 'schoolInfo'), (snap) => {
+    const schools: School[] = []
+    snap.forEach((child) => {
+      schools.push({ ...(child.val() as School), id: child.key as string })
+    })
+    cb(schools)
+  })
+}
+
+/** Superadmin only: every user on the platform. */
+export function subscribeToAllUsers(cb: (users: User[]) => void): Unsubscribe {
+  return onValue(ref(db, 'users'), (snap) => {
+    const users: User[] = []
+    snap.forEach((child) => {
+      users.push({ ...(child.val() as User), uid: child.key as string })
+    })
+    cb(users)
+  })
+}
 
 // ==================== Users ====================
 export async function getUser(userId: string): Promise<User | null> {
@@ -20,8 +84,9 @@ export async function deleteUser(userId: string): Promise<void> {
   await remove(ref(db, `users/${userId}`))
 }
 
+/** Users of the current school (server-filtered by schoolId). */
 export async function getAllUsers(): Promise<User[]> {
-  const snap = await get(ref(db, 'users'))
+  const snap = await get(schoolUsersQuery())
   const users: User[] = []
   snap.forEach((child) => {
     users.push({ id: child.key as string, ...child.val() })
@@ -31,24 +96,24 @@ export async function getAllUsers(): Promise<User[]> {
 
 // ==================== Classes ====================
 export async function getClass(classId: string): Promise<Class | null> {
-  const snap = await get(ref(db, `classes/${classId}`))
+  const snap = await get(sref(`classes/${classId}`))
   return snap.exists() ? (snap.val() as Class) : null
 }
 
 export async function createClass(classId: string, data: Partial<Class>): Promise<void> {
-  await set(ref(db, `classes/${classId}`), data)
+  await set(sref(`classes/${classId}`), data)
 }
 
 export async function updateClass(classId: string, updates: Partial<Class>): Promise<void> {
-  await update(ref(db, `classes/${classId}`), updates)
+  await update(sref(`classes/${classId}`), updates)
 }
 
 export async function deleteClass(classId: string): Promise<void> {
-  await remove(ref(db, `classes/${classId}`))
+  await remove(sref(`classes/${classId}`))
 }
 
 export async function getAllClasses(): Promise<Class[]> {
-  const snap = await get(ref(db, 'classes'))
+  const snap = await get(sref('classes'))
   const classes: Class[] = []
   snap.forEach((child) => {
     classes.push({ id: child.key as string, ...child.val() })
@@ -67,7 +132,7 @@ async function queryChildren<T extends { id?: string }>(
   constraints: QueryConstraint[]
 ): Promise<T[] | null> {
   try {
-    const snap = await get(query(ref(db, path), ...constraints))
+    const snap = await get(query(sref(path), ...constraints))
     const out: T[] = []
     snap.forEach((child) => {
       out.push({
@@ -82,23 +147,23 @@ async function queryChildren<T extends { id?: string }>(
 }
 
 export async function getStudent(studentId: string): Promise<Student | null> {
-  const snap = await get(ref(db, `students/${studentId}`))
+  const snap = await get(sref(`students/${studentId}`))
   return snap.exists() ? (snap.val() as Student) : null
 }
 
 export async function createStudent(studentId: string, data: Partial<Student>): Promise<void> {
-  await set(ref(db, `students/${studentId}`), data)
+  await set(sref(`students/${studentId}`), data)
 }
 
 export async function updateStudent(studentId: string, updates: Partial<Student>): Promise<void> {
-  await update(ref(db, `students/${studentId}`), updates)
+  await update(sref(`students/${studentId}`), updates)
 }
 
 export async function deleteStudent(studentId: string): Promise<void> {
-  await remove(ref(db, `students/${studentId}`))
+  await remove(sref(`students/${studentId}`))
   // Also clean up the student's on-demand photo record if any (best effort).
   try {
-    await remove(ref(db, `studentPhotos/${studentId}`))
+    await remove(sref(`studentPhotos/${studentId}`))
   } catch {
     /* ignore */
   }
@@ -113,15 +178,15 @@ export async function deleteStudent(studentId: string): Promise<void> {
 
 export async function setStudentPhoto(studentId: string, dataUrl: string): Promise<void> {
   if (!dataUrl) {
-    await remove(ref(db, `studentPhotos/${studentId}`))
+    await remove(sref(`studentPhotos/${studentId}`))
     return
   }
-  await set(ref(db, `studentPhotos/${studentId}/photo`), dataUrl)
+  await set(sref(`studentPhotos/${studentId}/photo`), dataUrl)
 }
 
 export async function getStudentPhoto(studentId: string): Promise<string | null> {
   try {
-    const snap = await get(ref(db, `studentPhotos/${studentId}/photo`))
+    const snap = await get(sref(`studentPhotos/${studentId}/photo`))
     return snap.exists() ? (snap.val() as string) : null
   } catch {
     return null
@@ -129,7 +194,7 @@ export async function getStudentPhoto(studentId: string): Promise<string | null>
 }
 
 export async function getAllStudents(): Promise<Student[]> {
-  const snap = await get(ref(db, 'students'))
+  const snap = await get(sref('students'))
   const students: Student[] = []
   snap.forEach((child) => {
     students.push({ id: child.key as string, ...child.val() })
@@ -151,7 +216,7 @@ export async function getStudentsByClass(classId: string): Promise<Student[]> {
 
 // ==================== Attendance ====================
 export async function getAttendance(attendanceId: string): Promise<Attendance | null> {
-  const snap = await get(ref(db, `attendance/${attendanceId}`))
+  const snap = await get(sref(`attendance/${attendanceId}`))
   return snap.exists() ? (snap.val() as Attendance) : null
 }
 
@@ -159,22 +224,22 @@ export async function createAttendance(
   attendanceId: string,
   data: Partial<Attendance>
 ): Promise<void> {
-  await set(ref(db, `attendance/${attendanceId}`), data)
+  await set(sref(`attendance/${attendanceId}`), data)
 }
 
 export async function updateAttendance(
   attendanceId: string,
   updates: Partial<Attendance>
 ): Promise<void> {
-  await update(ref(db, `attendance/${attendanceId}`), updates)
+  await update(sref(`attendance/${attendanceId}`), updates)
 }
 
 export async function deleteAttendance(attendanceId: string): Promise<void> {
-  await remove(ref(db, `attendance/${attendanceId}`))
+  await remove(sref(`attendance/${attendanceId}`))
 }
 
 export async function getAllAttendance(): Promise<Attendance[]> {
-  const snap = await get(ref(db, 'attendance'))
+  const snap = await get(sref('attendance'))
   const records: Attendance[] = []
   snap.forEach((child) => {
     records.push({ id: child.key as string, ...child.val() })
@@ -233,7 +298,7 @@ export async function getAttendanceByStudent(studentId: string): Promise<Attenda
 
 // ==================== Absence Alerts ====================
 export async function getAbsentAlerts(): Promise<AbsentAlert[]> {
-  const snap = await get(ref(db, 'absentAlerts'))
+  const snap = await get(sref('absentAlerts'))
   const alerts: AbsentAlert[] = []
   snap.forEach((child) => {
     alerts.push({ studentId: child.key as string, ...child.val() })
@@ -245,14 +310,14 @@ export async function acknowledgeAbsentAlert(
   studentId: string,
   data: Partial<AbsentAlert>
 ): Promise<void> {
-  await set(ref(db, `absentAlerts/${studentId}`), data)
+  await set(sref(`absentAlerts/${studentId}`), data)
 }
 
 // ==================== Missing Attendance Alerts ====================
 // Alerts created when a teacher has not marked attendance for their class on a given day.
 // Stored under missingAttendanceAlerts/{date}_{classId}.
 export async function getMissingAttendanceAlerts(): Promise<MissingAttendanceAlert[]> {
-  const snap = await get(ref(db, 'missingAttendanceAlerts'))
+  const snap = await get(sref('missingAttendanceAlerts'))
   const alerts: MissingAttendanceAlert[] = []
   snap.forEach((child) => {
     alerts.push({ ...(child.val() as MissingAttendanceAlert), id: child.key as string })
@@ -264,20 +329,20 @@ export async function setMissingAttendanceAlert(
   id: string,
   data: MissingAttendanceAlert
 ): Promise<void> {
-  await set(ref(db, `missingAttendanceAlerts/${id}`), data)
+  await set(sref(`missingAttendanceAlerts/${id}`), data)
 }
 
 export async function updateMissingAttendanceAlert(
   id: string,
   updates: Partial<MissingAttendanceAlert>
 ): Promise<void> {
-  await update(ref(db, `missingAttendanceAlerts/${id}`), updates)
+  await update(sref(`missingAttendanceAlerts/${id}`), updates)
 }
 
 export function subscribeToMissingAttendanceAlerts(
   cb: (alerts: MissingAttendanceAlert[]) => void
 ): Unsubscribe {
-  return onValue(ref(db, 'missingAttendanceAlerts'), (snap) => {
+  return onValue(sref('missingAttendanceAlerts'), (snap) => {
     const alerts: MissingAttendanceAlert[] = []
     snap.forEach((child) => {
       alerts.push({ ...(child.val() as MissingAttendanceAlert), id: child.key as string })
@@ -295,7 +360,7 @@ export async function getSettings(): Promise<Record<string, string>> {
   const out: Record<string, string> = {}
   await Promise.all(
     SETTING_KEYS.map(async (k) => {
-      const snap = await get(ref(db, `settings/${k}`))
+      const snap = await get(sref(`settings/${k}`))
       if (snap.exists()) out[k] = String(snap.val())
     })
   )
@@ -303,36 +368,36 @@ export async function getSettings(): Promise<Record<string, string>> {
 }
 
 export async function getRegistrationOpen(): Promise<boolean> {
-  const snap = await get(ref(db, 'settings/registrationOpen'))
+  const snap = await get(sref('settings/registrationOpen'))
   return !snap.exists() || String(snap.val()) !== 'false'
 }
 
 export async function updateSettings(data: Record<string, string>): Promise<void> {
   await Promise.all(
-    Object.entries(data).map(([k, v]) => set(ref(db, `settings/${k}`), v ?? ''))
+    Object.entries(data).map(([k, v]) => set(sref(`settings/${k}`), v ?? ''))
   )
 }
 
 // ==================== Exams / Results ====================
 export async function getExam(examId: string): Promise<Exam | null> {
-  const snap = await get(ref(db, `exams/${examId}`))
+  const snap = await get(sref(`exams/${examId}`))
   return snap.exists() ? (snap.val() as Exam) : null
 }
 
 export async function createExam(examId: string, data: Partial<Exam>): Promise<void> {
-  await set(ref(db, `exams/${examId}`), data)
+  await set(sref(`exams/${examId}`), data)
 }
 
 export async function updateExam(examId: string, updates: Partial<Exam>): Promise<void> {
-  await update(ref(db, `exams/${examId}`), updates)
+  await update(sref(`exams/${examId}`), updates)
 }
 
 export async function deleteExam(examId: string): Promise<void> {
-  await remove(ref(db, `exams/${examId}`))
+  await remove(sref(`exams/${examId}`))
 }
 
 export async function getAllExams(): Promise<Exam[]> {
-  const snap = await get(ref(db, 'exams'))
+  const snap = await get(sref('exams'))
   const exams: Exam[] = []
   snap.forEach((child) => {
     exams.push({ id: child.key as string, ...child.val() })
@@ -354,15 +419,15 @@ export async function getExamsByClass(classId: string): Promise<Exam[]> {
 // ==================== Announcements ====================
 export async function createAnnouncement(data: Partial<Announcement>): Promise<void> {
   const id = `annc_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
-  await set(ref(db, `announcements/${id}`), { id, ...data })
+  await set(sref(`announcements/${id}`), { id, ...data })
 }
 
 export async function deleteAnnouncement(announcementId: string): Promise<void> {
-  await remove(ref(db, `announcements/${announcementId}`))
+  await remove(sref(`announcements/${announcementId}`))
 }
 
 export function subscribeToAnnouncements(cb: (announcements: Announcement[]) => void): Unsubscribe {
-  return onValue(ref(db, 'announcements'), (snap) => {
+  return onValue(sref('announcements'), (snap) => {
     const announcements: Announcement[] = []
     snap.forEach((child) => {
       announcements.push({ id: child.key as string, ...child.val() })
@@ -375,8 +440,9 @@ export function subscribeToAnnouncements(cb: (announcements: Announcement[]) => 
 // Subscribe to a node and call the callback whenever it changes.
 // Returns an unsubscribe function to clean up in useEffect.
 
+/** Live users of the current school (server-filtered by schoolId). */
 export function subscribeToUsers(cb: (users: User[]) => void): Unsubscribe {
-  return onValue(ref(db, 'users'), (snap) => {
+  return onValue(schoolUsersQuery(), (snap) => {
     const users: User[] = []
     snap.forEach((child) => {
       users.push({ id: child.key as string, ...child.val() })
@@ -386,7 +452,7 @@ export function subscribeToUsers(cb: (users: User[]) => void): Unsubscribe {
 }
 
 export function subscribeToClasses(cb: (classes: Class[]) => void): Unsubscribe {
-  return onValue(ref(db, 'classes'), (snap) => {
+  return onValue(sref('classes'), (snap) => {
     const classes: Class[] = []
     snap.forEach((child) => {
       classes.push({ id: child.key as string, ...child.val() })
@@ -396,7 +462,7 @@ export function subscribeToClasses(cb: (classes: Class[]) => void): Unsubscribe 
 }
 
 export function subscribeToStudents(cb: (students: Student[]) => void): Unsubscribe {
-  return onValue(ref(db, 'students'), (snap) => {
+  return onValue(sref('students'), (snap) => {
     const students: Student[] = []
     snap.forEach((child) => {
       students.push({ id: child.key as string, ...child.val() })
@@ -406,7 +472,7 @@ export function subscribeToStudents(cb: (students: Student[]) => void): Unsubscr
 }
 
 export function subscribeToAttendance(cb: (records: Attendance[]) => void): Unsubscribe {
-  return onValue(ref(db, 'attendance'), (snap) => {
+  return onValue(sref('attendance'), (snap) => {
     const records: Attendance[] = []
     snap.forEach((child) => {
       records.push({ id: child.key as string, ...child.val() })
@@ -429,7 +495,7 @@ export function subscribeToAttendanceSince(
       unsub = subscribeToAttendance(cb)
       return
     }
-    const q = query(ref(db, 'attendance'), orderByChild('date'), startAt(date))
+    const q = query(sref('attendance'), orderByChild('date'), startAt(date))
     unsub = onValue(
       q,
       (snap) => {
@@ -466,7 +532,7 @@ export function subscribeToStudentsByClass(
       unsub = subscribeToStudents((all) => cb(all.filter((s) => s.classId === classId)))
       return
     }
-    const q = query(ref(db, 'students'), orderByChild('classId'), equalTo(classId))
+    const q = query(sref('students'), orderByChild('classId'), equalTo(classId))
     unsub = onValue(
       q,
       (snap) => {
@@ -500,7 +566,7 @@ export function subscribeToAttendanceByTeacher(
       )
       return
     }
-    const q = query(ref(db, 'attendance'), orderByChild('teacherId'), equalTo(teacherId))
+    const q = query(sref('attendance'), orderByChild('teacherId'), equalTo(teacherId))
     unsub = onValue(
       q,
       (snap) => {
@@ -521,7 +587,7 @@ export function subscribeToAttendanceByTeacher(
 }
 
 export function subscribeToAbsentAlerts(cb: (alerts: AbsentAlert[]) => void): Unsubscribe {
-  return onValue(ref(db, 'absentAlerts'), (snap) => {
+  return onValue(sref('absentAlerts'), (snap) => {
     const alerts: AbsentAlert[] = []
     snap.forEach((child) => {
       alerts.push({ studentId: child.key as string, ...child.val() })
@@ -531,7 +597,7 @@ export function subscribeToAbsentAlerts(cb: (alerts: AbsentAlert[]) => void): Un
 }
 
 export function subscribeToExams(cb: (exams: Exam[]) => void): Unsubscribe {
-  return onValue(ref(db, 'exams'), (snap) => {
+  return onValue(sref('exams'), (snap) => {
     const exams: Exam[] = []
     snap.forEach((child) => {
       exams.push({ id: child.key as string, ...child.val() })
@@ -551,19 +617,24 @@ export async function logAction(data: {
 }): Promise<void> {
   try {
     const id = `audit_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
-    await set(ref(db, `audit/${id}`), {
+    await set(sref(`audit/${id}`), {
       ...data,
       timestamp: new Date().toISOString(),
     })
   } catch {
-    // Audit logging must NEVER block the primary operation. The deployed
-    // database rules only allow admins to write to /audit, so audit entries
-    // triggered by teacher actions are intentionally skipped here.
+    // Audit logging must NEVER block the primary operation.
   }
 }
 
 // ==================== Exported API ====================
 export const rtdb = {
+  setCurrentSchoolId,
+  getCurrentSchoolId,
+  getSchool,
+  createSchool,
+  updateSchool,
+  subscribeToSchools,
+  subscribeToAllUsers,
   getUser,
   createUser,
   updateUser,

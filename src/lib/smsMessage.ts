@@ -31,13 +31,18 @@ export function normalizeGender(gender?: string): ParentGender {
  * @param studentName The student's full name (may be in Amharic script).
  * @param gender      'male' | 'female' (case-insensitive).
  * @param language    'Amharic' | 'Afaan Oromoo' (falls back to Amharic).
+ * @param school      The sending school (its name opens the message).
  */
 export function generateSmsMessage(
   studentName: string,
   gender?: string,
-  language?: string
+  language?: string,
+  school?: { name: string; nameAm?: string } | null
 ): string {
   const isFemale = normalizeGender(gender) === 'female'
+  // "From <school>" opening line, in each language.
+  const fromOromo = school ? `${school.name} irraa` : 'Madarasaa Khendeq irraa'
+  const fromAmharic = school ? `ከ ${school.nameAm || school.name}` : 'ከ ኸንደቅ መድረሳ'
 
   if (language === 'Afaan Oromoo') {
     // Convert the Amharic name to Latin, then apply the nominative vowel rule.
@@ -47,12 +52,12 @@ export function generateSmsMessage(
     const oromoSubjectName = isVowel ? `${latinName}n` : latinName
 
     return isFemale
-      ? `Madarasaa Khendeq irraa\n\nKabajamtoota maatii barattuu ${latinName}, guyyaa har'aa ${oromoSubjectName} madarasaa akka hin dhufne isin beeksifna.`
-      : `Madarasaa Khendeq irraa\n\nKabajamtoota maatii barataa ${latinName}, guyyaa har'aa ${oromoSubjectName} madarasaa akka hin dhufne isin beeksifna.`
+      ? `${fromOromo}\n\nKabajamtoota maatii barattuu ${latinName}, guyyaa har'aa ${oromoSubjectName} madarasaa akka hin dhufne isin beeksifna.`
+      : `${fromOromo}\n\nKabajamtoota maatii barataa ${latinName}, guyyaa har'aa ${oromoSubjectName} madarasaa akka hin dhufne isin beeksifna.`
   }
 
   // Default language: Amharic (the name is used as-is, no suffix rule)
   return isFemale
-    ? `ከ ኸንደቅ መድረሳ\n\nየተከበራችሁ የ${studentName} ወላጆች፣ ዛሬ ${studentName} መድረሳ አለመምጣቷን እናሳውቃለን።`
-    : `ከ ኸንደቅ መድረሳ\n\nየተከበራችሁ የ${studentName} ወላጆች፣ ዛሬ ${studentName} መድረሳ አለመምጣቱን እናሳውቃለን።`
+    ? `${fromAmharic}\n\nየተከበራችሁ የ${studentName} ወላጆች፣ ዛሬ ${studentName} መድረሳ አለመምጣቷን እናሳውቃለን።`
+    : `${fromAmharic}\n\nየተከበራችሁ የ${studentName} ወላጆች፣ ዛሬ ${studentName} መድረሳ አለመምጣቱን እናሳውቃለን።`
 }

@@ -20,7 +20,9 @@ param(
   [switch]$SkipDeploy
 )
 
-$ErrorActionPreference = 'Stop'
+# 'Continue': Windows PowerShell 5.1 turns gcloud/firebase progress output on
+# stderr into errors, so failures are detected via $LASTEXITCODE instead.
+$ErrorActionPreference = 'Continue'
 $root = Split-Path -Parent $PSScriptRoot
 Set-Location $root
 
@@ -111,7 +113,8 @@ if ($LASTEXITCODE -ne 0) {
 } else {
   Write-Host '  already exists'
 }
-Run "gcloud secrets add-iam-policy-binding cron-secret --project $ProjectId --member=serviceAccount:$computeSa --role=roles/secretmanager.secretAccessor --format=none"
+# Grants both the build and the runtime service accounts access.
+Run "firebase apphosting:secrets:grantaccess cron-secret --backend $BackendId --location $Region --project $ProjectId --non-interactive"
 
 if ($SkipDeploy) { Write-Host "`nSetup done (deploy skipped)."; exit 0 }
 

@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 export const SESSION_COOKIE = 'khandaq_session'
 
-const PROTECTED_PREFIXES = ['/admin', '/teacher', '/dashboard', '/profile']
+const PROTECTED_PREFIXES = ['/admin', '/teacher', '/dashboard', '/profile', '/superadmin']
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
@@ -25,5 +25,5 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/teacher/:path*', '/dashboard/:path*', '/profile/:path*', '/login'],
+  matcher: ['/admin/:path*', '/teacher/:path*', '/dashboard/:path*', '/profile/:path*', '/superadmin/:path*', '/login'],
 }

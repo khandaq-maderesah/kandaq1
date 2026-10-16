@@ -34,6 +34,7 @@ import {
 import { StudentAvatar } from '@/components/StudentAvatar'
 import { StudentDetailCard } from '@/components/StudentDetailCard'
 import { generateSmsMessage } from '@/lib/smsMessage'
+import { useAuth } from '@/context/AuthContext'
 
 interface AbsentStudent {
   id: string
@@ -63,6 +64,7 @@ interface DashboardData {
 }
 
 export default function AdminPage() {
+  const { school } = useAuth()
   const [error] = useState('')
   const [notice, setNotice] = useState('')
   const [search, setSearch] = useState('')
@@ -911,7 +913,7 @@ if (loading) {
                         {r.parentPhone !== '—' ? (
                           <a
                             href={`sms:${r.parentPhone}?body=${encodeURIComponent(
-                              generateSmsMessage(r.studentName, r.gender, r.parentLanguage)
+                              generateSmsMessage(r.studentName, r.gender, r.parentLanguage, school)
                             )}`}
                             className="inline-flex items-center gap-1.5 rounded-lg bg-green-50 px-2.5 py-1 font-medium text-green-700 transition hover:bg-green-100"
                             title="Open the SMS app with the absence message pre-filled"

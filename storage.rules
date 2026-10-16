@@ -1,19 +1,29 @@
 rules_version = '2';
 
 // Firebase Storage rules.
-// Only announcement attachments live in Storage (student photos are in RTDB).
+// Files are kept per school: schools/{schoolId}/... . Role and school come from
+// the user's ID token custom claims, set by the server when the account is
+// created (src/lib/firebase/admin.ts syncUserClaims).
 service firebase.storage {
   match /b/{bucket}/o {
-    // announcements/{uploaderUid}/{fileId}
-    // Any signed-in user can view; a user can only upload/delete files under
-    // their own uid folder, up to 25 MB each. (Posting the announcement itself
-    // is admin-only, enforced by database.rules.json.)
-    match /announcements/{uid}/{fileId} {
-      allow read: if request.auth != null;
+    function isSuper() {
+      return request.auth != null && request.auth.token.role == 'superadmin';
+    }
+    function inSchool(schoolId) {
+      return request.auth != null && request.auth.token.schoolId == schoolId;
+    }
+
+    // schools/{schoolId}/announcements/{uploaderUid}/{fileId}
+    // Members of the school can view; admins (and superadmins) upload/delete
+    // their own files, up to 25 MB each.
+    match /schools/{schoolId}/announcements/{uid}/{fileId} {
+      allow read: if isSuper() || inSchool(schoolId);
       allow create, update: if request.auth != null
         && request.auth.uid == uid
+        && (isSuper() || (inSchool(schoolId) && request.auth.token.role == 'admin'))
         && request.resource.size < 25 * 1024 * 1024;
-      allow delete: if request.auth != null && request.auth.uid == uid;
+      allow delete: if request.auth != null
+        && (isSuper() || (inSchool(schoolId) && request.auth.token.role == 'admin'));
     }
 
     match /{allPaths=**} {

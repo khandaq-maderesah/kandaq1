@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { requireAdmin, errorStatus } from '@/lib/firebase/admin'
+import { requireAdmin, assertCanManageSchool, errorStatus, HttpError } from '@/lib/firebase/admin'
 import { getAuth } from 'firebase-admin/auth'
 
 export const dynamic = 'force-dynamic'
@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic'
  *
  * Updates the classes assigned to an existing teacher. Class records and user
  * profiles are updated together so moving a teacher to a new grade does not
- * leave stale assignments behind.
+ * leave stale assignments behind. Only within the teacher's own school.
  */
 export async function PATCH(
   request: Request,
@@ -17,32 +17,34 @@ export async function PATCH(
 ) {
   const { uid } = await params
   try {
-    const { db, callerUid } = await requireAdmin(request)
+    const { db, caller } = await requireAdmin(request)
     const body = await request.json()
     const assignedClassIds = Array.isArray(body?.assignedClassIds)
-      ? [...new Set(body.assignedClassIds.filter((id: unknown): id is string => typeof id === 'string' && id.length > 0))]
+      ? [...new Set<string>(body.assignedClassIds.filter((id: unknown): id is string => typeof id === 'string' && id.length > 0))]
       : null
 
     if (!assignedClassIds) {
       return NextResponse.json({ ok: false, error: 'assignedClassIds must be an array.' }, { status: 400 })
     }
 
-    const [userSnap, classesSnap, usersSnap] = await Promise.all([
-      db.ref('users/' + uid).get(),
-      db.ref('classes').get(),
-      db.ref('users').get(),
-    ])
-    const user = userSnap.val()
+    const user = (await db.ref('users/' + uid).get()).val()
     if (!user) {
       return NextResponse.json({ ok: false, error: 'User not found.' }, { status: 404 })
     }
+    assertCanManageSchool(caller, user.schoolId)
     if (user.role !== 'teacher') {
       return NextResponse.json({ ok: false, error: 'Only teacher assignments can be edited.' }, { status: 400 })
     }
+    const schoolId: string = user.schoolId
 
-    const selected = new Set(assignedClassIds)
+    const [classesSnap, usersSnap] = await Promise.all([
+      db.ref(`schoolData/${schoolId}/classes`).get(),
+      db.ref('users').orderByChild('schoolId').equalTo(schoolId).get(),
+    ])
+
+    const selected = new Set(assignedClassIds.filter((cid) => classesSnap.hasChild(cid)))
     const updates: Record<string, unknown> = {
-      [`users/${uid}/assignedClassIds`]: assignedClassIds,
+      [`users/${uid}/assignedClassIds`]: [...selected],
       [`users/${uid}/updatedAt`]: new Date().toISOString(),
     }
     const assignedByUser = new Map<string, string[]>()
@@ -58,13 +60,14 @@ export async function PATCH(
       const classId = child.key as string
       const value = child.val()
       if (!value) return
+      const classPath = `schoolData/${schoolId}/classes/${classId}`
 
       if (selected.has(classId)) {
-        updates[`classes/${classId}/teacherId`] = uid
-        updates[`classes/${classId}/teacherName`] = user.name
+        updates[`${classPath}/teacherId`] = uid
+        updates[`${classPath}/teacherName`] = user.name
       } else if (value.teacherId === uid) {
-        updates[`classes/${classId}/teacherId`] = null
-        updates[`classes/${classId}/teacherName`] = null
+        updates[`${classPath}/teacherId`] = null
+        updates[`${classPath}/teacherName`] = null
       }
 
       if (selected.has(classId)) {
@@ -78,14 +81,16 @@ export async function PATCH(
     })
 
     await db.ref().update(updates)
-    await db.ref('audit/audit_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8)).set({
-      actorId: callerUid,
-      action: 'update',
-      entity: 'user',
-      entityId: uid,
-      details: `Updated class assignments for ${user.name}`,
-      timestamp: new Date().toISOString(),
-    })
+    await db
+      .ref(`schoolData/${schoolId}/audit/audit_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`)
+      .set({
+        actorId: caller.uid,
+        action: 'update',
+        entity: 'user',
+        entityId: uid,
+        details: `Updated class assignments for ${user.name}`,
+        timestamp: new Date().toISOString(),
+      })
 
     return NextResponse.json({ ok: true })
   } catch (err: any) {
@@ -101,11 +106,10 @@ export async function PATCH(
  * DELETE /api/admin/users/[uid]
  *
  * Permanently deletes a user (from Firebase Auth + Realtime Database) and
- * unassigns any classes they taught. Only an admin can do this, and an admin
- * cannot delete their own account (to avoid locking everyone out).
+ * unassigns any classes they taught. Admins can only delete users of their own
+ * school; nobody can delete their own account or a superadmin.
  *
- * Auth: the caller must send `Authorization: Bearer <idToken>` where the token
- * belongs to an account whose `users/{uid}/role` is "admin".
+ * Auth: `Authorization: Bearer <idToken>` of an admin or superadmin account.
  */
 export async function DELETE(
   request: Request,
@@ -114,24 +118,28 @@ export async function DELETE(
   const { uid } = await params
 
   try {
-    // Verify the caller and confirm they are an admin.
-    const { admin, db, callerUid } = await requireAdmin(request)
+    const { admin, db, caller } = await requireAdmin(request)
 
-    if (callerUid === uid) {
+    if (caller.uid === uid) {
       return NextResponse.json(
         { ok: false, error: 'You cannot delete your own account.' },
         { status: 400 }
       )
     }
 
+    const user = (await db.ref('users/' + uid).get()).val()
+    if (!user) throw new HttpError(404, 'User not found.')
+    if (user.role === 'superadmin') throw new HttpError(403, 'A superadmin cannot be deleted here.')
+    assertCanManageSchool(caller, user.schoolId)
+
     // Unassign classes taught by the user being deleted.
-    const classesSnap = await db.ref('classes').get()
+    const classesSnap = await db.ref(`schoolData/${user.schoolId}/classes`).get()
     const classUpdates: Record<string, null> = {}
     classesSnap.forEach((child) => {
       const val = child.val()
       if (val && val.teacherId === uid) {
-        classUpdates[`classes/${child.key}/teacherId`] = null
-        classUpdates[`classes/${child.key}/teacherName`] = null
+        classUpdates[`schoolData/${user.schoolId}/classes/${child.key}/teacherId`] = null
+        classUpdates[`schoolData/${user.schoolId}/classes/${child.key}/teacherName`] = null
       }
     })
     if (Object.keys(classUpdates).length > 0) {

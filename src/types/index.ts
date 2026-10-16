@@ -1,5 +1,8 @@
 // User Types
-export type UserRole = 'admin' | 'teacher'
+// superadmin: platform owner, manages every school (has no schoolId).
+// admin:      full control of ONE school (users/{uid}/schoolId).
+// teacher:    their assigned classes within ONE school.
+export type UserRole = 'superadmin' | 'admin' | 'teacher'
 export type UserStatus = 'active' | 'inactive'
 
 export interface User {
@@ -9,11 +12,32 @@ export interface User {
   phone?: string
   role: UserRole
   status: UserStatus
+  /** The school this user belongs to. Absent for superadmins. */
+  schoolId?: string
   createdAt: string
   updatedAt: string
   createdBy: string
   lastLogin?: string
   assignedClassIds?: string[]
+}
+
+// School Types
+export type SchoolStatus = 'active' | 'suspended'
+
+/** Stored at schoolInfo/{schoolId}. All of a school's data lives under schoolData/{schoolId}. */
+export interface School {
+  id: string
+  name: string
+  /** Amharic name, used in Amharic SMS messages. Falls back to `name`. */
+  nameAm?: string
+  address?: string
+  phone?: string
+  /** IANA timezone for attendance reminders. Defaults to Africa/Addis_Ababa. */
+  timezone?: string
+  status: SchoolStatus
+  createdAt: string
+  createdBy: string
+  updatedAt: string
 }
 
 // Class Types

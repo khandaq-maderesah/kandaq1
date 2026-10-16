@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Lock, Mail, Loader2, KeyRound } from 'lucide-react'
+import { homePathFor } from '@/components/ProtectedRoute'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -63,9 +64,7 @@ export default function LoginPage() {
       // login, so we skip the extra /dashboard -> /admin (or /teacher)
       // navigation and its accompanying layout + fresh data subscriptions.
       const role = result.profile?.role
-      const next =
-        role === 'admin' ? '/admin' : role === 'teacher' ? '/teacher' : '/dashboard'
-      router.replace(next)
+      router.replace(role ? homePathFor(role, role !== 'superadmin') : '/dashboard')
     } else {
       setError(result.error || 'Login failed')
     }

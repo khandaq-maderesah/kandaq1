@@ -37,6 +37,12 @@ export function getAuthErrorMessage(error: unknown): string {
     case 'auth/operation-not-allowed':
       return 'Email/password sign-in is not enabled for this project. ' +
         'Enable it in Firebase Console > Authentication > Sign-in method.'
+    case 'app/account-inactive':
+      return 'This account has been deactivated. Please contact your school administrator.'
+    case 'app/school-suspended':
+      return "Your school's account is suspended. Please contact the platform administrator."
+    case 'app/no-school':
+      return 'This account is not linked to a school. Please contact the platform administrator.'
     default:
       if (code) {
         return `Login failed (${code}). Please try again.`
