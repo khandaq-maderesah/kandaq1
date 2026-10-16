@@ -1,0 +1,61 @@
+{
+  "avatar": {
+    "photoOf": "የ{name} ፎቶ",
+    "photo": "የተማሪ ፎቶ"
+  },
+  "photo": {
+    "capturedAlt": "የተነሳ የተማሪ ፎቶ",
+    "retake": "እንደገና አንሳ",
+    "remove": "ፎቶ አስወግድ",
+    "frontCamera": "የፊት ካሜራ",
+    "backCamera": "የኋላ ካሜራ",
+    "take": "ፎቶ አንሳ",
+    "flip": "ካሜራ ቀይር",
+    "upload": "ከጋለሪ ጫን",
+    "hint": "የፊት (ሰልፊ) ወይም የኋላ ካሜራ ይጠቀሙ፤ ለመቀያየር «ካሜራ ቀይር»ን ይጫኑ። ከማስቀመጥዎ በፊት ፎቶውን የፈለጉትን ያህል ጊዜ እንደገና ማንሳት ይችላሉ።",
+    "cameraUnavailable": "ካሜራው አይገኝም። ለዚህ ድረ-ገጽ የካሜራ ፈቃድ ይስጡ፣ ወይም በምትኩ ከጋለሪዎ ፎቶ ይጫኑ።",
+    "notImage": "እባክዎ የምስል ፋይል ይምረጡ።"
+  },
+  "detail": {
+    "title": "የተማሪ ዝርዝር መረጃ",
+    "viewPhoto": "ፎቶ ተመልከት",
+    "closePhoto": "ፎቶ ዝጋ",
+    "classNotAssigned": "ክፍል አልተመደበም",
+    "classWithSection": "{name} · ሴክሽን {section}",
+    "roll": "ተ.ቁ. {roll}",
+    "rollNumber": "ተራ ቁጥር",
+    "age": "ዕድሜ",
+    "gender": "ጾታ",
+    "class": "ክፍል",
+    "section": "ሴክሽን",
+    "studentId": "የተማሪ መለያ ቁጥር",
+    "parentLanguage": "የወላጅ ቋንቋ",
+    "phoneHeading": "ስልክ",
+    "parentPhone": "የወላጅ ስልክ",
+    "alternativePhone": "ተጨማሪ ስልክ",
+    "registrationHeading": "ምዝገባ",
+    "registeredOn": "የተመዘገበበት ቀን",
+    "lastUpdated": "መጨረሻ የተሻሻለው",
+    "createdBy": "የመዘገበው",
+    "ustaz": "ኡስታዝ {name}",
+    "systemRecovered": "ሲስተም (በራሱ የተመለሰ)",
+    "admin": "አስተዳዳሪ",
+    "attendanceHeading": "የመገኘት ታሪክ",
+    "noAttendance": "ለዚህ ተማሪ እስካሁን የመገኘት መዝገብ የለም።",
+    "calendarFilter": "በኢትዮጵያ አቆጣጠር ማጣሪያ",
+    "ethYear": "ዓመት (ዓ.ም)",
+    "ethMonth": "ወር (ዓ.ም)",
+    "allYear": "ዓመቱን በሙሉ",
+    "noAttendanceInPeriod": "በተመረጠው ጊዜ ውስጥ የተመዘገበ መገኘት የለም።",
+    "records": "{count, plural, one {መዝገብ} other {መዝገቦች}}",
+    "ethiopianSuffix": "{date} (ዓ.ም)",
+    "legendItem": "{status}፦ {count}",
+    "callParent": "ለወላጅ ደውል",
+    "status": {
+      "present": "የተገኘ",
+      "absent": "ቀሪ",
+      "late": "ያረፈደ",
+      "excused": "በፈቃድ"
+    }
+  }
+}

@@ -1,0 +1,108 @@
+{
+  "appName": "Khendeq",
+  "appTagline": "የትምህርት ቤት አስተዳደር መድረክ",
+  "actions": {
+    "save": "አስቀምጥ",
+    "saveChanges": "ለውጦችን አስቀምጥ",
+    "cancel": "ይቅር",
+    "close": "ዝጋ",
+    "edit": "አስተካክል",
+    "delete": "ሰርዝ",
+    "add": "ጨምር",
+    "create": "ፍጠር",
+    "search": "ፈልግ",
+    "filter": "አጣራ",
+    "export": "ወደ ፋይል አውጣ",
+    "exportCsv": "ወደ CSV አውጣ",
+    "print": "አትም",
+    "back": "ተመለስ",
+    "next": "ቀጣይ",
+    "previous": "ቀዳሚ",
+    "confirm": "አረጋግጥ",
+    "submit": "አስገባ",
+    "retry": "እንደገና ሞክር",
+    "view": "ተመልከት",
+    "restore": "ወደነበረበት መልስ",
+    "approve": "አጽድቅ",
+    "reject": "ውድቅ አድርግ",
+    "clear": "አጽዳ",
+    "refresh": "አድስ",
+    "upload": "ስቀል",
+    "remove": "አስወግድ",
+    "showMore": "ተጨማሪ አሳይ",
+    "showLess": "ጥቂት አሳይ",
+    "selectAll": "ሁሉንም ምረጥ"
+  },
+  "status": {
+    "loading": "በመጫን ላይ…",
+    "saving": "በማስቀመጥ ላይ…",
+    "saved": "ተቀምጧል",
+    "active": "ንቁ",
+    "inactive": "የቦዘነ",
+    "suspended": "የታገደ",
+    "pending": "በመጠባበቅ ላይ",
+    "approved": "ጸድቋል",
+    "rejected": "ውድቅ ተደርጓል",
+    "cancelled": "ተነስቷል"
+  },
+  "roles": {
+    "superadmin": "የመድረክ አስተዳዳሪ",
+    "admin": "የትምህርት ቤት አስተዳዳሪ",
+    "teacher": "መምህር"
+  },
+  "gender": {
+    "male": "ወንድ",
+    "female": "ሴት"
+  },
+  "fields": {
+    "name": "ስም",
+    "fullName": "ሙሉ ስም",
+    "email": "ኢሜይል",
+    "phone": "ስልክ ቁጥር",
+    "password": "የይለፍ ቃል",
+    "address": "አድራሻ",
+    "date": "ቀን",
+    "class": "ክፍል",
+    "section": "ሴክሽን",
+    "status": "ሁኔታ",
+    "role": "ሚና",
+    "reason": "ምክንያት",
+    "notes": "ማስታወሻ",
+    "actions": "ተግባራት",
+    "required": "ግዴታ"
+  },
+  "empty": {
+    "noData": "እስካሁን ምንም የለም።",
+    "noResults": "ከፍለጋዎ ጋር የሚዛመድ ምንም አልተገኘም።"
+  },
+  "errors": {
+    "generic": "ችግር ተፈጥሯል። እባክዎ እንደገና ይሞክሩ።",
+    "network": "የኢንተርኔት ግንኙነትዎን አረጋግጠው እንደገና ይሞክሩ።",
+    "permission": "ይህን ለማድረግ ፈቃድ የለዎትም።",
+    "required": "ይህን መሙላት ግዴታ ነው።",
+    "api": {
+      "emailInUse": "በዚህ ኢሜይል የተከፈተ መለያ አስቀድሞ አለ።",
+      "invalidEmail": "ይህ የኢሜይል አድራሻ ትክክል አይደለም።",
+      "weakPassword": "የይለፍ ቃሉ ቢያንስ 6 ፊደላት መሆን አለበት።",
+      "sessionExpired": "የመግቢያ ጊዜዎ አልፏል። እባክዎ እንደገና ይግቡ።",
+      "forbidden": "ይህን ለማድረግ ፈቃድ የለዎትም።",
+      "schoolSuspended": "ይህ ትምህርት ቤት ታግዷል።",
+      "otherSchool": "ማስተዳደር የሚችሉት በራስዎ ትምህርት ቤት ያሉ ሰዎችን ብቻ ነው።",
+      "notFound": "ይህ መለያ ከእንግዲህ የለም።",
+      "cannotDeleteSelf": "የራስዎን መለያ መሰረዝ አይችሉም።",
+      "invalid": "አንዳንድ መረጃዎች ጎድለዋል ወይም ትክክል አይደሉም።",
+      "generic": "ችግር ተፈጥሯል። እባክዎ እንደገና ይሞክሩ።"
+    }
+  },
+  "pagination": {
+    "showing": "ከ{total} ውስጥ {from}–{to}",
+    "page": "ገጽ {page} ከ{pages}"
+  },
+  "count": {
+    "students": "{count, plural, =0 {ምንም ተማሪ የለም} one {# ተማሪ} other {# ተማሪዎች}}",
+    "teachers": "{count, plural, =0 {ምንም መምህር የለም} one {# መምህር} other {# መምህራን}}",
+    "classes": "{count, plural, =0 {ምንም ክፍል የለም} one {# ክፍል} other {# ክፍሎች}}"
+  },
+  "language": "ቋንቋ",
+  "today": "ዛሬ"
+}

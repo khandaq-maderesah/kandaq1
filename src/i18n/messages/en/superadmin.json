@@ -1,0 +1,60 @@
+{
+  "title": "Schools",
+  "description": "Create schools, give each one an admin, and open any school to manage it.",
+  "newSchool": "New school",
+  "stats": {
+    "total": "Schools",
+    "active": "Active",
+    "suspended": "Suspended",
+    "users": "Users"
+  },
+  "empty": {
+    "title": "No schools yet",
+    "description": "Create the first school to get started."
+  },
+  "card": {
+    "noContact": "No contact details",
+    "admins": "{count, plural, =0 {No admins} one {# admin} other {# admins}}",
+    "teachers": "{count, plural, =0 {No teachers} one {# teacher} other {# teachers}}",
+    "noAdminYet": "This school has no admin yet.",
+    "open": "Open",
+    "addAdmin": "Add admin",
+    "suspend": "Suspend",
+    "reactivate": "Reactivate"
+  },
+  "create": {
+    "title": "New school",
+    "description": "The school starts empty. Its admin then adds classes, teachers and students.",
+    "name": "School name",
+    "namePlaceholder": "e.g. Khendeq Medresah",
+    "nameAm": "Name in Amharic (for SMS)",
+    "address": "Address",
+    "phone": "Phone number",
+    "timezone": "Time zone",
+    "submit": "Create school",
+    "created": "{name} was created. Now add its admin account.",
+    "failed": "Couldn't create the school. Please try again."
+  },
+  "admin": {
+    "title": "New admin for {school}",
+    "description": "The admin signs in with this email and temporary password, and can change the password later.",
+    "fullName": "Full name",
+    "email": "Email",
+    "phone": "Phone number",
+    "password": "Temporary password",
+    "passwordHint": "At least 6 characters",
+    "submit": "Create admin",
+    "created": "Admin account created for {email}.",
+    "failed": "Couldn't create the admin account."
+  },
+  "suspend": {
+    "title": "Suspend {name}?",
+    "description": "Its admins and teachers won't be able to sign in until you reactivate it.",
+    "confirm": "Suspend school"
+  },
+  "toast": {
+    "suspended": "{name} was suspended.",
+    "reactivated": "{name} was reactivated.",
+    "updateFailed": "Couldn't update the school. Please try again."
+  }
+}

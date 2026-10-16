@@ -56,7 +56,7 @@ export function ProtectedRoute({
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+        <div className="h-10 w-10 animate-spin rounded-full border-2 border-muted border-t-primary" aria-hidden="true"></div>
       </div>
     )
   }

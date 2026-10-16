@@ -1,0 +1,58 @@
+{
+  "title": "Fasalladayda",
+  "description": "Fasalladaada iyo ardaydooda. Ku dar arday cusub ama cusboonaysii xogtooda.",
+  "classCard": {
+    "grade": "Heerka {grade}",
+    "section": "Qaybta {section}",
+    "select": "Tus ardayda {name}",
+    "selected": "La doortay"
+  },
+  "registrationClosed": "Diiwaangelinta ardayda waa xiran tahay. Weli wax waad ka beddeli kartaa ardayda horay u diiwaangashan.",
+  "form": {
+    "addTitle": "Ku dar arday",
+    "addDescription": "Lambarka taxanaha si toos ah ayaa loogu soo jeedinayaa fasal kasta.",
+    "editTitle": "Wax ka beddel {name}",
+    "editDescription": "Goobaha aad beddesho oo keliya ayaa la cusboonaysiinayaa.",
+    "class": "Fasalka",
+    "classLocked": "Si aad ardaygan ugu wareejiso fasal kale, isticmaal Codso wareejinta ee liiska ardayda.",
+    "name": "Magaca ardayga",
+    "namePlaceholder": "Magaca oo buuxa",
+    "gender": "Jinsiga",
+    "genderPlaceholder": "Dooro jinsiga",
+    "age": "Da'da",
+    "agePlaceholder": "Tusaale: 10",
+    "parentLanguage": "Luqadda waalidka",
+    "parentLanguagePlaceholder": "Dooro luqad",
+    "parentPhone": "Taleefanka waalidka",
+    "alternativePhone": "Taleefan kale (ikhtiyaari)",
+    "phonePlaceholder": "09XX XXX XXX",
+    "rollNumber": "Lambarka taxanaha",
+    "rollTaken": "Lambarkan taxanaha horay ayaa loogu isticmaalay fasalkan.",
+    "rollHint": "La soo jeediyay: {roll}. Waad beddeli kartaa si aad dib ugu habayso lambarrada taxanaha.",
+    "photo": "Sawirka ardayga",
+    "submitAdd": "Ku dar ardayga",
+    "submitEdit": "Kaydi isbeddellada",
+    "cancelEdit": "Jooji wax ka beddelka"
+  },
+  "list": {
+    "title": "Ardayda {name}",
+    "description": "Taabo Wax ka beddel si aad xogta arday u cusboonaysiiso. Si aad u tirtirto ama u wareejiso, isticmaal liiska ficillada.",
+    "roll": "Lambar {roll}",
+    "age": "{age, plural, one {# sano} other {# sano}}",
+    "edit": "Wax ka beddel {name}",
+    "empty": "Weli fasalkan arday kuma jiro.",
+    "emptyHint": "Ku dar ardayga ugu horreeya adigoo isticmaalaya foomka."
+  },
+  "empty": {
+    "noClasses": "Weli laguuma qoondayn wax fasal ah.",
+    "noClassesHint": "Fadlan maamulaha dugsiga ka codso inuu fasal kuu qoondeeyo."
+  },
+  "toast": {
+    "loadFailed": "Fasalladaada lama soo rari karin.",
+    "added": "{name} waxaa lagu daray lambarka taxanaha {roll}.",
+    "updated": "Xogta {name} waa la cusboonaysiiyay.",
+    "saveFailed": "Ardayga lama kaydin karin. Fadlan isku day mar kale.",
+    "registrationClosed": "Diiwaangelinta ardayda waa xiran tahay. Waa in maamulaha dugsigu ka furo Dejinta.",
+    "rollTaken": "Lambarka taxanaha {roll} horay ayaa loogu isticmaalay fasalkan."
+  }
+}

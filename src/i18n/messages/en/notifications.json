@@ -1,0 +1,82 @@
+{
+  "absence": {
+    "label": "Absence alerts",
+    "title": "Absence alerts",
+    "description": "Students absent {streak} or more days in a row",
+    "scopeLabel": "Show alerts for",
+    "scopeAll": "All classes",
+    "scopeMine": "My classes",
+    "empty": "No students have reached {streak} absent days in a row.",
+    "classWithSection": "{className} · Section {section}",
+    "streak": "{count, plural, one {# day absent} other {# days absent}}",
+    "call": "Call",
+    "callParent": "Call the parent of {name}",
+    "select": "Select {name}",
+    "dismiss": "Mark contacted and dismiss ({count})",
+    "dismissed": "{count, plural, one {Alert dismissed.} other {# alerts dismissed.}}",
+    "dismissFailed": "Couldn't dismiss the alert. Please try again."
+  },
+  "reminders": {
+    "label": "Attendance reminders",
+    "title": "Attendance reminders",
+    "description": "Classes where attendance hasn't been taken",
+    "emptyAdmin": "All classes have attendance recorded so far.",
+    "emptyTeacher": "You've taken attendance for all your classes.",
+    "adminLine": "{teacher} hasn't taken today's attendance yet.",
+    "teacherLine": "Please take today's attendance. It hasn't been taken yet.",
+    "markResolved": "Mark resolved",
+    "resolved": "Reminder resolved.",
+    "resolveFailed": "Couldn't resolve the reminder. Please try again."
+  },
+  "announcements": {
+    "label": "Announcements",
+    "title": "Announcements",
+    "empty": "No announcements for you yet.",
+    "count": "{count, plural, =0 {No announcements} one {# announcement} other {# announcements}}",
+    "postedBy": "Posted by {name}",
+    "openAttachment": "Open {name}",
+    "audience": {
+      "label": "Who can see this",
+      "everyone": "Everyone",
+      "teachers": "Teachers only",
+      "admins": "Admins only"
+    },
+    "form": {
+      "heading": "New announcement",
+      "title": "Title",
+      "titlePlaceholder": "Announcement title",
+      "message": "Message",
+      "messagePlaceholder": "Write the message…",
+      "attachments": "Attached files",
+      "removeAttachment": "Remove {name}",
+      "addFile": "Add file",
+      "publish": "Publish",
+      "missingFields": "Please add both a title and a message."
+    },
+    "toast": {
+      "published": "Announcement published.",
+      "publishFailed": "Couldn't publish the announcement. Please try again.",
+      "filesAdded": "{count, plural, one {File added to the announcement.} other {# files added to the announcement.}}",
+      "uploadFailed": "Couldn't upload the file. Please try again.",
+      "deleted": "Announcement deleted.",
+      "deleteFailed": "Couldn't delete the announcement. Please try again."
+    },
+    "delete": {
+      "action": "Delete announcement",
+      "title": "Delete this announcement?",
+      "description": "“{title}” will be removed for everyone. This can't be undone."
+    }
+  },
+  "install": {
+    "title": "Install Khendeq",
+    "descriptionIos": "Add Khendeq to your home screen to use it like an app.",
+    "description": "Install the app on your device for quicker access and offline support.",
+    "install": "Install app",
+    "notNow": "Not now",
+    "dismiss": "Dismiss",
+    "iosHowTo": "How to add to home screen",
+    "iosStep1": "Tap the Share button in Safari.",
+    "iosStep2": "Scroll down and tap “Add to Home Screen”.",
+    "iosStep3": "Tap “Add”. Khendeq will appear on your home screen."
+  }
+}

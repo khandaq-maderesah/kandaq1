@@ -1,0 +1,69 @@
+{
+  "types": {
+    "mid": "Imtixaanka bartamaha",
+    "assignment": "Hawl-guri",
+    "final": "Imtixaanka kama dambaysta ah"
+  },
+  "years": {
+    "label": "Sannad-dugsiyeedka",
+    "all": "Dhammaan sannadaha",
+    "legacy": "Sannad-dugsiyeed ma leh"
+  },
+  "table": {
+    "roll": "Lambar",
+    "student": "Ardayga",
+    "total": "Wadarta",
+    "average": "Celcelis",
+    "percent": "%",
+    "rank": "Kaalinta",
+    "grandTotal": "Wadarta guud",
+    "outOf": "ka mid ah {max}",
+    "maxMarks": "Buundada ugu badan: {max}",
+    "classAverage": "Celceliska fasalka",
+    "highest": "Ugu sarreeya",
+    "lowest": "Ugu hooseeya",
+    "noRoll": "—",
+    "rollShort": "Lambar {roll}"
+  },
+  "sheet": {
+    "section": "Qaybta {section}",
+    "totalMarks": "Wadarta buundada: {total}",
+    "studentCount": "{count, plural, =0 {Arday ma jiro} one {# arday} other {# arday}}",
+    "noRows": "Warqaddan arday kuma jiro."
+  },
+  "overall": {
+    "heading": "{school} — Natiijada guud",
+    "headingNoSchool": "Natiijada guud",
+    "examsMerged": "{count, plural, =0 {Imtixaan lama isku darin} one {# imtixaan ayaa la isku daray} other {# imtixaan ayaa la isku daray}}",
+    "generated": "La diyaariyay {date}",
+    "noStudents": "Fasalkan ma jiraan arday firfircoon."
+  },
+  "csv": {
+    "roll": "Lambar",
+    "student": "Ardayga",
+    "total": "Wadarta",
+    "average": "Celceliska",
+    "percentage": "Boqolley %",
+    "rank": "Kaalinta",
+    "grandTotal": "Wadarta guud",
+    "subjectOutOf": "{subject} / {max}",
+    "overallFile": "natiijada-guud"
+  },
+  "certificate": {
+    "subject": "Maaddada",
+    "total": "Wadarta",
+    "grandTotal": "Wadarta guud",
+    "average": "Celceliska",
+    "nextGrade": "Fasalka xiga",
+    "promoted": "U gudbay",
+    "notPromoted": "Ma gudbin",
+    "subjects": {
+      "seerah": "Siiro",
+      "aqeedah": "Caqiido",
+      "hadith": "Xadiis",
+      "zikr": "Dikri",
+      "arabic": "Af-Carabi",
+      "fiqh": "Fiqi"
+    }
+  }
+}

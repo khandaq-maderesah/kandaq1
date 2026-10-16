@@ -1,0 +1,69 @@
+{
+  "types": {
+    "mid": "የአጋማሽ ፈተና",
+    "assignment": "የቤት ሥራ",
+    "final": "የማጠቃለያ ፈተና"
+  },
+  "years": {
+    "label": "የትምህርት ዘመን",
+    "all": "ሁሉም ዘመናት",
+    "legacy": "የትምህርት ዘመን የሌለው"
+  },
+  "table": {
+    "roll": "ተ.ቁ.",
+    "student": "ተማሪ",
+    "total": "ድምር",
+    "average": "አማካይ",
+    "percent": "%",
+    "rank": "ደረጃ",
+    "grandTotal": "አጠቃላይ ድምር",
+    "outOf": "ከ{max}",
+    "maxMarks": "ሙሉ ውጤት፦ {max}",
+    "classAverage": "የክፍሉ አማካይ",
+    "highest": "ከፍተኛ",
+    "lowest": "ዝቅተኛ",
+    "noRoll": "—",
+    "rollShort": "ተ.ቁ. {roll}"
+  },
+  "sheet": {
+    "section": "ሴክሽን {section}",
+    "totalMarks": "ሙሉ ውጤት፦ {total}",
+    "studentCount": "{count, plural, =0 {ምንም ተማሪ የለም} one {# ተማሪ} other {# ተማሪዎች}}",
+    "noRows": "በዚህ ሉህ ላይ ተማሪ የለም።"
+  },
+  "overall": {
+    "heading": "{school} — አጠቃላይ ውጤት",
+    "headingNoSchool": "አጠቃላይ ውጤት",
+    "examsMerged": "{count, plural, =0 {ምንም ፈተና አልተጣመረም} one {# ፈተና ተጣምሯል} other {# ፈተናዎች ተጣምረዋል}}",
+    "generated": "የተዘጋጀበት ቀን፦ {date}",
+    "noStudents": "በዚህ ክፍል ውስጥ ንቁ ተማሪ የለም።"
+  },
+  "csv": {
+    "roll": "ተራ ቁጥር",
+    "student": "ተማሪ",
+    "total": "ድምር",
+    "average": "አማካይ",
+    "percentage": "መቶኛ %",
+    "rank": "ደረጃ",
+    "grandTotal": "አጠቃላይ ድምር",
+    "subjectOutOf": "{subject} / {max}",
+    "overallFile": "overall-result"
+  },
+  "certificate": {
+    "subject": "የትምህርት ዓይነት",
+    "total": "ድምር",
+    "grandTotal": "አጠቃላይ ድምር",
+    "average": "አማካይ",
+    "nextGrade": "ቀጣይ ደረጃ",
+    "promoted": "የተዛወረ",
+    "notPromoted": "ያልተዛወረ",
+    "subjects": {
+      "seerah": "ሲራ",
+      "aqeedah": "ዐቂዳ",
+      "hadith": "ሐዲስ",
+      "zikr": "ዚክር",
+      "arabic": "ዐረብኛ",
+      "fiqh": "ፊቅህ"
+    }
+  }
+}

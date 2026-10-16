@@ -1,0 +1,134 @@
+{
+  "title": "Dashboard",
+  "description": "Overview of students, teachers and attendance",
+  "todayDate": "{gregorian} · {ethiopian}",
+  "kpi": {
+    "totalStudents": "Total students",
+    "totalHint": "{male} male · {female} female",
+    "maleStudents": "Male students",
+    "femaleStudents": "Female students",
+    "percentOfTotal": "{percent}% of all students",
+    "teachers": "Teachers",
+    "classes": "Classes",
+    "absentToday": "Absent today",
+    "absentWeekHint": "{count, plural, =0 {None in the last 7 days} one {# in the last 7 days} other {# in the last 7 days}}"
+  },
+  "students": {
+    "title": "Students",
+    "titleMale": "Male students",
+    "titleFemale": "Female students",
+    "description": "Select a student to see their full details.",
+    "searchPlaceholder": "Search by name, roll number or phone",
+    "searchLabel": "Search students",
+    "empty": "No students found",
+    "table": {
+      "photo": "Photo",
+      "name": "Name",
+      "roll": "Roll",
+      "age": "Age",
+      "class": "Class",
+      "section": "Section",
+      "parentPhone": "Parent phone"
+    }
+  },
+  "teachers": {
+    "title": "Teachers",
+    "description": "All teacher accounts.",
+    "searchPlaceholder": "Search by name, email or phone",
+    "searchLabel": "Search teachers",
+    "empty": "No teachers found",
+    "table": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "classes": "Assigned classes",
+      "status": "Status"
+    }
+  },
+  "classes": {
+    "title": "Classes",
+    "description": "All classes and their assigned teachers.",
+    "searchPlaceholder": "Search class or teacher",
+    "searchLabel": "Search classes",
+    "empty": "No classes found",
+    "table": {
+      "class": "Class",
+      "grade": "Grade",
+      "section": "Section",
+      "teacher": "Teacher",
+      "students": "Students",
+      "academicYear": "Academic year"
+    }
+  },
+  "absent": {
+    "title": "Absent students",
+    "descriptionDay": "Absences on {date}, with parent contact details. Pick another date or choose \"All dates\" to see earlier absences.",
+    "descriptionPeriod": "Absences in the selected period, with parent contact details.",
+    "descriptionAll": "Absences from saved attendance across all classes, with parent contact details.",
+    "period": "Period",
+    "periods": {
+      "today": "Single day",
+      "thisWeek": "This week",
+      "lastWeek": "Last week",
+      "last2Weeks": "Last 2 weeks",
+      "last3Weeks": "Last 3 weeks",
+      "thisMonth": "This month"
+    },
+    "date": "Date",
+    "allDates": "All dates",
+    "allDatesOverrides": "\"All dates\" overrides the period.",
+    "searchPlaceholder": "Search student, phone, class or section",
+    "searchLabel": "Search absences",
+    "copyNumbers": "Copy numbers",
+    "copyNumbersHint": "Copy all visible parent phone numbers",
+    "clearStale": "Clear deleted",
+    "clearStaleHint": "Remove absences of students that were deleted",
+    "sendSms": "Send SMS",
+    "sendSmsHint": "Open your SMS app with the absence message filled in",
+    "altPhone": "Alt: {phone}",
+    "call": "Call {phone}",
+    "emptySearch": "No absent students match your search.",
+    "emptyAll": "No absences recorded yet.",
+    "emptyPeriod": "No absences in the selected period.",
+    "emptyDay": "No absences recorded on {date}.",
+    "table": {
+      "date": "Date",
+      "student": "Student",
+      "class": "Class",
+      "section": "Section",
+      "parentPhone": "Parent phone",
+      "action": "Action"
+    },
+    "toast": {
+      "nothingStale": "Nothing to clear. All absences belong to existing students.",
+      "cleared": "{count, plural, one {Cleared # absence record.} other {Cleared # absence records.}}",
+      "clearFailed": "Could not clear the absence records.",
+      "noNumbers": "No parent phone numbers to copy.",
+      "copied": "{count, plural, one {Copied # phone number.} other {Copied # phone numbers.}}",
+      "copyBlocked": "Your browser blocked clipboard access. Please copy the numbers manually."
+    },
+    "confirm": {
+      "title": "Clear deleted students' absences?",
+      "description": "{count, plural, one {# absence record belongs to a student who no longer exists. It will be deleted. This cannot be undone.} other {# absence records belong to students who no longer exist. They will be deleted. This cannot be undone.}}",
+      "action": "Delete records"
+    }
+  },
+  "charts": {
+    "byClassTitle": "Students by class",
+    "byClassDescription": "Male and female students per class",
+    "noStudents": "No student data yet.",
+    "teacherLabel": "Ustaz {name}",
+    "statusTitle": "Attendance status",
+    "statusDescription": "Daily attendance for {className} · last 7 days",
+    "classLabel": "Class",
+    "noAttendance": "No attendance recorded for this class yet.",
+    "male": "Male",
+    "female": "Female",
+    "present": "Present",
+    "absent": "Absent",
+    "late": "Late",
+    "excused": "Excused",
+    "total": "Total: {count}",
+    "unassigned": "Unassigned"
+  }
+}

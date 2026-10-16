@@ -1,7 +1,7 @@
 'use client'
 
 import { ProtectedRoute } from '@/components/ProtectedRoute'
-import { TeacherNav } from '@/components/TeacherNav'
+import { RoleShell } from '@/components/shell/RoleShell'
 
 export default function TeacherLayout({
   children,
@@ -10,10 +10,7 @@ export default function TeacherLayout({
 }) {
   return (
     <ProtectedRoute allowedRoles={['teacher']}>
-      <div className="min-h-screen overflow-x-hidden bg-slate-50">
-        <TeacherNav />
-        <main className="container mx-auto px-4 py-8">{children}</main>
-      </div>
+      <RoleShell>{children}</RoleShell>
     </ProtectedRoute>
   )
 }

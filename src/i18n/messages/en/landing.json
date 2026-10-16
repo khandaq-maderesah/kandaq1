@@ -1,0 +1,55 @@
+{
+  "nav": {
+    "signIn": "Sign in"
+  },
+  "hero": {
+    "eyebrow": "School management platform",
+    "title": "Run your whole school from one place",
+    "subtitle": "Khendeq helps schools take attendance, manage students and teachers, run exams and keep parents informed, in the language you prefer.",
+    "cta": "Sign in",
+    "secondary": "See what's included"
+  },
+  "features": {
+    "title": "Everything a school needs",
+    "subtitle": "Simple tools for administrators and teachers, built to work well on any phone.",
+    "attendance": {
+      "title": "Daily attendance",
+      "description": "Teachers mark present, absent or late in seconds. Administrators see the full picture right away."
+    },
+    "students": {
+      "title": "Student records",
+      "description": "Keep every student's class, photo and parent contact details in one tidy place."
+    },
+    "exams": {
+      "title": "Exams and results",
+      "description": "Create exams, enter marks and print clear result sheets for each class."
+    },
+    "parents": {
+      "title": "Parent follow-up",
+      "description": "Students with repeated absences are flagged automatically, with their parent's phone number ready to call."
+    },
+    "reports": {
+      "title": "Reports",
+      "description": "Charts for attendance trends, grades and class sizes help you spot problems early."
+    },
+    "languages": {
+      "title": "Many schools, many languages",
+      "description": "Each school has its own private space, and every user can choose their own language."
+    }
+  },
+  "footer": {
+    "copyright": "© {year} Khendeq. All rights reserved."
+  },
+  "errorPage": {
+    "title": "Something went wrong",
+    "description": "An unexpected error occurred. Please try again.",
+    "retry": "Try again",
+    "home": "Go to home page"
+  },
+  "notFound": {
+    "code": "404",
+    "title": "Page not found",
+    "description": "Sorry, the page you were looking for doesn't exist or has moved.",
+    "home": "Go to home page"
+  }
+}

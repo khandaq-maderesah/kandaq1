@@ -1,0 +1,108 @@
+{
+  "appName": "Khendeq",
+  "appTagline": "School management platform",
+  "actions": {
+    "save": "Save",
+    "saveChanges": "Save changes",
+    "cancel": "Cancel",
+    "close": "Close",
+    "edit": "Edit",
+    "delete": "Delete",
+    "add": "Add",
+    "create": "Create",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "exportCsv": "Export CSV",
+    "print": "Print",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "confirm": "Confirm",
+    "submit": "Submit",
+    "retry": "Try again",
+    "view": "View",
+    "restore": "Restore",
+    "approve": "Approve",
+    "reject": "Reject",
+    "clear": "Clear",
+    "refresh": "Refresh",
+    "upload": "Upload",
+    "remove": "Remove",
+    "showMore": "Show more",
+    "showLess": "Show less",
+    "selectAll": "Select all"
+  },
+  "status": {
+    "loading": "Loading…",
+    "saving": "Saving…",
+    "saved": "Saved",
+    "active": "Active",
+    "inactive": "Inactive",
+    "suspended": "Suspended",
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "cancelled": "Cancelled"
+  },
+  "roles": {
+    "superadmin": "Platform admin",
+    "admin": "School admin",
+    "teacher": "Teacher"
+  },
+  "gender": {
+    "male": "Male",
+    "female": "Female"
+  },
+  "fields": {
+    "name": "Name",
+    "fullName": "Full name",
+    "email": "Email",
+    "phone": "Phone number",
+    "password": "Password",
+    "address": "Address",
+    "date": "Date",
+    "class": "Class",
+    "section": "Section",
+    "status": "Status",
+    "role": "Role",
+    "reason": "Reason",
+    "notes": "Notes",
+    "actions": "Actions",
+    "required": "Required"
+  },
+  "empty": {
+    "noData": "Nothing here yet.",
+    "noResults": "No results match your search."
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "network": "Check your internet connection and try again.",
+    "permission": "You don't have permission to do this.",
+    "required": "This field is required.",
+    "api": {
+      "emailInUse": "An account with this email already exists.",
+      "invalidEmail": "This email address is not valid.",
+      "weakPassword": "The password must be at least 6 characters.",
+      "sessionExpired": "Your session has expired. Please sign in again.",
+      "forbidden": "You don't have permission to do this.",
+      "schoolSuspended": "This school is suspended.",
+      "otherSchool": "You can only manage people in your own school.",
+      "notFound": "This account no longer exists.",
+      "cannotDeleteSelf": "You can't delete your own account.",
+      "invalid": "Some information is missing or not valid.",
+      "generic": "Something went wrong. Please try again."
+    }
+  },
+  "pagination": {
+    "showing": "Showing {from}–{to} of {total}",
+    "page": "Page {page} of {pages}"
+  },
+  "count": {
+    "students": "{count, plural, =0 {No students} one {# student} other {# students}}",
+    "teachers": "{count, plural, =0 {No teachers} one {# teacher} other {# teachers}}",
+    "classes": "{count, plural, =0 {No classes} one {# class} other {# classes}}"
+  },
+  "language": "Language",
+  "today": "Today"
+}

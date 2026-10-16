@@ -1,21 +1,20 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { useAuth } from '@/context/AuthContext'
+import { useTranslations } from 'next-intl'
 import { Smartphone, X, Share } from 'lucide-react'
+import { useAuth } from '@/context/AuthContext'
+import { Button } from '@/components/ui/button'
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>
 }
 
-const IOS_HINTS = [
-  'Tap the Share button in Safari.',
-  'Scroll down and tap "Add to Home Screen".',
-  'Tap "Add" and Khendeq Medresah will appear on your home screen.',
-]
+const IOS_STEPS = ['iosStep1', 'iosStep2', 'iosStep3'] as const
 
 export function InstallAppPrompt() {
+  const t = useTranslations('notifications.install')
   const { user } = useAuth()
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [appInstalled, setAppInstalled] = useState(false)
@@ -42,7 +41,12 @@ export function InstallAppPrompt() {
     const ua = window.navigator.userAgent || ''
     setIsIos(/iphone|ipad|ipod/i.test(ua))
 
-    const saved = storageKey ? sessionStorage.getItem(storageKey) : null
+    let saved: string | null = null
+    try {
+      saved = storageKey ? sessionStorage.getItem(storageKey) : null
+    } catch {
+      /* storage unavailable */
+    }
     if (saved === '1') setDismissed(true)
 
     const onPrompt = (e: Event) => {
@@ -79,7 +83,11 @@ export function InstallAppPrompt() {
 
   const handleDismiss = () => {
     setDismissed(true)
-    if (storageKey) sessionStorage.setItem(storageKey, '1')
+    try {
+      if (storageKey) sessionStorage.setItem(storageKey, '1')
+    } catch {
+      /* storage unavailable */
+    }
   }
 
   // Only show after login, and not when already installed / dismissed.
@@ -88,72 +96,58 @@ export function InstallAppPrompt() {
   if (!deferredPrompt && !isIos) return null
 
   return (
-    <div className="fixed bottom-4 left-1/2 z-50 w-[calc(100%-2rem)] max-w-md -translate-x-1/2">
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/20">
+    <div className="no-print fixed inset-x-4 bottom-4 z-50 mx-auto max-w-md" role="dialog" aria-labelledby="install-app-title">
+      <div className="overflow-hidden rounded-xl border bg-card shadow-lg">
         <div className="flex items-start gap-3 p-4">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/icons/icon-192.png"
-            alt="Khendeq Medresah logo"
-            className="h-12 w-12 shrink-0 rounded-xl object-cover"
-          />
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-slate-900">Install Khendeq Medresah</p>
-            <p className="mt-0.5 text-xs leading-relaxed text-slate-500">
-              {isIos
-                ? 'Add Khendeq Medresah to your home screen to use it like an app.'
-                : 'Install the app on your device for quicker access and offline support.'}
+          <img src="/icons/icon-192.png" alt="" className="h-12 w-12 shrink-0 rounded-xl border object-cover" />
+          <div className="min-w-0 flex-1">
+            <p id="install-app-title" className="text-sm font-semibold text-foreground">
+              {t('title')}
+            </p>
+            <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
+              {isIos ? t('descriptionIos') : t('description')}
             </p>
           </div>
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="icon-sm"
             onClick={handleDismiss}
-            aria-label="Dismiss"
-            className="rounded-md p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
+            aria-label={t('dismiss')}
+            className="-me-1 -mt-1 shrink-0 text-muted-foreground"
           >
-            <X className="h-4 w-4" />
-          </button>
+            <X />
+          </Button>
         </div>
 
         {isIos ? (
-          <div className="border-t border-slate-100 p-4">
+          <div className="border-t p-4">
             {!showIosHints ? (
-              <button
-                type="button"
-                onClick={() => setShowIosHints(true)}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-700"
-              >
-                <Share className="h-4 w-4" /> How to add to home screen
-              </button>
+              <Button type="button" className="w-full" onClick={() => setShowIosHints(true)}>
+                <Share /> {t('iosHowTo')}
+              </Button>
             ) : (
-              <ol className="space-y-1.5 text-xs text-slate-600">
-                {IOS_HINTS.map((hint, i) => (
-                  <li key={i} className="flex gap-2">
-                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green-100 text-[10px] font-bold text-green-700">
+              <ol className="space-y-2 text-sm text-muted-foreground">
+                {IOS_STEPS.map((step, i) => (
+                  <li key={step} className="flex gap-2">
+                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
                       {i + 1}
                     </span>
-                    {hint}
+                    {t(step)}
                   </li>
                 ))}
               </ol>
             )}
           </div>
         ) : (
-          <div className="flex items-center gap-2 border-t border-slate-100 p-3">
-            <button
-              type="button"
-              onClick={handleInstall}
-              className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-700"
-            >
-              <Smartphone className="h-4 w-4" /> Install App
-            </button>
-            <button
-              type="button"
-              onClick={handleDismiss}
-              className="rounded-lg px-4 py-2 text-sm font-medium text-slate-500 transition hover:bg-slate-100"
-            >
-              Not now
-            </button>
+          <div className="flex items-center gap-2 border-t p-3">
+            <Button type="button" className="flex-1" onClick={handleInstall}>
+              <Smartphone /> {t('install')}
+            </Button>
+            <Button type="button" variant="ghost" onClick={handleDismiss} className="text-muted-foreground">
+              {t('notNow')}
+            </Button>
           </div>
         )}
       </div>

@@ -1,0 +1,51 @@
+{
+  "title": "Argama",
+  "description": "Kutaa kamiifuu argama galmeessaa, galmeewwan ilaalaa",
+  "tabs": {
+    "label": "Mul'ata argamaa",
+    "mark": "Argama galmeessi",
+    "records": "Galmeewwan"
+  },
+  "mark": {
+    "class": "Kutaa",
+    "date": "Guyyaa",
+    "ethiopianDate": "Akka Lakkoofsa Habashaa: {date}",
+    "allPresent": "Hundi argame",
+    "allAbsent": "Hundi hafe",
+    "allExcused": "Hundi hayyamaan",
+    "clear": "Qulqulleessi",
+    "noStudents": "Kutaa kana keessa barataan hojii irra jiru hin jiru",
+    "noClasses": "Ammaaf kutaan hin jiru",
+    "progress": "{total} keessaa {marked} mallatteeffame",
+    "save": "Argama olkaa'i",
+    "roll": "Lakk. {roll}",
+    "statusGroup": "Haala argamaa {name}"
+  },
+  "records": {
+    "class": "Kutaa",
+    "allClasses": "Kutaalee hunda",
+    "date": "Guyyaa",
+    "dateHint": "Guyyoota 90 darban agarsiisuuf duwwaa dhiisaa",
+    "title": "Galmeewwan",
+    "count": "{count, plural, one {Galmee tokko} other {Galmee #}}",
+    "empty": "Calallii filatameef galmeen argamaa hin jiru",
+    "table": {
+      "date": "Guyyaa",
+      "student": "Barataa",
+      "class": "Kutaa",
+      "status": "Haala"
+    }
+  },
+  "status": {
+    "present": "Argame",
+    "absent": "Hafe",
+    "late": "Booda dhufe",
+    "excused": "Hayyamaan"
+  },
+  "toast": {
+    "saved": "Argamni olkaa'ameera",
+    "saveFailed": "Argama olkaa'uun hin danda'amne",
+    "loadFailed": "Odeeffannoo argamaa fe'uun hin danda'amne",
+    "studentsFailed": "Barattoota fe'uun hin danda'amne"
+  }
+}

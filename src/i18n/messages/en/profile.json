@@ -1,0 +1,37 @@
+{
+  "title": "My profile",
+  "description": "View and update your account details.",
+  "account": {
+    "title": "Account",
+    "email": "Email",
+    "role": "Role",
+    "school": "School"
+  },
+  "details": {
+    "title": "Personal details",
+    "description": "Update your name and phone number.",
+    "saved": "Profile updated.",
+    "failed": "Couldn't update your profile. Please try again."
+  },
+  "language": {
+    "title": "Language",
+    "description": "Choose the language for menus and screens. It's saved to your account.",
+    "label": "Display language",
+    "saved": "Language updated.",
+    "failed": "Couldn't save your language to your account. It still applies on this device."
+  },
+  "password": {
+    "title": "Change password",
+    "description": "Update the password you use to sign in.",
+    "current": "Current password",
+    "new": "New password",
+    "newHint": "At least 6 characters",
+    "confirm": "Confirm new password",
+    "update": "Update password",
+    "updated": "Password updated.",
+    "tooShort": "The new password must be at least 6 characters.",
+    "mismatch": "The new passwords don't match.",
+    "wrongCurrent": "Your current password is incorrect.",
+    "failed": "Couldn't update your password. Please try again."
+  }
+}

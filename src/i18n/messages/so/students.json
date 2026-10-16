@@ -1,0 +1,61 @@
+{
+  "avatar": {
+    "photoOf": "Sawirka {name}",
+    "photo": "Sawirka ardayga"
+  },
+  "photo": {
+    "capturedAlt": "Sawirka ardayga ee la qaaday",
+    "retake": "Dib u qaad sawirka",
+    "remove": "Ka saar sawirka",
+    "frontCamera": "Kamarada hore",
+    "backCamera": "Kamarada dambe",
+    "take": "Qaad sawir",
+    "flip": "Beddel kamarada",
+    "upload": "Ka soo geli gallery-ga",
+    "hint": "Isticmaal kamarada hore (selfie) ama tan dambe, oo riix Beddel kamarada si aad u kala beddesho. Sawirka dib ayaad u qaadi kartaa inta aad rabto ka hor intaadan kaydin.",
+    "cameraUnavailable": "Kamaradu ma shaqaynayso. U oggolow boggan inuu isticmaalo kamarada, ama sawir ka soo geli gallery-gaaga.",
+    "notImage": "Fadlan dooro fayl sawir ah."
+  },
+  "detail": {
+    "title": "Faahfaahinta ardayga",
+    "viewPhoto": "Eeg sawirka",
+    "closePhoto": "Xir sawirka",
+    "classNotAssigned": "Fasal looma qoondayn",
+    "classWithSection": "{name} · Qaybta {section}",
+    "roll": "Lambar {roll}",
+    "rollNumber": "Lambarka taxanaha",
+    "age": "Da'da",
+    "gender": "Jinsiga",
+    "class": "Fasalka",
+    "section": "Qaybta",
+    "studentId": "Aqoonsiga ardayga",
+    "parentLanguage": "Luqadda waalidka",
+    "phoneHeading": "Taleefanka",
+    "parentPhone": "Taleefanka waalidka",
+    "alternativePhone": "Taleefan kale",
+    "registrationHeading": "Diiwaangelinta",
+    "registeredOn": "La diiwaangeliyay",
+    "lastUpdated": "Markii ugu dambaysay la cusboonaysiiyay",
+    "createdBy": "Waxaa diiwaangeliyay",
+    "ustaz": "Ustaad {name}",
+    "systemRecovered": "Nidaamka (si toos ah loo soo celiyay)",
+    "admin": "Maamulaha",
+    "attendanceHeading": "Taariikhda xaadiriska",
+    "noAttendance": "Weli ardaygan diiwaan xaadiris ma laha.",
+    "calendarFilter": "Ku shaandhee kalandarka Itoobiya",
+    "ethYear": "Sannadka Itoobiya",
+    "ethMonth": "Bisha Itoobiya",
+    "allYear": "Sannadka oo dhan",
+    "noAttendanceInPeriod": "Xaadiris lagama diiwaangelin muddada Itoobiya ee la doortay.",
+    "records": "{count, plural, one {diiwaan} other {diiwaan}}",
+    "ethiopianSuffix": "{date} (Itoobiya)",
+    "legendItem": "{status}: {count}",
+    "callParent": "Wac waalidka",
+    "status": {
+      "present": "Jooga",
+      "absent": "Maqan",
+      "late": "Daahay",
+      "excused": "Fasax"
+    }
+  }
+}

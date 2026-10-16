@@ -1,0 +1,36 @@
+{
+  "title": "My students",
+  "description": "Students in your assigned classes. To delete or move a student, send a request to the school admin.",
+  "filters": {
+    "search": "Search students",
+    "searchPlaceholder": "Name, roll number or phone",
+    "class": "Class",
+    "allClasses": "All my classes"
+  },
+  "table": {
+    "photo": "Photo",
+    "student": "Student",
+    "roll": "Roll",
+    "age": "Age",
+    "class": "Class",
+    "gender": "Gender",
+    "parentPhone": "Parent phone",
+    "alternativePhone": "Alternative phone",
+    "actions": "Actions"
+  },
+  "card": {
+    "roll": "Roll {roll}",
+    "age": "{age, plural, one {# year} other {# years}}"
+  },
+  "viewDetails": "View details for {name}",
+  "callNumber": "Call {phone}",
+  "empty": {
+    "noClasses": "No classes have been assigned to you yet.",
+    "noClassesHint": "Ask a school admin to assign you a class.",
+    "noStudents": "No students found.",
+    "noStudentsHint": "Add students from My classes."
+  },
+  "toast": {
+    "loadFailed": "Could not load your students."
+  }
+}

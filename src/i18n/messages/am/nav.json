@@ -1,0 +1,30 @@
+{
+  "dashboard": "ዳሽቦርድ",
+  "schools": "ትምህርት ቤቶች",
+  "allSchools": "ሁሉም ትምህርት ቤቶች",
+  "users": "ተጠቃሚዎች",
+  "teachers": "መምህራን",
+  "classes": "ክፍሎች",
+  "students": "ተማሪዎች",
+  "attendance": "መገኘት",
+  "takeAttendance": "መገኘት መዝግብ",
+  "history": "ታሪክ",
+  "results": "ውጤቶች",
+  "exams": "ፈተናዎችና ውጤቶች",
+  "reports": "ሪፖርቶች",
+  "requests": "ጥያቄዎች",
+  "myRequests": "የእኔ ጥያቄዎች",
+  "settings": "ቅንብሮች",
+  "profile": "መገለጫ",
+  "signOut": "ውጣ",
+  "openMenu": "ምናሌ ክፈት",
+  "closeMenu": "ምናሌ ዝጋ",
+  "notifications": "ማሳወቂያዎች",
+  "switchSchool": "ትምህርት ቤት ቀይር",
+  "sections": {
+    "overview": "አጠቃላይ እይታ",
+    "people": "ሰዎች",
+    "academics": "ትምህርት",
+    "administration": "አስተዳደር"
+  }
+}

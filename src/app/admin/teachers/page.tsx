@@ -1,51 +1,145 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { useTranslations } from 'next-intl'
+import { toast } from 'sonner'
+import {
+  ChevronLeft,
+  ChevronRight,
+  Download,
+  GraduationCap,
+  Loader2,
+  MoreHorizontal,
+  Pencil,
+  Plus,
+  Power,
+  Search,
+  Trash2,
+  UserPlus,
+} from 'lucide-react'
 import { auth } from '@/lib/firebase/config'
 import { rtdb } from '@/lib/database'
+import { useLiveData } from '@/lib/dataStore'
+import { exportToCsv, dateStamp } from '@/lib/exportCsv'
+import type { User, Class } from '@/types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { User as UserIcon, Mail, Phone, Loader2, Plus, Shield, Search, Download, GraduationCap, Trash2, Pencil, X } from 'lucide-react'
-import { Pagination } from '@/components/Pagination'
-import type { User, Class } from '@/types'
-import { useLiveData } from '@/lib/dataStore'
-import { exportToCsv, dateStamp } from '@/lib/exportCsv'
+import { Select } from '@/components/ui/select'
+import { Badge } from '@/components/ui/badge'
+import { Skeleton } from '@/components/ui/skeleton'
+import { EmptyState, PageHeader, TableContainer } from '@/components/ui/page'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { apiErrorKey, TranslatedError } from '@/lib/apiErrors'
+
+const PER_PAGE = 10
+
+type StaffRole = 'admin' | 'teacher'
+
+const classLabel = (c: Class) => `${c.name}${c.section ? ` · ${c.section}` : ''}${c.grade ? ` (${c.grade})` : ''}`
+
+/** Checkbox list of classes (create form + assignment dialog). */
+function ClassChecklist({
+  classes,
+  selected,
+  onChange,
+  currentUid,
+  teacherNames,
+}: {
+  classes: Class[]
+  selected: string[]
+  onChange: (ids: string[]) => void
+  currentUid?: string
+  teacherNames: Record<string, string>
+}) {
+  const t = useTranslations('adminTeachers')
+  if (classes.length === 0) {
+    return <p className="rounded-lg bg-muted p-3 text-sm text-muted-foreground">{t('form.noClassesYet')}</p>
+  }
+  return (
+    <div className="max-h-64 divide-y overflow-y-auto rounded-lg border">
+      {classes.map((c) => {
+        const checked = selected.includes(c.id)
+        const otherTeacher = c.teacherId && c.teacherId !== currentUid
+        const id = `cls-${currentUid ?? 'new'}-${c.id}`
+        return (
+          <label key={c.id} htmlFor={id} className="flex min-h-11 cursor-pointer items-center gap-3 px-3 py-2 text-sm hover:bg-muted/50">
+            <input
+              id={id}
+              type="checkbox"
+              checked={checked}
+              onChange={() => onChange(checked ? selected.filter((x) => x !== c.id) : [...selected, c.id])}
+              className="h-4 w-4 shrink-0 rounded border-input accent-[hsl(var(--primary))]"
+            />
+            <span className="min-w-0 flex-1 truncate text-foreground">{classLabel(c)}</span>
+            {otherTeacher && (
+              <span className="shrink-0 text-xs text-muted-foreground">
+                {c.teacherId && teacherNames[c.teacherId]
+                  ? t('assign.currentlyAssigned', { name: teacherNames[c.teacherId] })
+                  : t('assign.currentlyAssignedOther')}
+              </span>
+            )}
+          </label>
+        )
+      })}
+    </div>
+  )
+}
 
 export default function TeachersPage() {
+  const t = useTranslations('adminTeachers')
+  const tc = useTranslations('common')
+
   const [teachers, setTeachers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
+  const [roleFilter, setRoleFilter] = useState<'' | StaffRole>('')
+  const [page, setPage] = useState(1)
+
+  // Create form
+  const [createOpen, setCreateOpen] = useState(false)
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [password, setPassword] = useState('')
-  const [role, setRole] = useState<'admin' | 'teacher'>('teacher')
-  const [classes, setClasses] = useState<Class[]>([])
+  const [role, setRole] = useState<StaffRole>('teacher')
   const [selectedClasses, setSelectedClasses] = useState<string[]>([])
+  const [saving, setSaving] = useState(false)
+
+  // Assignment edit
   const [editingTeacher, setEditingTeacher] = useState<User | null>(null)
   const [editingClassIds, setEditingClassIds] = useState<string[]>([])
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
-  const [saving, setSaving] = useState(false)
-  const [search, setSearch] = useState('')
-  const [page, setPage] = useState(1)
-  const perPage = 10
+
+  // Delete
+  const [deleting, setDeleting] = useState<User | null>(null)
+  const [deleteBusy, setDeleteBusy] = useState(false)
 
   const loadTeachers = async () => {
-    setLoading(true)
     try {
       const users = await rtdb.getAllUsers()
       setTeachers(users.filter((u) => u.role === 'teacher' || u.role === 'admin'))
     } catch {
-      setError('Could not load users. Publish database.rules.json in Firebase (Realtime Database > Rules) so admins can read the users list, then refresh.')
+      toast.error(t('toast.loadError'))
     } finally {
       setLoading(false)
     }
   }
 
-  // Live updates via the shared store (the admin nav bells already keep these
+  // Live updates via the shared store (the shell's bells already keep these
   // channels open, so this page adds no extra downloads).
   const storeUsers = useLiveData<User[]>('users', (emit) => rtdb.subscribeToUsers(emit))
   const storeClasses = useLiveData<Class[]>('classes', (emit) => rtdb.subscribeToClasses(emit))
@@ -56,16 +150,61 @@ export default function TeachersPage() {
       setLoading(false)
     }
   }, [storeUsers.data])
+  const classes = useMemo(() => storeClasses.data?.filter((c) => c.isActive) ?? [], [storeClasses.data])
+
+  const teacherNames = useMemo(() => {
+    const m: Record<string, string> = {}
+    teachers.forEach((u) => {
+      m[u.uid] = u.name
+    })
+    return m
+  }, [teachers])
+
+  const classesByTeacher = useMemo(() => {
+    const m: Record<string, Class[]> = {}
+    classes.forEach((c) => {
+      if (c.teacherId) (m[c.teacherId] ||= []).push(c)
+    })
+    return m
+  }, [classes])
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    return teachers.filter((u) => {
+      if (roleFilter && u.role !== roleFilter) return false
+      if (!q) return true
+      return (
+        u.name.toLowerCase().includes(q) ||
+        u.email.toLowerCase().includes(q) ||
+        (u.phone || '').toLowerCase().includes(q)
+      )
+    })
+  }, [teachers, search, roleFilter])
+
   useEffect(() => {
-    setClasses(storeClasses.data?.filter((c) => c.isActive) ?? [])
-  }, [storeClasses.data])
+    setPage(1)
+  }, [search, roleFilter])
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE))
+  const paginated = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE)
+  const myUid = auth.currentUser?.uid
+
+  // Only messages we translated ourselves are shown; anything else (network, SDK) gets the generic text.
+  const errorText = (err: unknown) => (err instanceof TranslatedError ? err.message : tc('errors.generic'))
+
+  const openCreate = () => {
+    setName('')
+    setEmail('')
+    setPhone('')
+    setPassword('')
+    setRole('teacher')
+    setSelectedClasses([])
+    setCreateOpen(true)
+  }
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError('')
-    setSuccess('')
     setSaving(true)
-
     try {
       const idToken = await auth.currentUser?.getIdToken()
       const res = await fetch('/api/admin/users', {
@@ -85,80 +224,69 @@ export default function TeachersPage() {
         }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Failed to create user')
-      setSuccess(
-        role === 'admin'
-          ? 'Admin account created successfully'
-          : 'Teacher account created successfully'
-      )
-      setName('')
-      setEmail('')
-      setPhone('')
-      setPassword('')
-      setRole('teacher')
-      setSelectedClasses([])
+      if (!res.ok) throw new TranslatedError(tc(`errors.api.${apiErrorKey(data)}`))
+      toast.success(role === 'admin' ? t('toast.adminCreated') : t('toast.teacherCreated'))
+      setCreateOpen(false)
       await loadTeachers()
-    } catch (err: any) {
-      setError(err.message || 'Failed to create teacher')
+    } catch (err) {
+      toast.error(errorText(err))
     } finally {
       setSaving(false)
     }
   }
 
-  const toggleStatus = async (t: User) => {
+  const toggleStatus = async (u: User) => {
+    const next = u.status === 'active' ? 'inactive' : 'active'
     try {
-      await rtdb.updateUser(t.uid, {
-        status: t.status === 'active' ? 'inactive' : 'active',
+      await rtdb.updateUser(u.uid, {
+        status: next,
         updatedAt: new Date().toISOString(),
       })
+      toast.success(next === 'active' ? t('toast.activated', { name: u.name }) : t('toast.deactivated', { name: u.name }))
       await loadTeachers()
-    } catch (err: any) {
-      setError(err.message || 'Failed to update status')
+    } catch (err) {
+      toast.error(errorText(err))
     }
   }
 
-    const startAssignmentEdit = (t: User) => {
-      setEditingTeacher(t)
-      setEditingClassIds(classes.filter((c) => c.teacherId === t.uid).map((c) => c.id))
-      setError('')
-      setSuccess('')
-    }
+  const startAssignmentEdit = (u: User) => {
+    setEditingTeacher(u)
+    setEditingClassIds(classes.filter((c) => c.teacherId === u.uid).map((c) => c.id))
+  }
 
-    const handleAssignmentSave = async () => {
-      if (!editingTeacher) return
-      setSaving(true)
-      setError('')
-      setSuccess('')
-      try {
-        const idToken = await auth.currentUser?.getIdToken()
-        const res = await fetch(`/api/admin/users/${editingTeacher.uid}`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${idToken}`,
-          },
-          body: JSON.stringify({ assignedClassIds: editingClassIds }),
-        })
-        const data = await res.json()
-        if (!res.ok) throw new Error(data.error || 'Failed to update assignments')
-        setSuccess(`Classes assigned to ${editingTeacher.name} successfully.`)
-        setEditingTeacher(null)
-        await loadTeachers()
-      } catch (err: any) {
-        setError(err.message || 'Failed to update assignments')
-      } finally {
-        setSaving(false)
-      }
-    }
-
-  // Permanently delete a user via the admin-only server route.
-  const handleDelete = async (t: User) => {
-    if (!window.confirm(`Delete ${t.name} (${t.email})? This cannot be undone.`)) return
-    setError('')
-    setSuccess('')
+  const handleAssignmentSave = async () => {
+    if (!editingTeacher) return
+    setSaving(true)
     try {
       const idToken = await auth.currentUser?.getIdToken()
-      const res = await fetch(`/api/admin/users/${t.uid}`, {
+      const res = await fetch(`/api/admin/users/${editingTeacher.uid}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${idToken}`,
+        },
+        body: JSON.stringify({ assignedClassIds: editingClassIds }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new TranslatedError(tc(`errors.api.${apiErrorKey(data)}`))
+      toast.success(t('toast.assigned', { name: editingTeacher.name }))
+      setEditingTeacher(null)
+      await loadTeachers()
+    } catch (err) {
+      toast.error(errorText(err))
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  // Permanently delete a user via the admin-only server route.
+  const confirmDelete = async () => {
+    const u = deleting
+    if (!u) return
+    setDeleteBusy(true)
+    try {
+      const idToken = await auth.currentUser?.getIdToken()
+      const res = await fetch(`/api/admin/users/${u.uid}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${idToken}` },
       })
@@ -166,325 +294,391 @@ export default function TeachersPage() {
       try {
         data = await res.json()
       } catch {
-        data = {
-          error: `Server returned an unexpected response (${res.status}). If this just appeared, the latest code may not be deployed yet — please refresh and redeploy with \`vercel --prod\`.`,
-        }
+        data = { error: t('toast.unexpectedResponse', { status: res.status }) }
       }
-      if (!res.ok) throw new Error(data.error || 'Failed to delete user')
-      setSuccess(`User ${t.name} deleted.`)
+      if (!res.ok) throw new TranslatedError(tc(`errors.api.${apiErrorKey(data)}`))
+      toast.success(t('toast.deleted', { name: u.name }))
+      setDeleting(null)
       await loadTeachers()
-    } catch (err: any) {
-      setError(err.message || 'Failed to delete user')
+    } catch (err) {
+      toast.error(errorText(err))
+    } finally {
+      setDeleteBusy(false)
     }
   }
-  const filtered = teachers.filter((t) => {
-    const q = search.trim().toLowerCase()
-    if (!q) return true
-    return (
-      t.name.toLowerCase().includes(q) ||
-      t.email.toLowerCase().includes(q) ||
-      (t.phone || '').toLowerCase().includes(q)
-    )
-  })
 
-  useEffect(() => {
-    setPage(1)
-  }, [search])
-
-  const totalPages = Math.max(1, Math.ceil(filtered.length / perPage))
-  const paginated = filtered.slice((page - 1) * perPage, page * perPage)
+  const roleLabel = (r: string) => (r === 'admin' ? tc('roles.admin') : r === 'teacher' ? tc('roles.teacher') : r)
+  const statusLabel = (s: string) => (s === 'active' ? tc('status.active') : tc('status.inactive'))
 
   const handleExport = () => {
     exportToCsv(
       `users-${dateStamp()}.csv`,
-      ['Name', 'Email', 'Role', 'Phone', 'Status'],
-      filtered.map((u) => [u.name, u.email, u.role, u.phone || '', u.status])
+      [t('csv.name'), t('csv.email'), t('csv.role'), t('csv.phone'), t('csv.status')],
+      filtered.map((u) => [u.name, u.email, roleLabel(u.role), u.phone || '', statusLabel(u.status)])
     )
   }
 
-if (loading) {
-    return (
-      <div className="flex items-center justify-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-green-600" />
-      </div>
-    )
-  }
+  const renderActions = (u: User) => (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" aria-label={t('actions.more', { name: u.name })}>
+          <MoreHorizontal />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        {u.role === 'teacher' && (
+          <DropdownMenuItem onSelect={() => startAssignmentEdit(u)}>
+            <Pencil /> {t('actions.editClasses')}
+          </DropdownMenuItem>
+        )}
+        <DropdownMenuItem onSelect={() => toggleStatus(u)}>
+          <Power /> {u.status === 'active' ? t('actions.deactivate') : t('actions.activate')}
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          disabled={u.uid === myUid}
+          onSelect={() => setDeleting(u)}
+          className="text-destructive focus:text-destructive [&_svg]:text-destructive"
+        >
+          <Trash2 /> {u.uid === myUid ? t('actions.cannotDeleteSelf') : t('actions.delete')}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+
+  const roleBadge = (r: string) => (
+    <Badge variant={r === 'admin' ? 'default' : 'secondary'}>{roleLabel(r)}</Badge>
+  )
+  const statusBadge = (s: string) => (
+    <Badge variant={s === 'active' ? 'success' : 'secondary'}>{statusLabel(s)}</Badge>
+  )
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Users Management</h1>
-        <p className="text-gray-600 mt-1">Create and manage admin and teacher accounts</p>
+    <div>
+      <PageHeader
+        title={t('title')}
+        description={t('description')}
+        actions={
+          <>
+            <Button variant="outline" onClick={handleExport} disabled={filtered.length === 0}>
+              <Download /> {tc('actions.exportCsv')}
+            </Button>
+            <Button onClick={openCreate}>
+              <UserPlus /> {t('add')}
+            </Button>
+          </>
+        }
+      />
+
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="relative w-full sm:max-w-xs">
+          <Label htmlFor="user-search" className="sr-only">
+            {t('searchLabel')}
+          </Label>
+          <Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            id="user-search"
+            type="search"
+            placeholder={t('searchPlaceholder')}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="ps-9"
+          />
+        </div>
+        <div className="w-full sm:w-44">
+          <Label htmlFor="user-role-filter" className="sr-only">
+            {t('roleFilter')}
+          </Label>
+          <Select id="user-role-filter" value={roleFilter} onChange={(e) => setRoleFilter(e.target.value as '' | StaffRole)}>
+            <option value="">{t('allRoles')}</option>
+            <option value="teacher">{tc('roles.teacher')}</option>
+            <option value="admin">{tc('roles.admin')}</option>
+          </Select>
+        </div>
+        {!loading && (
+          <p className="text-sm text-muted-foreground sm:ms-auto">
+            {t('summary', { shown: filtered.length, total: teachers.length })}
+          </p>
+        )}
       </div>
 
-      {error && (
-        <Alert variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-      {success && (
-        <Alert variant="success">
-          <AlertDescription>{success}</AlertDescription>
-        </Alert>
+      {loading ? (
+        <div className="space-y-2">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Skeleton key={i} className="h-14 w-full rounded-xl" />
+          ))}
+        </div>
+      ) : filtered.length === 0 ? (
+        search || roleFilter ? (
+          <EmptyState icon={Search} title={t('empty.search')} />
+        ) : (
+          <EmptyState
+            icon={UserPlus}
+            title={t('empty.title')}
+            description={t('empty.description')}
+            action={
+              <Button onClick={openCreate}>
+                <Plus /> {t('add')}
+              </Button>
+            }
+          />
+        )
+      ) : (
+        <>
+          {/* Mobile: stacked cards */}
+          <ul className="space-y-3 md:hidden">
+            {paginated.map((u) => {
+              const assigned = classesByTeacher[u.uid] ?? []
+              return (
+                <li key={u.uid} className="rounded-xl border bg-card p-4 shadow-sm">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="truncate font-medium text-foreground">
+                        {u.name}
+                        {u.uid === myUid && <span className="ms-1.5 text-xs text-muted-foreground">({t('you')})</span>}
+                      </p>
+                      <p className="truncate text-sm text-muted-foreground" dir="ltr">
+                        {u.email}
+                      </p>
+                      {u.phone && (
+                        <p className="text-sm text-muted-foreground" dir="ltr">
+                          {u.phone}
+                        </p>
+                      )}
+                    </div>
+                    {renderActions(u)}
+                  </div>
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    {roleBadge(u.role)}
+                    {statusBadge(u.status)}
+                    {u.role === 'teacher' && (
+                      <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                        <GraduationCap className="h-3.5 w-3.5" /> {t('classCount', { count: assigned.length })}
+                      </span>
+                    )}
+                  </div>
+                </li>
+              )
+            })}
+          </ul>
+
+          {/* Desktop: table */}
+          <TableContainer className="hidden md:block">
+            <thead>
+              <tr>
+                <th>{t('table.name')}</th>
+                <th>{t('table.email')}</th>
+                <th>{t('table.role')}</th>
+                <th>{t('table.classes')}</th>
+                <th>{t('table.phone')}</th>
+                <th>{t('table.status')}</th>
+                <th className="text-end">{t('table.actions')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {paginated.map((u) => {
+                const assigned = classesByTeacher[u.uid] ?? []
+                return (
+                  <tr key={u.uid}>
+                    <td className="font-medium text-foreground">
+                      {u.name}
+                      {u.uid === myUid && <span className="ms-1.5 text-xs font-normal text-muted-foreground">({t('you')})</span>}
+                    </td>
+                    <td>
+                      <span dir="ltr">{u.email}</span>
+                    </td>
+                    <td>
+                      {roleBadge(u.role)}
+                    </td>
+                    <td className="max-w-[16rem]">
+                      {u.role !== 'teacher' ? (
+                        <span className="text-muted-foreground">—</span>
+                      ) : assigned.length === 0 ? (
+                        <span className="text-muted-foreground">{t('noClasses')}</span>
+                      ) : (
+                        <span className="line-clamp-2 text-sm" title={assigned.map(classLabel).join(', ')}>
+                          {assigned.map((c) => (c.section ? `${c.name} · ${c.section}` : c.name)).join(', ')}
+                        </span>
+                      )}
+                    </td>
+                    <td>{u.phone ? <span dir="ltr">{u.phone}</span> : '—'}</td>
+                    <td>
+                      {statusBadge(u.status)}
+                    </td>
+                    <td>
+                      <div className="flex justify-end">
+                        {renderActions(u)}
+                      </div>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </TableContainer>
+
+          <Pager page={page} totalPages={totalPages} total={filtered.length} onPage={setPage} />
+        </>
       )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Plus className="h-5 w-5" /> Add New User
-          </CardTitle>
-          <CardDescription>Create an admin or teacher account with login credentials</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleCreate} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* Create user */}
+      <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+        <DialogContent className="max-w-xl">
+          <form onSubmit={handleCreate} className="grid gap-4">
+            <DialogHeader>
+              <DialogTitle>{t('form.createTitle')}</DialogTitle>
+              <DialogDescription>{t('form.createDescription')}</DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
-                <div className="relative">
-                  <UserIcon className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input id="name" placeholder="Teacher name" value={name} onChange={(e) => setName(e.target.value)} className="pl-10" required />
-                </div>
+                <Label htmlFor="user-name">{t('form.name')}</Label>
+                <Input id="user-name" placeholder={t('form.namePlaceholder')} value={name} onChange={(e) => setName(e.target.value)} required />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input id="email" type="email" placeholder="teacher@school.com" value={email} onChange={(e) => setEmail(e.target.value)} className="pl-10" required />
-                </div>
+                <Label htmlFor="user-email">{t('form.email')}</Label>
+                <Input
+                  id="user-email"
+                  type="email"
+                  dir="ltr"
+                  autoComplete="off"
+                  placeholder={t('form.emailPlaceholder')}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="phone">Phone</Label>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input id="phone" placeholder="Phone number (optional)" value={phone} onChange={(e) => setPhone(e.target.value)} className="pl-10" />
-                </div>
+                <Label htmlFor="user-phone">{t('form.phone')}</Label>
+                <Input
+                  id="user-phone"
+                  type="tel"
+                  dir="ltr"
+                  placeholder={t('form.phonePlaceholder')}
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Temporary Password</Label>
-                <Input id="password" type="password" placeholder="Minimum 6 characters" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                <Label htmlFor="user-password">{t('form.password')}</Label>
+                <Input
+                  id="user-password"
+                  type="password"
+                  autoComplete="new-password"
+                  minLength={6}
+                  placeholder={t('form.passwordPlaceholder')}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
               </div>
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="role">Role</Label>
-                <select
-                  id="role"
-                  value={role}
-                  onChange={(e) => setRole(e.target.value as 'admin' | 'teacher')}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                >
-                  <option value="teacher">Teacher</option>
-                  <option value="admin">Admin</option>
-                </select>
-                <p className="text-xs text-gray-500">Admins have full access and can manage other users.</p>
+              <div className="space-y-2 sm:col-span-2">
+                <Label htmlFor="user-role">{t('form.role')}</Label>
+                <Select id="user-role" value={role} onChange={(e) => setRole(e.target.value as StaffRole)}>
+                  <option value="teacher">{tc('roles.teacher')}</option>
+                  <option value="admin">{tc('roles.admin')}</option>
+                </Select>
+                <p className="text-xs text-muted-foreground">{t('form.roleHint')}</p>
               </div>
             </div>
             {role === 'teacher' && (
               <div className="space-y-2">
-                <Label className="flex items-center gap-1.5">
-                  <GraduationCap className="h-4 w-4 text-gray-400" /> Assign Classes (Grade • Section)
-                </Label>
-                <div className="max-h-40 space-y-1 overflow-y-auto rounded-md border border-input p-3">
-                  {classes.length === 0 ? (
-                    <p className="text-sm text-gray-500">No classes created yet. Create classes first, then assign the teacher.</p>
-                  ) : (
-                    classes.map((c) => {
-                      const checked = selectedClasses.includes(c.id)
-                      return (
-                        <label key={c.id} className="flex items-center gap-2 text-sm">
-                          <input
-                            type="checkbox"
-                            checked={checked}
-                            onChange={() =>
-                              setSelectedClasses((prev) =>
-                                checked ? prev.filter((x) => x !== c.id) : [...prev, c.id]
-                              )
-                            }
-                            className="h-4 w-4 rounded border-gray-300 text-green-600"
-                          />
-                          {c.name}
-                          {c.section ? ` • ${c.section}` : ''}
-                          {c.grade ? ` (${c.grade})` : ''}
-                        </label>
-                      )
-                    })
-                  )}
-                </div>
-              </div>
-            )}
-            <Button type="submit" disabled={saving}>
-              {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Plus className="h-4 w-4 mr-2" />}
-              Create User
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
-<Card>
-        <CardHeader className="space-y-3">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5" /> Users List ({filtered.length} / {teachers.length})
-            </CardTitle>
-            <div className="flex items-center gap-2">
-              <div className="relative w-full sm:w-64">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder="Search by name, email or phone..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="pl-10"
+                <p className="text-sm font-medium text-foreground">{t('form.classes')}</p>
+                <p className="text-xs text-muted-foreground">{t('form.classesHint')}</p>
+                <ClassChecklist
+                  classes={classes}
+                  selected={selectedClasses}
+                  onChange={setSelectedClasses}
+                  teacherNames={teacherNames}
                 />
               </div>
-              <Button type="button" variant="outline" onClick={handleExport} disabled={filtered.length === 0}>
-                <Download className="h-4 w-4 mr-2" /> Export CSV
+            )}
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setCreateOpen(false)}>
+                {tc('actions.cancel')}
               </Button>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {filtered.length === 0 ? (
-            <p className="text-gray-500 text-center py-8">
-              {search ? 'No users match your search.' : 'No users yet. Add your first user above.'}
-            </p>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm border-collapse border border-gray-200 [&_th]:border [&_th]:border-gray-200 [&_td]:border [&_td]:border-gray-200">
-                <thead>
-                  <tr className="border-b text-left text-gray-500">
-                    <th className="pb-3 pr-4 font-medium">Name</th>
-                    <th className="pb-3 pr-4 font-medium">Email</th>
-                    <th className="pb-3 pr-4 font-medium">Role</th>
-                    <th className="pb-3 pr-4 font-medium">Phone</th>
-                    <th className="pb-3 pr-4 font-medium">Status</th>
-                    <th className="pb-3 font-medium">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {paginated.map((t) => (
-                    <tr key={t.uid} className="border-b last:border-0">
-                      <td className="py-3 pr-4 font-medium">{t.name}</td>
-                      <td className="py-3 pr-4">{t.email}</td>
-                      <td className="py-3 pr-4">
-                        <span
-                          className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
-                            t.role === 'admin' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
-                          }`}
-                        >
-                          {t.role}
-                        </span>
-                      </td>
-                      <td className="py-3 pr-4">{t.phone || '—'}</td>
-                      <td className="py-3 pr-4">
-                        <span
-                          className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
-                            t.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'
-                          }`}
-                        >
-                          {t.status}
-                        </span>
-                      </td>
-                      <td className="py-3">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => startAssignmentEdit(t)}
-                            disabled={t.role !== 'teacher'}
-                            title={t.role === 'teacher' ? 'Edit assigned classes' : 'Admins do not have class assignments'}
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => toggleStatus(t)}
-                          >
-                            {t.status === 'active' ? 'Deactivate' : 'Activate'}
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            disabled={t.uid === auth.currentUser?.uid}
-                            onClick={() => handleDelete(t)}
-                            title={t.uid === auth.currentUser?.uid ? 'You cannot delete your own account' : 'Delete user'}
-                          >
-                            <Trash2 className="h-4 w-4 text-red-500" />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-          <Pagination page={page} totalPages={totalPages} totalItems={filtered.length} onPageChange={setPage} />
-        </CardContent>
-      </Card>
+              <Button type="submit" disabled={saving}>
+                {saving && <Loader2 className="animate-spin" />}
+                {t('form.create')}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
-      {editingTeacher && (
-        <div
-          className="fixed inset-0 z-40 flex items-center justify-center bg-black/50 p-4"
-          onClick={() => setEditingTeacher(null)}
-        >
-          <Card className="w-full max-w-lg border-0 shadow-2xl" onClick={(e) => e.stopPropagation()}>
-            <CardHeader className="relative">
-              <button
-                type="button"
-                aria-label="Close"
-                className="absolute right-4 top-4 text-gray-400 transition hover:text-gray-600"
-                onClick={() => setEditingTeacher(null)}
-              >
-                <X className="h-5 w-5" />
-              </button>
-              <CardTitle>Edit Assigned Classes</CardTitle>
-              <CardDescription>
-                Select the classes currently taught by {editingTeacher.name}. Existing student records stay in their classes.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="max-h-64 space-y-1 overflow-y-auto rounded-md border border-input p-3">
-                {classes.length === 0 ? (
-                  <p className="text-sm text-gray-500">No classes created yet.</p>
-                ) : (
-                  classes.map((c) => {
-                    const checked = editingClassIds.includes(c.id)
-                    return (
-                      <label key={c.id} className="flex items-center gap-2 text-sm">
-                        <input
-                          type="checkbox"
-                          checked={checked}
-                          onChange={() =>
-                            setEditingClassIds((prev) =>
-                              checked ? prev.filter((id) => id !== c.id) : [...prev, c.id]
-                            )
-                          }
-                          className="h-4 w-4 rounded border-gray-300 text-green-600"
-                        />
-                        <span>
-                          {c.name}
-                          {c.section ? ` • ${c.section}` : ''}
-                          {c.grade ? ` (${c.grade})` : ''}
-                        </span>
-                        {c.teacherId && c.teacherId !== editingTeacher.uid && (
-                          <span className="ml-auto text-xs text-gray-400">Currently assigned</span>
-                        )}
-                      </label>
-                    )
-                  })
-                )}
-              </div>
-              <div className="flex justify-end gap-2">
-                <Button type="button" variant="outline" onClick={() => setEditingTeacher(null)}>
-                  Cancel
-                </Button>
-                <Button type="button" onClick={handleAssignmentSave} disabled={saving}>
-                  {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Save Assignments
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+      {/* Edit class assignments */}
+      <Dialog open={!!editingTeacher} onOpenChange={(o) => !o && setEditingTeacher(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('assign.title')}</DialogTitle>
+            <DialogDescription>{t('assign.description', { name: editingTeacher?.name ?? '' })}</DialogDescription>
+          </DialogHeader>
+          <ClassChecklist
+            classes={classes}
+            selected={editingClassIds}
+            onChange={setEditingClassIds}
+            currentUid={editingTeacher?.uid}
+            teacherNames={teacherNames}
+          />
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setEditingTeacher(null)}>
+              {tc('actions.cancel')}
+            </Button>
+            <Button type="button" onClick={handleAssignmentSave} disabled={saving}>
+              {saving && <Loader2 className="animate-spin" />}
+              {t('assign.save')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete confirmation */}
+      <Dialog open={!!deleting} onOpenChange={(o) => !o && setDeleting(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('delete.title', { name: deleting?.name ?? '' })}</DialogTitle>
+            <DialogDescription>{t('delete.description', { email: deleting?.email ?? '' })}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setDeleting(null)}>
+              {tc('actions.cancel')}
+            </Button>
+            <Button type="button" variant="destructive" onClick={confirmDelete} disabled={deleteBusy}>
+              {deleteBusy && <Loader2 className="animate-spin" />}
+              {t('delete.confirm')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  )
+}
+
+function Pager({
+  page,
+  totalPages,
+  total,
+  onPage,
+}: {
+  page: number
+  totalPages: number
+  total: number
+  onPage: (p: number) => void
+}) {
+  const tc = useTranslations('common')
+  if (totalPages <= 1) return null
+  const from = (page - 1) * PER_PAGE + 1
+  const to = Math.min(page * PER_PAGE, total)
+  return (
+    <div className="mt-4 flex flex-col items-center justify-between gap-3 sm:flex-row">
+      <p className="text-sm text-muted-foreground">{tc('pagination.showing', { from, to, total })}</p>
+      <div className="flex items-center gap-2">
+        <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => onPage(page - 1)}>
+          <ChevronLeft className="rtl:rotate-180" /> {tc('actions.previous')}
+        </Button>
+        <span className="text-sm text-muted-foreground">{tc('pagination.page', { page, pages: totalPages })}</span>
+        <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => onPage(page + 1)}>
+          {tc('actions.next')} <ChevronRight className="rtl:rotate-180" />
+        </Button>
+      </div>
     </div>
   )
 }

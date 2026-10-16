@@ -1,0 +1,22 @@
+{
+  "months": {
+    "1": "Fulbaana",
+    "2": "Onkoloolessa",
+    "3": "Sadaasa",
+    "4": "Muddee",
+    "5": "Amajjii",
+    "6": "Guraandhala",
+    "7": "Bitootessa",
+    "8": "Ebla",
+    "9": "Caamsaa",
+    "10": "Waxabajjii",
+    "11": "Adoolessa",
+    "12": "Hagayya",
+    "13": "Qaammee"
+  },
+  "format": {
+    "long": "{month} {day}, {year}",
+    "short": "{month} {day}",
+    "withEra": "{date} A.L.H."
+  }
+}

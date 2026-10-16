@@ -1,8 +1,9 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useTranslations } from 'next-intl'
+import { Camera, FlipHorizontal2, Loader2, RefreshCw, Trash2, Upload, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Camera, FlipHorizontal2, RefreshCw, Trash2, Upload, X } from 'lucide-react'
 
 type FacingMode = 'user' | 'environment'
 
@@ -29,11 +30,14 @@ function toResizedJpeg(source: CanvasImageSource, w: number, h: number): string 
   ctx.drawImage(source, 0, 0, canvas.width, canvas.height)
   return canvas.toDataURL('image/jpeg', JPEG_QUALITY)
 }
+
 /**
  * Take a student photo straight from the phone camera (front/"selfie" camera or
  * the back camera - flip any time), with a gallery/file fallback for desktops.
  */
 export function StudentPhotoCapture({ value, onChange }: StudentPhotoCaptureProps) {
+  const t = useTranslations('students.photo')
+  const tc = useTranslations('common.actions')
   const [open, setOpen] = useState(false)
   const [facing, setFacing] = useState<FacingMode>('user')
   const [error, setError] = useState('')
@@ -43,7 +47,7 @@ export function StudentPhotoCapture({ value, onChange }: StudentPhotoCaptureProp
   const fileRef = useRef<HTMLInputElement | null>(null)
 
   const stopCamera = useCallback(() => {
-    streamRef.current?.getTracks().forEach((t) => t.stop())
+    streamRef.current?.getTracks().forEach((track) => track.stop())
     streamRef.current = null
     setOpen(false)
   }, [])
@@ -76,15 +80,13 @@ export function StudentPhotoCapture({ value, onChange }: StudentPhotoCaptureProp
           }
         })
       } catch {
-        setError(
-          'Camera not available. Allow camera access for this site, or pick a photo from the gallery/file below instead.'
-        )
+        setError(t('cameraUnavailable'))
         setOpen(false)
       } finally {
         setStarting(false)
       }
     },
-    [stopCamera]
+    [stopCamera, t]
   )
 
   // Always stop the camera when the component unmounts.
@@ -104,9 +106,10 @@ export function StudentPhotoCapture({ value, onChange }: StudentPhotoCaptureProp
     e.target.value = ''
     if (!file) return
     if (!file.type.startsWith('image/')) {
-      setError('Please choose an image file.')
+      setError(t('notImage'))
       return
     }
+    setError('')
     const reader = new FileReader()
     reader.onload = () => {
       const img = new Image()
@@ -127,21 +130,21 @@ export function StudentPhotoCapture({ value, onChange }: StudentPhotoCaptureProp
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={value}
-              alt="Captured student photo"
-              className="h-20 w-20 shrink-0 rounded-full object-cover ring-2 ring-green-200"
+              alt={t('capturedAlt')}
+              className="h-20 w-20 shrink-0 rounded-full object-cover ring-2 ring-border"
             />
             <div className="flex flex-col gap-1.5">
               <Button type="button" variant="outline" size="sm" onClick={() => startCamera(facing)}>
-                <RefreshCw className="h-4 w-4 mr-1.5" /> Retake Photo
+                <RefreshCw /> {t('retake')}
               </Button>
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="text-red-600 hover:text-red-700"
+                className="text-destructive hover:text-destructive"
                 onClick={() => onChange('')}
               >
-                <Trash2 className="h-4 w-4 mr-1.5" /> Remove Photo
+                <Trash2 /> {t('remove')}
               </Button>
             </div>
           </>
@@ -149,13 +152,13 @@ export function StudentPhotoCapture({ value, onChange }: StudentPhotoCaptureProp
           <>
             <div className="relative w-44 shrink-0 overflow-hidden rounded-xl bg-black">
               <video ref={videoRef} autoPlay playsInline muted className="h-32 w-44 object-cover" />
-              <span className="absolute bottom-1 left-1 rounded bg-black/60 px-1.5 py-0.5 text-[10px] text-white">
-                {facing === 'user' ? 'Front camera' : 'Back camera'}
+              <span className="absolute bottom-1 start-1 rounded bg-black/60 px-1.5 py-0.5 text-[10px] text-white">
+                {facing === 'user' ? t('frontCamera') : t('backCamera')}
               </span>
             </div>
             <div className="flex flex-col gap-1.5">
               <Button type="button" size="sm" onClick={capture}>
-                <Camera className="h-4 w-4 mr-1.5" /> Take Photo
+                <Camera /> {t('take')}
               </Button>
               <Button
                 type="button"
@@ -163,35 +166,25 @@ export function StudentPhotoCapture({ value, onChange }: StudentPhotoCaptureProp
                 size="sm"
                 onClick={() => startCamera(facing === 'user' ? 'environment' : 'user')}
               >
-                <FlipHorizontal2 className="h-4 w-4 mr-1.5" /> Flip Camera
+                <FlipHorizontal2 /> {t('flip')}
               </Button>
               <Button type="button" variant="ghost" size="sm" onClick={stopCamera}>
-                <X className="h-4 w-4 mr-1.5" /> Cancel
+                <X /> {tc('cancel')}
               </Button>
             </div>
           </>
         ) : (
           <>
-            <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full border-2 border-dashed border-green-200 bg-green-50">
-              <Camera className="h-7 w-7 text-green-400" />
+            <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full border-2 border-dashed bg-muted">
+              <Camera className="h-7 w-7 text-muted-foreground" />
             </div>
             <div className="flex flex-col gap-1.5">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                disabled={starting}
-                onClick={() => startCamera('user')}
-              >
-                {starting ? (
-                  <RefreshCw className="h-4 w-4 mr-1.5 animate-spin" />
-                ) : (
-                  <Camera className="h-4 w-4 mr-1.5" />
-                )}
-                Take Photo
+              <Button type="button" variant="outline" size="sm" disabled={starting} onClick={() => startCamera('user')}>
+                {starting ? <Loader2 className="animate-spin" /> : <Camera />}
+                {t('take')}
               </Button>
               <Button type="button" variant="ghost" size="sm" onClick={() => fileRef.current?.click()}>
-                <Upload className="h-4 w-4 mr-1.5" /> Upload from Gallery
+                <Upload /> {t('upload')}
               </Button>
             </div>
           </>
@@ -200,13 +193,13 @@ export function StudentPhotoCapture({ value, onChange }: StudentPhotoCaptureProp
 
       <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
 
-      <p className="mt-2 text-xs text-gray-500">
-        Use the <b>front (selfie)</b> camera to point the phone at yourself/student, or the <b>back</b>{' '}
-        camera to take the photo from the other side. Press <b>Flip Camera</b> any time to switch.
-        You can retake as many times as needed before saving.
-      </p>
+      <p className="mt-2 text-xs text-muted-foreground">{t('hint')}</p>
 
-      {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
+      {error && (
+        <p className="mt-2 text-xs text-destructive" role="alert">
+          {error}
+        </p>
+      )}
     </div>
   )
 }

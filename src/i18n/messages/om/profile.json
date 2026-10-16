@@ -1,0 +1,37 @@
+{
+  "title": "Piroofaayilii koo",
+  "description": "Odeeffannoo herrega keessanii ilaalaa fi haaromsaa.",
+  "account": {
+    "title": "Herrega",
+    "email": "Imeelii",
+    "role": "Gahee",
+    "school": "Mana barumsaa"
+  },
+  "details": {
+    "title": "Odeeffannoo dhuunfaa",
+    "description": "Maqaa fi lakkoofsa bilbila keessanii haaromsaa.",
+    "saved": "Piroofaayiliin haaromfameera.",
+    "failed": "Piroofaayilii keessan haaromsuun hin danda'amne. Maaloo irra deebi'aa yaalaa."
+  },
+  "language": {
+    "title": "Afaan",
+    "description": "Afaan baafataa fi fuulotaa filadhaa. Herrega keessan irratti olkaa'ama.",
+    "label": "Afaan agarsiisaa",
+    "saved": "Afaan haaromfameera.",
+    "failed": "Afaan herrega keessan irratti olkaa'uun hin danda'amne. Garuu meeshaa kana irratti ni hojjeta."
+  },
+  "password": {
+    "title": "Jecha icciitii jijjiiri",
+    "description": "Jecha icciitii ittiin seentan haaromsaa.",
+    "current": "Jecha icciitii ammaa",
+    "new": "Jecha icciitii haaraa",
+    "newHint": "Yoo xiqqaate qubee 6",
+    "confirm": "Jecha icciitii haaraa mirkaneessi",
+    "update": "Jecha icciitii haaromsi",
+    "updated": "Jechi icciitii haaromfameera.",
+    "tooShort": "Jechi icciitii haaraan yoo xiqqaate qubee 6 qabaachuu qaba.",
+    "mismatch": "Jechoonni icciitii haaraan wal hin simne.",
+    "wrongCurrent": "Jechi icciitii keessan ammaa sirrii miti.",
+    "failed": "Jecha icciitii keessan haaromsuun hin danda'amne. Maaloo irra deebi'aa yaalaa."
+  }
+}

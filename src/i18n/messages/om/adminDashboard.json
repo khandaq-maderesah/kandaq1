@@ -1,0 +1,134 @@
+{
+  "title": "Fuula jalqabaa",
+  "description": "Waliigala barattootaa, barsiisotaa fi argamaa",
+  "todayDate": "{gregorian} · {ethiopian}",
+  "kpi": {
+    "totalStudents": "Barattoota waliigalaa",
+    "totalHint": "Dhiira {male} · Dhalaa {female}",
+    "maleStudents": "Barattoota dhiiraa",
+    "femaleStudents": "Barattoota dhalaa",
+    "percentOfTotal": "Barattoota hunda keessaa {percent}%",
+    "teachers": "Barsiisota",
+    "classes": "Kutaalee",
+    "absentToday": "Har'a kan hafan",
+    "absentWeekHint": "{count, plural, =0 {Guyyoota 7 darban keessa hin jiru} one {Guyyoota 7 darban keessa: #} other {Guyyoota 7 darban keessa: #}}"
+  },
+  "students": {
+    "title": "Barattoota",
+    "titleMale": "Barattoota dhiiraa",
+    "titleFemale": "Barattoota dhalaa",
+    "description": "Odeeffannoo guutuu ilaaluuf barataa filadhaa.",
+    "searchPlaceholder": "Maqaa, lakkoofsa tartiibaa ykn bilbilaan barbaadi",
+    "searchLabel": "Barattoota barbaadi",
+    "empty": "Barataan hin argamne",
+    "table": {
+      "photo": "Suuraa",
+      "name": "Maqaa",
+      "roll": "Lakk.",
+      "age": "Umurii",
+      "class": "Kutaa",
+      "section": "Garee",
+      "parentPhone": "Bilbila maatii"
+    }
+  },
+  "teachers": {
+    "title": "Barsiisota",
+    "description": "Herrega barsiisotaa hunda.",
+    "searchPlaceholder": "Maqaa, imeelii ykn bilbilaan barbaadi",
+    "searchLabel": "Barsiisota barbaadi",
+    "empty": "Barsiisaan hin argamne",
+    "table": {
+      "name": "Maqaa",
+      "email": "Imeelii",
+      "phone": "Bilbila",
+      "classes": "Kutaalee kennaman",
+      "status": "Haala"
+    }
+  },
+  "classes": {
+    "title": "Kutaalee",
+    "description": "Kutaalee hunda fi barsiisota itti ramadaman.",
+    "searchPlaceholder": "Kutaa ykn barsiisaa barbaadi",
+    "searchLabel": "Kutaalee barbaadi",
+    "empty": "Kutaan hin argamne",
+    "table": {
+      "class": "Kutaa",
+      "grade": "Sadarkaa kutaa",
+      "section": "Garee",
+      "teacher": "Barsiisaa",
+      "students": "Barattoota",
+      "academicYear": "Bara barnootaa"
+    }
+  },
+  "absent": {
+    "title": "Barattoota hafan",
+    "descriptionDay": "Hafuu guyyaa {date}, odeeffannoo quunnamtii maatii waliin. Hafuu duraanii ilaaluuf guyyaa biraa ykn \"Guyyaa hunda\" filadhaa.",
+    "descriptionPeriod": "Hafuu yeroo filatame keessaa, odeeffannoo quunnamtii maatii waliin.",
+    "descriptionAll": "Hafuu argama olkaa'ame kutaalee hunda keessaa, odeeffannoo quunnamtii maatii waliin.",
+    "period": "Yeroo",
+    "periods": {
+      "today": "Guyyaa tokko",
+      "thisWeek": "Torban kana",
+      "lastWeek": "Torban darbe",
+      "last2Weeks": "Torban 2 darban",
+      "last3Weeks": "Torban 3 darban",
+      "thisMonth": "Ji'a kana"
+    },
+    "date": "Guyyaa",
+    "allDates": "Guyyaa hunda",
+    "allDatesOverrides": "\"Guyyaa hunda\" yeroo filatame bakka bu'a.",
+    "searchPlaceholder": "Barataa, bilbila, kutaa ykn garee barbaadi",
+    "searchLabel": "Hafuu barbaadi",
+    "copyNumbers": "Lakkoofsota garagalchi",
+    "copyNumbersHint": "Lakkoofsa bilbila maatii mul'atan hunda garagalchi",
+    "clearStale": "Kan haqaman qulqulleessi",
+    "clearStaleHint": "Hafuu barattoota haqamanii keessaa baasi",
+    "sendSms": "SMS ergi",
+    "sendSmsHint": "Appii SMS keessanii ergaa hafuu guutameen bani",
+    "altPhone": "Kan biraa: {phone}",
+    "call": "{phone} bilbili",
+    "emptySearch": "Barataan hafe barbaacha keessaniin wal simu hin jiru.",
+    "emptyAll": "Hanga ammaatti hafuun galmaa'e hin jiru.",
+    "emptyPeriod": "Yeroo filatame keessatti hafuun hin jiru.",
+    "emptyDay": "Guyyaa {date} hafuun galmaa'e hin jiru.",
+    "table": {
+      "date": "Guyyaa",
+      "student": "Barataa",
+      "class": "Kutaa",
+      "section": "Garee",
+      "parentPhone": "Bilbila maatii",
+      "action": "Gocha"
+    },
+    "toast": {
+      "nothingStale": "Wanti qulqullaa'u hin jiru. Hafuun hundi kan barattoota jiranii ti.",
+      "cleared": "{count, plural, one {Galmeen hafuu # haqameera.} other {Galmeewwan hafuu # haqamaniiru.}}",
+      "clearFailed": "Galmeewwan hafuu qulqulleessuun hin danda'amne.",
+      "noNumbers": "Lakkoofsi bilbila maatii garagalfamu hin jiru.",
+      "copied": "{count, plural, one {Lakkoofsi bilbilaa # garagalfameera.} other {Lakkoofsonni bilbilaa # garagalfamaniiru.}}",
+      "copyBlocked": "Barbaadaan keessan garagalchuu dhorkeera. Maaloo lakkoofsota harkaan garagalchaa."
+    },
+    "confirm": {
+      "title": "Hafuu barattoota haqamanii qulqulleessituu?",
+      "description": "{count, plural, one {Galmeen hafuu # kan barataa amma hin jirree ti. Ni haqama. Kana booda deebisuun hin danda'amu.} other {Galmeewwan hafuu # kan barattoota amma hin jirree ti. Ni haqamu. Kana booda deebisuun hin danda'amu.}}",
+      "action": "Galmeewwan haqi"
+    }
+  },
+  "charts": {
+    "byClassTitle": "Barattoota akka kutaatti",
+    "byClassDescription": "Barattoota dhiiraa fi dhalaa kutaa tokkoon tokkoon",
+    "noStudents": "Ammaaf odeeffannoon barattootaa hin jiru.",
+    "teacherLabel": "Ustaaz {name}",
+    "statusTitle": "Haala argamaa",
+    "statusDescription": "Argama guyyaa guyyaa {className} · guyyoota 7 darban",
+    "classLabel": "Kutaa",
+    "noAttendance": "Ammaaf kutaa kanaaf argamni galmaa'e hin jiru.",
+    "male": "Dhiira",
+    "female": "Dhalaa",
+    "present": "Argame",
+    "absent": "Hafe",
+    "late": "Booda dhufe",
+    "excused": "Hayyamaan",
+    "total": "Ida'ama: {count}",
+    "unassigned": "Hin ramadamne"
+  }
+}

@@ -1,108 +1,114 @@
+'use client'
+
 import Link from 'next/link'
 import Image from 'next/image'
-import type { Metadata } from 'next'
-import { ClipboardCheck, PhoneCall, BarChart3, ArrowRight } from 'lucide-react'
-import NeonWaveBackground from '@/components/NeonWaveBackground'
+import { useTranslations } from 'next-intl'
+import {
+  ArrowRight,
+  BarChart3,
+  ClipboardCheck,
+  FileText,
+  Languages,
+  LogIn,
+  PhoneCall,
+  Users,
+  type LucideIcon,
+} from 'lucide-react'
+import { buttonVariants } from '@/components/ui/button'
+import { LanguageSwitcher } from '@/components/shell/LanguageSwitcher'
 
-export const metadata: Metadata = {
-  title: 'Home',
-}
-
-const features = [
-  {
-    icon: ClipboardCheck,
-    title: 'Real-time Attendance',
-    description: 'Teachers mark Present, Absent or Late in seconds. Admins see the full picture instantly.',
-    color: 'bg-emerald-500',
-  },
-  {
-    icon: PhoneCall,
-    title: 'Parent Contact',
-    description: 'Absent students are collected automatically with parent phone numbers for quick follow-up.',
-    color: 'bg-sky-500',
-  },
-  {
-    icon: BarChart3,
-    title: 'Reports & Analytics',
-    description: 'Beautiful charts for grades, gender balance and daily attendance trends.',
-    color: 'bg-amber-500',
-  },
+const FEATURES: { key: 'attendance' | 'students' | 'exams' | 'parents' | 'reports' | 'languages'; icon: LucideIcon }[] = [
+  { key: 'attendance', icon: ClipboardCheck },
+  { key: 'students', icon: Users },
+  { key: 'exams', icon: FileText },
+  { key: 'parents', icon: PhoneCall },
+  { key: 'reports', icon: BarChart3 },
+  { key: 'languages', icon: Languages },
 ]
 
 export default function Home() {
-  return (
-    <main className="min-h-screen bg-slate-50">
-      <section className="relative overflow-hidden text-white">
-        <NeonWaveBackground />
+  const t = useTranslations('landing')
+  const tc = useTranslations('common')
 
-        <div className="relative mx-auto max-w-5xl px-6 py-24 text-center">
-          <div className="mx-auto mb-8 flex justify-center">
+  return (
+    <div className="flex min-h-screen flex-col bg-background">
+      <header className="sticky top-0 z-20 border-b bg-card/90 backdrop-blur supports-[backdrop-filter]:bg-card/75">
+        <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-3 px-4 sm:px-6">
+          <Link href="/" className="flex min-w-0 items-center gap-3">
             <Image
               src="/image/khandaq-logo.png"
-              alt="Khendeq Medresah logo"
-              width={200}
-              height={200}
+              alt=""
+              width={36}
+              height={36}
               priority
-              className="h-auto w-40 rounded-full shadow-2xl ring-1 ring-white/25 md:w-52"
+              className="h-9 w-9 shrink-0 rounded-lg object-cover"
             />
-          </div>
-          <h1 className="mb-6 text-4xl font-extrabold tracking-tight md:text-6xl">
-            Khendeq Medresah <span className="text-green-200">Students Management System</span>
-          </h1>
-          <p className="mx-auto mb-10 max-w-2xl text-lg text-green-100 md:text-xl">
-            Track attendance, manage students, and keep parents informed —
-            all in one beautiful place.
-          </p>
-          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Link
-              href="/login"
-              className="group btn inline-flex items-center gap-2 rounded-xl bg-white px-8 py-3.5 font-semibold text-green-700 shadow-lg transition hover:bg-green-50"
-            >
-              Login
-              <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+            <span className="truncate font-semibold text-foreground">{tc('appName')}</span>
+          </Link>
+          <div className="flex items-center gap-1 sm:gap-2">
+            <LanguageSwitcher showLabel />
+            <Link href="/login" className={buttonVariants({ size: 'sm' })}>
+              <LogIn className="rtl:rotate-180" />
+              {t('nav.signIn')}
             </Link>
           </div>
         </div>
+      </header>
 
-        <svg className="absolute bottom-0 left-0 right-0 w-full text-slate-50" viewBox="0 0 1440 60" fill="currentColor" preserveAspectRatio="none">
-          <path d="M0,40 C360,80 1080,0 1440,40 L1440,60 L0,60 Z" />
-        </svg>
-      </section>
+      <main className="flex-1">
+        <section className="border-b bg-card">
+          <div className="mx-auto flex max-w-6xl flex-col items-center px-4 py-16 text-center sm:px-6 sm:py-24">
+            <span className="mb-5 inline-flex items-center rounded-full border bg-accent px-3 py-1 text-xs font-medium text-accent-foreground">
+              {t('hero.eyebrow')}
+            </span>
+            <h1 className="max-w-3xl text-balance text-3xl font-semibold tracking-tight text-foreground sm:text-5xl">
+              {t('hero.title')}
+            </h1>
+            <p className="mt-5 max-w-2xl text-pretty text-base text-muted-foreground sm:text-lg">
+              {t('hero.subtitle')}
+            </p>
+            <div className="mt-8 flex w-full flex-col items-stretch justify-center gap-3 sm:w-auto sm:flex-row">
+              <Link href="/login" className={buttonVariants({ size: 'lg' })}>
+                {t('hero.cta')}
+                <ArrowRight className="rtl:rotate-180" />
+              </Link>
+              <a href="#features" className={buttonVariants({ size: 'lg', variant: 'outline' })}>
+                {t('hero.secondary')}
+              </a>
+            </div>
+          </div>
+        </section>
 
-      {/* Everything you need — modern gradient background */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-indigo-50 via-white to-fuchsia-50">
-        <div aria-hidden="true" className="pointer-events-none absolute -top-16 right-0 h-64 w-64 rounded-full bg-purple-300/30 blur-3xl" />
-        <div aria-hidden="true" className="pointer-events-none absolute -bottom-20 left-0 h-72 w-72 rounded-full bg-cyan-300/30 blur-3xl" />
-        <div className="relative mx-auto max-w-6xl px-6 py-20">
-        <h2 className="mb-4 text-center text-3xl font-bold text-gray-900">Everything you need</h2>
-        <p className="mb-12 text-center text-lg text-gray-500">
-          A complete attendance management solution for your madresah. From real-time attendance tracking to parent notifications and insightful reports, we&apos;ve got you covered.
-        </p>
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-          {features.map((f) => {
-            const Icon = f.icon
-            return (
-              <div
-                key={f.title}
-                className="card-bounce h-full rounded-2xl bg-gradient-to-br from-cyan-400 via-purple-500 to-pink-500 p-[2px] shadow-[0_0_24px_rgba(168,85,247,0.35)] transition-shadow hover:shadow-[0_0_40px_rgba(236,72,153,0.6)]"
-              >
-                <div className="h-full rounded-[14px] bg-white p-8">
-                  <div className={`mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl ${f.color} text-white shadow-md`}>
-                    <Icon className="h-6 w-6" />
+        <section id="features" className="scroll-mt-16">
+          <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
+            <div className="mx-auto mb-10 max-w-2xl text-center">
+              <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+                {t('features.title')}
+              </h2>
+              <p className="mt-3 text-muted-foreground">{t('features.subtitle')}</p>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
+              {FEATURES.map(({ key, icon: Icon }) => (
+                <div key={key} className="rounded-xl border bg-card p-5 shadow-sm sm:p-6">
+                  <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                    <Icon className="h-5 w-5" />
                   </div>
-                  <h3 className="mb-2 text-xl font-semibold text-gray-900">{f.title}</h3>
-                  <p className="text-gray-600">{f.description}</p>
+                  <h3 className="font-semibold text-foreground">{t(`features.${key}.title`)}</h3>
+                  <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                    {t(`features.${key}.description`)}
+                  </p>
                 </div>
-              </div>
-            )
-          })}
-        </div>
-        </div>
-      </section>
+              ))}
+            </div>
+          </div>
+        </section>
+      </main>
 
-      <footer className="bg-gradient-to-r from-purple-950 via-indigo-900 to-purple-800 py-8 text-center text-sm text-purple-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
-        © {new Date().getFullYear()} Khendeq Medresah Students Management System. All rights reserved.
+      <footer className="border-t bg-card">
+        <div className="mx-auto max-w-6xl px-4 py-6 text-center text-sm text-muted-foreground sm:px-6">
+          {t('footer.copyright', { year: String(new Date().getFullYear()) })}
+        </div>
       </footer>
-    </main>
+    </div>
   )
 }

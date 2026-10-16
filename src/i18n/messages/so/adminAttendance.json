@@ -1,0 +1,51 @@
+{
+  "title": "Xaadiriska",
+  "description": "Calaamadee xaadiriska fasal kasta oo dib u eeg diiwaannada",
+  "tabs": {
+    "label": "Muuqaallada xaadiriska",
+    "mark": "Calaamadee xaadiriska",
+    "records": "Diiwaannada"
+  },
+  "mark": {
+    "class": "Fasalka",
+    "date": "Taariikhda",
+    "ethiopianDate": "Taariikhda Itoobiya: {date}",
+    "allPresent": "Dhammaan jooga",
+    "allAbsent": "Dhammaan maqan",
+    "allExcused": "Dhammaan fasax",
+    "clear": "Nadiifi",
+    "noStudents": "Fasalkan ma jiraan arday firfircoon",
+    "noClasses": "Weli fasal ma jiro",
+    "progress": "{marked} ka mid ah {total} ayaa la calaamadeeyay",
+    "save": "Kaydi xaadiriska",
+    "roll": "Lambar {roll}",
+    "statusGroup": "Xaaladda xaadiriska {name}"
+  },
+  "records": {
+    "class": "Fasalka",
+    "allClasses": "Dhammaan fasallada",
+    "date": "Taariikhda",
+    "dateHint": "Ka tag madhan si aad u aragto 90-ka maalmood ee u dambeeyay",
+    "title": "Diiwaannada",
+    "count": "{count, plural, one {# diiwaan} other {# diiwaan}}",
+    "empty": "Ma jiraan diiwaanno xaadiris oo u dhigma shaandhaynta la doortay",
+    "table": {
+      "date": "Taariikhda",
+      "student": "Ardayga",
+      "class": "Fasalka",
+      "status": "Xaaladda"
+    }
+  },
+  "status": {
+    "present": "Jooga",
+    "absent": "Maqan",
+    "late": "Daahay",
+    "excused": "Fasax"
+  },
+  "toast": {
+    "saved": "Xaadiriska waa la kaydiyay",
+    "saveFailed": "Xaadiriska lama kaydin karin",
+    "loadFailed": "Xogta xaadiriska lama soo rari karin",
+    "studentsFailed": "Ardayda lama soo rari karin"
+  }
+}

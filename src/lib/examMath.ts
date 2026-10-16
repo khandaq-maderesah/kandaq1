@@ -1,14 +1,25 @@
 import type { Exam, ExamRow, ExamSummary, ExamType, Student } from '@/types'
 
-export const EXAM_TYPES: { value: ExamType; label: string }[] = [
-  { value: 'mid', label: 'Mid Exam' },
-  { value: 'assignment', label: 'Assignment' },
-  { value: 'final', label: 'Final Exam' },
+/**
+ * Exam types in display order. Labels are translation keys in the `exams`
+ * namespace: `useTranslations('exams')(EXAM_TYPE_LABELS[type])`.
+ */
+export const EXAM_TYPE_LABELS = {
+  mid: 'types.mid',
+  assignment: 'types.assignment',
+  final: 'types.final',
+} as const satisfies Record<ExamType, `types.${ExamType}`>
+export type ExamTypeLabelKey = (typeof EXAM_TYPE_LABELS)[ExamType]
+
+export const EXAM_TYPES: { value: ExamType; label: ExamTypeLabelKey }[] = [
+  { value: 'mid', label: EXAM_TYPE_LABELS.mid },
+  { value: 'assignment', label: EXAM_TYPE_LABELS.assignment },
+  { value: 'final', label: EXAM_TYPE_LABELS.final },
 ]
-export const EXAM_TYPE_LABELS: Record<ExamType, string> = {
-  mid: 'Mid Exam',
-  assignment: 'Assignment',
-  final: 'Final Exam',
+
+/** Translation key (namespace `exams`) for an exam type; unknown values fall back to Mid. */
+export function examTypeKey(type: ExamType | string | undefined): ExamTypeLabelKey {
+  return EXAM_TYPE_LABELS[(type as ExamType)] ?? EXAM_TYPE_LABELS.mid
 }
 export const DEFAULT_SUBJECTS = ['Hadith', 'Iman', 'Fiqh', 'Sirah', 'Quran']
 export const DEFAULT_SUBJECT_MAX = 100

@@ -1,6 +1,6 @@
 import { db } from '@/lib/firebase/config'
 import { ref, get, set, update, remove, onValue, query, orderByChild, equalTo, startAt, type QueryConstraint, type Unsubscribe } from 'firebase/database'
-import type { User, Class, Student, Attendance, AbsentAlert, MissingAttendanceAlert, Exam, Announcement, School } from '@/types'
+import type { User, Class, Student, Attendance, AbsentAlert, MissingAttendanceAlert, Exam, Announcement, School, ChangeRequest, DeletionReason, StudentArchive } from '@/types'
 
 // ==================== Current school ====================
 // Every school's data lives under schoolData/{schoolId}/... . The signed-in
@@ -606,6 +606,168 @@ export function subscribeToExams(cb: (exams: Exam[]) => void): Unsubscribe {
   })
 }
 
+// ==================== Approval requests ====================
+// schoolData/{schoolId}/requests/{id}. Teachers create requests; admins
+// approve/reject. An approval applies the change, closes the request and
+// writes the audit entry in ONE atomic multi-path update.
+
+export type NewChangeRequest = Omit<ChangeRequest, 'id' | 'status' | 'requestedAt' | 'reviewedBy' | 'reviewedByName' | 'reviewedAt' | 'reviewNote'>
+
+export interface Actor {
+  uid: string
+  name: string
+}
+
+function newId(prefix: string): string {
+  return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
+}
+
+function auditEntry(actor: Actor, action: string, entity: string, entityId: string, details: string) {
+  return {
+    actorId: actor.uid,
+    actorName: actor.name,
+    action,
+    entity,
+    entityId,
+    details,
+    timestamp: new Date().toISOString(),
+  }
+}
+
+/** Never write `undefined` to RTDB (it throws); drop those keys. */
+function clean<T extends object>(obj: T): T {
+  return Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== undefined)) as T
+}
+
+export async function createChangeRequest(data: NewChangeRequest): Promise<string> {
+  const id = newId('req')
+  const record: ChangeRequest = clean({
+    ...data,
+    id,
+    status: 'pending' as const,
+    requestedAt: new Date().toISOString(),
+  })
+  await set(sref(`requests/${id}`), record)
+  return id
+}
+
+/** The requester withdraws their own pending request. */
+export async function cancelChangeRequest(id: string): Promise<void> {
+  await update(sref(`requests/${id}`), { status: 'cancelled', reviewedAt: new Date().toISOString() })
+}
+
+function toRequests(snap: { forEach: (cb: (child: { key: string | null; val: () => unknown }) => void) => void }): ChangeRequest[] {
+  const out: ChangeRequest[] = []
+  snap.forEach((child) => {
+    out.push({ ...(child.val() as ChangeRequest), id: child.key as string })
+  })
+  return out
+}
+
+/** Admin view: every request of the school. */
+export function subscribeToChangeRequests(cb: (requests: ChangeRequest[]) => void): Unsubscribe {
+  return onValue(sref('requests'), (snap) => cb(toRequests(snap)))
+}
+
+/** Teacher view: only the requests they made (server-filtered). */
+export function subscribeToMyChangeRequests(uid: string, cb: (requests: ChangeRequest[]) => void): Unsubscribe {
+  return onValue(query(sref('requests'), orderByChild('requestedBy'), equalTo(uid)), (snap) => cb(toRequests(snap)))
+}
+
+/** Applies a pending request (archive or move the student) and closes it. */
+export async function approveChangeRequest(request: ChangeRequest, reviewer: Actor, note?: string): Promise<void> {
+  const now = new Date().toISOString()
+  const student = await getStudent(request.studentId)
+  if (!student) throw new Error('STUDENT_NOT_FOUND')
+  if (student.isActive === false) throw new Error('STUDENT_ALREADY_ARCHIVED')
+
+  const updates: Record<string, unknown> = {
+    [`requests/${request.id}/status`]: 'approved',
+    [`requests/${request.id}/reviewedBy`]: reviewer.uid,
+    [`requests/${request.id}/reviewedByName`]: reviewer.name,
+    [`requests/${request.id}/reviewedAt`]: now,
+  }
+  if (note) updates[`requests/${request.id}/reviewNote`] = note
+
+  if (request.type === 'student_delete') {
+    const archive: StudentArchive = clean({
+      reasonCategory: request.reasonCategory ?? 'other',
+      reason: request.reason,
+      requestedBy: request.requestedBy,
+      requestedByName: request.requestedByName,
+      requestedAt: request.requestedAt,
+      archivedBy: reviewer.uid,
+      archivedByName: reviewer.name,
+      archivedAt: now,
+      requestId: request.id,
+    })
+    updates[`students/${request.studentId}/isActive`] = false
+    updates[`students/${request.studentId}/archive`] = archive
+    updates[`students/${request.studentId}/updatedAt`] = now
+    updates[`audit/${newId('audit')}`] = auditEntry(reviewer, 'approve_delete', 'student', request.studentId, `${request.studentName}: ${request.reason}`)
+  } else {
+    const target = request.toClassId ? await getClass(request.toClassId) : null
+    if (!target || !request.toClassId) throw new Error('CLASS_NOT_FOUND')
+    updates[`students/${request.studentId}/classId`] = request.toClassId
+    updates[`students/${request.studentId}/className`] = target.name
+    updates[`students/${request.studentId}/section`] = target.section ?? null
+    updates[`students/${request.studentId}/updatedAt`] = now
+    updates[`audit/${newId('audit')}`] = auditEntry(reviewer, 'approve_transfer', 'student', request.studentId, `${request.studentName}: ${request.className} -> ${target.name}`)
+  }
+
+  await update(ref(db, `schoolData/${requireSchoolId()}`), updates)
+}
+
+export async function rejectChangeRequest(request: ChangeRequest, reviewer: Actor, note?: string): Promise<void> {
+  const now = new Date().toISOString()
+  const updates: Record<string, unknown> = {
+    [`requests/${request.id}/status`]: 'rejected',
+    [`requests/${request.id}/reviewedBy`]: reviewer.uid,
+    [`requests/${request.id}/reviewedByName`]: reviewer.name,
+    [`requests/${request.id}/reviewedAt`]: now,
+    [`audit/${newId('audit')}`]: auditEntry(reviewer, 'reject_request', 'student', request.studentId, `${request.type}: ${request.studentName}`),
+  }
+  if (note) updates[`requests/${request.id}/reviewNote`] = note
+  await update(ref(db, `schoolData/${requireSchoolId()}`), updates)
+}
+
+/** Admin deletes a student directly: archived immediately, with a reason. */
+export async function archiveStudent(
+  student: Pick<Student, 'id' | 'name'>,
+  reasonCategory: DeletionReason,
+  reason: string,
+  admin: Actor
+): Promise<void> {
+  const now = new Date().toISOString()
+  const archive: StudentArchive = {
+    reasonCategory,
+    reason,
+    requestedBy: admin.uid,
+    requestedByName: admin.name,
+    requestedAt: now,
+    archivedBy: admin.uid,
+    archivedByName: admin.name,
+    archivedAt: now,
+  }
+  await update(ref(db, `schoolData/${requireSchoolId()}`), {
+    [`students/${student.id}/isActive`]: false,
+    [`students/${student.id}/archive`]: archive,
+    [`students/${student.id}/updatedAt`]: now,
+    [`audit/${newId('audit')}`]: auditEntry(admin, 'archive', 'student', student.id, `${student.name}: ${reason}`),
+  })
+}
+
+/** Brings an archived student back. */
+export async function restoreStudent(student: Pick<Student, 'id' | 'name'>, admin: Actor): Promise<void> {
+  const now = new Date().toISOString()
+  await update(ref(db, `schoolData/${requireSchoolId()}`), {
+    [`students/${student.id}/isActive`]: true,
+    [`students/${student.id}/archive`]: null,
+    [`students/${student.id}/updatedAt`]: now,
+    [`audit/${newId('audit')}`]: auditEntry(admin, 'restore', 'student', student.id, student.name),
+  })
+}
+
 // ==================== Audit Log ====================
 export async function logAction(data: {
   actorId?: string
@@ -628,6 +790,14 @@ export async function logAction(data: {
 
 // ==================== Exported API ====================
 export const rtdb = {
+  createChangeRequest,
+  cancelChangeRequest,
+  subscribeToChangeRequests,
+  subscribeToMyChangeRequests,
+  approveChangeRequest,
+  rejectChangeRequest,
+  archiveStudent,
+  restoreStudent,
   setCurrentSchoolId,
   getCurrentSchoolId,
   getSchool,

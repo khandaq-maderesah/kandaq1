@@ -14,7 +14,11 @@ export interface EthiopianParts {
   day: number
 }
 
-/** Names of the 13 Ethiopian months in Amharic (Ge'ez script). */
+/**
+ * Names of the 13 Ethiopian months in Amharic (Ge'ez script).
+ * For UI text prefer `useEthiopianDate()` (src/hooks/useEthiopianDate.ts), which
+ * uses the translated month names from the `dates` namespace.
+ */
 export const ETHIOPIAN_MONTHS = [
   'መስከረም', // Meskerem
   'ጥቅምት', // Tikimt

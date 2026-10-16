@@ -1,0 +1,30 @@
+{
+  "dashboard": "Bogga guud",
+  "schools": "Dugsiyada",
+  "allSchools": "Dhammaan dugsiyada",
+  "users": "Isticmaalayaasha",
+  "teachers": "Macallimiinta",
+  "classes": "Fasallada",
+  "students": "Ardayda",
+  "attendance": "Xaadiriska",
+  "takeAttendance": "Qaado xaadiriska",
+  "history": "Taariikhda",
+  "results": "Natiijooyinka",
+  "exams": "Imtixaannada iyo natiijooyinka",
+  "reports": "Warbixinnada",
+  "requests": "Codsiyada",
+  "myRequests": "Codsiyadayda",
+  "settings": "Dejinta",
+  "profile": "Borofaylka",
+  "signOut": "Ka bax",
+  "openMenu": "Fur liiska",
+  "closeMenu": "Xir liiska",
+  "notifications": "Ogeysiisyada",
+  "switchSchool": "Beddel dugsiga",
+  "sections": {
+    "overview": "Guudmar",
+    "people": "Dadka",
+    "academics": "Waxbarashada",
+    "administration": "Maamulka"
+  }
+}

@@ -12,6 +12,8 @@ import { auth, db } from '@/lib/firebase/config'
 import { ref, get, update } from 'firebase/database'
 import { getSchool, setCurrentSchoolId } from '@/lib/database'
 import type { School, User } from '@/types'
+import { useLocaleSettings } from '@/i18n/I18nProvider'
+import { isLocale } from '@/i18n/config'
 
 interface LoginResult {
   credential: UserCredential
@@ -88,6 +90,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null)
   const [school, setSchool] = useState<School | null>(null)
   const [loading, setLoading] = useState(true)
+  const { setLocale } = useLocaleSettings()
+
+  // A signed-in user's saved language wins over this browser's choice.
+  const applyProfileLocale = useCallback(
+    (profile: User) => {
+      if (isLocale(profile.language)) setLocale(profile.language)
+    },
+    [setLocale]
+  )
 
   const applySchool = useCallback((next: School | null) => {
     setCurrentSchoolId(next?.id ?? null)
@@ -120,6 +131,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (snapshot.exists()) {
             const profile = { ...(snapshot.val() as Omit<User, 'uid'>), uid: fbUser.uid } as User
             applySchool(await resolveSchool(profile))
+            applyProfileLocale(profile)
             setUser(profile)
           }
         } catch (error) {
@@ -137,7 +149,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     })
 
     return () => unsubscribe()
-  }, [applySchool, clearSession])
+  }, [applySchool, applyProfileLocale, clearSession])
 
   const login = async (email: string, password: string) => {
     const result = await signInWithEmailAndPassword(auth, email, password)
@@ -163,6 +175,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw err
       }
       await update(userRef, { lastLogin: new Date().toISOString() })
+      applyProfileLocale(profile)
       setUser(profile)
     }
 

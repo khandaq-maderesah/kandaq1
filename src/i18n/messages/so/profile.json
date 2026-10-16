@@ -1,0 +1,37 @@
+{
+  "title": "Borofaylkayga",
+  "description": "Eeg oo cusboonaysii xogta akoonkaaga.",
+  "account": {
+    "title": "Akoonka",
+    "email": "Iimayl",
+    "role": "Doorka",
+    "school": "Dugsiga"
+  },
+  "details": {
+    "title": "Xogta shakhsiga",
+    "description": "Cusboonaysii magacaaga iyo lambarka taleefankaaga.",
+    "saved": "Borofaylka waa la cusboonaysiiyay.",
+    "failed": "Borofaylkaaga lama cusboonaysiin karin. Fadlan isku day mar kale."
+  },
+  "language": {
+    "title": "Luqadda",
+    "description": "Dooro luqadda liisaska iyo shaashadaha. Waxaa lagu kaydinayaa akoonkaaga.",
+    "label": "Luqadda muuqaalka",
+    "saved": "Luqadda waa la beddelay.",
+    "failed": "Luqadda lagama kaydin karin akoonkaaga. Si kastaba, qalabkan way ka shaqaynaysaa."
+  },
+  "password": {
+    "title": "Beddel furaha sirta",
+    "description": "Cusboonaysii furaha sirta ee aad ku gasho.",
+    "current": "Furaha sirta ee hadda",
+    "new": "Furaha sirta cusub",
+    "newHint": "Ugu yaraan 6 xaraf",
+    "confirm": "Xaqiiji furaha sirta cusub",
+    "update": "Cusboonaysii furaha sirta",
+    "updated": "Furaha sirta waa la cusboonaysiiyay.",
+    "tooShort": "Furaha sirta cusub waa inuu ahaadaa ugu yaraan 6 xaraf.",
+    "mismatch": "Labada furo sir ee cusub isma waafaqsana.",
+    "wrongCurrent": "Furaha sirta ee hadda waa khalad.",
+    "failed": "Furaha sirta lama cusboonaysiin karin. Fadlan isku day mar kale."
+  }
+}

@@ -1,50 +1,65 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import { useTranslations } from 'next-intl'
+import { toast } from 'sonner'
+import { ChevronLeft, ChevronRight, ChevronRight as ChevronEnd, GraduationCap, Loader2, Pencil, Plus, Search, Trash2, Users } from 'lucide-react'
 import { rtdb } from '@/lib/database'
+import { useLiveData } from '@/lib/dataStore'
+import type { Class, Student } from '@/types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { GraduationCap, Loader2, Plus, Users, Trash2, Search, Pencil, X, Eye } from 'lucide-react'
-import { Pagination } from '@/components/Pagination'
-import { useLiveData } from '@/lib/dataStore'
-import type { Class, Student } from '@/types'
+import { Skeleton } from '@/components/ui/skeleton'
+import { EmptyState, PageHeader, TableContainer } from '@/components/ui/page'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { StudentDetailCard } from '@/components/StudentDetailCard'
 import { StudentAvatar } from '@/components/StudentAvatar'
 
+const PER_PAGE = 10
+
 export default function ClassesPage() {
-  const [classes, setClasses] = useState<Class[]>([])
-  const [students, setStudents] = useState<Student[]>([])
-  const [loading, setLoading] = useState(true)
+  const t = useTranslations('adminClasses')
+  const tc = useTranslations('common')
+
   const [search, setSearch] = useState('')
+  const [page, setPage] = useState(1)
+  const [formOpen, setFormOpen] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [name, setName] = useState('')
   const [grade, setGrade] = useState('')
   const [section, setSection] = useState('')
   const [academicYear, setAcademicYear] = useState('')
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
   const [saving, setSaving] = useState(false)
-  const [page, setPage] = useState(1)
-  const perPage = 10
+  const [deleting, setDeleting] = useState<Class | null>(null)
+  const [deleteBusy, setDeleteBusy] = useState(false)
   const [studentsOfClass, setStudentsOfClass] = useState<Class | null>(null)
   const [viewingStudent, setViewingStudent] = useState<Student | null>(null)
 
-  // Live updates via the shared store (the navbar bells already keep these
+  // Live updates via the shared store (the shell's bells already keep these
   // channels open, so this page adds no extra downloads).
   const storeClasses = useLiveData<Class[]>('classes', (emit) => rtdb.subscribeToClasses(emit))
   const storeStudents = useLiveData<Student[]>('students', (emit) => rtdb.subscribeToStudents(emit))
-  useEffect(() => {
-    if (storeClasses.data) {
-      setClasses(storeClasses.data)
-      setLoading(false)
-    }
-  }, [storeClasses.data])
-  useEffect(() => {
-    setStudents(storeStudents.data ?? [])
-  }, [storeStudents.data])
+  const classes = useMemo(() => storeClasses.data ?? [], [storeClasses.data])
+  // Archived (deleted) students are not part of any class list.
+  const students = useMemo(() => (storeStudents.data ?? []).filter((s) => s.isActive !== false), [storeStudents.data])
+  const loading = !storeClasses.data
+
+  const countByClass = useMemo(() => {
+    const m: Record<string, number> = {}
+    students.forEach((s) => {
+      m[s.classId] = (m[s.classId] || 0) + 1
+    })
+    return m
+  }, [students])
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
@@ -63,37 +78,34 @@ export default function ClassesPage() {
     setPage(1)
   }, [search])
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / perPage))
-  const paginated = filtered.slice((page - 1) * perPage, page * perPage)
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE))
+  const paginated = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE)
 
   const classStudents = useMemo(
     () => students.filter((s) => s.classId === studentsOfClass?.id),
     [students, studentsOfClass]
   )
 
-  const resetForm = () => {
+  const openCreate = () => {
+    setEditingId(null)
     setName('')
     setGrade('')
     setSection('')
     setAcademicYear('')
-    setEditingId(null)
+    setFormOpen(true)
   }
 
-  const startEdit = (c: Class) => {
+  const openEdit = (c: Class) => {
     setEditingId(c.id)
     setName(c.name)
     setGrade(c.grade || '')
     setSection(c.section || '')
-    setAcademicYear(c.academicYear)
-    setError('')
-    setSuccess('')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    setAcademicYear(c.academicYear || '')
+    setFormOpen(true)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError('')
-    setSuccess('')
     setSaving(true)
     try {
       const data = {
@@ -105,7 +117,7 @@ export default function ClassesPage() {
       }
       if (editingId) {
         await rtdb.updateClass(editingId, data)
-        setSuccess('Class updated successfully')
+        toast.success(t('toast.updated'))
       } else {
         const classId = `class_${Date.now()}`
         await rtdb.createClass(classId, {
@@ -115,230 +127,329 @@ export default function ClassesPage() {
           createdAt: new Date().toISOString(),
           createdBy: 'admin',
         })
-        setSuccess('Class created successfully')
+        toast.success(t('toast.created'))
       }
-      resetForm()
-      // The shared store refresh passes through automatically.
-    } catch (err: any) {
-      setError(err.message || 'Failed to save class')
+      setFormOpen(false)
+    } catch (err) {
+      toast.error(err instanceof Error && err.message ? err.message : tc('errors.generic'))
     } finally {
       setSaving(false)
     }
   }
 
-  const handleDelete = async (c: Class) => {
-    if (!confirm(`Delete class "${c.name}"? This cannot be undone.`)) return
+  const confirmDelete = async () => {
+    if (!deleting) return
+    setDeleteBusy(true)
     try {
-      await rtdb.deleteClass(c.id)
-      if (editingId === c.id) resetForm()
-      setSuccess('Class deleted')
-      // The store refresh passes through automatically.
-    } catch (err: any) {
-      setError(err.message || 'Failed to delete class')
+      await rtdb.deleteClass(deleting.id)
+      toast.success(t('toast.deleted', { name: deleting.name }))
+      setDeleting(null)
+    } catch (err) {
+      toast.error(err instanceof Error && err.message ? err.message : tc('errors.generic'))
+    } finally {
+      setDeleteBusy(false)
     }
   }
-if (loading) {
-    return (
-      <div className="flex items-center justify-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-green-600" />
-      </div>
-    )
-  }
+
+  const deletingCount = deleting ? countByClass[deleting.id] || 0 : 0
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Classes Management</h1>
-        <p className="text-gray-600 mt-1">Create and edit classes</p>
+    <div>
+      <PageHeader
+        title={t('title')}
+        description={t('description')}
+        actions={
+          <Button onClick={openCreate}>
+            <Plus /> {t('add')}
+          </Button>
+        }
+      />
+
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="relative w-full sm:max-w-xs">
+          <Label htmlFor="class-search" className="sr-only">
+            {t('searchLabel')}
+          </Label>
+          <Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            id="class-search"
+            type="search"
+            placeholder={t('searchPlaceholder')}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="ps-9"
+          />
+        </div>
+        {!loading && (
+          <p className="text-sm text-muted-foreground">{t('summary', { shown: filtered.length, total: classes.length })}</p>
+        )}
       </div>
 
-      {error && (
-        <Alert variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-      {success && (
-        <Alert variant="success">
-          <AlertDescription>{success}</AlertDescription>
-        </Alert>
-      )}
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            {editingId ? <Pencil className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
-            {editingId ? 'Edit Class' : 'Create New Class'}
-          </CardTitle>
-          <CardDescription>
-            {editingId ? 'Update the class details below' : 'Create a class. Teachers are assigned when you register them from the Users page.'}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Class Name</Label>
-                <Input id="name" placeholder="e.g. Grade 5" value={name} onChange={(e) => setName(e.target.value)} required />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="grade">Grade</Label>
-                <Input id="grade" placeholder="e.g. 5" value={grade} onChange={(e) => setGrade(e.target.value)} />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="section">Section</Label>
-                <Input id="section" placeholder="e.g. A" value={section} onChange={(e) => setSection(e.target.value)} />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="year">Academic Year</Label>
-                <Input id="year" placeholder="e.g. 2026-2027" value={academicYear} onChange={(e) => setAcademicYear(e.target.value)} required />
-              </div>
-            </div>
-            <div className="flex gap-3">
-              <Button type="submit" disabled={saving}>
-                {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : editingId ? <Pencil className="h-4 w-4 mr-2" /> : <Plus className="h-4 w-4 mr-2" />}
-                {editingId ? 'Save Changes' : 'Create Class'}
-              </Button>
-              {editingId && (
-                <Button type="button" variant="outline" onClick={resetForm}>
-                  <X className="h-4 w-4 mr-2" /> Cancel
-                </Button>
-              )}
-            </div>
-          </form>
-        </CardContent>
-      </Card>
-<Card>
-        <CardHeader className="space-y-3">
-          <CardTitle className="flex items-center gap-2">
-            <GraduationCap className="h-5 w-5" /> Class List ({filtered.length} / {classes.length})
-          </CardTitle>
-          <div className="relative w-full md:max-w-xs">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-            <Input
-              placeholder="Search by class, teacher or year..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-        </CardHeader>
-        <CardContent>
-          {filtered.length === 0 ? (
-            <p className="text-gray-500 text-center py-8">
-              {search ? 'No classes match your search.' : 'No classes yet. Create your first class above.'}
-            </p>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm border-collapse border border-gray-200 [&_th]:border [&_th]:border-gray-200 [&_td]:border [&_td]:border-gray-200">
-                <thead>
-                  <tr className="border-b text-left text-gray-500">
-                    <th className="pb-3 pr-4 font-medium">Class</th>
-                    <th className="pb-3 pr-4 font-medium">Section</th>
-                    <th className="pb-3 pr-4 font-medium">Teacher</th>
-                    <th className="pb-3 pr-4 font-medium">Year</th>
-                    <th className="pb-3 pr-4 font-medium">Students</th>
-                    <th className="pb-3 font-medium">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {paginated.map((c) => {
-                    const count = students.filter((s) => s.classId === c.id).length
-                    return (
-                      <tr key={c.id} className="border-b last:border-0">
-                        <td className="py-3 pr-4 font-medium">{c.name}</td>
-                        <td className="py-3 pr-4">{c.section || '—'}</td>
-                        <td className="py-3 pr-4">{c.teacherName || 'Unassigned'}</td>
-                        <td className="py-3 pr-4">{c.academicYear}</td>
-                        <td className="py-3 pr-4">
-                          <button
-                            type="button"
-                            onClick={() => setStudentsOfClass(c)}
-                            title="View students in this class"
-                            className="inline-flex items-center gap-1 rounded-lg bg-green-50 px-2.5 py-1 font-medium text-green-700 transition hover:bg-green-100"
-                          >
-                            <Users className="h-3.5 w-3.5" /> {count}
-                          </button>
-                        </td>
-                        <td className="py-3">
-                          <div className="flex gap-2">
-                            <Button variant="outline" size="sm" onClick={() => startEdit(c)}>
-                              <Pencil className="h-4 w-4" />
-                            </Button>
-                            <Button variant="outline" size="sm" onClick={() => handleDelete(c)}>
-                              <Trash2 className="h-4 w-4 text-red-500" />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-          <Pagination page={page} totalPages={totalPages} totalItems={filtered.length} onPageChange={setPage} />
-        </CardContent>
-      </Card>
-
-      {studentsOfClass && (
-        <div
-          className="fixed inset-0 z-40 flex items-center justify-center bg-black/50 p-4"
-          onClick={() => setStudentsOfClass(null)}
-        >
-          <Card
-            className="flex max-h-[85vh] w-full max-w-lg flex-col border-0 shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <CardHeader className="relative">
-              <button
-                type="button"
-                aria-label="Close"
-                className="absolute right-4 top-4 text-gray-400 transition hover:text-gray-600"
-                onClick={() => setStudentsOfClass(null)}
-              >
-                <X className="h-5 w-5" />
-              </button>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-green-600" /> {studentsOfClass.name} — Students ({classStudents.length})
-              </CardTitle>
-              <CardDescription>
-                {studentsOfClass.academicYear} • {studentsOfClass.section || 'No section'} •{' '}
-                {studentsOfClass.teacherName || 'Unassigned'}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="overflow-y-auto">
-              {classStudents.length === 0 ? (
-                <p className="py-8 text-center text-sm text-gray-500">No students registered in this class yet.</p>
-              ) : (
-                <ul className="divide-y divide-gray-100">
-                  {classStudents.map((s) => (
-                    <li key={s.id}>
-                      <button
-                        type="button"
-                        onClick={() => setViewingStudent(s)}
-                        className="flex w-full items-center gap-3 rounded-lg px-2 py-2.5 text-left transition hover:bg-gray-50"
-                      >
-                        <StudentAvatar photoUrl={s.photoUrl} studentId={s.id} name={s.name} size="sm" />
-                        <span className="min-w-0 flex-1">
-                          <span className="block truncate text-sm font-medium text-gray-800">{s.name}</span>
-                          <span className="block text-xs text-gray-500">
-                            {s.rollNumber ? `Roll ${s.rollNumber}` : 'No roll'} • {s.parentPhone || 'No phone'}
-                          </span>
-                        </span>
-                        <Eye className="h-4 w-4 text-gray-400" />
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </CardContent>
-          </Card>
+      {loading ? (
+        <div className="space-y-2">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Skeleton key={i} className="h-14 w-full rounded-xl" />
+          ))}
         </div>
+      ) : filtered.length === 0 ? (
+        search ? (
+          <EmptyState icon={Search} title={t('empty.search')} />
+        ) : (
+          <EmptyState
+            icon={GraduationCap}
+            title={t('empty.title')}
+            description={t('empty.description')}
+            action={
+              <Button onClick={openCreate}>
+                <Plus /> {t('add')}
+              </Button>
+            }
+          />
+        )
+      ) : (
+        <>
+          {/* Mobile: stacked cards */}
+          <ul className="space-y-3 md:hidden">
+            {paginated.map((c) => {
+              const count = countByClass[c.id] || 0
+              return (
+                <li key={c.id} className="rounded-xl border bg-card p-4 shadow-sm">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="truncate font-medium text-foreground">
+                        {c.name}
+                        {c.section ? ` · ${c.section}` : ''}
+                      </p>
+                      <p className="mt-0.5 text-sm text-muted-foreground">
+                        {c.teacherName || t('unassigned')} · {c.academicYear}
+                      </p>
+                    </div>
+                    <div className="flex shrink-0 gap-1">
+                      <Button variant="ghost" size="icon" aria-label={t('editClass', { name: c.name })} onClick={() => openEdit(c)}>
+                        <Pencil />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-destructive hover:text-destructive"
+                        aria-label={t('deleteClass', { name: c.name })}
+                        onClick={() => setDeleting(c)}
+                      >
+                        <Trash2 />
+                      </Button>
+                    </div>
+                  </div>
+                  <Button variant="outline" size="sm" className="mt-3 w-full" onClick={() => setStudentsOfClass(c)}>
+                    <Users /> {t('studentCount', { count })}
+                  </Button>
+                </li>
+              )
+            })}
+          </ul>
+
+          {/* Desktop: table */}
+          <TableContainer className="hidden md:block">
+            <thead>
+              <tr>
+                <th>{t('table.class')}</th>
+                <th>{t('table.section')}</th>
+                <th>{t('table.teacher')}</th>
+                <th>{t('table.year')}</th>
+                <th>{t('table.students')}</th>
+                <th className="text-end">{t('table.actions')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {paginated.map((c) => {
+                const count = countByClass[c.id] || 0
+                return (
+                  <tr key={c.id}>
+                    <td className="font-medium text-foreground">{c.name}</td>
+                    <td>{c.section || '—'}</td>
+                    <td>
+                      {c.teacherName || <span className="text-muted-foreground">{t('unassigned')}</span>}
+                    </td>
+                    <td>{c.academicYear}</td>
+                    <td>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setStudentsOfClass(c)}
+                        aria-label={t('viewStudents', { name: c.name })}
+                      >
+                        <Users /> {count}
+                      </Button>
+                    </td>
+                    <td>
+                      <div className="flex justify-end gap-1">
+                        <Button variant="ghost" size="icon-sm" aria-label={t('editClass', { name: c.name })} onClick={() => openEdit(c)}>
+                          <Pencil />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          className="text-destructive hover:text-destructive"
+                          aria-label={t('deleteClass', { name: c.name })}
+                          onClick={() => setDeleting(c)}
+                        >
+                          <Trash2 />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </TableContainer>
+
+          <Pager page={page} totalPages={totalPages} total={filtered.length} onPage={setPage} />
+        </>
       )}
+
+      {/* Create / edit */}
+      <Dialog open={formOpen} onOpenChange={setFormOpen}>
+        <DialogContent>
+          <form onSubmit={handleSubmit} className="grid gap-4">
+            <DialogHeader>
+              <DialogTitle>{editingId ? t('form.editTitle') : t('form.createTitle')}</DialogTitle>
+              <DialogDescription>{editingId ? t('form.editDescription') : t('form.createDescription')}</DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="class-name">{t('form.name')}</Label>
+                <Input id="class-name" placeholder={t('form.namePlaceholder')} value={name} onChange={(e) => setName(e.target.value)} required />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="class-grade">{t('form.grade')}</Label>
+                <Input id="class-grade" placeholder={t('form.gradePlaceholder')} value={grade} onChange={(e) => setGrade(e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="class-section">{t('form.section')}</Label>
+                <Input id="class-section" placeholder={t('form.sectionPlaceholder')} value={section} onChange={(e) => setSection(e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="class-year">{t('form.year')}</Label>
+                <Input
+                  id="class-year"
+                  placeholder={t('form.yearPlaceholder')}
+                  value={academicYear}
+                  onChange={(e) => setAcademicYear(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setFormOpen(false)}>
+                {tc('actions.cancel')}
+              </Button>
+              <Button type="submit" disabled={saving}>
+                {saving && <Loader2 className="animate-spin" />}
+                {editingId ? tc('actions.saveChanges') : t('form.create')}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete confirmation */}
+      <Dialog open={!!deleting} onOpenChange={(o) => !o && setDeleting(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('delete.title', { name: deleting?.name ?? '' })}</DialogTitle>
+            <DialogDescription>{t('delete.description')}</DialogDescription>
+          </DialogHeader>
+          {deletingCount > 0 && (
+            <Alert variant="warning">
+              <AlertDescription>{t('delete.withStudents', { count: deletingCount })}</AlertDescription>
+            </Alert>
+          )}
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setDeleting(null)}>
+              {tc('actions.cancel')}
+            </Button>
+            <Button type="button" variant="destructive" onClick={confirmDelete} disabled={deleteBusy}>
+              {deleteBusy && <Loader2 className="animate-spin" />}
+              {t('delete.confirm')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Students of a class */}
+      <Dialog open={!!studentsOfClass} onOpenChange={(o) => !o && setStudentsOfClass(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('studentsDialog.title', { name: studentsOfClass?.name ?? '' })}</DialogTitle>
+            <DialogDescription>
+              {t('studentsDialog.meta', {
+                year: studentsOfClass?.academicYear ?? '',
+                section: studentsOfClass?.section || t('noSection'),
+                teacher: studentsOfClass?.teacherName || t('unassigned'),
+              })}
+            </DialogDescription>
+          </DialogHeader>
+          {classStudents.length === 0 ? (
+            <EmptyState icon={Users} title={t('studentsDialog.empty')} className="py-8" />
+          ) : (
+            <ul className="-mx-2 divide-y">
+              {classStudents.map((s) => (
+                <li key={s.id}>
+                  <button
+                    type="button"
+                    onClick={() => setViewingStudent(s)}
+                    className="flex w-full items-center gap-3 rounded-lg px-2 py-2.5 text-start transition-colors hover:bg-muted"
+                  >
+                    <StudentAvatar photoUrl={s.photoUrl} studentId={s.id} name={s.name} size="sm" />
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-sm font-medium text-foreground">{s.name}</span>
+                      <span className="block text-xs text-muted-foreground">
+                        {s.rollNumber ? t('studentsDialog.roll', { roll: s.rollNumber }) : t('studentsDialog.noRoll')} ·{' '}
+                        <span dir="ltr">{s.parentPhone || t('studentsDialog.noPhone')}</span>
+                      </span>
+                    </span>
+                    <ChevronEnd className="h-4 w-4 text-muted-foreground rtl:rotate-180" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {viewingStudent && (
         <StudentDetailCard student={viewingStudent} classes={classes} onClose={() => setViewingStudent(null)} />
       )}
+    </div>
+  )
+}
+
+function Pager({
+  page,
+  totalPages,
+  total,
+  onPage,
+}: {
+  page: number
+  totalPages: number
+  total: number
+  onPage: (p: number) => void
+}) {
+  const tc = useTranslations('common')
+  if (totalPages <= 1) return null
+  const from = (page - 1) * PER_PAGE + 1
+  const to = Math.min(page * PER_PAGE, total)
+  return (
+    <div className="mt-4 flex flex-col items-center justify-between gap-3 sm:flex-row">
+      <p className="text-sm text-muted-foreground">{tc('pagination.showing', { from, to, total })}</p>
+      <div className="flex items-center gap-2">
+        <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => onPage(page - 1)}>
+          <ChevronLeft className="rtl:rotate-180" /> {tc('actions.previous')}
+        </Button>
+        <span className="text-sm text-muted-foreground">{tc('pagination.page', { page, pages: totalPages })}</span>
+        <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => onPage(page + 1)}>
+          {tc('actions.next')} <ChevronRight className="rtl:rotate-180" />
+        </Button>
+      </div>
     </div>
   )
 }

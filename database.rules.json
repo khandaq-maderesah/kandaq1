@@ -44,7 +44,43 @@
             "classId"
           ],
           "$studentId": {
-            ".write": "auth != null && (root.child('users/' + auth.uid).child('role').val() === 'superadmin' || ((root.child('users/' + auth.uid).child('schoolId').val() === $schoolId && root.child('users/' + auth.uid).child('status').val() !== 'inactive' && root.child('schoolInfo/' + $schoolId + '/status').val() === 'active') && root.child('users/' + auth.uid).child('role').val() === 'admin')) || ((root.child('users/' + auth.uid).child('schoolId').val() === $schoolId && root.child('users/' + auth.uid).child('status').val() !== 'inactive' && root.child('schoolInfo/' + $schoolId + '/status').val() === 'active') && newData.child('classId').exists() && root.child('schoolData/' + $schoolId + '/classes/' + newData.child('classId').val() + '/teacherId').val() === auth.uid)"
+            ".write": "auth != null && (root.child('users/' + auth.uid).child('role').val() === 'superadmin' || ((root.child('users/' + auth.uid).child('schoolId').val() === $schoolId && root.child('users/' + auth.uid).child('status').val() !== 'inactive' && root.child('schoolInfo/' + $schoolId + '/status').val() === 'active') && root.child('users/' + auth.uid).child('role').val() === 'admin')) || ((root.child('users/' + auth.uid).child('schoolId').val() === $schoolId && root.child('users/' + auth.uid).child('status').val() !== 'inactive' && root.child('schoolInfo/' + $schoolId + '/status').val() === 'active') && newData.child('classId').exists() && root.child('schoolData/' + $schoolId + '/classes/' + newData.child('classId').val() + '/teacherId').val() === auth.uid && data.child('isActive').val() !== false)",
+            "classId": {
+              ".validate": "!data.exists() || newData.val() === data.val() || auth != null && (root.child('users/' + auth.uid).child('role').val() === 'superadmin' || ((root.child('users/' + auth.uid).child('schoolId').val() === $schoolId && root.child('users/' + auth.uid).child('status').val() !== 'inactive' && root.child('schoolInfo/' + $schoolId + '/status').val() === 'active') && root.child('users/' + auth.uid).child('role').val() === 'admin'))"
+            },
+            "isActive": {
+              ".validate": "newData.val() === data.val() || auth != null && (root.child('users/' + auth.uid).child('role').val() === 'superadmin' || ((root.child('users/' + auth.uid).child('schoolId').val() === $schoolId && root.child('users/' + auth.uid).child('status').val() !== 'inactive' && root.child('schoolInfo/' + $schoolId + '/status').val() === 'active') && root.child('users/' + auth.uid).child('role').val() === 'admin')) || (!data.exists() && newData.val() === true)"
+            },
+            "archive": {
+              ".validate": "auth != null && (root.child('users/' + auth.uid).child('role').val() === 'superadmin' || ((root.child('users/' + auth.uid).child('schoolId').val() === $schoolId && root.child('users/' + auth.uid).child('status').val() !== 'inactive' && root.child('schoolInfo/' + $schoolId + '/status').val() === 'active') && root.child('users/' + auth.uid).child('role').val() === 'admin'))"
+            }
+          }
+        },
+        "requests": {
+          ".read": "auth != null && (root.child('users/' + auth.uid).child('role').val() === 'superadmin' || ((root.child('users/' + auth.uid).child('schoolId').val() === $schoolId && root.child('users/' + auth.uid).child('status').val() !== 'inactive' && root.child('schoolInfo/' + $schoolId + '/status').val() === 'active') && root.child('users/' + auth.uid).child('role').val() === 'admin')) || ((root.child('users/' + auth.uid).child('schoolId').val() === $schoolId && root.child('users/' + auth.uid).child('status').val() !== 'inactive' && root.child('schoolInfo/' + $schoolId + '/status').val() === 'active') && query.orderByChild === 'requestedBy' && query.equalTo === auth.uid)",
+          ".indexOn": [
+            "requestedBy",
+            "status",
+            "studentId"
+          ],
+          "$requestId": {
+            ".read": "auth != null && (root.child('users/' + auth.uid).child('role').val() === 'superadmin' || ((root.child('users/' + auth.uid).child('schoolId').val() === $schoolId && root.child('users/' + auth.uid).child('status').val() !== 'inactive' && root.child('schoolInfo/' + $schoolId + '/status').val() === 'active') && root.child('users/' + auth.uid).child('role').val() === 'admin')) || ((root.child('users/' + auth.uid).child('schoolId').val() === $schoolId && root.child('users/' + auth.uid).child('status').val() !== 'inactive' && root.child('schoolInfo/' + $schoolId + '/status').val() === 'active') && data.child('requestedBy').val() === auth.uid)",
+            ".write": "auth != null && (root.child('users/' + auth.uid).child('role').val() === 'superadmin' || ((root.child('users/' + auth.uid).child('schoolId').val() === $schoolId && root.child('users/' + auth.uid).child('status').val() !== 'inactive' && root.child('schoolInfo/' + $schoolId + '/status').val() === 'active') && root.child('users/' + auth.uid).child('role').val() === 'admin')) || ((root.child('users/' + auth.uid).child('schoolId').val() === $schoolId && root.child('users/' + auth.uid).child('status').val() !== 'inactive' && root.child('schoolInfo/' + $schoolId + '/status').val() === 'active') && ((!data.exists() && newData.child('requestedBy').val() === auth.uid && newData.child('status').val() === 'pending' && root.child('schoolData/' + $schoolId + '/classes/' + root.child('schoolData/' + $schoolId + '/students/' + newData.child('studentId').val()).child('classId').val() + '/teacherId').val() === auth.uid && root.child('schoolData/' + $schoolId + '/students/' + newData.child('studentId').val()).child('isActive').val() !== false) || (data.exists() && data.child('requestedBy').val() === auth.uid && data.child('status').val() === 'pending' && newData.child('status').val() === 'cancelled' && newData.child('requestedBy').val() === auth.uid && newData.child('studentId').val() === data.child('studentId').val() && newData.child('type').val() === data.child('type').val())))",
+            "type": {
+              ".validate": "newData.val() === 'student_delete' || newData.val() === 'student_transfer'"
+            },
+            "status": {
+              ".validate": "newData.val() === 'pending' || newData.val() === 'approved' || newData.val() === 'rejected' || newData.val() === 'cancelled'"
+            },
+            "reason": {
+              ".validate": "newData.isString() && newData.val().length >= 3 && newData.val().length <= 1000"
+            },
+            "toClassId": {
+              ".validate": "root.child('schoolData/' + $schoolId + '/classes/' + newData.val()).exists()"
+            },
+            "reviewNote": {
+              ".validate": "newData.isString() && newData.val().length <= 1000"
+            }
           }
         },
         "studentPhotos": {

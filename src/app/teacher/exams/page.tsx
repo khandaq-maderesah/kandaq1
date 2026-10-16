@@ -1,35 +1,48 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { useFormatter, useTranslations } from 'next-intl'
+import { toast } from 'sonner'
 import { useAuth } from '@/context/AuthContext'
 import { rtdb } from '@/lib/database'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Loader2, FileText, Plus, Trash2, ClipboardList, Award } from 'lucide-react'
+import { Button, buttonVariants } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Skeleton } from '@/components/ui/skeleton'
+import { PageHeader, EmptyState, TableContainer } from '@/components/ui/page'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogClose,
+} from '@/components/ui/dialog'
+import { FileText, Plus, Trash2, ClipboardList, Award, CheckCircle2, PencilLine, Loader2 } from 'lucide-react'
 import type { Class, Exam } from '@/types'
 import { useLiveData } from '@/lib/dataStore'
-import { EXAM_TYPE_LABELS, fmt } from '@/lib/examMath'
-
-function examMax(exam: Exam): number {
-  return exam.subjects.reduce((s, sub) => s + (exam.subjectMax?.[sub] ?? 100), 0)
-}
+import { examTypeKey } from '@/lib/examMath'
+import { useExamFormat } from '@/components/ExamResultsSheet'
 
 function classAveragePercent(exam: Exam): number {
   const rows = Object.values(exam.rows || {})
-  if (!rows.length || !examMax(exam)) return 0
-  const avg = rows.reduce((s, r) => s + r.percentage, 0) / rows.length
-  return avg
+  if (!rows.length) return 0
+  return rows.reduce((s, r) => s + (r.percentage || 0), 0) / rows.length
 }
 
 export default function TeacherExamsPage() {
+  const t = useTranslations('teacherExams.list')
+  const tx = useTranslations('exams')
+  const tc = useTranslations('common')
+  const format = useFormatter()
+  const f = useExamFormat()
   const { user } = useAuth()
-  const router = useRouter()
   const [classes, setClasses] = useState<Class[]>([])
   const [exams, setExams] = useState<Exam[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
+  const [toDelete, setToDelete] = useState<Exam | null>(null)
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     if (!user) return
@@ -53,13 +66,18 @@ export default function TeacherExamsPage() {
 
   const myClassIds = useMemo(() => new Set(classes.map((c) => c.id)), [classes])
   const myExams = useMemo(
-    () => exams.filter((e) => e.teacherId === user?.uid || myClassIds.has(e.classId)),
+    () =>
+      exams
+        .filter((e) => e.teacherId === user?.uid || myClassIds.has(e.classId))
+        .sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || '')),
     [exams, myClassIds, user]
   )
-  const savedExams = myExams.filter((e) => e.status === 'saved')
+  const savedCount = myExams.filter((e) => e.status === 'saved').length
 
-  const handleDelete = async (exam: Exam) => {
-    if (!confirm(`Delete "${exam.title}"? This cannot be undone.`)) return
+  const handleDelete = async () => {
+    const exam = toDelete
+    if (!exam) return
+    setDeleting(true)
     try {
       await rtdb.deleteExam(exam.id)
       await rtdb.logAction({
@@ -70,115 +88,178 @@ export default function TeacherExamsPage() {
         entityId: exam.id,
         details: exam.title,
       })
+      toast.success(t('deleted'))
+      setToDelete(null)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete exam')
+      console.error(err)
+      toast.error(t('deleteError'))
+    } finally {
+      setDeleting(false)
     }
   }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-green-600" />
-      </div>
+  const dateOf = (exam: Exam) =>
+    format.dateTime(new Date(exam.updatedAt || exam.createdAt), { dateStyle: 'medium' })
+
+  const statusBadge = (exam: Exam) =>
+    exam.status === 'saved' ? (
+      <Badge variant="success">
+        <CheckCircle2 /> {t('status.saved')}
+      </Badge>
+    ) : (
+      <Badge variant="warning">
+        <PencilLine /> {t('status.draft')}
+      </Badge>
     )
-  }
+
+  const actions = (exam: Exam) => (
+    <div className="flex items-center gap-1">
+      <Link
+        href={`/teacher/exams/${exam.id}`}
+        className={buttonVariants({ variant: 'outline', size: 'sm', className: 'h-10 sm:h-9' })}
+      >
+        <ClipboardList /> {exam.status === 'saved' ? t('view') : t('fillMarks')}
+      </Link>
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={() => setToDelete(exam)}
+        aria-label={t('deleteLabel', { title: exam.title })}
+        title={tc('actions.delete')}
+      >
+        <Trash2 className="text-destructive" />
+      </Button>
+    </div>
+  )
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Exams & Results</h1>
-          <p className="text-gray-600 mt-1">Create exams, enter marks and view results</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => router.push('/teacher/exams/overall')}>
-            <Award className="h-4 w-4 mr-2" /> Overall Result
-          </Button>
-          <Button onClick={() => router.push('/teacher/exams/create')}>
-            <Plus className="h-4 w-4 mr-2" /> New Exam
-          </Button>
-        </div>
-      </div>
+      <PageHeader
+        title={t('title')}
+        description={t('description')}
+        actions={
+          <>
+            <Link href="/teacher/exams/overall" className={buttonVariants({ variant: 'outline' })}>
+              <Award /> {t('overall')}
+            </Link>
+            <Link href="/teacher/exams/create" className={buttonVariants()}>
+              <Plus /> {t('newExam')}
+            </Link>
+          </>
+        }
+      />
 
-      {error && (
-        <Alert variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-
-      {myExams.length === 0 ? (
-        <Card className="border-0 shadow-md">
-          <CardContent className="py-12 text-center text-gray-500">
-            No exams yet. Click &quot;New Exam&quot; to create your first sheet.
-          </CardContent>
-        </Card>
+      {loading ? (
+        <div className="space-y-2">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Skeleton key={i} className="h-14 w-full rounded-xl" />
+          ))}
+        </div>
+      ) : myExams.length === 0 ? (
+        <EmptyState
+          icon={FileText}
+          title={t('emptyTitle')}
+          description={t('emptyDescription')}
+          action={
+            <Link href="/teacher/exams/create" className={buttonVariants()}>
+              <Plus /> {t('newExam')}
+            </Link>
+          }
+        />
       ) : (
-        <Card className="border-0 shadow-md">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5" /> My Exams ({myExams.length})
-            </CardTitle>
-            <CardDescription>
-              {savedExams.length} saved · Total, average, %, rank and pass scores are calculated automatically.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="overflow-x-auto">
-            <table className="w-full text-sm border-collapse border border-gray-200 [&_th]:border [&_th]:border-gray-200 [&_td]:border [&_td]:border-gray-200">
-              <thead>
-                <tr className="border-b text-left text-gray-500">
-                  <th className="px-3 py-2 font-medium">Title</th>
-                  <th className="px-3 py-2 font-medium">Type</th>
-                  <th className="px-3 py-2 font-medium">Class</th>
-                  <th className="px-3 py-2 font-medium">Subjects</th>
-                  <th className="px-3 py-2 font-medium">Status</th>
-                  <th className="px-3 py-2 font-medium">Class Avg %</th>
-                  <th className="px-3 py-2 font-medium">Updated</th>
-                  <th className="px-3 py-2 font-medium">Actions</th>
+        <section className="space-y-3">
+          <div>
+            <h2 className="flex items-center gap-2 text-base font-semibold text-foreground">
+              <FileText className="h-5 w-5 text-muted-foreground" /> {t('cardTitle')}
+              <Badge variant="secondary">{f.int(myExams.length)}</Badge>
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">{t('summary', { count: savedCount })}</p>
+          </div>
+
+          {/* Mobile: stacked cards */}
+          <ul className="space-y-3 md:hidden">
+            {myExams.map((exam) => (
+              <li key={exam.id} className="rounded-xl border bg-card p-4 shadow-sm">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="truncate font-medium text-foreground">{exam.title}</p>
+                    <p className="mt-0.5 text-sm text-muted-foreground">
+                      {tx(examTypeKey(exam.type))} · {exam.className}
+                      {exam.section ? ` • ${exam.section}` : ''}
+                    </p>
+                  </div>
+                  {statusBadge(exam)}
+                </div>
+                <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                  <span>{t('subjectCount', { count: exam.subjects.length })}</span>
+                  {exam.status === 'saved' && (
+                    <span>{t('classAverageValue', { value: f.pct(classAveragePercent(exam)) })}</span>
+                  )}
+                  <span>{dateOf(exam)}</span>
+                </div>
+                <div className="mt-3 flex justify-end">{actions(exam)}</div>
+              </li>
+            ))}
+          </ul>
+
+          {/* Desktop: table */}
+          <TableContainer className="hidden md:block">
+            <thead>
+              <tr>
+                <th>{t('col.title')}</th>
+                <th>{t('col.type')}</th>
+                <th>{t('col.class')}</th>
+                <th className="!text-center">{t('col.subjects')}</th>
+                <th>{t('col.status')}</th>
+                <th className="!text-end">{t('col.classAverage')}</th>
+                <th>{t('col.updated')}</th>
+                <th className="!text-end">{t('col.actions')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {myExams.map((exam) => (
+                <tr key={exam.id}>
+                  <td className="font-medium text-foreground">{exam.title}</td>
+                  <td className="whitespace-nowrap">{tx(examTypeKey(exam.type))}</td>
+                  <td className="whitespace-nowrap">
+                    {exam.className}
+                    {exam.section ? ` • ${exam.section}` : ''}
+                  </td>
+                  <td className="text-center tabular-nums">{f.int(exam.subjects.length)}</td>
+                  <td>{statusBadge(exam)}</td>
+                  <td className="text-end tabular-nums">
+                    {exam.status === 'saved' ? f.pct(classAveragePercent(exam)) : '—'}
+                  </td>
+                  <td className="whitespace-nowrap text-muted-foreground">{dateOf(exam)}</td>
+                  <td>
+                    <div className="flex justify-end">{actions(exam)}</div>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {myExams
-                  .slice()
-                  .sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''))
-                  .map((exam) => (
-                    <tr key={exam.id} className="hover:bg-gray-50">
-                      <td className="px-3 py-2 font-medium text-gray-900">{exam.title}</td>
-                      <td className="px-3 py-2">{EXAM_TYPE_LABELS[exam.type]}</td>
-                      <td className="px-3 py-2">{exam.className}{exam.section ? ` • ${exam.section}` : ''}</td>
-                      <td className="px-3 py-2">{exam.subjects.length}</td>
-                      <td className="px-3 py-2">
-                        <span
-                          className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
-                            exam.status === 'saved' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
-                          }`}
-                        >
-                          {exam.status === 'saved' ? 'Saved' : 'Draft'}
-                        </span>
-                      </td>
-                      <td className="px-3 py-2">
-                        {exam.status === 'saved' ? `${fmt(classAveragePercent(exam))}%` : '—'}
-                      </td>
-                      <td className="px-3 py-2 text-gray-500">
-                        {new Date(exam.updatedAt || exam.createdAt).toLocaleDateString()}
-                      </td>
-                      <td className="px-3 py-2">
-                        <div className="flex gap-2">
-                          <Button variant="outline" size="sm" onClick={() => router.push(`/teacher/exams/${exam.id}`)}>
-                            <ClipboardList className="h-4 w-4 mr-1" />
-                            {exam.status === 'saved' ? 'View' : 'Fill Marks'}
-                          </Button>
-                          <Button variant="outline" size="sm" onClick={() => handleDelete(exam)}>
-                            <Trash2 className="h-4 w-4 text-red-500" />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
-          </CardContent>
-        </Card>
+              ))}
+            </tbody>
+          </TableContainer>
+        </section>
       )}
+
+      <Dialog open={!!toDelete} onOpenChange={(o) => !o && !deleting && setToDelete(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('deleteTitle')}</DialogTitle>
+            <DialogDescription>{t('deleteDescription', { title: toDelete?.title ?? '' })}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline" disabled={deleting}>
+                {tc('actions.cancel')}
+              </Button>
+            </DialogClose>
+            <Button variant="destructive" onClick={handleDelete} disabled={deleting}>
+              {deleting ? <Loader2 className="animate-spin" /> : <Trash2 />}
+              {tc('actions.delete')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

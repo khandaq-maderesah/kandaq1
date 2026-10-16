@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { requireAdmin, assertCanManageSchool, errorStatus, HttpError } from '@/lib/firebase/admin'
+import { requireAdmin, assertCanManageSchool, errorStatus, errorCode, HttpError } from '@/lib/firebase/admin'
 import { getAuth } from 'firebase-admin/auth'
 
 export const dynamic = 'force-dynamic'
@@ -24,16 +24,16 @@ export async function PATCH(
       : null
 
     if (!assignedClassIds) {
-      return NextResponse.json({ ok: false, error: 'assignedClassIds must be an array.' }, { status: 400 })
+      return NextResponse.json({ ok: false, error: 'assignedClassIds must be an array.', code: 'invalid' }, { status: 400 })
     }
 
     const user = (await db.ref('users/' + uid).get()).val()
     if (!user) {
-      return NextResponse.json({ ok: false, error: 'User not found.' }, { status: 404 })
+      return NextResponse.json({ ok: false, error: 'User not found.', code: 'not-found' }, { status: 404 })
     }
     assertCanManageSchool(caller, user.schoolId)
     if (user.role !== 'teacher') {
-      return NextResponse.json({ ok: false, error: 'Only teacher assignments can be edited.' }, { status: 400 })
+      return NextResponse.json({ ok: false, error: 'Only teacher assignments can be edited.', code: 'invalid' }, { status: 400 })
     }
     const schoolId: string = user.schoolId
 
@@ -96,7 +96,7 @@ export async function PATCH(
   } catch (err: any) {
     console.error('Update user assignments failed:', err)
     return NextResponse.json(
-      { ok: false, error: err?.message || 'Failed to update user assignments' },
+      { ok: false, error: err?.message || 'Failed to update user assignments', code: errorCode(err) },
       { status: errorStatus(err) }
     )
   }
@@ -122,7 +122,7 @@ export async function DELETE(
 
     if (caller.uid === uid) {
       return NextResponse.json(
-        { ok: false, error: 'You cannot delete your own account.' },
+        { ok: false, error: 'You cannot delete your own account.', code: 'cannot-delete-self' },
         { status: 400 }
       )
     }
@@ -154,7 +154,7 @@ export async function DELETE(
   } catch (err: any) {
     console.error('Delete user failed:', err)
     return NextResponse.json(
-      { ok: false, error: err?.message || 'Failed to delete user' },
+      { ok: false, error: err?.message || 'Failed to delete user', code: errorCode(err) },
       { status: errorStatus(err) }
     )
   }

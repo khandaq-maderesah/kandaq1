@@ -1,0 +1,36 @@
+{
+  "title": "Barattoota koo",
+  "description": "Barattoota kutaalee isinitti kennaman keessa jiran. Barataa haquuf ykn dabarsuuf bulchaa mana barumsaatiif gaaffii ergaa.",
+  "filters": {
+    "search": "Barattoota barbaadi",
+    "searchPlaceholder": "Maqaa, lakkoofsa tartiibaa ykn bilbila",
+    "class": "Kutaa",
+    "allClasses": "Kutaalee koo hunda"
+  },
+  "table": {
+    "photo": "Suuraa",
+    "student": "Barataa",
+    "roll": "Lakk.",
+    "age": "Umurii",
+    "class": "Kutaa",
+    "gender": "Saala",
+    "parentPhone": "Bilbila maatii",
+    "alternativePhone": "Bilbila biraa",
+    "actions": "Gochaalee"
+  },
+  "card": {
+    "roll": "Lakk. {roll}",
+    "age": "{age, plural, one {Waggaa #} other {Waggaa #}}"
+  },
+  "viewDetails": "Odeeffannoo {name} ilaali",
+  "callNumber": "{phone} bilbili",
+  "empty": {
+    "noClasses": "Hanga ammaatti kutaan isinitti kenname hin jiru.",
+    "noClassesHint": "Akka kutaan isiniif kennamu bulchaa mana barumsaa gaafadhaa.",
+    "noStudents": "Barataan hin argamne.",
+    "noStudentsHint": "Barattoota fuula Kutaalee koo irraa dabalaa."
+  },
+  "toast": {
+    "loadFailed": "Barattoota keessan fe'uun hin danda'amne."
+  }
+}

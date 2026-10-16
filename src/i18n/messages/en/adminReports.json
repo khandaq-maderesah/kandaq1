@@ -1,0 +1,71 @@
+{
+  "title": "Reports",
+  "description": "Attendance overview for your school",
+  "actions": {
+    "studentCsv": "Student CSV",
+    "summaryCsv": "Summary CSV"
+  },
+  "filters": {
+    "from": "From",
+    "to": "To",
+    "hint": "All numbers below follow this date range. Leave it empty for all time.",
+    "clear": "Clear dates",
+    "ethRange": "Ethiopian calendar: {from} – {to}",
+    "ethFrom": "Ethiopian calendar: from {date}",
+    "ethTo": "Ethiopian calendar: until {date}"
+  },
+  "kpi": {
+    "students": "Active students",
+    "classes": "Classes",
+    "teachers": "Teachers",
+    "records": "Attendance records",
+    "rateHint": "{percent}% present"
+  },
+  "charts": {
+    "byStatusTitle": "Attendance by status",
+    "byStatusDescription": "Share of records in the selected range",
+    "dailyTitle": "Recent daily attendance",
+    "dailyDescription": "Last 7 days with records",
+    "noData": "No attendance data yet.",
+    "percent": "{percent}%",
+    "total": "Total: {count}",
+    "pieTooltip": "{name}: {value} ({percent}%)"
+  },
+  "status": {
+    "present": "Present",
+    "absent": "Absent",
+    "late": "Late",
+    "excused": "Excused"
+  },
+  "summary": {
+    "title": "Student attendance summary",
+    "count": "{count, plural, one {# active student} other {# active students}}",
+    "empty": "No active students",
+    "table": {
+      "student": "Student",
+      "class": "Class",
+      "present": "Present",
+      "absent": "Absent",
+      "late": "Late",
+      "excused": "Excused",
+      "total": "Total",
+      "rate": "Rate"
+    }
+  },
+  "csv": {
+    "metric": "Metric",
+    "value": "Value",
+    "totalStudents": "Active students",
+    "totalClasses": "Classes",
+    "totalTeachers": "Teachers",
+    "records": "Attendance records (range)",
+    "present": "Present",
+    "absent": "Absent",
+    "late": "Late",
+    "excused": "Excused",
+    "name": "Name",
+    "class": "Class",
+    "total": "Total",
+    "rate": "Rate %"
+  }
+}

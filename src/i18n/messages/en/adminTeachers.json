@@ -1,0 +1,82 @@
+{
+  "title": "Users",
+  "description": "Create and manage school admin and teacher accounts.",
+  "add": "Add user",
+  "searchPlaceholder": "Search by name, email or phone",
+  "searchLabel": "Search users",
+  "roleFilter": "Filter by role",
+  "allRoles": "All roles",
+  "summary": "{shown, plural, one {Showing # user} other {Showing # users}} of {total}",
+  "you": "You",
+  "table": {
+    "name": "Name",
+    "email": "Email",
+    "role": "Role",
+    "phone": "Phone",
+    "classes": "Classes",
+    "status": "Status",
+    "actions": "Actions"
+  },
+  "noClasses": "No classes",
+  "classCount": "{count, plural, =0 {No classes} one {# class} other {# classes}}",
+  "actions": {
+    "editClasses": "Edit assigned classes",
+    "deactivate": "Deactivate",
+    "activate": "Activate",
+    "delete": "Delete user",
+    "more": "More actions for {name}",
+    "cannotDeleteSelf": "You can't delete your own account"
+  },
+  "form": {
+    "createTitle": "Add user",
+    "createDescription": "Create a school admin or teacher account with login details.",
+    "name": "Full name",
+    "namePlaceholder": "For example: Ahmed Ali",
+    "email": "Email",
+    "emailPlaceholder": "teacher@school.com",
+    "phone": "Phone number (optional)",
+    "phonePlaceholder": "For example: 0911 223344",
+    "password": "Temporary password",
+    "passwordPlaceholder": "At least 6 characters",
+    "role": "Role",
+    "roleHint": "School admins have full access and can manage other users.",
+    "classes": "Assign classes",
+    "classesHint": "Choose the classes this teacher teaches.",
+    "noClassesYet": "No classes yet. Create classes first, then assign the teacher.",
+    "create": "Create user"
+  },
+  "assign": {
+    "title": "Edit assigned classes",
+    "description": "Choose the classes {name} teaches. Students stay in their classes.",
+    "currentlyAssigned": "Assigned to {name}",
+    "currentlyAssignedOther": "Assigned to another teacher",
+    "save": "Save assignments"
+  },
+  "delete": {
+    "title": "Delete {name}?",
+    "description": "The account {email} will be removed and can no longer sign in. This cannot be undone.",
+    "confirm": "Delete user"
+  },
+  "toast": {
+    "adminCreated": "School admin account created.",
+    "teacherCreated": "Teacher account created.",
+    "assigned": "Classes updated for {name}.",
+    "activated": "{name} was activated.",
+    "deactivated": "{name} was deactivated.",
+    "deleted": "{name} was deleted.",
+    "loadError": "Could not load users. Make sure the database rules are published, then refresh.",
+    "unexpectedResponse": "The server returned an unexpected response ({status}). Refresh the page and try again."
+  },
+  "empty": {
+    "title": "No users yet",
+    "description": "Add teachers and school admins so they can sign in.",
+    "search": "No users match your search."
+  },
+  "csv": {
+    "name": "Name",
+    "email": "Email",
+    "role": "Role",
+    "phone": "Phone",
+    "status": "Status"
+  }
+}

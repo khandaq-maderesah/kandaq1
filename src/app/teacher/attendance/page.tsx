@@ -1,46 +1,90 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { useTranslations } from 'next-intl'
+import { toast } from 'sonner'
+import { Check, ClipboardCheck, Clock, Loader2, RotateCcw, Save, ShieldCheck, Users, X, type LucideIcon } from 'lucide-react'
 import { rtdb } from '@/lib/database'
 import { useAuth } from '@/context/AuthContext'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Loader2, Check, X, Clock, Save, RotateCcw, ShieldCheck } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select } from '@/components/ui/select'
+import { Skeleton } from '@/components/ui/skeleton'
+import { EmptyState, PageHeader } from '@/components/ui/page'
+import { cn } from '@/lib/utils'
 import type { Class, Student, AttendanceStatus } from '@/types'
 
 const today = () => new Date().toISOString().slice(0, 10)
 
+const STATUSES: {
+  value: AttendanceStatus
+  icon: LucideIcon
+  active: string
+  idle: string
+  chip: string
+}[] = [
+  {
+    value: 'present',
+    icon: Check,
+    active: 'border-success bg-success text-success-foreground',
+    idle: 'hover:border-success/50 hover:bg-success/10 hover:text-success',
+    chip: 'bg-success/10 text-success',
+  },
+  {
+    value: 'absent',
+    icon: X,
+    active: 'border-destructive bg-destructive text-destructive-foreground',
+    idle: 'hover:border-destructive/50 hover:bg-destructive/10 hover:text-destructive',
+    chip: 'bg-destructive/10 text-destructive',
+  },
+  {
+    value: 'late',
+    icon: Clock,
+    active: 'border-warning bg-warning text-warning-foreground',
+    idle: 'hover:border-warning/50 hover:bg-warning/10 hover:text-warning',
+    chip: 'bg-warning/10 text-warning',
+  },
+  {
+    value: 'excused',
+    icon: ShieldCheck,
+    active: 'border-info bg-info text-info-foreground',
+    idle: 'hover:border-info/50 hover:bg-info/10 hover:text-info',
+    chip: 'bg-info/10 text-info',
+  },
+]
+
 export default function TeacherAttendancePage() {
+  const t = useTranslations('teacherAttendance')
   const { user } = useAuth()
   const [classes, setClasses] = useState<Class[]>([])
   const [students, setStudents] = useState<Student[]>([])
   const [classId, setClassId] = useState('')
   const [date, setDate] = useState(today())
   const [statusMap, setStatusMap] = useState<Record<string, AttendanceStatus>>({})
+  const [savedMap, setSavedMap] = useState<Record<string, AttendanceStatus>>({})
   const [loading, setLoading] = useState(true)
   const [loadingStudents, setLoadingStudents] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
 
   useEffect(() => {
     const load = async () => {
       if (!user) return
       try {
         const classList = await rtdb.getAllClasses()
-        const myClasses = classList.filter((c) => c.teacherId === user.uid)
+        const myClasses = classList.filter((c) => c.teacherId === user.uid && c.isActive !== false)
         setClasses(myClasses)
         if (myClasses.length > 0) {
           setClassId(myClasses[0].id)
         }
       } catch {
-        setError('Failed to load your classes')
+        toast.error(t('toast.loadClassesFailed'))
       } finally {
         setLoading(false)
       }
     }
     load()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user])
 
   // Load students + existing attendance for selected class/date
@@ -48,26 +92,34 @@ export default function TeacherAttendancePage() {
     const loadClassData = async () => {
       if (!classId) return
       setLoadingStudents(true)
-      setError('')
-      setSuccess('')
       try {
-        const studentList = await rtdb.getStudentsByClass(classId)
-        const activeStudents = studentList.filter((s) => s.isActive)
+        const [studentList, existing] = await Promise.all([
+          rtdb.getStudentsByClass(classId),
+          rtdb.getAttendanceByClassAndDate(classId, date),
+        ])
+        // Archived (deleted) students never appear in attendance taking.
+        const activeStudents = studentList
+          .filter((s) => s.isActive !== false)
+          .sort((a, b) =>
+            (a.rollNumber || '').localeCompare(b.rollNumber || '', undefined, { numeric: true })
+          )
         setStudents(activeStudents)
 
-        const existing = await rtdb.getAttendanceByClassAndDate(classId, date)
+        const activeIds = new Set(activeStudents.map((s) => s.id))
         const map: Record<string, AttendanceStatus> = {}
         existing.forEach((r) => {
-          map[r.studentId] = r.status
+          if (activeIds.has(r.studentId)) map[r.studentId] = r.status
         })
         setStatusMap(map)
+        setSavedMap(map)
       } catch {
-        setError('Failed to load students')
+        toast.error(t('toast.loadStudentsFailed'))
       } finally {
         setLoadingStudents(false)
       }
     }
     loadClassData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [classId, date])
 
   const setStatus = (studentId: string, status: AttendanceStatus) => {
@@ -86,209 +138,237 @@ export default function TeacherAttendancePage() {
     setStatusMap(map)
   }
 
+  const counts = useMemo(() => {
+    const c: Record<AttendanceStatus | 'unmarked', number> = {
+      present: 0,
+      absent: 0,
+      late: 0,
+      excused: 0,
+      unmarked: 0,
+    }
+    students.forEach((s) => {
+      const st = statusMap[s.id]
+      c[st ?? 'unmarked']++
+    })
+    return c
+  }, [students, statusMap])
+
+  const marked = students.length - counts.unmarked
+  const dirty = students.some((s) => statusMap[s.id] !== savedMap[s.id])
+
   const handleSave = async () => {
     if (!classId) return
+    if (marked === 0) {
+      toast.error(t('toast.nothingToSave'))
+      return
+    }
     setSaving(true)
-    setError('')
-    setSuccess('')
     try {
-      for (const s of students) {
-        const status = statusMap[s.id]
-        if (!status) continue
-        const attendanceId = `${classId}_${date}_${s.id}`
-        const existing = await rtdb.getAttendance(attendanceId)
-        const record = {
-          studentId: s.id,
-          classId,
-          date,
-          status,
-          studentName: s.name,
-          className: classes.find((c) => c.id === classId)?.name || '',
-          teacherId: user?.uid,
-          markedBy: user?.uid,
-          markedAt: new Date().toISOString(),
-        }
-        if (existing) {
-          await rtdb.updateAttendance(attendanceId, { ...record, id: attendanceId })
-        } else {
-          await rtdb.createAttendance(attendanceId, { ...record, id: attendanceId })
-        }
-      }
-      setSuccess('Attendance saved successfully')
-    } catch (e: any) {
-      setError(e.message || 'Failed to save attendance')
+      const className = classes.find((c) => c.id === classId)?.name || ''
+      await Promise.all(
+        students.map(async (s) => {
+          const status = statusMap[s.id]
+          if (!status) return
+          const attendanceId = `${classId}_${date}_${s.id}`
+          const existing = await rtdb.getAttendance(attendanceId)
+          const record = {
+            studentId: s.id,
+            classId,
+            date,
+            status,
+            studentName: s.name,
+            className,
+            teacherId: user?.uid,
+            markedBy: user?.uid,
+            markedAt: new Date().toISOString(),
+          }
+          if (existing) {
+            await rtdb.updateAttendance(attendanceId, { ...record, id: attendanceId })
+          } else {
+            await rtdb.createAttendance(attendanceId, { ...record, id: attendanceId })
+          }
+        })
+      )
+      setSavedMap(statusMap)
+      toast.success(t('toast.saved'))
+    } catch {
+      toast.error(t('toast.saveFailed'))
     } finally {
       setSaving(false)
     }
   }
-if (loading) {
+
+  if (loading) {
     return (
-      <div className="flex items-center justify-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-green-600" />
+      <div>
+        <PageHeader title={t('title')} description={t('description')} />
+        <Skeleton className="mb-4 h-24 rounded-xl" />
+        <div className="space-y-2">
+          {[0, 1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-28 rounded-xl" />
+          ))}
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Take Attendance</h1>
-        <p className="text-gray-600 mt-1">Mark student attendance for a class</p>
-      </div>
+    <div>
+      <PageHeader title={t('title')} description={t('description')} />
 
-      {error && (
-        <Alert variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-      {success && (
-        <Alert variant="success">
-          <AlertDescription>{success}</AlertDescription>
-        </Alert>
-      )}
-
-      <Card>
-        <CardContent className="pt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {classes.length === 0 ? (
+        <EmptyState icon={ClipboardCheck} title={t('empty.noClasses')} description={t('empty.noClassesHint')} />
+      ) : (
+        <>
+          <div className="grid gap-4 rounded-xl border bg-card p-4 shadow-sm sm:grid-cols-2 sm:p-5">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Class</label>
-              <select
-                value={classId}
-                onChange={(e) => setClassId(e.target.value)}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                disabled={classes.length === 0}
-              >
-                <option value="">Select a class</option>
+              <Label htmlFor="att-class">{t('filters.class')}</Label>
+              <Select id="att-class" value={classId} onChange={(e) => setClassId(e.target.value)} className="h-11">
+                <option value="" disabled>
+                  {t('filters.classPlaceholder')}
+                </option>
                 {classes.map((c) => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
+                  <option key={c.id} value={c.id}>
+                    {c.section ? `${c.name} · ${c.section}` : c.name}
+                  </option>
                 ))}
-              </select>
+              </Select>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Date</label>
-              <input
+              <Label htmlFor="att-date">{t('filters.date')}</Label>
+              <Input
+                id="att-date"
                 type="date"
                 value={date}
-                onChange={(e) => setDate(e.target.value)}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                max={today()}
+                onChange={(e) => setDate(e.target.value || today())}
+                className="h-11"
               />
             </div>
           </div>
-        </CardContent>
-      </Card>
 
-      {classes.length === 0 ? (
-        <Card>
-          <CardContent className="py-12">
-            <p className="text-gray-500 text-center">No classes assigned to you yet.</p>
-          </CardContent>
-        </Card>
-      ) : loadingStudents ? (
-        <div className="flex items-center justify-center h-48">
-          <Loader2 className="h-8 w-8 animate-spin text-green-600" />
-        </div>
-      ) : students.length === 0 ? (
-        <Card>
-          <CardContent className="py-12">
-            <p className="text-gray-500 text-center">No active students in this class.</p>
-          </CardContent>
-        </Card>
-      ) : (
-        <Card>
-          <CardHeader className="space-y-3">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <CardTitle>Students ({students.length})</CardTitle>
-              <div className="flex gap-2 flex-wrap">
+          {loadingStudents ? (
+            <div className="mt-6 space-y-2">
+              {[0, 1, 2, 3].map((i) => (
+                <Skeleton key={i} className="h-28 rounded-xl" />
+              ))}
+            </div>
+          ) : students.length === 0 ? (
+            <EmptyState
+              className="mt-6"
+              icon={Users}
+              title={t('empty.noStudents')}
+              description={t('empty.noStudentsHint')}
+            />
+          ) : (
+            <>
+              {/* Live counts */}
+              <div className="mt-6 grid grid-cols-3 gap-2 sm:grid-cols-5">
+                {STATUSES.map(({ value, icon: Icon, chip }) => (
+                  <div key={value} className={cn('flex items-center gap-2 rounded-lg px-3 py-2', chip)}>
+                    <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
+                    <div className="min-w-0">
+                      <p className="text-lg font-semibold leading-none tabular-nums">{counts[value]}</p>
+                      <p className="mt-0.5 truncate text-xs">{t(`status.${value}`)}</p>
+                    </div>
+                  </div>
+                ))}
+                <div className="flex items-center gap-2 rounded-lg bg-muted px-3 py-2 text-muted-foreground">
+                  <div className="min-w-0">
+                    <p className="text-lg font-semibold leading-none tabular-nums">{counts.unmarked}</p>
+                    <p className="mt-0.5 truncate text-xs">{t('status.unmarked')}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bulk actions */}
+              <div className="mt-4 flex flex-wrap items-center gap-2">
+                <span className="text-sm text-muted-foreground">{t('markAll.label')}</span>
                 <Button type="button" size="sm" variant="outline" onClick={() => markAll('present')}>
-                  <Check className="h-4 w-4 mr-1" /> All Present
+                  <Check /> {t('markAll.present')}
                 </Button>
                 <Button type="button" size="sm" variant="outline" onClick={() => markAll('absent')}>
-                  <X className="h-4 w-4 mr-1" /> All Absent
+                  <X /> {t('markAll.absent')}
                 </Button>
                 <Button type="button" size="sm" variant="outline" onClick={() => markAll('excused')}>
-                  <ShieldCheck className="h-4 w-4 mr-1" /> All Excused
+                  <ShieldCheck /> {t('markAll.excused')}
                 </Button>
-                <Button type="button" size="sm" variant="outline" onClick={() => markAll(null)}>
-                  <RotateCcw className="h-4 w-4 mr-1" /> Clear
+                <Button type="button" size="sm" variant="ghost" onClick={() => markAll(null)}>
+                  <RotateCcw /> {t('markAll.clear')}
                 </Button>
               </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm border-collapse border border-gray-200 [&_th]:border [&_th]:border-gray-200 [&_td]:border [&_td]:border-gray-200">
-                <thead>
-                  <tr className="border-b text-left text-gray-500">
-                    <th className="pb-3 pr-4 font-medium">Student</th>
-                    <th className="pb-3 pr-4 font-medium">Roll</th>
-                    <th className="pb-3 font-medium">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {students.map((s) => {
-                    const status = statusMap[s.id]
-                    return (
-                      <tr key={s.id} className="border-b last:border-0">
-                        <td className="py-3 pr-4 font-medium">{s.name}</td>
-                        <td className="py-3 pr-4">{s.rollNumber || '—'}</td>
-                        <td className="py-3">
-                          <div className="flex flex-wrap gap-2">
+
+              {/* Students */}
+              <h2 className="sr-only">{t('list.title')}</h2>
+              <ul className="mt-4 space-y-2">
+                {students.map((s) => {
+                  const current = statusMap[s.id]
+                  return (
+                    <li
+                      key={s.id}
+                      className="flex flex-col gap-3 rounded-xl border bg-card p-3 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:p-4"
+                    >
+                      <div className="flex min-w-0 items-center gap-3">
+                        <span className="flex h-9 min-w-9 shrink-0 items-center justify-center rounded-lg bg-muted px-2 text-sm font-semibold tabular-nums text-muted-foreground">
+                          {s.rollNumber || '–'}
+                        </span>
+                        <div className="min-w-0">
+                          <p className="truncate font-medium text-foreground">{s.name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {current ? t(`status.${current}`) : t('status.unmarked')}
+                          </p>
+                        </div>
+                      </div>
+                      <div
+                        role="radiogroup"
+                        aria-label={t('list.statusGroup', { name: s.name })}
+                        className="grid grid-cols-4 gap-2 sm:w-[26rem] sm:shrink-0"
+                      >
+                        {STATUSES.map(({ value, icon: Icon, active, idle }) => {
+                          const selected = current === value
+                          return (
                             <button
-                              onClick={() => setStatus(s.id, 'present')}
-                              className={`inline-flex items-center gap-1 px-3 py-1 rounded-md text-xs font-medium border ${
-                                status === 'present'
-                                  ? 'bg-green-500 text-white border-green-500'
-                                  : 'bg-white text-green-600 border-green-300 hover:bg-green-50'
-                              }`}
+                              key={value}
+                              type="button"
+                              role="radio"
+                              aria-checked={selected}
+                              onClick={() => setStatus(s.id, value)}
+                              className={cn(
+                                'flex min-h-12 flex-col items-center justify-center gap-0.5 rounded-lg border px-1 py-1.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
+                                selected ? active : cn('bg-card text-muted-foreground', idle)
+                              )}
                             >
-                              <Check className="h-3.5 w-3.5" /> Present
+                              <Icon className="h-5 w-5" aria-hidden="true" />
+                              <span className="max-w-full truncate">{t(`status.${value}`)}</span>
                             </button>
-                            <button
-                              onClick={() => setStatus(s.id, 'absent')}
-                              className={`inline-flex items-center gap-1 px-3 py-1 rounded-md text-xs font-medium border ${
-                                status === 'absent'
-                                  ? 'bg-red-500 text-white border-red-500'
-                                  : 'bg-white text-red-600 border-red-300 hover:bg-red-50'
-                              }`}
-                            >
-                              <X className="h-3.5 w-3.5" /> Absent
-                            </button>
-                            <button
-                              onClick={() => setStatus(s.id, 'late')}
-                              className={`inline-flex items-center gap-1 px-3 py-1 rounded-md text-xs font-medium border ${
-                                status === 'late'
-                                  ? 'bg-yellow-500 text-white border-yellow-500'
-                                  : 'bg-white text-yellow-600 border-yellow-300 hover:bg-yellow-50'
-                              }`}
-                            >
-                              <Clock className="h-3.5 w-3.5" /> Late
-                            </button>
-                            <button
-                              onClick={() => setStatus(s.id, 'excused')}
-                              className={`inline-flex items-center gap-1 px-3 py-1 rounded-md text-xs font-medium border ${
-                                status === 'excused'
-                                  ? 'bg-amber-500 text-white border-amber-500'
-                                  : 'bg-white text-amber-600 border-amber-300 hover:bg-amber-50'
-                              }`}
-                            >
-                              <ShieldCheck className="h-3.5 w-3.5" /> Excused
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
-            <div className="mt-6">
-              <Button onClick={handleSave} disabled={saving}>
-                {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
-                Save Attendance
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+                          )
+                        })}
+                      </div>
+                    </li>
+                  )
+                })}
+              </ul>
+
+              {/* Sticky save bar */}
+              <div className="sticky bottom-0 z-10 -mx-4 mt-4 border-t bg-background/95 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur supports-[backdrop-filter]:bg-background/80 sm:-mx-6 sm:px-6">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium tabular-nums text-foreground">
+                      {t('saveBar.progress', { marked, total: students.length })}
+                    </p>
+                    <p className={cn('text-xs', dirty ? 'text-warning' : 'text-muted-foreground')}>
+                      {dirty ? t('saveBar.unsaved') : t('saveBar.allSaved')}
+                    </p>
+                  </div>
+                  <Button size="lg" onClick={handleSave} disabled={saving || !dirty} className="shrink-0">
+                    {saving ? <Loader2 className="animate-spin" /> : <Save />}
+                    {t('saveBar.save')}
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
+        </>
       )}
     </div>
   )

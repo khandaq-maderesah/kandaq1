@@ -1,30 +1,45 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import Link from 'next/link'
+import { useFormatter, useTranslations } from 'next-intl'
+import { toast } from 'sonner'
+import { ChevronRight, ClipboardList, GraduationCap, Phone, Search, UserCheck, Users, UserX } from 'lucide-react'
 import { rtdb } from '@/lib/database'
 import { useAuth } from '@/context/AuthContext'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Loader2, UserX, Phone, Calendar, Users, Search, UserCheck } from 'lucide-react'
+import { useMyRequests } from '@/hooks/useRequestBadges'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select } from '@/components/ui/select'
+import { Skeleton } from '@/components/ui/skeleton'
+import { buttonVariants } from '@/components/ui/button'
+import { badgeVariants } from '@/components/ui/badge'
+import { EmptyState, PageHeader, StatCard, TableContainer } from '@/components/ui/page'
+import { RequestStatusBadge } from '@/components/requests/RequestStatusBadge'
+import { cn } from '@/lib/utils'
 import type { Student, Class, Attendance } from '@/types'
 
+const todayIso = () => new Date().toISOString().slice(0, 10)
+
 export default function TeacherPage() {
+  const t = useTranslations('teacherDashboard')
+  const tr = useTranslations('requests')
+  const format = useFormatter()
   const { user } = useAuth()
   const [classes, setClasses] = useState<Class[]>([])
   const [students, setStudents] = useState<Student[]>([])
   const [attendance, setAttendance] = useState<Attendance[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
   const [selectedClass, setSelectedClass] = useState('')
   const [search, setSearch] = useState('')
-  const [dateFilter, setDateFilter] = useState(() => new Date().toISOString().slice(0, 10))
+  const [dateFilter, setDateFilter] = useState(todayIso)
   const [showAllDates, setShowAllDates] = useState(false)
+  const myRequests = useMyRequests(user?.uid)
 
   useEffect(() => {
     const load = async () => {
       if (!user) return
       setLoading(true)
-      setError('')
       try {
         const classList = await rtdb.getAllClasses()
         const myClasses = classList.filter((c) => c.teacherId === user.uid && c.isActive !== false)
@@ -33,9 +48,7 @@ export default function TeacherPage() {
         // students of their own classes (queried server-side, in parallel).
         const [attList, myStudents] = await Promise.all([
           rtdb.getAttendanceByTeacher(user.uid),
-          Promise.all(myClasses.map((c) => rtdb.getStudentsByClass(c.id))).then((lists) =>
-            lists.flat()
-          ),
+          Promise.all(myClasses.map((c) => rtdb.getStudentsByClass(c.id))).then((lists) => lists.flat()),
         ])
 
         setClasses(myClasses)
@@ -43,15 +56,22 @@ export default function TeacherPage() {
         setAttendance(attList)
         setSelectedClass((current) => current || (myClasses.length > 0 ? myClasses[0].id : ''))
       } catch {
-        setError('Failed to load dashboard data. Check your connection.')
+        toast.error(t('toast.loadFailed'))
       } finally {
         setLoading(false)
       }
     }
     load()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user])
 
   const myClassIds = useMemo(() => new Set(classes.map((c) => c.id)), [classes])
+
+  // Archived (deleted) students are hidden everywhere in the teacher area.
+  const archivedIds = useMemo(
+    () => new Set(students.filter((s) => s.isActive === false).map((s) => s.id)),
+    [students]
+  )
 
   const classById = useMemo(() => {
     const m: Record<string, Class> = {}
@@ -69,10 +89,14 @@ export default function TeacherPage() {
     return m
   }, [students])
 
+  const myAttendance = useMemo(
+    () => attendance.filter((r) => myClassIds.has(r.classId) && !archivedIds.has(r.studentId)),
+    [attendance, myClassIds, archivedIds]
+  )
+
   const absentRows = useMemo(() => {
-    return attendance
+    return myAttendance
       .filter((r) => r.status === 'absent')
-      .filter((r) => myClassIds.has(r.classId))
       .filter((r) => !selectedClass || r.classId === selectedClass)
       .map((r) => {
         const stu = studentById[r.studentId]
@@ -88,14 +112,27 @@ export default function TeacherPage() {
         }
       })
       .sort((a, b) => (a.date < b.date ? 1 : -1))
-  }, [attendance, studentById, classById, myClassIds, selectedClass])
+  }, [myAttendance, studentById, classById, selectedClass])
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-green-600" />
-      </div>
-    )
+  const requestSummary = useMemo(() => {
+    const list = myRequests ?? []
+    return {
+      pending: list.filter((r) => r.status === 'pending').length,
+      recent: list
+        .filter((r) => r.status === 'approved' || r.status === 'rejected')
+        .sort((a, b) => (b.reviewedAt ?? '').localeCompare(a.reviewedAt ?? ''))
+        .slice(0, 3),
+    }
+  }, [myRequests])
+
+  const formatDay = (d: string) => {
+    const parsed = new Date(`${d}T00:00:00`)
+    return isNaN(parsed.getTime()) ? d : format.dateTime(parsed, { dateStyle: 'medium' })
+  }
+  const formatStamp = (iso?: string) => {
+    if (!iso) return ''
+    const parsed = new Date(iso)
+    return isNaN(parsed.getTime()) ? iso : format.dateTime(parsed, { dateStyle: 'medium' })
   }
 
   // Current day by default; "All dates" + search to browse previous absences.
@@ -106,208 +143,240 @@ export default function TeacherPage() {
     return (
       r.studentName.toLowerCase().includes(q) ||
       r.parentPhone.toLowerCase().includes(q) ||
-      r.className.toLowerCase().includes(q)
+      (r.className || '').toLowerCase().includes(q)
     )
   })
 
-  // Today's headline numbers for the KPI cards.
-  const today = new Date().toISOString().slice(0, 10)
-  const totalStudents = students.filter((s) => s.isActive && myClassIds.has(s.classId)).length
-  const todayAtt = attendance.filter((r) => myClassIds.has(r.classId) && r.date === today)
+  // Today's headline numbers for the KPI cards (active students only).
+  const today = todayIso()
+  const totalStudents = students.filter((s) => s.isActive !== false && myClassIds.has(s.classId)).length
+  const todayAtt = myAttendance.filter((r) => r.date === today)
   const absentToday = todayAtt.filter((r) => r.status === 'absent').length
   const presentToday = todayAtt.filter((r) => r.status === 'present').length
 
-  return (
-    <div className="space-y-6">
+  const phoneLink = (phone: string) =>
+    phone ? (
+      <a
+        href={`tel:${phone}`}
+        aria-label={t('absent.callNumber', { phone })}
+        className="inline-flex min-h-9 items-center gap-1.5 rounded-lg bg-muted px-2.5 py-1 font-medium text-foreground transition-colors hover:bg-accent"
+      >
+        <Phone className="h-3.5 w-3.5 text-muted-foreground" aria-hidden="true" />
+        <span dir="ltr">{phone}</span>
+      </a>
+    ) : (
+      <span className="text-muted-foreground">–</span>
+    )
+
+  if (loading) {
+    return (
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Teacher Dashboard</h1>
-        <p className="text-gray-500 mt-1">Absent students in your classes, ready to contact</p>
+        <PageHeader title={t('title')} description={t('description')} />
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          {[0, 1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-24 rounded-xl" />
+          ))}
+        </div>
+        <div className="mt-6 grid gap-6 lg:grid-cols-3">
+          <Skeleton className="h-80 rounded-xl lg:col-span-2" />
+          <Skeleton className="h-56 rounded-xl" />
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      <PageHeader title={t('title')} description={t('description')} />
+
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <StatCard label={t('stats.students')} value={totalStudents} icon={Users} />
+        <StatCard label={t('stats.absentToday')} value={absentToday} icon={UserX} tone="destructive" />
+        <StatCard label={t('stats.presentToday')} value={presentToday} icon={UserCheck} tone="success" />
+        <StatCard label={t('stats.classes')} value={classes.length} icon={GraduationCap} tone="info" />
       </div>
 
-      {error && (
-        <Alert variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-
-      {/* KPI cards */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <Card className="border-0 shadow-md">
-          <div className="bg-gradient-to-br from-green-600 to-green-700 p-5">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-white/90">Total Students</span>
-              <div className="rounded-lg bg-white/20 p-2"><Users className="h-5 w-5 text-white" /></div>
-            </div>
-            <p className="mt-3 text-4xl font-extrabold text-white">{totalStudents}</p>
-          </div>
-        </Card>
-        <Card className="border-0 shadow-md">
-          <div className="bg-gradient-to-br from-rose-600 to-red-800 p-5">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-white/90">Absent Today</span>
-              <div className="rounded-lg bg-white/20 p-2"><UserX className="h-5 w-5 text-white" /></div>
-            </div>
-            <p className="mt-3 text-4xl font-extrabold text-white">{absentToday}</p>
-          </div>
-        </Card>
-        <Card className="border-0 shadow-md">
-          <div className="bg-gradient-to-br from-emerald-600 to-teal-700 p-5">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-white/90">Present Today</span>
-              <div className="rounded-lg bg-white/20 p-2"><UserCheck className="h-5 w-5 text-white" /></div>
-            </div>
-            <p className="mt-3 text-4xl font-extrabold text-white">{presentToday}</p>
-          </div>
-        </Card>
-      </div>
-
-      <Card className="border-0 shadow-md bg-gradient-to-br from-rose-50 to-rose-100/70">
-        <CardHeader className="space-y-3">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <span className="inline-flex items-center justify-center rounded-lg bg-red-100 p-2">
-                <UserX className="h-5 w-5 text-red-600" />
+      <div className="mt-6 grid items-start gap-6 lg:grid-cols-3">
+        {/* Absent students */}
+        <section className="rounded-xl border bg-card shadow-sm lg:col-span-2">
+          <div className="space-y-4 border-b p-5">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h2 className="text-lg font-semibold text-foreground">{t('absent.title')}</h2>
+                <p className="text-sm text-muted-foreground">{t('absent.description')}</p>
+              </div>
+              <span className={badgeVariants({ variant: 'destructive' })}>
+                {t('absent.count', { count: filteredAbsent.length })}
               </span>
-              Absent Students (My Classes)
-              <span className="rounded-full bg-red-100 px-2.5 py-0.5 text-sm font-semibold text-red-600">
-                {filteredAbsent.length}
-              </span>
-            </CardTitle>
-            <select
-              value={selectedClass}
-              onChange={(e) => setSelectedClass(e.target.value)}
-              className="h-9 rounded-lg border border-input bg-white px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              <option value="">All My Classes</option>
-              {classes.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                  {c.section ? ` • ${c.section}` : ''}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-            <label className="inline-flex items-center gap-2 text-sm font-medium text-gray-600">
-              <input
-                type="checkbox"
-                checked={showAllDates}
-                onChange={(e) => setShowAllDates(e.target.checked)}
-                className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
-              />
-              All dates
-            </label>
-            <input
-              type="date"
-              value={dateFilter}
-              onChange={(e) => setDateFilter(e.target.value)}
-              disabled={showAllDates}
-              className="h-9 rounded-lg border border-input bg-white px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
-            />
-            <div className="relative w-full sm:w-64">
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search student, parent or phone..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="h-9 w-full rounded-lg border border-input bg-white pl-9 pr-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              />
             </div>
-          </div>
-          <CardDescription>
-            {showAllDates
-              ? 'Absent students from your classes with parent contact details. Tap a phone number to call directly.'
-              : `Absent students in your classes for ${dateFilter}, with parent contact details. Pick a date or tick "All dates" to see previous absences.`}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {classes.length === 0 ? (
-            <p className="text-gray-500 text-center py-10">No classes have been assigned to you yet.</p>
-          ) : filteredAbsent.length === 0 ? (
-            <div className="text-center py-10">
-              <UserX className="h-10 w-10 mx-auto text-red-200 mb-2" />
-              <p className="text-gray-500">
-                {search
-                  ? 'No absent students match your search.'
-                  : showAllDates
-                  ? 'No absent students recorded yet in your classes.'
-                  : `No absent students recorded for ${dateFilter}.`}
-              </p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm border-collapse border border-gray-200 [&_th]:border [&_th]:border-gray-200 [&_td]:border [&_td]:border-gray-200">
-                <thead>
-                  <tr className="border-b text-left text-gray-500">
-                    <th className="pb-3 pr-4 font-medium">
-                      <Calendar className="h-3.5 w-3.5 inline mr-1" />Date
-                    </th>
-                    <th className="pb-3 pr-4 font-medium">Student</th>
-                    <th className="pb-3 pr-4 font-medium">Class</th>
-                    <th className="pb-3 pr-4 font-medium">Parent Phone</th>
-                    <th className="pb-3 font-medium">Alternative Phone</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredAbsent.map((r) => (
-                    <tr key={r.id} className="border-b last:border-0 hover:bg-gray-50 transition-colors">
-                      <td className="py-3 pr-4">{r.date}</td>
-                      <td className="py-3 pr-4 font-medium text-gray-900">{r.studentName}</td>
-                      <td className="py-3 pr-4">
-                        <span className="inline-flex rounded-md bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700">
-                          {r.className}
-                          {r.section ? ` • ${r.section}` : ''}
-                        </span>
-                      </td>
-                      <td className="py-3 pr-4">
-                        {r.parentPhone ? (
-                          <a
-                            href={`tel:${r.parentPhone}`}
-                            className="inline-flex items-center gap-1.5 rounded-lg bg-green-50 px-2.5 py-1 font-medium text-green-700 transition hover:bg-green-100"
-                          >
-                            <Phone className="h-3.5 w-3.5" /> {r.parentPhone}
-                          </a>
-                        ) : (
-                          <span className="text-gray-400">—</span>
-                        )}
-                      </td>
-                      <td className="py-3">
-                        {r.alternativePhone ? (
-                          <a
-                            href={`tel:${r.alternativePhone}`}
-                            className="inline-flex items-center gap-1.5 rounded-lg bg-teal-50 px-2.5 py-1 font-medium text-teal-700 transition hover:bg-teal-100"
-                          >
-                            <Phone className="h-3.5 w-3.5" /> {r.alternativePhone}
-                          </a>
-                        ) : (
-                          <span className="text-gray-400">—</span>
-                        )}
-                      </td>
-                    </tr>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div className="space-y-2">
+                <Label htmlFor="dash-class">{t('absent.class')}</Label>
+                <Select id="dash-class" value={selectedClass} onChange={(e) => setSelectedClass(e.target.value)}>
+                  <option value="">{t('absent.allClasses')}</option>
+                  {classes.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.section ? `${c.name} · ${c.section}` : c.name}
+                    </option>
                   ))}
-                </tbody>
-              </table>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <Label htmlFor="dash-date">{t('absent.date')}</Label>
+                  <label className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                    <input
+                      type="checkbox"
+                      checked={showAllDates}
+                      onChange={(e) => setShowAllDates(e.target.checked)}
+                      className="h-4 w-4 rounded border-input accent-primary"
+                    />
+                    {t('absent.allDates')}
+                  </label>
+                </div>
+                <Input
+                  id="dash-date"
+                  type="date"
+                  value={dateFilter}
+                  onChange={(e) => setDateFilter(e.target.value || todayIso())}
+                  disabled={showAllDates}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="dash-search">{t('absent.search')}</Label>
+                <div className="relative">
+                  <Search
+                    className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+                    aria-hidden="true"
+                  />
+                  <Input
+                    id="dash-search"
+                    type="search"
+                    placeholder={t('absent.searchPlaceholder')}
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="ps-9"
+                  />
+                </div>
+              </div>
             </div>
-          )}
-        </CardContent>
-      </Card>
+          </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardContent className="pt-6 flex items-center gap-3">
-            <span className="inline-flex items-center justify-center rounded-lg bg-green-100 p-2">
-              <Users className="h-5 w-5 text-green-600" />
-            </span>
-            <div>
-              <p className="text-sm text-gray-500">My Classes</p>
-              <p className="text-2xl font-bold text-gray-900">{classes.length}</p>
+          <div className="p-5">
+            {classes.length === 0 ? (
+              <EmptyState icon={GraduationCap} title={t('absent.noClasses')} />
+            ) : filteredAbsent.length === 0 ? (
+              <EmptyState
+                icon={UserX}
+                title={
+                  search
+                    ? t('absent.emptySearch')
+                    : showAllDates
+                      ? t('absent.emptyAll')
+                      : t('absent.emptyDate', { date: formatDay(dateFilter) })
+                }
+              />
+            ) : (
+              <>
+                {/* Mobile: stacked cards */}
+                <ul className="space-y-2 md:hidden">
+                  {filteredAbsent.map((r) => (
+                    <li key={r.id} className="rounded-xl border bg-card p-3">
+                      <p className="font-medium text-foreground">{r.studentName}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {formatDay(r.date)} · {r.section ? `${r.className} · ${r.section}` : r.className}
+                      </p>
+                      {(r.parentPhone || r.alternativePhone) && (
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          {r.parentPhone && phoneLink(r.parentPhone)}
+                          {r.alternativePhone && phoneLink(r.alternativePhone)}
+                        </div>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+
+                {/* Desktop: table */}
+                <TableContainer className="hidden shadow-none md:block">
+                  <thead>
+                    <tr>
+                      <th>{t('table.date')}</th>
+                      <th>{t('table.student')}</th>
+                      <th>{t('table.class')}</th>
+                      <th>{t('table.parentPhone')}</th>
+                      <th>{t('table.alternativePhone')}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredAbsent.map((r) => (
+                      <tr key={r.id}>
+                        <td className="whitespace-nowrap text-muted-foreground">{formatDay(r.date)}</td>
+                        <td className="font-medium text-foreground">{r.studentName}</td>
+                        <td className="text-muted-foreground">
+                          {r.section ? `${r.className} · ${r.section}` : r.className}
+                        </td>
+                        <td>{phoneLink(r.parentPhone)}</td>
+                        <td>{phoneLink(r.alternativePhone)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </TableContainer>
+              </>
+            )}
+          </div>
+        </section>
+
+        {/* My requests */}
+        <section className="rounded-xl border bg-card p-5 shadow-sm">
+          <div className="flex items-start gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-warning/10 text-warning">
+              <ClipboardList className="h-5 w-5" aria-hidden="true" />
             </div>
-          </CardContent>
-        </Card>
+            <div className="min-w-0">
+              <h2 className="text-lg font-semibold text-foreground">{t('requests.title')}</h2>
+              {myRequests === undefined ? (
+                <Skeleton className="mt-1 h-4 w-40" />
+              ) : (
+                <p className="text-sm text-muted-foreground">{t('requests.pending', { count: requestSummary.pending })}</p>
+              )}
+            </div>
+          </div>
+
+          <h3 className="mt-5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            {t('requests.recent')}
+          </h3>
+          {myRequests === undefined ? (
+            <div className="mt-2 space-y-2">
+              <Skeleton className="h-12 rounded-lg" />
+              <Skeleton className="h-12 rounded-lg" />
+            </div>
+          ) : requestSummary.recent.length === 0 ? (
+            <p className="mt-2 text-sm text-muted-foreground">{t('requests.noRecent')}</p>
+          ) : (
+            <ul className="mt-2 divide-y">
+              {requestSummary.recent.map((r) => (
+                <li key={r.id} className="flex items-center justify-between gap-3 py-2.5">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium text-foreground">{tr(`types.${r.type}`)}</p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      {t('requests.decided', { student: r.studentName, date: formatStamp(r.reviewedAt) })}
+                    </p>
+                  </div>
+                  <RequestStatusBadge status={r.status} />
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <Link
+            href="/teacher/requests"
+            className={cn(buttonVariants({ variant: 'outline' }), 'mt-4 w-full justify-between')}
+          >
+            {t('requests.viewAll')}
+            <ChevronRight className="rtl:rotate-180" />
+          </Link>
+        </section>
       </div>
     </div>
   )
 }
-
-

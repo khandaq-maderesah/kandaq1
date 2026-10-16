@@ -1,0 +1,108 @@
+{
+  "appName": "Khendeq",
+  "appTagline": "Waltajjii bulchiinsa mana barumsaa",
+  "actions": {
+    "save": "Olkaa'i",
+    "saveChanges": "Jijjiirama olkaa'i",
+    "cancel": "Dhiisi",
+    "close": "Cufi",
+    "edit": "Gulaali",
+    "delete": "Haqi",
+    "add": "Dabali",
+    "create": "Uumi",
+    "search": "Barbaadi",
+    "filter": "Calali",
+    "export": "Baasi",
+    "exportCsv": "CSV baasi",
+    "print": "Maxxansi",
+    "back": "Duubatti",
+    "next": "Itti aanu",
+    "previous": "Kan duraa",
+    "confirm": "Mirkaneessi",
+    "submit": "Ergi",
+    "retry": "Irra deebi'ii yaali",
+    "view": "Ilaali",
+    "restore": "Deebisi",
+    "approve": "Raggaasisi",
+    "reject": "Didi",
+    "clear": "Qulqulleessi",
+    "refresh": "Haaromsi",
+    "upload": "Ol fe'i",
+    "remove": "Keessaa baasi",
+    "showMore": "Dabalata agarsiisi",
+    "showLess": "Muraasa agarsiisi",
+    "selectAll": "Hunda filadhu"
+  },
+  "status": {
+    "loading": "Fe'aa jira…",
+    "saving": "Olkaa'aa jira…",
+    "saved": "Olkaa'ameera",
+    "active": "Hojii irra",
+    "inactive": "Hojii irra hin jiru",
+    "suspended": "Dhorkame",
+    "pending": "Eeggachaa jira",
+    "approved": "Raggaasifame",
+    "rejected": "Didame",
+    "cancelled": "Haqame"
+  },
+  "roles": {
+    "superadmin": "Bulchaa waltajjii",
+    "admin": "Bulchaa mana barumsaa",
+    "teacher": "Barsiisaa"
+  },
+  "gender": {
+    "male": "Dhiira",
+    "female": "Dhalaa"
+  },
+  "fields": {
+    "name": "Maqaa",
+    "fullName": "Maqaa guutuu",
+    "email": "Imeelii",
+    "phone": "Lakk. bilbilaa",
+    "password": "Jecha icciitii",
+    "address": "Teessoo",
+    "date": "Guyyaa",
+    "class": "Kutaa",
+    "section": "Garee",
+    "status": "Haala",
+    "role": "Gahee",
+    "reason": "Sababa",
+    "notes": "Yaadannoo",
+    "actions": "Gochaalee",
+    "required": "Dirqama"
+  },
+  "empty": {
+    "noData": "Ammaaf wanti tokkollee hin jiru.",
+    "noResults": "Barbaacha keessaniif bu'aan argame hin jiru."
+  },
+  "errors": {
+    "generic": "Rakkoon uumameera. Maaloo irra deebi'aa yaalaa.",
+    "network": "Walqunnamtii interneetii keessanii mirkaneeffadhaatii irra deebi'aa yaalaa.",
+    "permission": "Kana gochuuf hayyama hin qabdan.",
+    "required": "Iddoon kun guutamuu qaba.",
+    "api": {
+      "emailInUse": "Herregni imeelii kanaan duraanuu jira.",
+      "invalidEmail": "Teessoon imeelii kun sirrii miti.",
+      "weakPassword": "Jechi icciitii yoo xiqqaate qubee 6 qabaachuu qaba.",
+      "sessionExpired": "Yeroon seensa keessanii xumurameera. Maaloo irra deebi'aa seenaa.",
+      "forbidden": "Kana gochuuf hayyama hin qabdan.",
+      "schoolSuspended": "Manni barumsaa kun dhorkameera.",
+      "otherSchool": "Namoota mana barumsaa keessanii qofa bulchuu dandeessu.",
+      "notFound": "Herregni kun kana booda hin jiru.",
+      "cannotDeleteSelf": "Herrega mataa keessanii haquu hin dandeessan.",
+      "invalid": "Odeeffannoon tokko tokko hin guutamne ykn sirrii miti.",
+      "generic": "Rakkoon uumameera. Maaloo irra deebi'aa yaalaa."
+    }
+  },
+  "pagination": {
+    "showing": "{total} keessaa {from}–{to}",
+    "page": "Fuula {page}/{pages}"
+  },
+  "count": {
+    "students": "{count, plural, =0 {Barataan hin jiru} one {Barataa tokko} other {Barattoota #}}",
+    "teachers": "{count, plural, =0 {Barsiisaan hin jiru} one {Barsiisaa tokko} other {Barsiisota #}}",
+    "classes": "{count, plural, =0 {Kutaan hin jiru} one {Kutaa tokko} other {Kutaalee #}}"
+  },
+  "language": "Afaan",
+  "today": "Har'a"
+}

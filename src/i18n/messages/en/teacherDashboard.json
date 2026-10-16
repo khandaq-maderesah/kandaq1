@@ -1,0 +1,44 @@
+{
+  "title": "Dashboard",
+  "description": "Today in your classes, and absent students ready to contact.",
+  "stats": {
+    "students": "My students",
+    "absentToday": "Absent today",
+    "presentToday": "Present today",
+    "classes": "My classes"
+  },
+  "requests": {
+    "title": "My requests",
+    "pending": "{count, plural, =0 {No requests waiting} one {# request waiting for approval} other {# requests waiting for approval}}",
+    "recent": "Recent decisions",
+    "noRecent": "No decisions yet.",
+    "viewAll": "View my requests",
+    "decided": "{student} · {date}"
+  },
+  "absent": {
+    "title": "Absent students",
+    "description": "Absent students in your classes with parent contact details. Tap a number to call.",
+    "class": "Class",
+    "allClasses": "All my classes",
+    "date": "Date",
+    "allDates": "All dates",
+    "search": "Search",
+    "searchPlaceholder": "Student, class or phone",
+    "count": "{count, plural, =0 {No absences} one {# absence} other {# absences}}",
+    "emptySearch": "No absent students match your search.",
+    "emptyAll": "No absences recorded yet in your classes.",
+    "emptyDate": "No absences recorded for {date}.",
+    "noClasses": "No classes have been assigned to you yet.",
+    "callNumber": "Call {phone}"
+  },
+  "table": {
+    "date": "Date",
+    "student": "Student",
+    "class": "Class",
+    "parentPhone": "Parent phone",
+    "alternativePhone": "Alternative phone"
+  },
+  "toast": {
+    "loadFailed": "Could not load dashboard data. Check your connection."
+  }
+}

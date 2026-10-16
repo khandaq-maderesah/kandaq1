@@ -1,6 +1,8 @@
 'use client'
 
 import { useMemo } from 'react'
+import { useFormatter, useLocale, useTranslations } from 'next-intl'
+import { LOCALE_DIR } from '@/i18n/config'
 import { cn } from '@/lib/utils'
 import type { Student, Class, Exam } from '@/types'
 
@@ -21,7 +23,7 @@ import type { Student, Class, Exam } from '@/types'
  *
  * ── ALIGNMENT HANDBOOK ─────────────────────────────────────────────────
  * Pass `debug` to paint every overlay panel with a translucent colour so you
- * can SEE the containers. Tweak the `top-[%]` / `right-[%]` / `left-[%]`
+ * can SEE the containers. Tweak the `top-[%]` / `end-[%]` / `start-[%]` (the container is always dir="ltr", so end = right)
  * classes on each panel until it sits exactly on the matching white area of
  * the image, then set `debug={false}` (or omit the prop). All positions are
  * relative to the A4-landscape container below.
@@ -107,12 +109,6 @@ const SUBJECT_ALIASES: Record<CertificateSubject, string[]> = {
  * Same visual result as a Tailwind bg-url utility, but parser-proof.
  */
 const CERT_BACKGROUND_IMAGE = "/image/2%20page%20%5BRecovered%5D-11.jpg"
-
-/** Round to a clean integer string (certificate marks are whole numbers). */
-function fmt(n: number | undefined | null): string {
-  if (n == null || Number.isNaN(n)) return '—'
-  return String(Math.round(n))
-}
 
 /** Clamp a 1–3 star rating to the supported range. */
 function clampRating(value: number | undefined | null): number {
@@ -275,6 +271,16 @@ export function CertificateOverlay({
     [student.grades]
   )
 
+  const t = useTranslations('exams.certificate')
+  const locale = useLocale()
+  const format = useFormatter()
+  /** Whole-number marks, formatted for the UI language. */
+  const fmt = (n: number | undefined | null): string =>
+    n == null || Number.isNaN(n) ? '—' : format.number(Math.round(n), { maximumFractionDigits: 0 })
+  // Text direction of the UI language: used for the certificate's text so
+  // Arabic reads right-to-left, while the panel positions stay fixed.
+  const textDir = LOCALE_DIR[locale]
+
   // Convenience: return the debug class string only when debug is on.
   const dbg = (color: string) => (debug ? color : '')
 
@@ -287,6 +293,10 @@ export function CertificateOverlay({
         className
       )}
       style={{ backgroundImage: `url('${CERT_BACKGROUND_IMAGE}')` }}
+      // The overlay panels are positioned on the printed artwork, so the
+      // geometry is always left-to-right; text inside follows the UI language.
+      dir="ltr"
+      lang={locale}
     >
       {/* ═══════════════════════════════════════════════════════════
            SECTION 1 — Top-right: student info (2×2 grid)
@@ -295,18 +305,18 @@ export function CertificateOverlay({
       ═══════════════════════════════════════════════════════════ */}
       <div
         className={cn(
-          'absolute top-[15%] right-[5%] grid w-[22%] grid-cols-2 gap-[2%] text-xs font-medium text-gray-800',
-          dbg('bg-red-500/20')
+          'absolute top-[15%] end-[5%] grid w-[22%] grid-cols-2 gap-[2%] text-xs font-medium text-[#1f2937]',
+          dbg('bg-destructive/20')
         )}
       >
         {/* TL: የተማሪ ስም */}
-        <div className="truncate text-center leading-tight">{student.name}</div>
+        <div dir="auto" className="truncate text-center leading-tight">{student.name}</div>
         {/* TR: ክፍል */}
-        <div className="truncate text-center leading-tight">{student.class}</div>
+        <div dir="auto" className="truncate text-center leading-tight">{student.class}</div>
         {/* BL: የኡስታዝ/ዛ ስም */}
-        <div className="truncate text-center leading-tight">{student.teacherName}</div>
+        <div dir="auto" className="truncate text-center leading-tight">{student.teacherName}</div>
         {/* BR: የት/ት ዘመን */}
-        <div className="truncate text-center leading-tight">{student.academicYear}</div>
+        <div dir="auto" className="truncate text-center leading-tight">{student.academicYear}</div>
       </div>
 
       {/* ═══════════════════════════════════════════════════════════
@@ -317,9 +327,9 @@ export function CertificateOverlay({
            Approx: top 26–30%, right 2–5%, width 52–55% — adjust to align —
       ═══════════════════════════════════════════════════════════ */}
       <div
-        className={cn('absolute top-[30%] right-[5%] w-[52%]', dbg('bg-green-500/20'))}
+        className={cn('absolute top-[30%] end-[5%] w-[52%]', dbg('bg-success/20'))}
       >
-        <div className="grid grid-cols-[0.9fr_1.5fr_repeat(4,_1fr)] gap-y-[2.2%] text-xs font-medium text-gray-800">
+        <div className="grid grid-cols-[0.9fr_1.5fr_repeat(4,_1fr)] gap-y-[2.2%] text-xs font-medium text-[#1f2937]">
           {grades.map((g) => (
             <div key={g.subject} className="contents">
               {/* Subject column (printed in image) */}
@@ -327,13 +337,13 @@ export function CertificateOverlay({
               {/* Description column (printed in image) */}
               <div />
               {/* Term 1 */}
-              <div className="text-right leading-tight">{fmt(g.term1)}</div>
+              <div className="text-end leading-tight">{fmt(g.term1)}</div>
               {/* Term 2 */}
-              <div className="text-right leading-tight">{fmt(g.term2)}</div>
+              <div className="text-end leading-tight">{fmt(g.term2)}</div>
               {/* Term 3 */}
-              <div className="text-right leading-tight">{fmt(g.term3)}</div>
+              <div className="text-end leading-tight">{fmt(g.term3)}</div>
               {/* Total */}
-              <div className="text-right font-bold leading-tight">
+              <div className="text-end font-bold leading-tight">
                 {fmt(g.total > 0 ? g.total : g.term1 + g.term2 + g.term3)}
               </div>
               </div>
@@ -351,34 +361,36 @@ export function CertificateOverlay({
       ═══════════════════════════════════════════════════════════ */}
       <div
         className={cn(
-          'absolute bottom-[30%] right-[5%] flex w-[24%] items-center justify-end gap-[3%]',
-          dbg('bg-green-500/20')
+          'absolute bottom-[30%] end-[5%] flex w-[24%] items-center justify-end gap-[3%]',
+          dbg('bg-success/20')
         )}
       >
         {/* Promote-status circles (stacked; ✓ goes in the active one) */}
         <div className="flex flex-col items-center justify-center gap-[2.5%]">
-          <div className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-white/80 text-[9px] font-bold text-gray-700 shadow">
-            {student.isPromoted ? '✓' : ''}
+          <div className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#ffffff]/80 text-[9px] font-bold text-[#374151] shadow">
+            {student.isPromoted ? <span aria-hidden="true">✓</span> : ''}
           </div>
-          <div className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-white/80 text-[9px] font-bold text-gray-700 shadow">
-            {student.isPromoted ? '' : '✓'}
+          <div className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#ffffff]/80 text-[9px] font-bold text-[#374151] shadow">
+            {student.isPromoted ? '' : <span aria-hidden="true">✓</span>}
           </div>
+          <span className="sr-only">{student.isPromoted ? t('promoted') : t('notPromoted')}</span>
         </div>
 
         {/* Green hollow circle — next grade (next to "ወደ" in the image) */}
         <div
-          className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-green-600 text-[11px] font-bold text-green-700"
-          aria-label="next grade"
+          className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[#16a34a] text-[11px] font-bold text-[#15803d]"
+          aria-label={t('nextGrade')}
+          dir="auto"
         >
           {student.nextGrade || '—'}
         </div>
 
         {/* Pill boxes — grand total (top) + average (bottom) */}
         <div className="flex flex-col items-center justify-center gap-[3%]">
-          <div className="w-full rounded-full bg-white/80 px-3 py-1 text-center text-xs font-bold text-gray-800 shadow">
+          <div className="w-full rounded-full bg-[#ffffff]/80 px-3 py-1 text-center text-xs font-bold text-[#1f2937] shadow">
             {fmt(student.grandTotal)}
           </div>
-          <div className="w-full rounded-full bg-white/80 px-3 py-1 text-center text-xs font-bold text-gray-800 shadow">
+          <div className="w-full rounded-full bg-[#ffffff]/80 px-3 py-1 text-center text-xs font-bold text-[#1f2937] shadow">
             {fmt(student.average)}
           </div>
         </div>
@@ -393,43 +405,43 @@ export function CertificateOverlay({
       ═══════════════════════════════════════════════════════════ */}
       <div
         className={cn(
-          'absolute top-[15%] left-[5%] w-[30%]',
-          dbg('bg-amber-500/20')
+          'absolute top-[15%] start-[5%] w-[30%]',
+          dbg('bg-warning/20')
         )}
       >
-        <table className="w-full text-[11px] font-medium text-gray-800">
+        <table dir={textDir} className="w-full text-[11px] font-medium text-[#1f2937]">
           <thead>
-            <tr className="border-b border-gray-400/50">
-              <th className="pb-1 text-left font-semibold uppercase tracking-wide">
-                Subject
+            <tr className="border-b border-[#9ca3af]/50">
+              <th className="pb-1 text-start font-semibold uppercase tracking-wide">
+                {t('subject')}
               </th>
-              <th className="pb-1 text-right font-semibold uppercase tracking-wide">
-                Total
+              <th className="pb-1 text-end font-semibold uppercase tracking-wide">
+                {t('total')}
               </th>
             </tr>
           </thead>
           <tbody>
             {grades.map((g) => (
-              <tr key={g.subject} className="border-b border-gray-300/30">
-                <td className="py-[2px] capitalize leading-tight">
-                  {g.subject}
+              <tr key={g.subject} className="border-b border-[#d1d5db]/30">
+                <td className="py-[2px] leading-tight">
+                  {t(`subjects.${g.subject}`)}
                 </td>
-                <td className="py-[2px] text-right font-bold leading-tight">
+                <td className="py-[2px] text-end font-bold leading-tight">
                   {fmt(g.total > 0 ? g.total : g.term1 + g.term2 + g.term3)}
                 </td>
               </tr>
             ))}
           </tbody>
           <tfoot>
-            <tr className="border-t-2 border-gray-400/60 font-bold text-gray-900">
-              <td className="pt-1 text-left">Grand Total</td>
-              <td className="pt-1 text-right">
+            <tr className="border-t-2 border-[#9ca3af]/60 font-bold text-[#111827]">
+              <td className="pt-1 text-start">{t('grandTotal')}</td>
+              <td className="pt-1 text-end">
                 {fmt(student.grandTotal)}
               </td>
             </tr>
-            <tr className="font-semibold text-gray-800">
-              <td className="pb-1 text-left">Average</td>
-              <td className="pb-1 text-right">
+            <tr className="font-semibold text-[#1f2937]">
+              <td className="pb-1 text-start">{t('average')}</td>
+              <td className="pb-1 text-end">
                 {fmt(student.average)}
               </td>
             </tr>
@@ -446,8 +458,8 @@ export function CertificateOverlay({
       ═══════════════════════════════════════════════════════════ */}
       <div
         className={cn(
-          'absolute bottom-[10%] left-[45%] flex flex-col items-center gap-[2.5%]',
-          dbg('bg-yellow-500/20')
+          'absolute bottom-[10%] start-[45%] flex flex-col items-center gap-[2.5%]',
+          dbg('bg-info/20')
         )}
       >
         {[
@@ -456,7 +468,7 @@ export function CertificateOverlay({
           { rating: student.quranInterestRating },
         ].map((row, idx) => (
           <div key={idx} className="flex items-center gap-0.5">
-            {debug && <span className="text-[10px] text-gray-400">{idx + 1}</span>}
+            {debug && <span className="text-[10px] text-[#9ca3af]">{idx + 1}</span>}
             {[1, 2, 3].map((i) => (
               <Star key={i} filled={i <= clampRating(row.rating)} size={18} />
             ))}

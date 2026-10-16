@@ -1,0 +1,51 @@
+{
+  "title": "Attendance",
+  "description": "Mark attendance for any class and review records",
+  "tabs": {
+    "label": "Attendance views",
+    "mark": "Mark attendance",
+    "records": "Records"
+  },
+  "mark": {
+    "class": "Class",
+    "date": "Date",
+    "ethiopianDate": "Ethiopian date: {date}",
+    "allPresent": "All present",
+    "allAbsent": "All absent",
+    "allExcused": "All excused",
+    "clear": "Clear",
+    "noStudents": "No active students in this class",
+    "noClasses": "No classes yet",
+    "progress": "{marked} of {total} marked",
+    "save": "Save attendance",
+    "roll": "Roll {roll}",
+    "statusGroup": "Attendance status for {name}"
+  },
+  "records": {
+    "class": "Class",
+    "allClasses": "All classes",
+    "date": "Date",
+    "dateHint": "Leave empty to show the last 90 days",
+    "title": "Records",
+    "count": "{count, plural, one {# record} other {# records}}",
+    "empty": "No attendance records for the selected filters",
+    "table": {
+      "date": "Date",
+      "student": "Student",
+      "class": "Class",
+      "status": "Status"
+    }
+  },
+  "status": {
+    "present": "Present",
+    "absent": "Absent",
+    "late": "Late",
+    "excused": "Excused"
+  },
+  "toast": {
+    "saved": "Attendance saved",
+    "saveFailed": "Could not save attendance",
+    "loadFailed": "Could not load attendance data",
+    "studentsFailed": "Could not load students"
+  }
+}

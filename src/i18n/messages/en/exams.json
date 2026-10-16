@@ -1,0 +1,69 @@
+{
+  "types": {
+    "mid": "Mid exam",
+    "assignment": "Assignment",
+    "final": "Final exam"
+  },
+  "years": {
+    "label": "Academic year",
+    "all": "All years",
+    "legacy": "No academic year"
+  },
+  "table": {
+    "roll": "Roll",
+    "student": "Student",
+    "total": "Total",
+    "average": "Avg",
+    "percent": "%",
+    "rank": "Rank",
+    "grandTotal": "Grand total",
+    "outOf": "out of {max}",
+    "maxMarks": "Maximum marks: {max}",
+    "classAverage": "Class average",
+    "highest": "Highest",
+    "lowest": "Lowest",
+    "noRoll": "—",
+    "rollShort": "Roll {roll}"
+  },
+  "sheet": {
+    "section": "Section {section}",
+    "totalMarks": "Total marks: {total}",
+    "studentCount": "{count, plural, =0 {No students} one {# student} other {# students}}",
+    "noRows": "No students on this sheet."
+  },
+  "overall": {
+    "heading": "{school} — Overall result",
+    "headingNoSchool": "Overall result",
+    "examsMerged": "{count, plural, =0 {No exams merged} one {# exam merged} other {# exams merged}}",
+    "generated": "Generated {date}",
+    "noStudents": "No active students in this class."
+  },
+  "csv": {
+    "roll": "Roll",
+    "student": "Student",
+    "total": "Total",
+    "average": "Average",
+    "percentage": "Percentage %",
+    "rank": "Rank",
+    "grandTotal": "Grand total",
+    "subjectOutOf": "{subject} / {max}",
+    "overallFile": "overall-result"
+  },
+  "certificate": {
+    "subject": "Subject",
+    "total": "Total",
+    "grandTotal": "Grand total",
+    "average": "Average",
+    "nextGrade": "Next grade",
+    "promoted": "Promoted",
+    "notPromoted": "Not promoted",
+    "subjects": {
+      "seerah": "Seerah",
+      "aqeedah": "Aqeedah",
+      "hadith": "Hadith",
+      "zikr": "Zikr",
+      "arabic": "Arabic",
+      "fiqh": "Fiqh"
+    }
+  }
+}

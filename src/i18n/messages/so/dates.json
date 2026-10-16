@@ -1,0 +1,22 @@
+{
+  "months": {
+    "1": "Meskerem",
+    "2": "Tikimt",
+    "3": "Hidar",
+    "4": "Tahsas",
+    "5": "Tir",
+    "6": "Yekatit",
+    "7": "Megabit",
+    "8": "Miazia",
+    "9": "Ginbot",
+    "10": "Sene",
+    "11": "Hamle",
+    "12": "Nehase",
+    "13": "Pagume"
+  },
+  "format": {
+    "long": "{day} {month} {year}",
+    "short": "{day} {month}",
+    "withEra": "{date} T.I."
+  }
+}

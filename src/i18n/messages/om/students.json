@@ -1,0 +1,61 @@
+{
+  "avatar": {
+    "photoOf": "Suuraa {name}",
+    "photo": "Suuraa barataa"
+  },
+  "photo": {
+    "capturedAlt": "Suuraa barataa kaafame",
+    "retake": "Irra deebi'ii kaasi",
+    "remove": "Suuraa keessaa baasi",
+    "frontCamera": "Kaameraa fuulaa",
+    "backCamera": "Kaameraa duubaa",
+    "take": "Suuraa kaasi",
+    "flip": "Kaameraa jijjiiri",
+    "upload": "Gaalarii irraa ol fe'i",
+    "hint": "Kaameraa fuulaa (selfie) ykn duubaa fayyadamaa; jijjiiruuf \"Kaameraa jijjiiri\" tuqaa. Osoo hin olkaa'in dura suuraa al meeqa barbaaddan irra deebitanii kaasuu ni dandeessu.",
+    "cameraUnavailable": "Kaameraan hin argamu. Marsariitii kanaaf kaameraa akka fayyadamu hayyamaa, ykn gaalarii keessan irraa suuraa ol fe'aa.",
+    "notImage": "Maaloo faayilii suuraa filadhaa."
+  },
+  "detail": {
+    "title": "Odeeffannoo barataa",
+    "viewPhoto": "Suuraa ilaali",
+    "closePhoto": "Suuraa cufi",
+    "classNotAssigned": "Kutaan hin kennamne",
+    "classWithSection": "{name} · Garee {section}",
+    "roll": "Lakk. {roll}",
+    "rollNumber": "Lakkoofsa tartiibaa",
+    "age": "Umurii",
+    "gender": "Saala",
+    "class": "Kutaa",
+    "section": "Garee",
+    "studentId": "Eenyummaa barataa (ID)",
+    "parentLanguage": "Afaan maatii",
+    "phoneHeading": "Bilbila",
+    "parentPhone": "Bilbila maatii",
+    "alternativePhone": "Bilbila biraa",
+    "registrationHeading": "Galmee",
+    "registeredOn": "Guyyaa galmaa'e",
+    "lastUpdated": "Yeroo dhumaaf kan haaromfame",
+    "createdBy": "Kan galmeesse",
+    "ustaz": "Ustaaz {name}",
+    "systemRecovered": "Sirna (ofumaan deebi'e)",
+    "admin": "Bulchaa",
+    "attendanceHeading": "Seenaa argamaa",
+    "noAttendance": "Ammaaf barataa kanaaf galmeen argamaa hin jiru.",
+    "calendarFilter": "Calallii lakkoofsa Habashaa",
+    "ethYear": "Bara (A.L.H.)",
+    "ethMonth": "Ji'a (A.L.H.)",
+    "allYear": "Bara guutuu",
+    "noAttendanceInPeriod": "Yeroo (A.L.H.) filatame keessatti argamni galmaa'e hin jiru.",
+    "records": "{count, plural, one {galmee} other {galmeewwan}}",
+    "ethiopianSuffix": "{date} (A.L.H.)",
+    "legendItem": "{status}: {count}",
+    "callParent": "Maatii bilbili",
+    "status": {
+      "present": "Argame",
+      "absent": "Hafe",
+      "late": "Booda dhufe",
+      "excused": "Hayyamaan"
+    }
+  }
+}

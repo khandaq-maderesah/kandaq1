@@ -1,0 +1,36 @@
+{
+  "title": "طلابي",
+  "description": "الطلاب في الفصول المسندة إليك. لحذف طالب أو نقله، يُرجى إرسال طلب إلى مسؤول المدرسة.",
+  "filters": {
+    "search": "البحث عن طالب",
+    "searchPlaceholder": "الاسم أو الرقم التسلسلي أو الهاتف",
+    "class": "الفصل",
+    "allClasses": "جميع فصولي"
+  },
+  "table": {
+    "photo": "الصورة",
+    "student": "الطالب",
+    "roll": "الرقم",
+    "age": "العمر",
+    "class": "الفصل",
+    "gender": "الجنس",
+    "parentPhone": "هاتف وليّ الأمر",
+    "alternativePhone": "هاتف بديل",
+    "actions": "الإجراءات"
+  },
+  "card": {
+    "roll": "رقم {roll}",
+    "age": "{age, plural, zero {# سنة} one {سنة واحدة} two {سنتان} few {# سنوات} many {# سنةً} other {# سنة}}"
+  },
+  "viewDetails": "عرض تفاصيل {name}",
+  "callNumber": "الاتصال بالرقم {phone}",
+  "empty": {
+    "noClasses": "لم يُسنَد إليك أي فصل بعد.",
+    "noClassesHint": "يُرجى التواصل مع مسؤول المدرسة لإسناد فصل إليك.",
+    "noStudents": "لم يُعثَر على أي طالب.",
+    "noStudentsHint": "يمكن إضافة الطلاب من صفحة «فصولي»."
+  },
+  "toast": {
+    "loadFailed": "تعذّر تحميل طلابك."
+  }
+}

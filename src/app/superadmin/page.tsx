@@ -2,6 +2,22 @@
 
 import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
+import { toast } from 'sonner'
+import {
+  Building2,
+  CheckCircle2,
+  Loader2,
+  LogIn,
+  Mail,
+  MapPin,
+  PauseCircle,
+  Phone,
+  PlayCircle,
+  Plus,
+  UserPlus,
+  Users,
+} from 'lucide-react'
 import { auth } from '@/lib/firebase/config'
 import { rtdb } from '@/lib/database'
 import { useLiveData } from '@/lib/dataStore'
@@ -9,10 +25,19 @@ import { useAuth } from '@/context/AuthContext'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Building2, Loader2, Plus, LogIn, PauseCircle, PlayCircle, UserPlus, X } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
+import { Skeleton } from '@/components/ui/skeleton'
+import { EmptyState, PageHeader, StatCard } from '@/components/ui/page'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import type { School, User } from '@/types'
+import { apiErrorKey } from '@/lib/apiErrors'
 
 const DEFAULT_TIMEZONE = 'Africa/Addis_Ababa'
 
@@ -21,13 +46,12 @@ function newSchoolId(): string {
 }
 
 export default function SuperAdminPage() {
+  const t = useTranslations('superadmin')
+  const tc = useTranslations('common')
   const router = useRouter()
   const { user, selectSchool } = useAuth()
   const schoolsData = useLiveData<School[]>('schools', (emit) => rtdb.subscribeToSchools(emit))
   const usersData = useLiveData<User[]>('allUsers', (emit) => rtdb.subscribeToAllUsers(emit))
-
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
 
   // New school form
   const [showCreate, setShowCreate] = useState(false)
@@ -46,6 +70,11 @@ export default function SuperAdminPage() {
   const [adminPassword, setAdminPassword] = useState('')
   const [addingAdmin, setAddingAdmin] = useState(false)
 
+  // Suspend confirmation + per-school busy state
+  const [suspendTarget, setSuspendTarget] = useState<School | null>(null)
+  const [busyId, setBusyId] = useState<string | null>(null)
+  const [openingId, setOpeningId] = useState<string | null>(null)
+
   const schools = useMemo(
     () => [...(schoolsData.data ?? [])].sort((a, b) => a.name.localeCompare(b.name)),
     [schoolsData.data]
@@ -62,10 +91,31 @@ export default function SuperAdminPage() {
     return map
   }, [usersData.data])
 
+  const stats = useMemo(() => {
+    const suspended = schools.filter((s) => s.status === 'suspended').length
+    const users = (usersData.data ?? []).filter((u) => u.schoolId).length
+    return { total: schools.length, active: schools.length - suspended, suspended, users }
+  }, [schools, usersData.data])
+
+  const adminSchool = adminFor ? schools.find((s) => s.id === adminFor) : undefined
+
+  const resetCreateForm = () => {
+    setName('')
+    setNameAm('')
+    setAddress('')
+    setPhone('')
+    setTimezone(DEFAULT_TIMEZONE)
+  }
+
+  const resetAdminForm = () => {
+    setAdminName('')
+    setAdminEmail('')
+    setAdminPhone('')
+    setAdminPassword('')
+  }
+
   const handleCreateSchool = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError('')
-    setSuccess('')
     if (!name.trim()) return
     setCreating(true)
     try {
@@ -83,49 +133,55 @@ export default function SuperAdminPage() {
       if (phone.trim()) record.phone = phone.trim()
       const id = newSchoolId()
       await rtdb.createSchool(id, record)
-      setSuccess(`School "${record.name}" created. Now add its admin account.`)
-      setName('')
-      setNameAm('')
-      setAddress('')
-      setPhone('')
-      setTimezone(DEFAULT_TIMEZONE)
+      toast.success(t('create.created', { name: record.name }))
+      resetCreateForm()
       setShowCreate(false)
+      resetAdminForm()
       setAdminFor(id)
-    } catch (err: any) {
-      setError(err.message || 'Failed to create school')
+    } catch (err) {
+      console.error('Create school failed', err)
+      toast.error(t('create.failed'))
     } finally {
       setCreating(false)
     }
   }
 
-  const toggleStatus = async (school: School) => {
-    setError('')
-    setSuccess('')
-    const next = school.status === 'active' ? 'suspended' : 'active'
-    if (
-      next === 'suspended' &&
-      !window.confirm(`Suspend "${school.name}"? Its admins and teachers will not be able to sign in until it is reactivated.`)
-    ) {
-      return
-    }
+  const setStatus = async (school: School, next: School['status']) => {
+    setBusyId(school.id)
     try {
       await rtdb.updateSchool(school.id, { status: next, updatedAt: new Date().toISOString() })
-      setSuccess(`"${school.name}" is now ${next}.`)
-    } catch (err: any) {
-      setError(err.message || 'Failed to update school')
+      toast.success(
+        next === 'suspended' ? t('toast.suspended', { name: school.name }) : t('toast.reactivated', { name: school.name })
+      )
+      setSuspendTarget(null)
+    } catch (err) {
+      console.error('Update school failed', err)
+      toast.error(t('toast.updateFailed'))
+    } finally {
+      setBusyId(null)
     }
   }
 
+  const toggleStatus = (school: School) => {
+    if (school.status === 'active') setSuspendTarget(school)
+    else setStatus(school, 'active')
+  }
+
   const openSchool = async (school: School) => {
-    await selectSchool(school.id)
-    router.push('/admin')
+    setOpeningId(school.id)
+    try {
+      await selectSchool(school.id)
+      router.push('/admin')
+    } catch (err) {
+      console.error('Open school failed', err)
+      toast.error(tc('errors.generic'))
+      setOpeningId(null)
+    }
   }
 
   const handleAddAdmin = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!adminFor) return
-    setError('')
-    setSuccess('')
     setAddingAdmin(true)
     try {
       const idToken = await auth.currentUser?.getIdToken()
@@ -144,16 +200,17 @@ export default function SuperAdminPage() {
           schoolId: adminFor,
         }),
       })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Failed to create admin')
-      setSuccess(`Admin account created for ${adminEmail}.`)
-      setAdminName('')
-      setAdminEmail('')
-      setAdminPhone('')
-      setAdminPassword('')
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        toast.error(t('admin.failed'), { description: tc(`errors.api.${apiErrorKey(data)}`) })
+        return
+      }
+      toast.success(t('admin.created', { email: adminEmail }))
+      resetAdminForm()
       setAdminFor(null)
-    } catch (err: any) {
-      setError(err.message || 'Failed to create admin')
+    } catch (err) {
+      console.error('Create admin failed', err)
+      toast.error(t('admin.failed'), { description: tc('errors.network') })
     } finally {
       setAddingAdmin(false)
     }
@@ -162,79 +219,48 @@ export default function SuperAdminPage() {
   const loading = schoolsData.data === undefined
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Schools</h1>
-          <p className="mt-1 text-gray-600">Create schools, give each one an admin, and open any school to manage it.</p>
-        </div>
-        <Button onClick={() => setShowCreate((v) => !v)}>
-          {showCreate ? <X className="mr-2 h-4 w-4" /> : <Plus className="mr-2 h-4 w-4" />}
-          {showCreate ? 'Cancel' : 'New school'}
-        </Button>
+    <div>
+      <PageHeader
+        title={t('title')}
+        description={t('description')}
+        actions={
+          <Button onClick={() => setShowCreate(true)}>
+            <Plus />
+            {t('newSchool')}
+          </Button>
+        }
+      />
+
+      <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <StatCard label={t('stats.total')} value={loading ? '—' : stats.total} icon={Building2} />
+        <StatCard label={t('stats.active')} value={loading ? '—' : stats.active} icon={CheckCircle2} tone="success" />
+        <StatCard label={t('stats.suspended')} value={loading ? '—' : stats.suspended} icon={PauseCircle} tone="warning" />
+        <StatCard
+          label={t('stats.users')}
+          value={usersData.data === undefined ? '—' : stats.users}
+          icon={Users}
+          tone="info"
+        />
       </div>
 
-      {error && (
-        <Alert variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-      {success && (
-        <Alert>
-          <AlertDescription>{success}</AlertDescription>
-        </Alert>
-      )}
-
-      {showCreate && (
-        <Card>
-          <CardHeader>
-            <CardTitle>New school</CardTitle>
-            <CardDescription>The school starts empty. Its admin then adds classes, teachers and students.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleCreateSchool} className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="school-name">School name *</Label>
-                <Input id="school-name" required value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Khendeq Medresah" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="school-name-am">Name in Amharic (for SMS)</Label>
-                <Input id="school-name-am" value={nameAm} onChange={(e) => setNameAm(e.target.value)} placeholder="e.g. ኸንደቅ መድረሳ" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="school-address">Address</Label>
-                <Input id="school-address" value={address} onChange={(e) => setAddress(e.target.value)} />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="school-phone">Phone</Label>
-                <Input id="school-phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="school-tz">Timezone</Label>
-                <Input id="school-tz" value={timezone} onChange={(e) => setTimezone(e.target.value)} />
-              </div>
-              <div className="flex items-end">
-                <Button type="submit" disabled={creating} className="w-full">
-                  {creating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Create school
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-      )}
-
       {loading ? (
-        <div className="flex justify-center py-16">
-          <Loader2 className="h-8 w-8 animate-spin text-green-600" />
+        <div className="grid gap-4 md:grid-cols-2">
+          {[0, 1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-52 rounded-xl" />
+          ))}
         </div>
       ) : schools.length === 0 ? (
-        <Card>
-          <CardContent className="py-12 text-center text-gray-600">
-            <Building2 className="mx-auto mb-3 h-10 w-10 text-gray-400" />
-            No schools yet. Click <strong>New school</strong> to create the first one.
-          </CardContent>
-        </Card>
+        <EmptyState
+          icon={Building2}
+          title={t('empty.title')}
+          description={t('empty.description')}
+          action={
+            <Button onClick={() => setShowCreate(true)}>
+              <Plus />
+              {t('newSchool')}
+            </Button>
+          }
+        />
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
           {schools.map((school) => {
@@ -243,83 +269,254 @@ export default function SuperAdminPage() {
             const teacherCount = members.filter((u) => u.role === 'teacher').length
             const suspended = school.status === 'suspended'
             return (
-              <Card key={school.id} className={suspended ? 'opacity-75' : undefined}>
-                <CardHeader>
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <CardTitle className="truncate">{school.name}</CardTitle>
-                      <CardDescription>
-                        {[school.address, school.phone].filter(Boolean).join(' · ') || 'No contact details'}
-                      </CardDescription>
+              <div key={school.id} className="flex flex-col rounded-xl border bg-card p-5 shadow-sm">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex min-w-0 items-start gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                      <Building2 className="h-5 w-5" />
                     </div>
-                    <span
-                      className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                        suspended ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
-                      }`}
-                    >
-                      {suspended ? 'Suspended' : 'Active'}
-                    </span>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="text-sm text-gray-700">
-                    <p>
-                      <strong>{admins.length}</strong> admin{admins.length === 1 ? '' : 's'} ·{' '}
-                      <strong>{teacherCount}</strong> teacher{teacherCount === 1 ? '' : 's'}
-                    </p>
-                    {admins.length > 0 && (
-                      <p className="mt-1 truncate text-gray-500">{admins.map((a) => a.email).join(', ')}</p>
-                    )}
-                  </div>
-
-                  <div className="flex flex-wrap gap-2">
-                    <Button size="sm" onClick={() => openSchool(school)}>
-                      <LogIn className="mr-1.5 h-4 w-4" /> Open
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={() => setAdminFor(adminFor === school.id ? null : school.id)}>
-                      <UserPlus className="mr-1.5 h-4 w-4" /> Add admin
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={() => toggleStatus(school)}>
-                      {suspended ? (
-                        <><PlayCircle className="mr-1.5 h-4 w-4" /> Reactivate</>
-                      ) : (
-                        <><PauseCircle className="mr-1.5 h-4 w-4" /> Suspend</>
+                    <div className="min-w-0">
+                      <h2 className="truncate font-semibold text-foreground">{school.name}</h2>
+                      {school.nameAm && (
+                        <p className="truncate text-sm text-muted-foreground" lang="am">
+                          {school.nameAm}
+                        </p>
                       )}
-                    </Button>
+                    </div>
                   </div>
+                  <Badge variant={suspended ? 'warning' : 'success'} className="shrink-0">
+                    {suspended ? <PauseCircle /> : <CheckCircle2 />}
+                    {suspended ? tc('status.suspended') : tc('status.active')}
+                  </Badge>
+                </div>
 
-                  {adminFor === school.id && (
-                    <form onSubmit={handleAddAdmin} className="grid gap-3 rounded-lg border bg-slate-50 p-3 sm:grid-cols-2">
-                      <div className="space-y-1">
-                        <Label htmlFor={`an-${school.id}`}>Full name *</Label>
-                        <Input id={`an-${school.id}`} required value={adminName} onChange={(e) => setAdminName(e.target.value)} />
-                      </div>
-                      <div className="space-y-1">
-                        <Label htmlFor={`ae-${school.id}`}>Email *</Label>
-                        <Input id={`ae-${school.id}`} type="email" required value={adminEmail} onChange={(e) => setAdminEmail(e.target.value)} />
-                      </div>
-                      <div className="space-y-1">
-                        <Label htmlFor={`ap-${school.id}`}>Phone</Label>
-                        <Input id={`ap-${school.id}`} value={adminPhone} onChange={(e) => setAdminPhone(e.target.value)} />
-                      </div>
-                      <div className="space-y-1">
-                        <Label htmlFor={`aw-${school.id}`}>Temporary password *</Label>
-                        <Input id={`aw-${school.id}`} type="password" required minLength={6} value={adminPassword} onChange={(e) => setAdminPassword(e.target.value)} />
-                      </div>
-                      <div className="sm:col-span-2">
-                        <Button type="submit" size="sm" disabled={addingAdmin}>
-                          {addingAdmin && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                          Create admin for {school.name}
-                        </Button>
-                      </div>
-                    </form>
+                <div className="mt-4 space-y-1.5 text-sm text-muted-foreground">
+                  {school.address || school.phone ? (
+                    <>
+                      {school.address && (
+                        <p className="flex min-w-0 items-center gap-2">
+                          <MapPin className="h-4 w-4 shrink-0" />
+                          <span className="truncate">{school.address}</span>
+                        </p>
+                      )}
+                      {school.phone && (
+                        <p className="flex items-center gap-2">
+                          <Phone className="h-4 w-4 shrink-0" />
+                          <span dir="ltr">{school.phone}</span>
+                        </p>
+                      )}
+                    </>
+                  ) : (
+                    <p>{t('card.noContact')}</p>
                   )}
-                </CardContent>
-              </Card>
+                </div>
+
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <Badge variant="secondary">{t('card.admins', { count: admins.length })}</Badge>
+                  <Badge variant="secondary">{t('card.teachers', { count: teacherCount })}</Badge>
+                </div>
+                {admins.length > 0 ? (
+                  <p className="mt-2 flex min-w-0 items-center gap-2 text-sm text-muted-foreground">
+                    <Mail className="h-4 w-4 shrink-0" />
+                    <span className="truncate" dir="ltr">
+                      {admins.map((a) => a.email).join(', ')}
+                    </span>
+                  </p>
+                ) : (
+                  <p className="mt-2 text-sm text-warning">{t('card.noAdminYet')}</p>
+                )}
+
+                <div className="mt-5 flex flex-wrap gap-2 border-t pt-4">
+                  <Button size="sm" onClick={() => openSchool(school)} disabled={openingId !== null}>
+                    {openingId === school.id ? <Loader2 className="animate-spin" /> : <LogIn className="rtl:rotate-180" />}
+                    {t('card.open')}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      resetAdminForm()
+                      setAdminFor(school.id)
+                    }}
+                  >
+                    <UserPlus />
+                    {t('card.addAdmin')}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => toggleStatus(school)}
+                    disabled={busyId === school.id}
+                    className={suspended ? undefined : 'text-destructive hover:text-destructive'}
+                  >
+                    {busyId === school.id ? (
+                      <Loader2 className="animate-spin" />
+                    ) : suspended ? (
+                      <PlayCircle />
+                    ) : (
+                      <PauseCircle />
+                    )}
+                    {suspended ? t('card.reactivate') : t('card.suspend')}
+                  </Button>
+                </div>
+              </div>
             )
           })}
         </div>
       )}
+
+      {/* New school */}
+      <Dialog open={showCreate} onOpenChange={(o) => !creating && setShowCreate(o)}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>{t('create.title')}</DialogTitle>
+            <DialogDescription>{t('create.description')}</DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleCreateSchool} className="space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="school-name">{t('create.name')}</Label>
+                <Input
+                  id="school-name"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder={t('create.namePlaceholder')}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="school-name-am">{t('create.nameAm')}</Label>
+                <Input id="school-name-am" lang="am" value={nameAm} onChange={(e) => setNameAm(e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="school-address">{t('create.address')}</Label>
+                <Input id="school-address" value={address} onChange={(e) => setAddress(e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="school-phone">{t('create.phone')}</Label>
+                <Input
+                  id="school-phone"
+                  type="tel"
+                  dir="ltr"
+                  className="text-start"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="school-tz">{t('create.timezone')}</Label>
+                <Input
+                  id="school-tz"
+                  dir="ltr"
+                  className="text-start"
+                  value={timezone}
+                  onChange={(e) => setTimezone(e.target.value)}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setShowCreate(false)} disabled={creating}>
+                {tc('actions.cancel')}
+              </Button>
+              <Button type="submit" disabled={creating || !name.trim()}>
+                {creating ? <Loader2 className="animate-spin" /> : <Plus />}
+                {t('create.submit')}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* New school admin */}
+      <Dialog open={adminFor !== null} onOpenChange={(o) => !o && !addingAdmin && setAdminFor(null)}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>{t('admin.title', { school: adminSchool?.name ?? '' })}</DialogTitle>
+            <DialogDescription>{t('admin.description')}</DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleAddAdmin} className="space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="admin-name">{t('admin.fullName')}</Label>
+                <Input id="admin-name" required autoComplete="off" value={adminName} onChange={(e) => setAdminName(e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="admin-email">{t('admin.email')}</Label>
+                <Input
+                  id="admin-email"
+                  type="email"
+                  required
+                  dir="ltr"
+                  className="text-start"
+                  autoComplete="off"
+                  value={adminEmail}
+                  onChange={(e) => setAdminEmail(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="admin-phone">{t('admin.phone')}</Label>
+                <Input
+                  id="admin-phone"
+                  type="tel"
+                  dir="ltr"
+                  className="text-start"
+                  value={adminPhone}
+                  onChange={(e) => setAdminPhone(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="admin-password">{t('admin.password')}</Label>
+                <Input
+                  id="admin-password"
+                  type="password"
+                  required
+                  minLength={6}
+                  autoComplete="new-password"
+                  aria-describedby="admin-password-hint"
+                  value={adminPassword}
+                  onChange={(e) => setAdminPassword(e.target.value)}
+                />
+                <p id="admin-password-hint" className="text-xs text-muted-foreground">
+                  {t('admin.passwordHint')}
+                </p>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setAdminFor(null)} disabled={addingAdmin}>
+                {tc('actions.cancel')}
+              </Button>
+              <Button type="submit" disabled={addingAdmin}>
+                {addingAdmin ? <Loader2 className="animate-spin" /> : <UserPlus />}
+                {t('admin.submit')}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Suspend confirmation */}
+      <Dialog open={suspendTarget !== null} onOpenChange={(o) => !o && busyId === null && setSuspendTarget(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('suspend.title', { name: suspendTarget?.name ?? '' })}</DialogTitle>
+            <DialogDescription>{t('suspend.description')}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setSuspendTarget(null)} disabled={busyId !== null}>
+              {tc('actions.cancel')}
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              disabled={busyId !== null}
+              onClick={() => suspendTarget && setStatus(suspendTarget, 'suspended')}
+            >
+              {busyId !== null ? <Loader2 className="animate-spin" /> : <PauseCircle />}
+              {t('suspend.confirm')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

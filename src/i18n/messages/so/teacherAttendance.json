@@ -1,0 +1,46 @@
+{
+  "title": "Qaado xaadiriska",
+  "description": "Calaamadee ardayda maanta joogta, kadibna kaydi.",
+  "filters": {
+    "class": "Fasalka",
+    "classPlaceholder": "Dooro fasal",
+    "date": "Taariikhda"
+  },
+  "status": {
+    "present": "Jooga",
+    "absent": "Maqan",
+    "late": "Daahay",
+    "excused": "Fasax",
+    "unmarked": "Lama calaamadin"
+  },
+  "markAll": {
+    "label": "Calaamadee dhammaan",
+    "present": "Dhammaan jooga",
+    "absent": "Dhammaan maqan",
+    "excused": "Dhammaan fasax",
+    "clear": "Nadiifi dhammaan"
+  },
+  "list": {
+    "title": "Ardayda",
+    "statusGroup": "Xaadiriska {name}"
+  },
+  "saveBar": {
+    "progress": "{marked} ka mid ah {total} ayaa la calaamadeeyay",
+    "unsaved": "Isbeddello aan la kaydin",
+    "allSaved": "Dhammaan isbeddellada waa la kaydiyay",
+    "save": "Kaydi xaadiriska"
+  },
+  "empty": {
+    "noClasses": "Weli laguuma qoondayn wax fasal ah.",
+    "noClassesHint": "Fadlan maamulaha dugsiga ka codso inuu fasal kuu qoondeeyo.",
+    "noStudents": "Fasalkan arday kuma jiro.",
+    "noStudentsHint": "Ardayda ku dar bogga Fasalladayda."
+  },
+  "toast": {
+    "saved": "Xaadiriska waa la kaydiyay.",
+    "nothingToSave": "Fadlan calaamadee ugu yaraan hal arday ka hor intaadan kaydin.",
+    "loadClassesFailed": "Fasalladaada lama soo rari karin.",
+    "loadStudentsFailed": "Ardayda lama soo rari karin.",
+    "saveFailed": "Xaadiriska lama kaydin karin. Fadlan isku day mar kale."
+  }
+}

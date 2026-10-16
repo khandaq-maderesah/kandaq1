@@ -1,0 +1,35 @@
+{
+  "title": "Settings",
+  "description": "Manage your school's information.",
+  "school": {
+    "title": "School information",
+    "description": "These details are shown across the system and on printed reports.",
+    "name": "School name",
+    "namePlaceholder": "e.g. Khendeq Medresah",
+    "nameAm": "School name in Amharic (used in SMS)",
+    "address": "Address",
+    "addressPlaceholder": "Street, city",
+    "phone": "Contact phone",
+    "academicYear": "Academic year",
+    "academicYearPlaceholder": "e.g. 2026-2027",
+    "save": "Save settings",
+    "saved": "Settings saved.",
+    "nameRequired": "School name is required.",
+    "noSchool": "No school is selected.",
+    "failed": "Couldn't save the settings. Please try again.",
+    "loadFailed": "Couldn't load the settings. Please refresh the page."
+  },
+  "registration": {
+    "title": "Student registration",
+    "description": "Control whether teachers can register new students.",
+    "openStatus": "Registration is open",
+    "closedStatus": "Registration is closed",
+    "openHint": "Teachers can register new students.",
+    "closedHint": "Teachers can't register new students until you open registration again. Existing student records can still be edited.",
+    "close": "Close registration",
+    "open": "Open registration",
+    "opened": "Student registration opened. Teachers can now register new students.",
+    "closed": "Student registration closed. Teachers can no longer register new students.",
+    "failed": "Couldn't update registration. Please try again."
+  }
+}

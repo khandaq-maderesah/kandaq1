@@ -1,0 +1,71 @@
+{
+  "title": "التقارير",
+  "description": "نظرة عامة على الحضور في مدرستك",
+  "actions": {
+    "studentCsv": "ملف CSV للطلاب",
+    "summaryCsv": "ملف CSV للملخص"
+  },
+  "filters": {
+    "from": "من",
+    "to": "إلى",
+    "hint": "تعتمد جميع الأرقام أدناه على هذا النطاق الزمني. عند تركه فارغًا تُعرض البيانات لكل الفترات.",
+    "clear": "مسح التواريخ",
+    "ethRange": "بالتقويم الإثيوبي: {from} – {to}",
+    "ethFrom": "بالتقويم الإثيوبي: من {date}",
+    "ethTo": "بالتقويم الإثيوبي: حتى {date}"
+  },
+  "kpi": {
+    "students": "الطلاب النشطون",
+    "classes": "الفصول",
+    "teachers": "المعلّمون",
+    "records": "سجلات الحضور",
+    "rateHint": "نسبة الحضور {percent}%"
+  },
+  "charts": {
+    "byStatusTitle": "الحضور حسب الحالة",
+    "byStatusDescription": "نسبة السجلات ضمن النطاق المحدد",
+    "dailyTitle": "الحضور اليومي مؤخرًا",
+    "dailyDescription": "آخر 7 أيام تتضمّن سجلات",
+    "noData": "لا توجد بيانات حضور بعد.",
+    "percent": "{percent}%",
+    "total": "المجموع: {count}",
+    "pieTooltip": "{name}: {value} ({percent}%)"
+  },
+  "status": {
+    "present": "حاضر",
+    "absent": "غائب",
+    "late": "متأخّر",
+    "excused": "غائب بعذر"
+  },
+  "summary": {
+    "title": "ملخص حضور الطلاب",
+    "count": "{count, plural, zero {لا يوجد طلاب نشطون} one {طالب نشط واحد} two {طالبان نشطان} few {# طلاب نشطين} many {# طالبًا نشطًا} other {# طالب نشط}}",
+    "empty": "لا يوجد طلاب نشطون",
+    "table": {
+      "student": "الطالب",
+      "class": "الفصل",
+      "present": "حاضر",
+      "absent": "غائب",
+      "late": "متأخّر",
+      "excused": "بعذر",
+      "total": "المجموع",
+      "rate": "النسبة"
+    }
+  },
+  "csv": {
+    "metric": "المؤشر",
+    "value": "القيمة",
+    "totalStudents": "الطلاب النشطون",
+    "totalClasses": "الفصول",
+    "totalTeachers": "المعلّمون",
+    "records": "سجلات الحضور (ضمن النطاق)",
+    "present": "حاضر",
+    "absent": "غائب",
+    "late": "متأخّر",
+    "excused": "غائب بعذر",
+    "name": "الاسم",
+    "class": "الفصل",
+    "total": "المجموع",
+    "rate": "النسبة %"
+  }
+}

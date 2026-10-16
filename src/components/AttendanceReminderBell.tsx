@@ -1,15 +1,28 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useFormatter, useTranslations } from 'next-intl'
+import { toast } from 'sonner'
 import { rtdb } from '@/lib/database'
 import { useAuth } from '@/context/AuthContext'
 import { useLiveData } from '@/lib/dataStore'
 import { ATTENDANCE_RECENT_DAYS, daysAgoISO } from '@/lib/utils'
-import { Bell, CheckCircle2, Loader2, X, GraduationCap, AlertTriangle } from 'lucide-react'
+import { ClipboardList, CheckCircle2, Loader2, X, GraduationCap } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import type { Class, Attendance, User, MissingAttendanceAlert } from '@/types'
 import { runMissingAttendanceCheck, CHECK_INTERVAL_MS } from '@/lib/attendanceReminder'
 
-export function AttendanceReminderBell({ dark = true }: { dark?: boolean }) {
+export function AttendanceReminderBell(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _props: {
+    /** @deprecated Kept for backward compatibility; the bell always matches the light top bar. */
+    dark?: boolean
+  } = {}
+) {
+  const t = useTranslations('notifications')
+  const tc = useTranslations('common')
+  const format = useFormatter()
   const { user } = useAuth()
   const [open, setOpen] = useState(false)
   const [savingId, setSavingId] = useState('')
@@ -88,15 +101,22 @@ export function AttendanceReminderBell({ dark = true }: { dark?: boolean }) {
     if (storeReady) runCheck()
   }, [storeReady, runCheck])
 
-  // Close the dropdown when clicking outside.
+  // Close the panel when clicking outside or pressing Escape.
   useEffect(() => {
-    const handler = (e: MouseEvent) => {
+    const onClick = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setOpen(false)
       }
     }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false)
+    }
+    document.addEventListener('mousedown', onClick)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('mousedown', onClick)
+      document.removeEventListener('keydown', onKey)
+    }
   }, [])
 
   const isAdmin = user?.role === 'admin'
@@ -129,113 +149,116 @@ export function AttendanceReminderBell({ dark = true }: { dark?: boolean }) {
         resolvedAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       })
+      toast.success(t('reminders.resolved'))
     } catch (e) {
       console.error('Failed to resolve reminder', e)
+      toast.error(t('reminders.resolveFailed'))
     } finally {
       setSavingId('')
     }
   }
 
+  // Reminder dates are calendar days (YYYY-MM-DD); noon avoids time-zone shifts.
+  const formatDay = (day: string) => {
+    const d = new Date(`${day}T12:00:00`)
+    return Number.isNaN(d.getTime()) ? day : format.dateTime(d, { dateStyle: 'medium' })
+  }
+
   return (
     <div ref={containerRef} className="relative">
-      <button
+      <Button
         type="button"
+        variant="ghost"
+        size="icon"
         onClick={() => setOpen((o) => !o)}
-        aria-label="Attendance reminders"
-        className={`relative inline-flex h-9 w-9 items-center justify-center rounded-full shadow-sm transition ${
-          dark
-            ? 'bg-white/15 text-white hover:bg-white hover:text-amber-600'
-            : 'border border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
-        }`}
+        className="relative text-muted-foreground"
+        aria-label={count > 0 ? `${t('reminders.label')} (${count})` : t('reminders.label')}
+        aria-expanded={open}
+        aria-haspopup="dialog"
+        title={t('reminders.label')}
       >
-        <Bell className="h-4 w-4" />
+        <ClipboardList />
         {count > 0 && (
-          <span className="absolute -right-1 -top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
-            {count}
+          <span
+            aria-hidden="true"
+            className="absolute -end-0.5 -top-0.5 inline-flex h-[1.125rem] min-w-[1.125rem] items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold leading-none text-destructive-foreground ring-2 ring-card"
+          >
+            {count > 99 ? '99+' : count}
           </span>
         )}
-      </button>
+      </Button>
 
       {open && (
-        <div className="fixed right-2 top-16 z-50 w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-2xl">
-          <div className="flex items-center gap-2 border-b border-gray-100 bg-gray-50 px-4 py-3">
-            <span className="inline-flex items-center justify-center rounded-lg bg-amber-100 p-1.5">
-              <AlertTriangle className="h-4 w-4 text-amber-600" />
+        <div
+          role="dialog"
+          aria-label={t('reminders.title')}
+          className="fixed end-2 top-16 z-50 flex max-h-[calc(100dvh-5rem)] w-[min(24rem,calc(100vw-1rem))] flex-col overflow-hidden rounded-xl border bg-popover text-popover-foreground shadow-lg"
+        >
+          <div className="flex items-start gap-3 border-b px-4 py-3">
+            <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-warning/10 text-warning">
+              <ClipboardList className="h-4 w-4" />
             </span>
-            <div>
-              <p className="text-sm font-semibold text-gray-900">Attendance Reminders</p>
-              <p className="text-xs text-gray-500">Classes where attendance was not taken</p>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-foreground">{t('reminders.title')}</p>
+              <p className="text-xs text-muted-foreground">{t('reminders.description')}</p>
             </div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-sm"
+              onClick={() => setOpen(false)}
+              className="-me-1 shrink-0 text-muted-foreground"
+              aria-label={tc('actions.close')}
+            >
+              <X />
+            </Button>
           </div>
 
-          <div className="max-h-80 overflow-y-auto">
+          <div className="min-h-0 flex-1 overflow-y-auto">
             {loading ? (
-              <div className="flex justify-center py-8">
-                <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
+              <div className="space-y-3 p-4">
+                <Skeleton className="h-12 w-full" />
+                <Skeleton className="h-12 w-full" />
               </div>
             ) : visible.length === 0 ? (
-              <div className="flex flex-col items-center gap-2 px-4 py-8 text-center text-sm text-gray-500">
-                <CheckCircle2 className="h-6 w-6 text-green-500" />
-                {isAdmin
-                  ? 'All classes have attendance recorded so far.'
-                  : 'You have taken attendance for all your classes.'}
+              <div className="flex flex-col items-center gap-2 px-4 py-8 text-center text-sm text-muted-foreground">
+                <CheckCircle2 className="h-6 w-6 text-success" />
+                {isAdmin ? t('reminders.emptyAdmin') : t('reminders.emptyTeacher')}
               </div>
             ) : (
-              visible.map((a) => (
-                <div
-                  key={a.id}
-                  className="flex items-start gap-3 border-b border-gray-50 px-4 py-3 last:border-0"
-                >
-                  <span className="mt-0.5 inline-flex items-center justify-center rounded-lg bg-red-50 p-1.5">
-                    <GraduationCap className="h-4 w-4 text-red-500" />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    {isAdmin ? (
-                      <p className="text-sm font-medium text-gray-900">
-                        Uataz {a.teacherName}{' '}
-                        <span className="text-red-600">has not taken today&apos;s attendance</span>
+              <ul className="divide-y">
+                {visible.map((a) => (
+                  <li key={a.id} className="flex items-start gap-3 px-4 py-3">
+                    <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-destructive/10 text-destructive">
+                      <GraduationCap className="h-4 w-4" />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-foreground">
+                        {isAdmin ? t('reminders.adminLine', { teacher: a.teacherName }) : t('reminders.teacherLine')}
                       </p>
-                    ) : (
-                      <p className="text-sm font-medium text-gray-900">
-                        Dear Ustaz {a.teacherName},{' '}
-                        <span className="text-red-600">
-                          please take today&apos;s attendance &mdash; you haven&apos;t taken it yet
-                        </span>
+                      <p className="mt-0.5 text-xs text-muted-foreground">
+                        {a.section ? t('absence.classWithSection', { className: a.className, section: a.section }) : a.className}
+                        {' · '}
+                        <time dateTime={a.date}>{formatDay(a.date)}</time>
                       </p>
-                    )}
-                    <p className="mt-0.5 text-xs text-gray-500">
-                      {a.className}
-                      {a.section ? ` • ${a.section}` : ''} · {a.date}
-                    </p>
-                    {isAdmin && (
-                      <button
-                        type="button"
-                        onClick={() => handleResolve(a.id)}
-                        disabled={savingId === a.id}
-                        className="mt-1.5 inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700 transition hover:bg-emerald-100 disabled:opacity-50"
-                      >
-                        {savingId === a.id ? (
-                          <Loader2 className="h-3 w-3 animate-spin" />
-                        ) : (
-                          <CheckCircle2 className="h-3 w-3" />
-                        )}
-                        Mark resolved
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))
+                      {isAdmin && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="mt-2"
+                          onClick={() => handleResolve(a.id)}
+                          disabled={savingId === a.id}
+                        >
+                          {savingId === a.id ? <Loader2 className="animate-spin" /> : <CheckCircle2 className="text-success" />}
+                          {t('reminders.markResolved')}
+                        </Button>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
             )}
-          </div>
-
-          <div className="border-t border-gray-100 bg-gray-50 px-4 py-2 text-right">
-            <button
-              type="button"
-              onClick={() => setOpen(false)}
-              className="inline-flex items-center gap-1 text-xs font-medium text-gray-500 hover:text-gray-700"
-            >
-              <X className="h-3 w-3" /> Close
-            </button>
           </div>
         </div>
       )}

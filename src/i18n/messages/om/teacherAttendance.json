@@ -1,0 +1,46 @@
+{
+  "title": "Argama galmeessi",
+  "description": "Har'a eenyu akka jiru mallatteessaatii olkaa'aa.",
+  "filters": {
+    "class": "Kutaa",
+    "classPlaceholder": "Kutaa filadhaa",
+    "date": "Guyyaa"
+  },
+  "status": {
+    "present": "Argame",
+    "absent": "Hafe",
+    "late": "Booda dhufe",
+    "excused": "Hayyamaan",
+    "unmarked": "Hin mallatteeffamne"
+  },
+  "markAll": {
+    "label": "Hunda mallatteessi",
+    "present": "Hundi argame",
+    "absent": "Hundi hafe",
+    "excused": "Hundi hayyamaan",
+    "clear": "Hunda qulqulleessi"
+  },
+  "list": {
+    "title": "Barattoota",
+    "statusGroup": "Argama {name}"
+  },
+  "saveBar": {
+    "progress": "{total} keessaa {marked} mallatteeffame",
+    "unsaved": "Jijjiirama hin olkaa'amne",
+    "allSaved": "Jijjiiramni hundi olkaa'ameera",
+    "save": "Argama olkaa'i"
+  },
+  "empty": {
+    "noClasses": "Hanga ammaatti kutaan isinitti kenname hin jiru.",
+    "noClassesHint": "Akka kutaan isiniif kennamu bulchaa mana barumsaa gaafadhaa.",
+    "noStudents": "Kutaa kana keessa barataan hin jiru.",
+    "noStudentsHint": "Barattoota fuula Kutaalee koo irraa dabalaa."
+  },
+  "toast": {
+    "saved": "Argamni olkaa'ameera.",
+    "nothingToSave": "Osoo hin olkaa'in dura yoo xiqqaate barataa tokko mallatteessaa.",
+    "loadClassesFailed": "Kutaalee keessan fe'uun hin danda'amne.",
+    "loadStudentsFailed": "Barattoota fe'uun hin danda'amne.",
+    "saveFailed": "Argama olkaa'uun hin danda'amne. Maaloo irra deebi'aa yaalaa."
+  }
+}

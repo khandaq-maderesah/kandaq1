@@ -1,0 +1,61 @@
+{
+  "title": "Classes",
+  "description": "Create and edit classes. Teachers are assigned from the Users page.",
+  "add": "Add class",
+  "searchPlaceholder": "Search by class, teacher or year",
+  "searchLabel": "Search classes",
+  "summary": "{shown, plural, one {Showing # class} other {Showing # classes}} of {total}",
+  "table": {
+    "class": "Class",
+    "section": "Section",
+    "teacher": "Teacher",
+    "year": "Academic year",
+    "students": "Students",
+    "actions": "Actions"
+  },
+  "unassigned": "Unassigned",
+  "noSection": "No section",
+  "viewStudents": "View students in {name}",
+  "studentCount": "{count, plural, =0 {No students} one {# student} other {# students}}",
+  "editClass": "Edit {name}",
+  "deleteClass": "Delete {name}",
+  "form": {
+    "createTitle": "Add class",
+    "createDescription": "Teachers are assigned when you register or edit them on the Users page.",
+    "editTitle": "Edit class",
+    "editDescription": "Update the class details.",
+    "name": "Class name",
+    "namePlaceholder": "For example: Grade 5",
+    "grade": "Grade",
+    "gradePlaceholder": "For example: 5",
+    "section": "Section",
+    "sectionPlaceholder": "For example: A",
+    "year": "Academic year",
+    "yearPlaceholder": "For example: 2026-2027",
+    "create": "Create class"
+  },
+  "delete": {
+    "title": "Delete {name}?",
+    "description": "This removes the class for good and cannot be undone.",
+    "withStudents": "{count, plural, one {# student is} other {# students are}} still in this class. Move them to another class first so they stay visible.",
+    "confirm": "Delete class"
+  },
+  "toast": {
+    "created": "Class created.",
+    "updated": "Class updated.",
+    "deleted": "{name} was deleted."
+  },
+  "empty": {
+    "title": "No classes yet",
+    "description": "Create your first class to start registering students.",
+    "search": "No classes match your search."
+  },
+  "studentsDialog": {
+    "title": "Students in {name}",
+    "meta": "{year} · {section} · {teacher}",
+    "empty": "No students in this class yet.",
+    "roll": "Roll {roll}",
+    "noRoll": "No roll number",
+    "noPhone": "No phone"
+  }
+}

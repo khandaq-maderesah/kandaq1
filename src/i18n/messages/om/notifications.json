@@ -1,0 +1,82 @@
+{
+  "absence": {
+    "label": "Beeksisa hafuu",
+    "title": "Beeksisa hafuu",
+    "description": "Barattoota guyyoota {streak} ykn isaa ol walitti aansanii hafan",
+    "scopeLabel": "Beeksisa kan agarsiifamu",
+    "scopeAll": "Kutaalee hunda",
+    "scopeMine": "Kutaalee koo",
+    "empty": "Barataan guyyoota {streak} walitti aansee hafe hin jiru.",
+    "classWithSection": "{className} · Garee {section}",
+    "streak": "{count, plural, one {Hafuu guyyaa #} other {Hafuu guyyoota #}}",
+    "call": "Bilbili",
+    "callParent": "Maatii {name} bilbili",
+    "select": "{name} filadhu",
+    "dismiss": "Quunnamameera jedhiitii cufi ({count})",
+    "dismissed": "{count, plural, one {Beeksisni cufameera.} other {Beeksisonni # cufamaniiru.}}",
+    "dismissFailed": "Beeksisa cufuun hin danda'amne. Maaloo irra deebi'aa yaalaa."
+  },
+  "reminders": {
+    "label": "Yaadachiisa argamaa",
+    "title": "Yaadachiisa argamaa",
+    "description": "Kutaalee argamni itti hin galmeeffamne",
+    "emptyAdmin": "Hanga ammaatti kutaalee hundaaf argamni galmaa'eera.",
+    "emptyTeacher": "Kutaalee keessan hundaaf argama galmeessitaniittu.",
+    "adminLine": "{teacher} hanga ammaatti argama har'aa hin galmeessine.",
+    "teacherLine": "Maaloo argama har'aa galmeessaa. Hanga ammaatti hin galmeeffamne.",
+    "markResolved": "Xumurameera jedhi",
+    "resolved": "Yaadachiisni xumurameera.",
+    "resolveFailed": "Yaadachiisa xumuruun hin danda'amne. Maaloo irra deebi'aa yaalaa."
+  },
+  "announcements": {
+    "label": "Beeksisa waliigalaa",
+    "title": "Beeksisa waliigalaa",
+    "empty": "Ammaaf beeksisni isiniif ergame hin jiru.",
+    "count": "{count, plural, =0 {Beeksisni hin jiru} one {Beeksisa tokko} other {Beeksisa #}}",
+    "postedBy": "Kan maxxanse: {name}",
+    "openAttachment": "{name} bani",
+    "audience": {
+      "label": "Eenyutu arguu danda'a",
+      "everyone": "Nama hunda",
+      "teachers": "Barsiisota qofa",
+      "admins": "Bulchitoota qofa"
+    },
+    "form": {
+      "heading": "Beeksisa haaraa",
+      "title": "Mata duree",
+      "titlePlaceholder": "Mata duree beeksisaa",
+      "message": "Ergaa",
+      "messagePlaceholder": "Ergaa barreessaa…",
+      "attachments": "Faayilota maxxanfaman",
+      "removeAttachment": "{name} keessaa baasi",
+      "addFile": "Faayilii dabali",
+      "publish": "Maxxansi",
+      "missingFields": "Maaloo mata duree fi ergaa lachuu galchaa."
+    },
+    "toast": {
+      "published": "Beeksisni maxxanfameera.",
+      "publishFailed": "Beeksisa maxxansuun hin danda'amne. Maaloo irra deebi'aa yaalaa.",
+      "filesAdded": "{count, plural, one {Faayiliin beeksisatti dabalameera.} other {Faayilonni # beeksisatti dabalamaniiru.}}",
+      "uploadFailed": "Faayilii ol fe'uun hin danda'amne. Maaloo irra deebi'aa yaalaa.",
+      "deleted": "Beeksisni haqameera.",
+      "deleteFailed": "Beeksisa haquun hin danda'amne. Maaloo irra deebi'aa yaalaa."
+    },
+    "delete": {
+      "action": "Beeksisa haqi",
+      "title": "Beeksisa kana haqxu?",
+      "description": "“{title}” nama hundaaf ni haqama. Kana booda deebisuun hin danda'amu."
+    }
+  },
+  "install": {
+    "title": "Khendeq diriirsi",
+    "descriptionIos": "Akka appiitti itti fayyadamuuf Khendeq iskiriinii jalqabaa keessanitti dabalaa.",
+    "description": "Saffisaan argachuu fi interneetii malee hojjechuuf appii kana meeshaa keessan irratti diriirsaa.",
+    "install": "Appii diriirsi",
+    "notNow": "Amma miti",
+    "dismiss": "Cufi",
+    "iosHowTo": "Akkamitti iskiriinii jalqabaatti dabaluu",
+    "iosStep1": "Safari keessatti qabduu “Share” tuqaa.",
+    "iosStep2": "Gara gadiitti sochoosaatii “Add to Home Screen” tuqaa.",
+    "iosStep3": "“Add” tuqaa. Khendeq iskiriinii jalqabaa keessan irratti ni mul'ata."
+  }
+}

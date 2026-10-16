@@ -1,0 +1,69 @@
+{
+  "types": {
+    "mid": "Qormaata walakkaa",
+    "assignment": "Hojii manaa",
+    "final": "Qormaata xumuraa"
+  },
+  "years": {
+    "label": "Bara barnootaa",
+    "all": "Bara hunda",
+    "legacy": "Bara barnootaa malee"
+  },
+  "table": {
+    "roll": "Lakk.",
+    "student": "Barataa",
+    "total": "Ida'ama",
+    "average": "Gidd.",
+    "percent": "%",
+    "rank": "Sadarkaa",
+    "grandTotal": "Ida'ama waliigalaa",
+    "outOf": "{max} keessaa",
+    "maxMarks": "Qabxii guddaa: {max}",
+    "classAverage": "Giddugaleessa kutaa",
+    "highest": "Isa olaanaa",
+    "lowest": "Isa gadi aanaa",
+    "noRoll": "—",
+    "rollShort": "Lakk. {roll}"
+  },
+  "sheet": {
+    "section": "Garee {section}",
+    "totalMarks": "Qabxii waliigalaa: {total}",
+    "studentCount": "{count, plural, =0 {Barataan hin jiru} one {Barataa tokko} other {Barattoota #}}",
+    "noRows": "Waraqaa kana irra barataan hin jiru."
+  },
+  "overall": {
+    "heading": "{school} — Bu'aa waliigalaa",
+    "headingNoSchool": "Bu'aa waliigalaa",
+    "examsMerged": "{count, plural, =0 {Qormaanni walitti hin makamne} one {Qormaata tokkotu walitti makame} other {Qormaanni # walitti makameera}}",
+    "generated": "Kan qophaa'e: {date}",
+    "noStudents": "Kutaa kana keessa barataan hojii irra jiru hin jiru."
+  },
+  "csv": {
+    "roll": "Lakk.",
+    "student": "Barataa",
+    "total": "Ida'ama",
+    "average": "Giddugaleessa",
+    "percentage": "Dhibbeentaa %",
+    "rank": "Sadarkaa",
+    "grandTotal": "Ida'ama waliigalaa",
+    "subjectOutOf": "{subject} / {max}",
+    "overallFile": "buaa-waliigalaa"
+  },
+  "certificate": {
+    "subject": "Gosa barnootaa",
+    "total": "Ida'ama",
+    "grandTotal": "Ida'ama waliigalaa",
+    "average": "Giddugaleessa",
+    "nextGrade": "Kutaa itti aanu",
+    "promoted": "Darbe",
+    "notPromoted": "Hin darbine",
+    "subjects": {
+      "seerah": "Siiraa",
+      "aqeedah": "Aqiidaa",
+      "hadith": "Hadiisa",
+      "zikr": "Zikrii",
+      "arabic": "Afaan Arabaa",
+      "fiqh": "Fiqhii"
+    }
+  }
+}

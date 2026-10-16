@@ -1,0 +1,82 @@
+{
+  "title": "ተጠቃሚዎች",
+  "description": "የትምህርት ቤት አስተዳዳሪና የመምህራን መለያዎችን ይፍጠሩ እና ያስተዳድሩ።",
+  "add": "ተጠቃሚ ጨምር",
+  "searchPlaceholder": "በስም፣ በኢሜይል ወይም በስልክ ይፈልጉ",
+  "searchLabel": "ተጠቃሚዎችን ፈልግ",
+  "roleFilter": "በሚና አጣራ",
+  "allRoles": "ሁሉም ሚናዎች",
+  "summary": "ከ{total} ውስጥ {shown, plural, one {# ተጠቃሚ ይታያል} other {# ተጠቃሚዎች ይታያሉ}}",
+  "you": "እርስዎ",
+  "table": {
+    "name": "ስም",
+    "email": "ኢሜይል",
+    "role": "ሚና",
+    "phone": "ስልክ",
+    "classes": "ክፍሎች",
+    "status": "ሁኔታ",
+    "actions": "ተግባራት"
+  },
+  "noClasses": "ክፍል የለም",
+  "classCount": "{count, plural, =0 {ክፍል የለም} one {# ክፍል} other {# ክፍሎች}}",
+  "actions": {
+    "editClasses": "የተመደቡ ክፍሎችን አስተካክል",
+    "deactivate": "አቦዝን",
+    "activate": "አንቃ",
+    "delete": "ተጠቃሚ ሰርዝ",
+    "more": "ለ{name} ተጨማሪ ተግባራት",
+    "cannotDeleteSelf": "የራስዎን መለያ መሰረዝ አይችሉም"
+  },
+  "form": {
+    "createTitle": "ተጠቃሚ ጨምር",
+    "createDescription": "የመግቢያ መረጃ ያለው የትምህርት ቤት አስተዳዳሪ ወይም የመምህር መለያ ይፍጠሩ።",
+    "name": "ሙሉ ስም",
+    "namePlaceholder": "ለምሳሌ፦ አሕመድ ዓሊ",
+    "email": "ኢሜይል",
+    "emailPlaceholder": "teacher@school.com",
+    "phone": "ስልክ ቁጥር (አማራጭ)",
+    "phonePlaceholder": "ለምሳሌ፦ 0911 223344",
+    "password": "ጊዜያዊ የይለፍ ቃል",
+    "passwordPlaceholder": "ቢያንስ 6 ፊደላት",
+    "role": "ሚና",
+    "roleHint": "የትምህርት ቤት አስተዳዳሪዎች ሙሉ ፈቃድ አላቸው፤ ሌሎች ተጠቃሚዎችንም ማስተዳደር ይችላሉ።",
+    "classes": "ክፍሎችን መድብ",
+    "classesHint": "ይህ መምህር የሚያስተምራቸውን ክፍሎች ይምረጡ።",
+    "noClassesYet": "እስካሁን ክፍል የለም። መጀመሪያ ክፍሎችን ይፍጠሩ፤ ከዚያ መምህሩን ይመድቡ።",
+    "create": "ተጠቃሚ ፍጠር"
+  },
+  "assign": {
+    "title": "የተመደቡ ክፍሎችን አስተካክል",
+    "description": "{name} የሚያስተምሯቸውን ክፍሎች ይምረጡ። ተማሪዎች በክፍሎቻቸው ይቆያሉ።",
+    "currentlyAssigned": "ለ{name} ተመድቧል",
+    "currentlyAssignedOther": "ለሌላ መምህር ተመድቧል",
+    "save": "ምደባውን አስቀምጥ"
+  },
+  "delete": {
+    "title": "{name} ይሰረዙ?",
+    "description": "የ{email} መለያ ይወገዳል፤ ከእንግዲህ መግባት አይችልም። ይህ ተግባር ሊቀለበስ አይችልም።",
+    "confirm": "ተጠቃሚ ሰርዝ"
+  },
+  "toast": {
+    "adminCreated": "የትምህርት ቤት አስተዳዳሪ መለያ ተፈጥሯል።",
+    "teacherCreated": "የመምህር መለያ ተፈጥሯል።",
+    "assigned": "የ{name} ክፍሎች ተሻሽለዋል።",
+    "activated": "የ{name} መለያ ነቅቷል።",
+    "deactivated": "የ{name} መለያ ቦዝኗል።",
+    "deleted": "የ{name} መለያ ተሰርዟል።",
+    "loadError": "ተጠቃሚዎችን መጫን አልተቻለም። የዳታቤዝ ደንቦቹ መታተማቸውን (published) ያረጋግጡ፤ ከዚያ ገጹን ያድሱ።",
+    "unexpectedResponse": "አገልጋዩ ያልተጠበቀ ምላሽ ሰጥቷል ({status})። ገጹን አድሰው እንደገና ይሞክሩ።"
+  },
+  "empty": {
+    "title": "እስካሁን ተጠቃሚ የለም",
+    "description": "መግባት እንዲችሉ መምህራንን እና የትምህርት ቤት አስተዳዳሪዎችን ይጨምሩ።",
+    "search": "ከፍለጋዎ ጋር የሚዛመድ ተጠቃሚ የለም።"
+  },
+  "csv": {
+    "name": "ስም",
+    "email": "ኢሜይል",
+    "role": "ሚና",
+    "phone": "ስልክ",
+    "status": "ሁኔታ"
+  }
+}

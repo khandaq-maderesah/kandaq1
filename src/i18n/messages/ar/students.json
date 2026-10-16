@@ -1,0 +1,61 @@
+{
+  "avatar": {
+    "photoOf": "صورة {name}",
+    "photo": "صورة الطالب"
+  },
+  "photo": {
+    "capturedAlt": "صورة الطالب الملتقطة",
+    "retake": "إعادة التصوير",
+    "remove": "إزالة الصورة",
+    "frontCamera": "الكاميرا الأمامية",
+    "backCamera": "الكاميرا الخلفية",
+    "take": "التقاط صورة",
+    "flip": "تبديل الكاميرا",
+    "upload": "الرفع من المعرض",
+    "hint": "يمكن استخدام الكاميرا الأمامية أو الخلفية، والضغط على «تبديل الكاميرا» للتنقّل بينهما. ويمكن إعادة التصوير أي عدد من المرات قبل الحفظ.",
+    "cameraUnavailable": "الكاميرا غير متاحة. يُرجى السماح لهذا الموقع باستخدام الكاميرا، أو رفع صورة من المعرض بدلًا من ذلك.",
+    "notImage": "يُرجى اختيار ملف صورة."
+  },
+  "detail": {
+    "title": "بيانات الطالب",
+    "viewPhoto": "عرض الصورة",
+    "closePhoto": "إغلاق الصورة",
+    "classNotAssigned": "لم يُحدَّد الفصل",
+    "classWithSection": "{name} · الشعبة {section}",
+    "roll": "رقم {roll}",
+    "rollNumber": "الرقم التسلسلي",
+    "age": "العمر",
+    "gender": "الجنس",
+    "class": "الفصل",
+    "section": "الشعبة",
+    "studentId": "رقم تعريف الطالب",
+    "parentLanguage": "لغة وليّ الأمر",
+    "phoneHeading": "الهاتف",
+    "parentPhone": "هاتف وليّ الأمر",
+    "alternativePhone": "هاتف بديل",
+    "registrationHeading": "التسجيل",
+    "registeredOn": "تاريخ التسجيل",
+    "lastUpdated": "آخر تحديث",
+    "createdBy": "أنشأه",
+    "ustaz": "الأستاذ {name}",
+    "systemRecovered": "النظام (استعادة تلقائية)",
+    "admin": "المسؤول",
+    "attendanceHeading": "سجل الحضور",
+    "noAttendance": "لا توجد سجلات حضور لهذا الطالب بعد.",
+    "calendarFilter": "التصفية بالتقويم الإثيوبي",
+    "ethYear": "السنة الإثيوبية",
+    "ethMonth": "الشهر الإثيوبي",
+    "allYear": "السنة كاملة",
+    "noAttendanceInPeriod": "لم يُسجَّل أي حضور في الفترة المحددة بالتقويم الإثيوبي.",
+    "records": "{count, plural, zero {سجل} one {سجل} two {سجلّان} few {سجلات} many {سجلًّا} other {سجل}}",
+    "ethiopianSuffix": "{date} (بالتقويم الإثيوبي)",
+    "legendItem": "{status}: {count}",
+    "callParent": "الاتصال بوليّ الأمر",
+    "status": {
+      "present": "حاضر",
+      "absent": "غائب",
+      "late": "متأخّر",
+      "excused": "غائب بعذر"
+    }
+  }
+}

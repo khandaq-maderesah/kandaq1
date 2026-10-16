@@ -1,0 +1,71 @@
+{
+  "title": "ሪፖርቶች",
+  "description": "የትምህርት ቤትዎ የመገኘት አጠቃላይ እይታ",
+  "actions": {
+    "studentCsv": "የተማሪዎች CSV",
+    "summaryCsv": "የማጠቃለያ CSV"
+  },
+  "filters": {
+    "from": "ከ",
+    "to": "እስከ",
+    "hint": "ከታች ያሉት ቁጥሮች በሙሉ በዚህ የቀን ክልል ላይ የተመሠረቱ ናቸው። ለሁሉም ጊዜ ባዶ ይተዉት።",
+    "clear": "ቀኖችን አጽዳ",
+    "ethRange": "በኢትዮጵያ አቆጣጠር፦ {from} – {to}",
+    "ethFrom": "በኢትዮጵያ አቆጣጠር፦ ከ{date} ጀምሮ",
+    "ethTo": "በኢትዮጵያ አቆጣጠር፦ እስከ {date}"
+  },
+  "kpi": {
+    "students": "ንቁ ተማሪዎች",
+    "classes": "ክፍሎች",
+    "teachers": "መምህራን",
+    "records": "የመገኘት መዝገቦች",
+    "rateHint": "{percent}% ተገኝተዋል"
+  },
+  "charts": {
+    "byStatusTitle": "መገኘት በሁኔታ",
+    "byStatusDescription": "በተመረጠው ክልል ውስጥ ያሉ መዝገቦች ድርሻ",
+    "dailyTitle": "የቅርብ ቀናት መገኘት",
+    "dailyDescription": "መዝገብ ያላቸው የመጨረሻዎቹ 7 ቀናት",
+    "noData": "እስካሁን የመገኘት መረጃ የለም።",
+    "percent": "{percent}%",
+    "total": "ድምር፦ {count}",
+    "pieTooltip": "{name}፦ {value} ({percent}%)"
+  },
+  "status": {
+    "present": "የተገኘ",
+    "absent": "ቀሪ",
+    "late": "ያረፈደ",
+    "excused": "በፈቃድ"
+  },
+  "summary": {
+    "title": "የተማሪዎች መገኘት ማጠቃለያ",
+    "count": "{count, plural, one {# ንቁ ተማሪ} other {# ንቁ ተማሪዎች}}",
+    "empty": "ንቁ ተማሪ የለም",
+    "table": {
+      "student": "ተማሪ",
+      "class": "ክፍል",
+      "present": "የተገኘ",
+      "absent": "ቀሪ",
+      "late": "ያረፈደ",
+      "excused": "በፈቃድ",
+      "total": "ድምር",
+      "rate": "የመገኘት መጠን"
+    }
+  },
+  "csv": {
+    "metric": "መለኪያ",
+    "value": "ዋጋ",
+    "totalStudents": "ንቁ ተማሪዎች",
+    "totalClasses": "ክፍሎች",
+    "totalTeachers": "መምህራን",
+    "records": "የመገኘት መዝገቦች (በክልሉ)",
+    "present": "የተገኘ",
+    "absent": "ቀሪ",
+    "late": "ያረፈደ",
+    "excused": "በፈቃድ",
+    "name": "ስም",
+    "class": "ክፍል",
+    "total": "ድምር",
+    "rate": "የመገኘት መጠን %"
+  }
+}

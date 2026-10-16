@@ -1,12 +1,8 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { rtdb } from '@/lib/database'
-import { useAuth } from '@/context/AuthContext'
-import { daysAgoISO } from '@/lib/utils'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
+import { useFormatter, useTranslations } from 'next-intl'
+import { toast } from 'sonner'
 import {
   Loader2,
   ClipboardList,
@@ -17,12 +13,61 @@ import {
   Save,
   RotateCcw,
   ShieldCheck,
+  Users,
+  type LucideIcon,
 } from 'lucide-react'
+import { rtdb } from '@/lib/database'
+import { useAuth } from '@/context/AuthContext'
+import { cn, daysAgoISO } from '@/lib/utils'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select } from '@/components/ui/select'
+import { Skeleton } from '@/components/ui/skeleton'
+import { EmptyState, PageHeader, StatCard, TableContainer } from '@/components/ui/page'
+import { useEthiopianDate } from '@/hooks/useEthiopianDate'
 import type { Attendance, Class, Student, AttendanceStatus } from '@/types'
 
 const today = () => new Date().toISOString().slice(0, 10)
 
+const STATUS_META: Record<
+  AttendanceStatus,
+  { icon: LucideIcon; badge: 'success' | 'destructive' | 'warning' | 'info'; active: string; idle: string }
+> = {
+  present: {
+    icon: Check,
+    badge: 'success',
+    active: 'border-success bg-success text-success-foreground',
+    idle: 'border-input bg-card text-success hover:bg-success/10',
+  },
+  absent: {
+    icon: X,
+    badge: 'destructive',
+    active: 'border-destructive bg-destructive text-destructive-foreground',
+    idle: 'border-input bg-card text-destructive hover:bg-destructive/10',
+  },
+  late: {
+    icon: Clock,
+    badge: 'warning',
+    active: 'border-warning bg-warning text-warning-foreground',
+    idle: 'border-input bg-card text-warning hover:bg-warning/10',
+  },
+  excused: {
+    icon: ShieldCheck,
+    badge: 'info',
+    active: 'border-info bg-info text-info-foreground',
+    idle: 'border-input bg-card text-info hover:bg-info/10',
+  },
+}
+
+const STATUSES: AttendanceStatus[] = ['present', 'absent', 'late', 'excused']
+
 export default function AttendancePage() {
+  const t = useTranslations('adminAttendance')
+  const format = useFormatter()
+  const eth = useEthiopianDate()
   const { user } = useAuth()
 
   const [tab, setTab] = useState<'mark' | 'records'>('mark')
@@ -32,7 +77,7 @@ export default function AttendancePage() {
   const [loading, setLoading] = useState(true)
   const [filterClassId, setFilterClassId] = useState('')
   const [filterDate, setFilterDate] = useState(today())
-  const [error, setError] = useState('')
+  const [loadError, setLoadError] = useState(false)
 
   const [students, setStudents] = useState<Student[]>([])
   const [classId, setClassId] = useState('')
@@ -40,7 +85,6 @@ export default function AttendancePage() {
   const [statusMap, setStatusMap] = useState<Record<string, AttendanceStatus>>({})
   const [loadingStudents, setLoadingStudents] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [success, setSuccess] = useState('')
 
   const loadData = useCallback(async (showLoader = false) => {
     if (showLoader) setLoading(true)
@@ -51,30 +95,29 @@ export default function AttendancePage() {
       ])
       setRecords(attendanceList)
       setClasses(classList)
-      setError('')
+      setLoadError(false)
       setClassId((current) => (classList.length > 0 && !current ? classList[0].id : current))
     } catch {
-      setError('Failed to load attendance data')
+      setLoadError(true)
+      toast.error(t('toast.loadFailed'))
     } finally {
       if (showLoader) setLoading(false)
     }
-  }, [])
+  }, [t])
 
   useEffect(() => {
     loadData(true)
   }, [loadData])
 
-  // Load students + existing attendance for the selected class/date (admin can mark any class)
+  // Load students + existing attendance for the selected class/date (admin can mark any class).
   useEffect(() => {
     const loadClassData = async () => {
       if (!classId) return
       setLoadingStudents(true)
-      setError('')
-      setSuccess('')
       try {
         const studentList = await rtdb.getStudentsByClass(classId)
-        const activeStudents = studentList.filter((s) => s.isActive)
-        setStudents(activeStudents)
+        // Archived students (isActive === false) are never offered for attendance.
+        setStudents(studentList.filter((s) => s.isActive !== false))
         const existing = await rtdb.getAttendanceByClassAndDate(classId, date)
         const map: Record<string, AttendanceStatus> = {}
         existing.forEach((r) => {
@@ -82,13 +125,13 @@ export default function AttendancePage() {
         })
         setStatusMap(map)
       } catch {
-        setError('Failed to load students')
+        toast.error(t('toast.studentsFailed'))
       } finally {
         setLoadingStudents(false)
       }
     }
     loadClassData()
-  }, [classId, date])
+  }, [classId, date, t])
 
   const setStatus = (studentId: string, status: AttendanceStatus) => {
     setStatusMap((prev) => ({ ...prev, [studentId]: status }))
@@ -109,8 +152,6 @@ export default function AttendancePage() {
   const handleSave = async () => {
     if (!classId || !user) return
     setSaving(true)
-    setError('')
-    setSuccess('')
     try {
       const classInfo = classes.find((c) => c.id === classId)
       // Admin may mark any class. teacherId = assigned teacher so the record shows in
@@ -138,19 +179,31 @@ export default function AttendancePage() {
           await rtdb.createAttendance(attendanceId, { ...record, id: attendanceId })
         }
       }
-      setSuccess('Attendance saved successfully')
+      toast.success(t('toast.saved'))
       await loadData(false) // quietly refresh records overview
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to save attendance')
+    } catch {
+      toast.error(t('toast.saveFailed'))
     } finally {
       setSaving(false)
     }
   }
 
+  const gDate = (d: string) => {
+    const parsed = new Date(d)
+    if (!d || Number.isNaN(parsed.getTime())) return d || '—'
+    return format.dateTime(parsed, { dateStyle: 'medium', timeZone: 'UTC' })
+  }
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-green-600" />
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-4 w-72 max-w-full" />
+        </div>
+        <Skeleton className="h-10 w-72 max-w-full rounded-lg" />
+        <Skeleton className="h-40 rounded-xl" />
+        <Skeleton className="h-72 rounded-xl" />
       </div>
     )
   }
@@ -158,269 +211,226 @@ export default function AttendancePage() {
   const filtered = records.filter(
     (r) => (!filterClassId || r.classId === filterClassId) && (!filterDate || r.date === filterDate)
   )
-  const present = filtered.filter((r) => r.status === 'present').length
-  const absent = filtered.filter((r) => r.status === 'absent').length
-  const late = filtered.filter((r) => r.status === 'late').length
-  const excused = filtered.filter((r) => r.status === 'excused').length
+  const counts = STATUSES.reduce(
+    (acc, s) => ({ ...acc, [s]: filtered.filter((r) => r.status === s).length }),
+    {} as Record<AttendanceStatus, number>
+  )
+  const markedCount = students.filter((s) => statusMap[s.id]).length
+  const ethDate = eth.format(date)
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Attendance</h1>
-          <p className="text-gray-600 mt-1">Mark attendance for any class and monitor records</p>
-        </div>
-        <div className="inline-flex items-center rounded-xl border border-gray-200 bg-white p-1 shadow-sm">
-          <button onClick={() => setTab('mark')} className={cn_tab(tab === 'mark')}>
-            <ClipboardList className="h-4 w-4" /> Mark Attendance
+      <PageHeader title={t('title')} description={t('description')} />
+
+      {/* Tabs */}
+      <div role="tablist" aria-label={t('tabs.label')} className="inline-flex rounded-lg border bg-muted p-1">
+        {(
+          [
+            ['mark', ClipboardList, t('tabs.mark')],
+            ['records', Calendar, t('tabs.records')],
+          ] as const
+        ).map(([key, Icon, label]) => (
+          <button
+            key={key}
+            type="button"
+            role="tab"
+            aria-selected={tab === key}
+            onClick={() => setTab(key)}
+            className={cn(
+              'inline-flex min-h-9 items-center gap-2 rounded-md px-4 text-sm font-medium transition-colors',
+              tab === key ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+            )}
+          >
+            <Icon className="h-4 w-4" /> {label}
           </button>
-          <button onClick={() => setTab('records')} className={cn_tab(tab === 'records')}>
-            <Calendar className="h-4 w-4" /> Records
-          </button>
-        </div>
+        ))}
       </div>
 
-      {error && (
+      {loadError && (
         <Alert variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-      {success && (
-        <Alert variant="success">
-          <AlertDescription>{success}</AlertDescription>
+          <AlertDescription>{t('toast.loadFailed')}</AlertDescription>
         </Alert>
       )}
 
       {tab === 'mark' ? (
-        <Card>
-          <CardHeader className="space-y-3">
-            <CardTitle className="text-lg">Mark Attendance</CardTitle>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="space-y-4">
+          {/* Toolbar */}
+          <div className="rounded-xl border bg-card p-4 shadow-sm sm:p-5">
+            <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <label className="text-sm font-medium">Class</label>
-                <select
-                  value={classId}
-                  onChange={(e) => setClassId(e.target.value)}
-                  className="flex h-10 w-full rounded-lg border border-input bg-white px-3 py-2 text-sm"
-                >
+                <Label htmlFor="mark-class">{t('mark.class')}</Label>
+                <Select id="mark-class" value={classId} onChange={(e) => setClassId(e.target.value)}>
                   {classes.map((c) => (
                     <option key={c.id} value={c.id}>
-                      {c.name}
-                      {c.section ? ' • ' + c.section : ''}
-                      {c.teacherName ? ' — ' + c.teacherName : ''}
+                      {[c.name, c.section, c.teacherName].filter(Boolean).join(' • ')}
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium">Date</label>
-                <input
-                  type="date"
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                  className="flex h-10 w-full rounded-lg border border-input bg-white px-3 py-2 text-sm"
-                />
+                <Label htmlFor="mark-date">{t('mark.date')}</Label>
+                <Input id="mark-date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+                {ethDate && <p className="text-xs text-muted-foreground">{t('mark.ethiopianDate', { date: ethDate })}</p>}
               </div>
             </div>
-            <div className="flex flex-wrap items-center gap-2 pt-1">
-              <Button type="button" size="sm" onClick={() => markAll('present')}>
-                <Check className="h-4 w-4 mr-1" /> All Present
+            <div className="mt-4 flex flex-wrap items-center gap-2 border-t pt-4">
+              <Button type="button" size="sm" variant="success" onClick={() => markAll('present')}>
+                <Check /> {t('mark.allPresent')}
               </Button>
               <Button type="button" size="sm" variant="destructive" onClick={() => markAll('absent')}>
-                <X className="h-4 w-4 mr-1" /> All Absent
+                <X /> {t('mark.allAbsent')}
               </Button>
               <Button type="button" size="sm" variant="outline" onClick={() => markAll('excused')}>
-                <ShieldCheck className="h-4 w-4 mr-1" /> All Excused
+                <ShieldCheck /> {t('mark.allExcused')}
               </Button>
-              <Button type="button" size="sm" variant="outline" onClick={() => markAll(null)}>
-                <RotateCcw className="h-4 w-4 mr-1" /> Clear
+              <Button type="button" size="sm" variant="ghost" onClick={() => markAll(null)}>
+                <RotateCcw /> {t('mark.clear')}
               </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {loadingStudents ? (
-              <div className="flex items-center justify-center h-40">
-                <Loader2 className="h-6 w-6 animate-spin text-green-600" />
-              </div>
-            ) : students.length === 0 ? (
-              <p className="text-gray-500 text-center py-16">No active students in this class.</p>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm border-collapse border border-gray-200 [&_th]:border [&_th]:border-gray-200 [&_td]:border [&_td]:border-gray-200">
-                  <thead>
-                    <tr className="border-b text-left text-gray-500">
-                      <th className="pb-3 pr-4 font-medium">Student</th>
-                      <th className="pb-3 pr-4 font-medium">Roll</th>
-                      <th className="pb-3 font-medium">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {students.map((s) => {
-                      const status = statusMap[s.id]
-                      return (
-                        <tr key={s.id} className="border-b last:border-0">
-                          <td className="py-3 pr-4 font-medium">{s.name}</td>
-                          <td className="py-3 pr-4">{s.rollNumber || '—'}</td>
-                          <td className="py-3">
-                            <div className="flex flex-wrap gap-2">
-                              <button onClick={() => setStatus(s.id, 'present')} className={cn_status('present', status)}>
-                                <Check className="h-3.5 w-3.5" /> Present
-                              </button>
-                              <button onClick={() => setStatus(s.id, 'absent')} className={cn_status('absent', status)}>
-                                <X className="h-3.5 w-3.5" /> Absent
-                              </button>
-                              <button onClick={() => setStatus(s.id, 'late')} className={cn_status('late', status)}>
-                                <Clock className="h-3.5 w-3.5" /> Late
-                              </button>
-                              <button onClick={() => setStatus(s.id, 'excused')} className={cn_status('excused', status)}>
-                                <ShieldCheck className="h-3.5 w-3.5" /> Excused
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            )}
-            <div className="mt-6">
-              <Button onClick={handleSave} disabled={saving || !classId}>
-                {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
-                Save Attendance
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      ) : (
-        <>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Class</label>
-              <select
-                value={filterClassId}
-                onChange={(e) => setFilterClassId(e.target.value)}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-              >
-                <option value="">All Classes</option>
-                {classes.map((c) => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
-                ))}
-              </select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Date</label>
-              <input
-                type="date"
-                value={filterDate}
-                onChange={(e) => setFilterDate(e.target.value)}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card className="border-green-200">
-              <CardHeader><CardTitle className="text-green-700">Present</CardTitle></CardHeader>
-              <CardContent><p className="text-3xl font-bold">{present}</p></CardContent>
-            </Card>
-            <Card className="border-red-200">
-              <CardHeader><CardTitle className="text-red-700">Absent</CardTitle></CardHeader>
-              <CardContent><p className="text-3xl font-bold">{absent}</p></CardContent>
-            </Card>
-            <Card className="border-yellow-200">
-              <CardHeader><CardTitle className="text-yellow-700">Late</CardTitle></CardHeader>
-              <CardContent><p className="text-3xl font-bold">{late}</p></CardContent>
-            </Card>
-            <Card className="border-amber-200">
-              <CardHeader><CardTitle className="text-amber-700">Excused</CardTitle></CardHeader>
-              <CardContent><p className="text-3xl font-bold">{excused}</p></CardContent>
-            </Card>
-          </div>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <ClipboardList className="h-5 w-5" /> Records ({filtered.length})
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {filtered.length === 0 ? (
-                <p className="text-gray-500 text-center py-8">No attendance records for the selected filters.</p>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm border-collapse border border-gray-200 [&_th]:border [&_th]:border-gray-200 [&_td]:border [&_td]:border-gray-200">
-                    <thead>
-                      <tr className="border-b text-left text-gray-500">
-                        <th className="pb-3 pr-4 font-medium">Date</th>
-                        <th className="pb-3 pr-4 font-medium">Student</th>
-                        <th className="pb-3 pr-4 font-medium">Class</th>
-                        <th className="pb-3 font-medium">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filtered.map((r) => (
-                        <tr key={r.id} className="border-b last:border-0">
-                          <td className="py-3 pr-4">
-                            <span className="inline-flex items-center gap-1">
-                              <Calendar className="h-3.5 w-3.5 text-gray-400" /> {r.date}
-                            </span>
-                          </td>
-                          <td className="py-3 pr-4 font-medium">{r.studentName}</td>
-                          <td className="py-3 pr-4">{r.className || r.classId}</td>
-                          <td className="py-3">
-                            <span
-                              className={
-                                r.status === 'present'
-                                  ? 'inline-flex px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700'
-                                  : r.status === 'late'
-                                  ? 'inline-flex px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700'
-                                  : r.status === 'excused'
-                                  ? 'inline-flex px-2 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700'
-                                  : 'inline-flex px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700'
-                              }
-                            >
-                              {r.status}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+              {students.length > 0 && (
+                <span className="ms-auto text-sm text-muted-foreground">
+                  {t('mark.progress', { marked: markedCount, total: students.length })}
+                </span>
               )}
-            </CardContent>
-          </Card>
-        </>
+            </div>
+          </div>
+
+          {/* Student list */}
+          {classes.length === 0 ? (
+            <EmptyState icon={ClipboardList} title={t('mark.noClasses')} />
+          ) : loadingStudents ? (
+            <div className="space-y-2 rounded-xl border bg-card p-4 shadow-sm">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton key={i} className="h-12 w-full" />
+              ))}
+            </div>
+          ) : students.length === 0 ? (
+            <EmptyState icon={Users} title={t('mark.noStudents')} />
+          ) : (
+            <ul className="divide-y rounded-xl border bg-card shadow-sm">
+              {students.map((s) => {
+                const current = statusMap[s.id]
+                return (
+                  <li key={s.id} className="flex flex-col gap-3 p-4 md:flex-row md:items-center md:justify-between">
+                    <div className="min-w-0">
+                      <p className="truncate font-medium text-foreground">{s.name}</p>
+                      {s.rollNumber && (
+                        <p className="text-xs text-muted-foreground">{t('mark.roll', { roll: s.rollNumber })}</p>
+                      )}
+                    </div>
+                    <div
+                      role="radiogroup"
+                      aria-label={t('mark.statusGroup', { name: s.name })}
+                      className="grid grid-cols-2 gap-2 sm:grid-cols-4"
+                    >
+                      {STATUSES.map((status) => {
+                        const meta = STATUS_META[status]
+                        const Icon = meta.icon
+                        const selected = current === status
+                        return (
+                          <button
+                            key={status}
+                            type="button"
+                            role="radio"
+                            aria-checked={selected}
+                            onClick={() => setStatus(s.id, status)}
+                            className={cn(
+                              'inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg border px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                              selected ? meta.active : meta.idle
+                            )}
+                          >
+                            <Icon className="h-4 w-4" /> {t(`status.${status}`)}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </li>
+                )
+              })}
+            </ul>
+          )}
+
+          <div className="flex justify-end">
+            <Button onClick={handleSave} disabled={saving || !classId || students.length === 0}>
+              {saving ? <Loader2 className="animate-spin" /> : <Save />}
+              {t('mark.save')}
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {/* Filters */}
+          <div className="grid gap-4 rounded-xl border bg-card p-4 shadow-sm sm:grid-cols-2 sm:p-5">
+            <div className="space-y-2">
+              <Label htmlFor="records-class">{t('records.class')}</Label>
+              <Select id="records-class" value={filterClassId} onChange={(e) => setFilterClassId(e.target.value)}>
+                <option value="">{t('records.allClasses')}</option>
+                {classes.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.section ? `${c.name} • ${c.section}` : c.name}
+                  </option>
+                ))}
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="records-date">{t('records.date')}</Label>
+              <Input id="records-date" type="date" value={filterDate} onChange={(e) => setFilterDate(e.target.value)} />
+              <p className="text-xs text-muted-foreground">
+                {filterDate && eth.format(filterDate) ? t('mark.ethiopianDate', { date: eth.format(filterDate)! }) : t('records.dateHint')}
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+            <StatCard label={t('status.present')} value={format.number(counts.present)} icon={Check} tone="success" />
+            <StatCard label={t('status.absent')} value={format.number(counts.absent)} icon={X} tone="destructive" />
+            <StatCard label={t('status.late')} value={format.number(counts.late)} icon={Clock} tone="warning" />
+            <StatCard label={t('status.excused')} value={format.number(counts.excused)} icon={ShieldCheck} tone="info" />
+          </div>
+
+          <section className="space-y-3">
+            <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
+              {t('records.title')}
+              <Badge variant="secondary">{t('records.count', { count: filtered.length })}</Badge>
+            </h2>
+            {filtered.length === 0 ? (
+              <EmptyState icon={Calendar} title={t('records.empty')} />
+            ) : (
+              <TableContainer>
+                <thead>
+                  <tr>
+                    <th>{t('records.table.date')}</th>
+                    <th>{t('records.table.student')}</th>
+                    <th>{t('records.table.class')}</th>
+                    <th>{t('records.table.status')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((r) => {
+                    const meta = STATUS_META[r.status] ?? STATUS_META.absent
+                    const Icon = meta.icon
+                    const e = eth.format(r.date)
+                    return (
+                      <tr key={r.id}>
+                        <td className="whitespace-nowrap">
+                          <span className="block text-foreground">{gDate(r.date)}</span>
+                          {e && <span className="block text-xs text-muted-foreground">{e}</span>}
+                        </td>
+                        <td className="font-medium text-foreground">{r.studentName}</td>
+                        <td>{r.className || r.classId}</td>
+                        <td>
+                          <Badge variant={meta.badge}>
+                            <Icon /> {STATUSES.includes(r.status) ? t(`status.${r.status}`) : r.status}
+                          </Badge>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </TableContainer>
+            )}
+          </section>
+        </div>
       )}
     </div>
   )
-}
-
-function cn_tab(active: boolean): string {
-  return active
-    ? 'inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium bg-green-600 text-white shadow'
-    : 'inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100'
-}
-
-function cn_status(status: AttendanceStatus, current?: AttendanceStatus): string {
-  const base = 'inline-flex items-center gap-1 px-3 py-1 rounded-md text-xs font-medium border '
-  if (status === 'present') {
-    return current === status
-      ? base + 'bg-green-500 text-white border-green-500'
-      : base + 'bg-white text-green-600 border-green-300 hover:bg-green-50'
-  }
-  if (status === 'absent') {
-    return current === status
-      ? base + 'bg-red-500 text-white border-red-500'
-      : base + 'bg-white text-red-600 border-red-300 hover:bg-red-50'
-  }
-  if (status === 'excused') {
-    return current === status
-      ? base + 'bg-amber-500 text-white border-amber-500'
-      : base + 'bg-white text-amber-600 border-amber-300 hover:bg-amber-50'
-  }
-  return current === status
-    ? base + 'bg-yellow-500 text-white border-yellow-500'
-    : base + 'bg-white text-yellow-600 border-yellow-300 hover:bg-yellow-50'
 }

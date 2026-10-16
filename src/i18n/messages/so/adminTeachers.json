@@ -1,0 +1,82 @@
+{
+  "title": "Isticmaalayaasha",
+  "description": "Samee oo maamul akoonnada maamulayaasha dugsiga iyo macallimiinta.",
+  "add": "Ku dar isticmaale",
+  "searchPlaceholder": "Ku raadi magac, iimayl ama taleefan",
+  "searchLabel": "Raadi isticmaalayaasha",
+  "roleFilter": "Ku shaandhee door",
+  "allRoles": "Dhammaan doorarka",
+  "summary": "{shown, plural, one {Waxaa muuqda # isticmaale} other {Waxaa muuqda # isticmaale}} oo ka mid ah {total}",
+  "you": "Adiga",
+  "table": {
+    "name": "Magaca",
+    "email": "Iimayl",
+    "role": "Doorka",
+    "phone": "Taleefanka",
+    "classes": "Fasallada",
+    "status": "Xaaladda",
+    "actions": "Ficillo"
+  },
+  "noClasses": "Fasal ma leh",
+  "classCount": "{count, plural, =0 {Fasal ma leh} one {# fasal} other {# fasal}}",
+  "actions": {
+    "editClasses": "Wax ka beddel fasallada loo qoondeeyay",
+    "deactivate": "Jooji akoonka",
+    "activate": "Hawlgeli akoonka",
+    "delete": "Tirtir isticmaalaha",
+    "more": "Ficillo kale oo {name} ah",
+    "cannotDeleteSelf": "Ma tirtiri kartid akoonkaaga"
+  },
+  "form": {
+    "createTitle": "Ku dar isticmaale",
+    "createDescription": "Samee akoon maamulaha dugsiga ama macallin, oo leh xogta galitaanka.",
+    "name": "Magaca oo buuxa",
+    "namePlaceholder": "Tusaale: Axmed Cali",
+    "email": "Iimayl",
+    "emailPlaceholder": "teacher@school.com",
+    "phone": "Lambarka taleefanka (ikhtiyaari)",
+    "phonePlaceholder": "Tusaale: 0911 223344",
+    "password": "Furaha sirta ku meel gaarka ah",
+    "passwordPlaceholder": "Ugu yaraan 6 xaraf",
+    "role": "Doorka",
+    "roleHint": "Maamulayaasha dugsigu waxay leeyihiin awood buuxda, waxayna maamuli karaan isticmaalayaasha kale.",
+    "classes": "Qoondee fasallada",
+    "classesHint": "Dooro fasallada uu macallinkani dhigo.",
+    "noClassesYet": "Weli fasal ma jiro. Marka hore samee fasallo, kadibna u qoondee macallinka.",
+    "create": "Samee isticmaale"
+  },
+  "assign": {
+    "title": "Wax ka beddel fasallada loo qoondeeyay",
+    "description": "Dooro fasallada uu {name} dhigo. Ardaydu fasalladooda ayay ku sii jirayaan.",
+    "currentlyAssigned": "Waxaa loo qoondeeyay {name}",
+    "currentlyAssignedOther": "Waxaa loo qoondeeyay macallin kale",
+    "save": "Kaydi qoondaynta"
+  },
+  "delete": {
+    "title": "Ma tirtiraysaa {name}?",
+    "description": "Akoonka {email} waa la tirtiri doonaa, mar dambena laguma geli karo. Dib looma soo celin karo.",
+    "confirm": "Tirtir isticmaalaha"
+  },
+  "toast": {
+    "adminCreated": "Akoonka maamulaha dugsiga waa la sameeyay.",
+    "teacherCreated": "Akoonka macallinka waa la sameeyay.",
+    "assigned": "Fasallada {name} waa la cusboonaysiiyay.",
+    "activated": "Akoonka {name} waa la hawlgeliyay.",
+    "deactivated": "Akoonka {name} waa la joojiyay.",
+    "deleted": "{name} waa la tirtiray.",
+    "loadError": "Isticmaalayaasha lama soo rari karin. Hubi in xeerarka xogta (database rules) la daabacay, kadibna cusboonaysii bogga.",
+    "unexpectedResponse": "Server-ku wuxuu soo celiyay jawaab aan la filayn ({status}). Fadlan cusboonaysii bogga oo isku day mar kale."
+  },
+  "empty": {
+    "title": "Weli isticmaale ma jiro",
+    "description": "Ku dar macallimiin iyo maamulayaal dugsi si ay u galaan.",
+    "search": "Ma jiro isticmaale u dhigma raadintaada."
+  },
+  "csv": {
+    "name": "Magaca",
+    "email": "Iimayl",
+    "role": "Doorka",
+    "phone": "Taleefanka",
+    "status": "Xaaladda"
+  }
+}

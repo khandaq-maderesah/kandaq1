@@ -2,16 +2,16 @@ import type { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Khendeq Medresah',
-    short_name: 'Khendeq Medresah',
-    description: 'Students management system for Khendeq Medresah.',
+    name: 'Khendeq',
+    short_name: 'Khendeq',
+    description: 'School management platform: attendance, students, teachers, exams and reports.',
     id: '/',
     start_url: '/',
     scope: '/',
     display: 'standalone',
     orientation: 'portrait',
-    background_color: '#f8fafc',
-    theme_color: '#166534',
+    background_color: '#f5f6f8',
+    theme_color: '#214dc4',
     categories: ['education', 'productivity'],
     icons: [
       { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },

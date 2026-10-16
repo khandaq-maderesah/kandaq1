@@ -19,6 +19,8 @@ export interface User {
   createdBy: string
   lastLogin?: string
   assignedClassIds?: string[]
+  /** Preferred UI language (en | am | ar | om | so). */
+  language?: string
 }
 
 // School Types
@@ -66,7 +68,7 @@ export interface Student {
   age?: number
   dateOfBirth?: string
   photoUrl?: string
-  parentLanguage?: 'Amharic' | 'Afaan Oromoo'
+  parentLanguage?: 'Amharic' | 'Afaan Oromoo' | 'English' | 'Arabic' | 'Somali'
   classId: string
   className?: string
   section?: string
@@ -85,6 +87,71 @@ export interface Student {
   updatedAt: string
   admissionNumber?: string
   admissionDate?: string
+  /** Set when the student was deleted (archived). isActive is false then. */
+  archive?: StudentArchive
+}
+
+// ==================== Approval requests ====================
+// Teachers can add/edit their students directly, but deleting a student or
+// moving them to another class needs a school admin's approval.
+
+export type RequestType = 'student_delete' | 'student_transfer'
+export type RequestStatus = 'pending' | 'approved' | 'rejected' | 'cancelled'
+export type DeletionReason =
+  | 'transferred_school'
+  | 'dropped_out'
+  | 'moved_away'
+  | 'graduated'
+  | 'duplicate'
+  | 'other'
+
+export const DELETION_REASONS: DeletionReason[] = [
+  'transferred_school',
+  'dropped_out',
+  'moved_away',
+  'graduated',
+  'duplicate',
+  'other',
+]
+
+/** Stored at schoolData/{schoolId}/requests/{id}. Keeps a snapshot of the student. */
+export interface ChangeRequest {
+  id: string
+  type: RequestType
+  status: RequestStatus
+  studentId: string
+  studentName: string
+  /** For grammatically correct messages in gendered languages. */
+  studentGender?: 'male' | 'female'
+  classId: string
+  className: string
+  section?: string
+  /** student_transfer only */
+  toClassId?: string
+  toClassName?: string
+  /** student_delete only */
+  reasonCategory?: DeletionReason
+  reason: string
+  requestedBy: string
+  requestedByName: string
+  requestedAt: string
+  reviewedBy?: string
+  reviewedByName?: string
+  reviewedAt?: string
+  reviewNote?: string
+}
+
+/** Why and by whom a student was deleted (archived). */
+export interface StudentArchive {
+  reasonCategory: DeletionReason
+  reason: string
+  requestedBy: string
+  requestedByName: string
+  requestedAt: string
+  archivedBy: string
+  archivedByName: string
+  archivedAt: string
+  requestId?: string
 }
 
 // Attendance Types
@@ -167,7 +234,7 @@ export interface CreateStudentForm {
   age?: number
   dateOfBirth?: string
   photoUrl?: string
-  parentLanguage?: 'Amharic' | 'Afaan Oromoo'
+  parentLanguage?: 'Amharic' | 'Afaan Oromoo' | 'English' | 'Arabic' | 'Somali'
   classId: string
   parentName?: string
   parentPhone: string

@@ -1,0 +1,25 @@
+{
+  "title": "Exam results",
+  "description": "View, download and print saved exam results for every class.",
+  "loadError": "Couldn't load exams. Please try again.",
+  "filters": {
+    "class": "Class",
+    "allClasses": "All classes"
+  },
+  "list": {
+    "title": "Saved exams",
+    "count": "{count, plural, =0 {No saved exams for this class} one {# saved exam for this class} other {# saved exams for this class}}",
+    "empty": "No saved exams for this class yet.",
+    "emptyHint": "Exams appear here after a teacher saves the results.",
+    "selectClass": "Select a class to see its exams.",
+    "updated": "Updated {date}",
+    "showResults": "Show results",
+    "hideResults": "Hide results",
+    "downloadCsv": "Download {title} as CSV",
+    "printExam": "Print {title}"
+  },
+  "overall": {
+    "title": "Overall result",
+    "description": "Combines all saved exams for this class into one sheet."
+  }
+}

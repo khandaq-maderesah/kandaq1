@@ -1,23 +1,30 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useTranslations } from 'next-intl'
+import { toast } from 'sonner'
 import { rtdb } from '@/lib/database'
 import { useAuth } from '@/context/AuthContext'
 import { getConsecutiveAbsentCount } from '@/lib/absentAlert'
 import { useLiveData } from '@/lib/dataStore'
 import { daysAgoISO, ATTENDANCE_RECENT_DAYS } from '@/lib/utils'
 import { Bell, CheckCircle2, Loader2, Phone, X, GraduationCap } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
+import { cn } from '@/lib/utils'
 import type { Attendance, Class, Student, AbsentAlert } from '@/types'
 
 const ABSENT_STREAK = 5
 
 export function AbsenceAlertBell({
   teacherOnly = false,
-  dark = true,
 }: {
   teacherOnly?: boolean
+  /** @deprecated Kept for backward compatibility; the bell always matches the light top bar. */
   dark?: boolean
 }) {
+  const t = useTranslations('notifications.absence')
+  const tc = useTranslations('common')
   const { user } = useAuth()
   const [open, setOpen] = useState(false)
   const [classList, setClassList] = useState<Class[]>([])
@@ -28,7 +35,6 @@ export function AbsenceAlertBell({
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [message, setMessage] = useState('')
   const containerRef = useRef<HTMLDivElement>(null)
 
   // Shared realtime store: the admin/teacher navs all read the SAME channel, so
@@ -139,15 +145,22 @@ export function AbsenceAlertBell({
       .sort((a, b) => b.streak - a.streak)
   }, [studentsAll, attendanceAll, alertRecords, classList])
 
-  // Close dropdown when clicking outside
+  // Close the panel when clicking outside or pressing Escape.
   useEffect(() => {
-    const handler = (e: MouseEvent) => {
+    const onClick = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setOpen(false)
       }
     }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false)
+    }
+    document.addEventListener('mousedown', onClick)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('mousedown', onClick)
+      document.removeEventListener('keydown', onKey)
+    }
   }, [])
 
   const myClassIds = useMemo(() => {
@@ -174,7 +187,6 @@ export function AbsenceAlertBell({
   const handleCancel = async () => {
     if (selected.size === 0) return
     setSaving(true)
-    setMessage('')
     const now = new Date().toISOString()
     const resolvedBy = user?.uid || 'admin'
     try {
@@ -195,142 +207,157 @@ export function AbsenceAlertBell({
       }
       // The acknowledgment updates realtime data, so the alert disappears automatically
       setSelected(new Set())
-      setMessage(`Alert${ids.length > 1 ? 's' : ''} cancelled.`)
-    } catch {
-      setMessage('Failed to cancel alert.')
+      toast.success(t('dismissed', { count: ids.length }))
+    } catch (err) {
+      console.error('Failed to dismiss absence alert', err)
+      toast.error(t('dismissFailed'))
     } finally {
       setSaving(false)
     }
   }
 
+  const count = displayAlerts.length
+
   return (
     <div className="relative" ref={containerRef}>
-      <button
+      <Button
         type="button"
+        variant="ghost"
+        size="icon"
         onClick={() => setOpen((o) => !o)}
-        className={`relative inline-flex h-10 w-10 items-center justify-center rounded-full border shadow-sm backdrop-blur transition-all duration-200 ${
-          dark
-            ? 'border-white/40 bg-white/10 text-white hover:bg-white/20'
-            : 'border-gray-300 bg-gray-100 text-gray-700 hover:bg-gray-200'
-        }`}
-        aria-label="Absence alerts"
-        title="Absence alerts"
+        className="relative text-muted-foreground"
+        aria-label={count > 0 ? `${t('label')} (${count})` : t('label')}
+        aria-expanded={open}
+        aria-haspopup="dialog"
+        title={t('label')}
       >
-        <Bell className="h-5 w-5" />
-        {displayAlerts.length > 0 && (
-          <span className={`absolute -right-1 -top-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white ring-2 ${dark ? 'ring-green-700' : 'ring-white'}`}>
-            {displayAlerts.length}
+        <Bell />
+        {count > 0 && (
+          <span
+            aria-hidden="true"
+            className="absolute -end-0.5 -top-0.5 inline-flex h-[1.125rem] min-w-[1.125rem] items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold leading-none text-destructive-foreground ring-2 ring-card"
+          >
+            {count > 99 ? '99+' : count}
           </span>
         )}
-      </button>
+      </Button>
 
       {open && (
-        <div className="fixed right-2 top-16 z-50 w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl">
-          <div className="flex items-center justify-between border-b border-gray-100 bg-gradient-to-r from-amber-50 to-orange-50 px-4 py-3">
-            <div className="flex items-center gap-2 text-sm font-semibold text-amber-800">
+        <div
+          role="dialog"
+          aria-label={t('title')}
+          className="fixed end-2 top-16 z-50 flex max-h-[calc(100dvh-5rem)] w-[min(24rem,calc(100vw-1rem))] flex-col overflow-hidden rounded-xl border bg-popover text-popover-foreground shadow-lg"
+        >
+          <div className="flex items-start gap-3 border-b px-4 py-3">
+            <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-warning/10 text-warning">
               <Bell className="h-4 w-4" />
-              Absence Alerts
-              <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-600">
-                {displayAlerts.length}
-              </span>
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                {t('title')}
+                <span className="rounded-full bg-destructive/10 px-2 py-0.5 text-xs font-medium tabular-nums text-destructive">
+                  {count}
+                </span>
+              </p>
+              <p className="text-xs text-muted-foreground">{t('description', { streak: ABSENT_STREAK })}</p>
             </div>
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="icon-sm"
               onClick={() => setOpen(false)}
-              className="inline-flex h-6 w-6 items-center justify-center rounded-full text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
-              aria-label="Close"
+              className="-me-1 shrink-0 text-muted-foreground"
+              aria-label={tc('actions.close')}
             >
-              <X className="h-4 w-4" />
-            </button>
+              <X />
+            </Button>
           </div>
 
           {!teacherOnly && (
-            <div className="flex gap-1 border-b border-gray-100 bg-gray-50 px-3 py-2">
-              <button
-                type="button"
-                onClick={() => setScope('all')}
-                className={`inline-flex flex-1 items-center justify-center gap-1 rounded-md px-2 py-1.5 text-xs font-medium transition ${
-                  scope === 'all' ? 'bg-amber-600 text-white' : 'text-gray-600 hover:bg-gray-200'
-                }`}
-              >
-                <GraduationCap className="h-3.5 w-3.5" /> All classes
-              </button>
-              <button
-                type="button"
-                onClick={() => setScope('mine')}
-                className={`inline-flex flex-1 items-center justify-center gap-1 rounded-md px-2 py-1.5 text-xs font-medium transition ${
-                  scope === 'mine' ? 'bg-amber-600 text-white' : 'text-gray-600 hover:bg-gray-200'
-                }`}
-              >
-                <GraduationCap className="h-3.5 w-3.5" /> My classes
-              </button>
+            <div role="radiogroup" aria-label={t('scopeLabel')} className="grid grid-cols-2 gap-1 border-b bg-muted/50 p-2">
+              {(['all', 'mine'] as const).map((value) => (
+                <button
+                  key={value}
+                  type="button"
+                  role="radio"
+                  aria-checked={scope === value}
+                  onClick={() => setScope(value)}
+                  className={cn(
+                    'inline-flex h-9 items-center justify-center gap-1.5 rounded-md px-2 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                    scope === value ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                  )}
+                >
+                  <GraduationCap className="h-3.5 w-3.5" />
+                  {value === 'all' ? t('scopeAll') : t('scopeMine')}
+                </button>
+              ))}
             </div>
           )}
 
-          <div className="max-h-80 overflow-y-auto">
+          <div className="min-h-0 flex-1 overflow-y-auto">
             {loading ? (
-              <div className="flex justify-center py-8">
-                <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
+              <div className="space-y-3 p-4">
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-2/3" />
               </div>
-            ) : displayAlerts.length === 0 ? (
-              <div className="px-4 py-6 text-center text-sm text-gray-500">
-                No students have reached {ABSENT_STREAK} consecutive absent days.
+            ) : count === 0 ? (
+              <div className="flex flex-col items-center gap-2 px-4 py-8 text-center text-sm text-muted-foreground">
+                <CheckCircle2 className="h-6 w-6 text-success" />
+                {t('empty', { streak: ABSENT_STREAK })}
               </div>
             ) : (
-              displayAlerts.map((a) => (
-                <div
-                  key={a.studentId}
-                  className="flex items-start gap-3 border-b border-gray-50 px-4 py-3 last:border-0"
-                >
-                  {!teacherOnly && (
-                    <input
-                      type="checkbox"
-                      checked={selected.has(a.studentId)}
-                      onChange={() => toggle(a.studentId)}
-                      className="mt-1 h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
-                    />
-                  )}
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-gray-900">{a.name}</p>
-                    <p className="text-xs text-gray-500">
-                      {a.className}
-                      {a.section ? ` · Section ${a.section}` : ''} &middot;{' '}
-                      <span className="font-semibold text-red-600">{a.streak} days</span>
-                    </p>
-                  </div>
-                  {a.parentPhone ? (
-                    <a
-                      href={`tel:${a.parentPhone}`}
-                      className="inline-flex items-center gap-1 rounded-lg bg-green-50 px-2 py-1 text-xs font-medium text-green-700 transition hover:bg-green-100"
-                    >
-                      <Phone className="h-3 w-3" /> Call
-                    </a>
-                  ) : null}
-                </div>
-              ))
+              <ul className="divide-y">
+                {displayAlerts.map((a) => {
+                  const checkboxId = `absence-${a.studentId}`
+                  return (
+                    <li key={a.studentId} className="flex items-center gap-3 px-4 py-3">
+                      {!teacherOnly && (
+                        <input
+                          id={checkboxId}
+                          type="checkbox"
+                          checked={selected.has(a.studentId)}
+                          onChange={() => toggle(a.studentId)}
+                          aria-label={t('select', { name: a.name })}
+                          className="h-4 w-4 shrink-0 rounded border-input accent-primary"
+                        />
+                      )}
+                      <div className="min-w-0 flex-1">
+                        {teacherOnly ? (
+                          <p className="truncate text-sm font-medium text-foreground">{a.name}</p>
+                        ) : (
+                          <label htmlFor={checkboxId} className="block cursor-pointer truncate text-sm font-medium text-foreground">
+                            {a.name}
+                          </label>
+                        )}
+                        <p className="truncate text-xs text-muted-foreground">
+                          {a.section ? t('classWithSection', { className: a.className, section: a.section }) : a.className}
+                        </p>
+                        <p className="mt-0.5 text-xs font-medium text-destructive">{t('streak', { count: a.streak })}</p>
+                      </div>
+                      {a.parentPhone ? (
+                        <a
+                          href={`tel:${a.parentPhone}`}
+                          aria-label={t('callParent', { name: a.name })}
+                          className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg border bg-card px-3 text-xs font-medium text-foreground transition-colors hover:bg-muted"
+                        >
+                          <Phone className="h-3.5 w-3.5 text-success" />
+                          {t('call')}
+                        </a>
+                      ) : null}
+                    </li>
+                  )
+                })}
+              </ul>
             )}
           </div>
-          {message && (
-            <div className="border-t border-gray-100 bg-emerald-50 px-4 py-2 text-xs font-medium text-emerald-700">
-              {message}
-            </div>
-          )}
 
           {!teacherOnly && (
-            <div className="border-t border-gray-100 bg-gray-50 px-4 py-3">
-              <button
-                type="button"
-                onClick={handleCancel}
-                disabled={saving || selected.size === 0}
-                className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-amber-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-amber-700 disabled:opacity-50"
-              >
-                {saving ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <CheckCircle2 className="h-4 w-4" />
-                )}
-                Mark Contacted &amp; Cancel ({selected.size})
-              </button>
+            <div className="border-t bg-muted/30 p-3">
+              <Button type="button" onClick={handleCancel} disabled={saving || selected.size === 0} className="w-full">
+                {saving ? <Loader2 className="animate-spin" /> : <CheckCircle2 />}
+                {t('dismiss', { count: selected.size })}
+              </Button>
             </div>
           )}
         </div>

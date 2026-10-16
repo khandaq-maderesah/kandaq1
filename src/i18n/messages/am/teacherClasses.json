@@ -1,0 +1,58 @@
+{
+  "title": "የእኔ ክፍሎች",
+  "description": "ክፍሎችዎ እና ተማሪዎቻቸው። አዲስ ተማሪ ይጨምሩ ወይም መረጃቸውን ያስተካክሉ።",
+  "classCard": {
+    "grade": "ደረጃ {grade}",
+    "section": "ሴክሽን {section}",
+    "select": "የ{name} ተማሪዎችን አሳይ",
+    "selected": "ተመርጧል"
+  },
+  "registrationClosed": "የተማሪዎች ምዝገባ ተዘግቷል። ያሉትን ተማሪዎች ግን አሁንም ማስተካከል ይችላሉ።",
+  "form": {
+    "addTitle": "ተማሪ ጨምር",
+    "addDescription": "ለእያንዳንዱ ክፍል ተራ ቁጥር በራሱ ይጠቆማል።",
+    "editTitle": "ማስተካከያ፦ {name}",
+    "editDescription": "የሚቀየሩት እርስዎ ያስተካከሏቸው መስኮች ብቻ ናቸው።",
+    "class": "ክፍል",
+    "classLocked": "ይህን ተማሪ ወደ ሌላ ክፍል ለማዛወር በተማሪዎች ዝርዝር ውስጥ «እንዲዛወር ጠይቅ»ን ይጠቀሙ።",
+    "name": "የተማሪ ስም",
+    "namePlaceholder": "ሙሉ ስም",
+    "gender": "ጾታ",
+    "genderPlaceholder": "ጾታ ይምረጡ",
+    "age": "ዕድሜ",
+    "agePlaceholder": "ለምሳሌ 10",
+    "parentLanguage": "የወላጅ ቋንቋ",
+    "parentLanguagePlaceholder": "ቋንቋ ይምረጡ",
+    "parentPhone": "የወላጅ ስልክ",
+    "alternativePhone": "ተጨማሪ ስልክ (አማራጭ)",
+    "phonePlaceholder": "09XX XXX XXX",
+    "rollNumber": "ተራ ቁጥር",
+    "rollTaken": "ይህ ተራ ቁጥር በዚህ ክፍል ውስጥ አስቀድሞ ተይዟል።",
+    "rollHint": "የተጠቆመው፦ {roll}። ተራ ቁጥሮችን እንደገና ለማስተካከል መቀየር ይችላሉ።",
+    "photo": "የተማሪ ፎቶ",
+    "submitAdd": "ተማሪ ጨምር",
+    "submitEdit": "ለውጦችን አስቀምጥ",
+    "cancelEdit": "ማስተካከሉን ተው"
+  },
+  "list": {
+    "title": "የ{name} ተማሪዎች",
+    "description": "ተማሪን ለማስተካከል «አስተካክል»ን ይንኩ። ለመሰረዝ ወይም ለማዛወር የተግባራት ምናሌውን ይጠቀሙ።",
+    "roll": "ተ.ቁ. {roll}",
+    "age": "{age, plural, one {# ዓመት} other {# ዓመት}}",
+    "edit": "{name}ን አስተካክል",
+    "empty": "በዚህ ክፍል ውስጥ እስካሁን ተማሪ የለም።",
+    "emptyHint": "የመጀመሪያውን ተማሪ በቅጹ ይጨምሩ።"
+  },
+  "empty": {
+    "noClasses": "እስካሁን ምንም ክፍል አልተመደበልዎትም።",
+    "noClassesHint": "ክፍል እንዲመድብልዎ የትምህርት ቤቱን አስተዳዳሪ ይጠይቁ።"
+  },
+  "toast": {
+    "loadFailed": "ክፍሎችዎን መጫን አልተቻለም።",
+    "added": "ተማሪ ተጨምሯል፦ {name} (ተራ ቁጥር {roll})።",
+    "updated": "የ{name} መረጃ ተሻሽሏል።",
+    "saveFailed": "የተማሪውን መረጃ ማስቀመጥ አልተቻለም። እባክዎ እንደገና ይሞክሩ።",
+    "registrationClosed": "የተማሪዎች ምዝገባ ተዘግቷል። የትምህርት ቤቱ አስተዳዳሪ በቅንብሮች ውስጥ መክፈት አለበት።",
+    "rollTaken": "ተራ ቁጥር {roll} በዚህ ክፍል ውስጥ አስቀድሞ ተይዟል።"
+  }
+}

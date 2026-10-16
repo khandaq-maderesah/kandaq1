@@ -1,0 +1,108 @@
+{
+  "appName": "Khendeq",
+  "appTagline": "Madal maamulka dugsiyada",
+  "actions": {
+    "save": "Kaydi",
+    "saveChanges": "Kaydi isbeddellada",
+    "cancel": "Jooji",
+    "close": "Xir",
+    "edit": "Wax ka beddel",
+    "delete": "Tirtir",
+    "add": "Ku dar",
+    "create": "Samee",
+    "search": "Raadi",
+    "filter": "Shaandhee",
+    "export": "Soo saar",
+    "exportCsv": "Soo saar CSV",
+    "print": "Daabac",
+    "back": "Dib u noqo",
+    "next": "Xiga",
+    "previous": "Hore",
+    "confirm": "Xaqiiji",
+    "submit": "Gudbi",
+    "retry": "Isku day mar kale",
+    "view": "Eeg",
+    "restore": "Soo celi",
+    "approve": "Ansixi",
+    "reject": "Diid",
+    "clear": "Nadiifi",
+    "refresh": "Cusboonaysii",
+    "upload": "Soo geli",
+    "remove": "Ka saar",
+    "showMore": "Tus in badan",
+    "showLess": "Tus in yar",
+    "selectAll": "Dooro dhammaan"
+  },
+  "status": {
+    "loading": "Waa la soo rarayaa…",
+    "saving": "Waa la kaydinayaa…",
+    "saved": "Waa la kaydiyay",
+    "active": "Firfircoon",
+    "inactive": "Aan firfircoonayn",
+    "suspended": "La hakiyay",
+    "pending": "La sugayo",
+    "approved": "La ansixiyay",
+    "rejected": "La diiday",
+    "cancelled": "La joojiyay"
+  },
+  "roles": {
+    "superadmin": "Maamulaha madasha",
+    "admin": "Maamulaha dugsiga",
+    "teacher": "Macallin"
+  },
+  "gender": {
+    "male": "Lab",
+    "female": "Dheddig"
+  },
+  "fields": {
+    "name": "Magaca",
+    "fullName": "Magaca oo buuxa",
+    "email": "Iimayl",
+    "phone": "Lambarka taleefanka",
+    "password": "Furaha sirta ah",
+    "address": "Cinwaanka",
+    "date": "Taariikhda",
+    "class": "Fasalka",
+    "section": "Qaybta",
+    "status": "Xaaladda",
+    "role": "Doorka",
+    "reason": "Sababta",
+    "notes": "Qoraallo",
+    "actions": "Ficillo",
+    "required": "Qasab"
+  },
+  "empty": {
+    "noData": "Weli halkan wax ma yaallaan.",
+    "noResults": "Raadintaada wax u dhigma lama helin."
+  },
+  "errors": {
+    "generic": "Cillad ayaa dhacday. Fadlan isku day mar kale.",
+    "network": "Fadlan hubi xiriirka internetka, kadibna isku day mar kale.",
+    "permission": "Uma lihid ogolaansho aad tan ku samayso.",
+    "required": "Goobtan waa qasab.",
+    "api": {
+      "emailInUse": "Iimaylkan horay ayaa akoon loogu sameeyay.",
+      "invalidEmail": "Cinwaanka iimaylkan sax ma aha.",
+      "weakPassword": "Furaha sirta waa inuu ahaadaa ugu yaraan 6 xaraf.",
+      "sessionExpired": "Fadhigaagu wuu dhammaaday. Fadlan mar kale gal.",
+      "forbidden": "Uma lihid ogolaansho aad tan ku samayso.",
+      "schoolSuspended": "Dugsigan waa la hakiyay.",
+      "otherSchool": "Waxaad maamuli kartaa oo keliya dadka dugsigaaga.",
+      "notFound": "Akoonkan mar dambe ma jiro.",
+      "cannotDeleteSelf": "Ma tirtiri kartid akoonkaaga.",
+      "invalid": "Xog qaar ayaa maqan ama sax ma aha.",
+      "generic": "Cillad ayaa dhacday. Fadlan isku day mar kale."
+    }
+  },
+  "pagination": {
+    "showing": "Waxaa muuqda {from}–{to} oo ka mid ah {total}",
+    "page": "Bogga {page} ee {pages}"
+  },
+  "count": {
+    "students": "{count, plural, =0 {Arday ma jiro} one {# arday} other {# arday}}",
+    "teachers": "{count, plural, =0 {Macallin ma jiro} one {# macallin} other {# macallin}}",
+    "classes": "{count, plural, =0 {Fasal ma jiro} one {# fasal} other {# fasal}}"
+  },
+  "language": "Luqadda",
+  "today": "Maanta"
+}

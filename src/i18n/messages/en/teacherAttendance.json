@@ -1,0 +1,46 @@
+{
+  "title": "Take attendance",
+  "description": "Mark who is here today, then save.",
+  "filters": {
+    "class": "Class",
+    "classPlaceholder": "Choose a class",
+    "date": "Date"
+  },
+  "status": {
+    "present": "Present",
+    "absent": "Absent",
+    "late": "Late",
+    "excused": "Excused",
+    "unmarked": "Not marked"
+  },
+  "markAll": {
+    "label": "Mark everyone",
+    "present": "All present",
+    "absent": "All absent",
+    "excused": "All excused",
+    "clear": "Clear all"
+  },
+  "list": {
+    "title": "Students",
+    "statusGroup": "Attendance for {name}"
+  },
+  "saveBar": {
+    "progress": "{marked} of {total} marked",
+    "unsaved": "Unsaved changes",
+    "allSaved": "All changes saved",
+    "save": "Save attendance"
+  },
+  "empty": {
+    "noClasses": "No classes assigned to you yet.",
+    "noClassesHint": "Ask a school admin to assign you a class.",
+    "noStudents": "No students in this class.",
+    "noStudentsHint": "Add students from My classes."
+  },
+  "toast": {
+    "saved": "Attendance saved.",
+    "nothingToSave": "Mark at least one student before saving.",
+    "loadClassesFailed": "Could not load your classes.",
+    "loadStudentsFailed": "Could not load the students.",
+    "saveFailed": "Could not save attendance. Please try again."
+  }
+}

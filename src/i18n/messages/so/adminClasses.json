@@ -1,0 +1,61 @@
+{
+  "title": "Fasallada",
+  "description": "Samee oo wax ka beddel fasallada. Macallimiinta waxaa laga qoondeeyaa bogga Isticmaalayaasha.",
+  "add": "Ku dar fasal",
+  "searchPlaceholder": "Ku raadi fasal, macallin ama sannad",
+  "searchLabel": "Raadi fasallada",
+  "summary": "{shown, plural, one {Waxaa muuqda # fasal} other {Waxaa muuqda # fasal}} oo ka mid ah {total}",
+  "table": {
+    "class": "Fasalka",
+    "section": "Qaybta",
+    "teacher": "Macallinka",
+    "year": "Sannad-dugsiyeedka",
+    "students": "Ardayda",
+    "actions": "Ficillo"
+  },
+  "unassigned": "Aan loo qoondayn",
+  "noSection": "Qayb ma leh",
+  "viewStudents": "Eeg ardayda {name}",
+  "studentCount": "{count, plural, =0 {Arday ma jiro} one {# arday} other {# arday}}",
+  "editClass": "Wax ka beddel {name}",
+  "deleteClass": "Tirtir {name}",
+  "form": {
+    "createTitle": "Ku dar fasal",
+    "createDescription": "Macallimiinta waxaa la qoondeeyaa marka aad diiwaangeliso ama wax ka beddesho bogga Isticmaalayaasha.",
+    "editTitle": "Wax ka beddel fasalka",
+    "editDescription": "Cusboonaysii xogta fasalka.",
+    "name": "Magaca fasalka",
+    "namePlaceholder": "Tusaale: Fasalka 5aad",
+    "grade": "Heerka",
+    "gradePlaceholder": "Tusaale: 5",
+    "section": "Qaybta",
+    "sectionPlaceholder": "Tusaale: A",
+    "year": "Sannad-dugsiyeedka",
+    "yearPlaceholder": "Tusaale: 2026-2027",
+    "create": "Samee fasal"
+  },
+  "delete": {
+    "title": "Ma tirtiraysaa {name}?",
+    "description": "Tani gebi ahaanba way tirtiraysaa fasalka, dib looma soo celin karo.",
+    "withStudents": "{count, plural, one {# arday ayaa} other {# arday ayaa}} weli ku jira fasalkan. Marka hore u wareeji fasal kale si ay u sii muuqdaan.",
+    "confirm": "Tirtir fasalka"
+  },
+  "toast": {
+    "created": "Fasalka waa la sameeyay.",
+    "updated": "Fasalka waa la cusboonaysiiyay.",
+    "deleted": "{name} waa la tirtiray."
+  },
+  "empty": {
+    "title": "Weli fasal ma jiro",
+    "description": "Samee fasalkaaga ugu horreeya si aad u bilowdo diiwaangelinta ardayda.",
+    "search": "Ma jiro fasal u dhigma raadintaada."
+  },
+  "studentsDialog": {
+    "title": "Ardayda {name}",
+    "meta": "{year} · {section} · {teacher}",
+    "empty": "Weli fasalkan arday kuma jiro.",
+    "roll": "Lambar {roll}",
+    "noRoll": "Lambar taxane ma leh",
+    "noPhone": "Taleefan ma leh"
+  }
+}

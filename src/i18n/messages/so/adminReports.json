@@ -1,0 +1,71 @@
+{
+  "title": "Warbixinnada",
+  "description": "Guudmarka xaadiriska dugsigaaga",
+  "actions": {
+    "studentCsv": "CSV ardayda",
+    "summaryCsv": "CSV soo koobidda"
+  },
+  "filters": {
+    "from": "Laga bilaabo",
+    "to": "Ilaa",
+    "hint": "Dhammaan tirooyinka hoose waxay raacayaan muddadan. Ka tag madhan si aad u aragto waqtiga oo dhan.",
+    "clear": "Nadiifi taariikhaha",
+    "ethRange": "Kalandarka Itoobiya: {from} – {to}",
+    "ethFrom": "Kalandarka Itoobiya: laga bilaabo {date}",
+    "ethTo": "Kalandarka Itoobiya: ilaa {date}"
+  },
+  "kpi": {
+    "students": "Ardayda firfircoon",
+    "classes": "Fasallada",
+    "teachers": "Macallimiinta",
+    "records": "Diiwaannada xaadiriska",
+    "rateHint": "{percent}% jooga"
+  },
+  "charts": {
+    "byStatusTitle": "Xaadiriska marka loo eego xaaladda",
+    "byStatusDescription": "Saamiga diiwaannada ee muddada la doortay",
+    "dailyTitle": "Xaadiriska maalinlaha ah ee dhowaan",
+    "dailyDescription": "7-dii maalmood ee u dambeeyay ee diiwaanno leh",
+    "noData": "Weli xog xaadiris ma jirto.",
+    "percent": "{percent}%",
+    "total": "Wadarta: {count}",
+    "pieTooltip": "{name}: {value} ({percent}%)"
+  },
+  "status": {
+    "present": "Jooga",
+    "absent": "Maqan",
+    "late": "Daahay",
+    "excused": "Fasax"
+  },
+  "summary": {
+    "title": "Soo koobidda xaadiriska ardayda",
+    "count": "{count, plural, one {# arday firfircoon} other {# arday firfircoon}}",
+    "empty": "Ma jiraan arday firfircoon",
+    "table": {
+      "student": "Ardayga",
+      "class": "Fasalka",
+      "present": "Jooga",
+      "absent": "Maqan",
+      "late": "Daahay",
+      "excused": "Fasax",
+      "total": "Wadarta",
+      "rate": "Heerka"
+    }
+  },
+  "csv": {
+    "metric": "Halbeeg",
+    "value": "Qiime",
+    "totalStudents": "Ardayda firfircoon",
+    "totalClasses": "Fasallada",
+    "totalTeachers": "Macallimiinta",
+    "records": "Diiwaannada xaadiriska (muddada)",
+    "present": "Jooga",
+    "absent": "Maqan",
+    "late": "Daahay",
+    "excused": "Fasax",
+    "name": "Magaca",
+    "class": "Fasalka",
+    "total": "Wadarta",
+    "rate": "Heerka %"
+  }
+}

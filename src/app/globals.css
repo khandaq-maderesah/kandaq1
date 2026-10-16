@@ -2,50 +2,40 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Design tokens ───────────────────────────────────────────
+   Neutral platform look: cool greys + one calm blue accent.
+   Use the semantic Tailwind colours (bg-background, text-muted-foreground,
+   bg-primary, text-success, ...) instead of raw palette colours so every
+   screen stays consistent. Values are HSL channels. */
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 220 20% 97%;
+    --foreground: 222 47% 11%;
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 143 64% 24%; /* emblem deep green #166534 */
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 143 64% 24%;
-    --radius: 0.5rem;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 143 64% 42%; /* emblem green (lighter for dark mode) */
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 143 64% 42%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 224 71% 45%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 14% 94%;
+    --secondary-foreground: 222 47% 15%;
+    --muted: 220 14% 95%;
+    --muted-foreground: 220 9% 43%;
+    --accent: 224 71% 96%;
+    --accent-foreground: 224 71% 35%;
+    --destructive: 0 72% 48%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 152 62% 32%;
+    --success-foreground: 0 0% 100%;
+    --warning: 35 92% 40%;
+    --warning-foreground: 0 0% 100%;
+    --info: 199 89% 38%;
+    --info-foreground: 0 0% 100%;
+    --border: 220 13% 89%;
+    --input: 220 13% 84%;
+    --ring: 224 71% 45%;
+    --radius: 0.75rem;
+    --sidebar: 0 0% 100%;
   }
 }
 
@@ -53,122 +43,49 @@
   * {
     @apply border-border;
   }
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-latin), var(--font-ethiopic), var(--font-arabic), ui-sans-serif, system-ui, sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+  /* Script-specific fonts first so punctuation/digits match the script. */
+  html[lang="am"] body {
+    font-family: var(--font-ethiopic), var(--font-latin), ui-sans-serif, system-ui, sans-serif;
+  }
+  html[lang="ar"] body {
+    font-family: var(--font-arabic), var(--font-latin), ui-sans-serif, system-ui, sans-serif;
+  }
+  /* Ethiopic and Arabic glyphs need a little more line height. */
+  html[lang="am"] body,
+  html[lang="ar"] body {
+    line-height: 1.65;
+  }
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
 }
+
 html {
   scroll-behavior: smooth;
 }
 
-/* ── NeonWaveBackground animation ────────────────────────────
-   Slow, subtle horizontal drift so the light ribbons feel alive. */
-.nw-drift-a { animation: nwDriftA 24s ease-in-out infinite alternate; }
-.nw-drift-b { animation: nwDriftB 32s ease-in-out infinite alternate; }
-.nw-drift-c { animation: nwDriftC 28s ease-in-out infinite alternate; }
-.nw-drift-d { animation: nwDriftD 36s ease-in-out infinite alternate; }
-.nw-orb { animation: nwOrb 6s ease-in-out infinite alternate; }
-
-@keyframes nwDriftA { from { transform: translateX(0); }    to { transform: translateX(-48px); } }
-@keyframes nwDriftB { from { transform: translateX(-30px); } to { transform: translateX(30px); } }
-@keyframes nwDriftC { from { transform: translateX(0); }    to { transform: translateX(40px); } }
-@keyframes nwDriftD { from { transform: translateX(24px); }  to { transform: translateX(-24px); } }
-@keyframes nwOrb    { from { opacity: 0.35; }                to { opacity: 0.9; } }
-
 @media (prefers-reduced-motion: reduce) {
-  .nw-drift-a, .nw-drift-b, .nw-drift-c, .nw-drift-d, .nw-orb {
-    animation: none;
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
   }
 }
-
-/* ── Glowing rainbow hover for buttons ────────────────────────
-   Applied to EVERY <button> automatically, plus any element with
-   the .btn class (e.g. links styled as buttons).
-   From the requested .btn spec — note: margin-left:50% was a demo
-   artifact and is deliberately omitted (it would break layouts). */
-.btn,
-button:not(:disabled) {
-  position: relative;
-  z-index: 0;
-}
-
-.btn::before,
-button:not(:disabled)::before {
-  content: "";
-  position: absolute;
-  inset: -2px;
-  z-index: -1;
-  border-radius: inherit;
-  background: linear-gradient(
-    45deg,
-    #ff0000,
-    #ff7300,
-    #fffb00,
-    #48ff00,
-    #0000ff,
-    #00ffb2,
-    #ff00c8,
-    #ff0000
-  );
-  background-size: 500px;
-  filter: blur(8px);
-  opacity: 0;
-  transition: opacity 0.3s ease-in-out;
-  pointer-events: none;
-}
-
-.btn:hover::before,
-button:not(:disabled):hover::before {
-  opacity: 1;
-  /* Glow shows for 5 seconds, then fades out even while still hovering;
-     moving the mouse away and back restarts it. */
-  animation: glowing 20s linear infinite, glowFadeOut 5s linear forwards;
-}
-
-@keyframes glowing {
-  0% { background-position: 0 0; }
-  50% { background-position: 400% 0; }
-  100% { background-position: 200% 0; }
-}
-
-@keyframes glowFadeOut {
-  0% { opacity: 0; }
-  8% { opacity: 1; }
-  75% { opacity: 1; }
-  100% { opacity: 0; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .btn:hover::before,
-  button:not(:disabled):hover::before {
-    animation: none;
-  }
-}
-
-/* ── Feature cards: gentle continuous bounce (faster on hover) ── */
-.card-bounce {
-  animation: cardBounce 2.4s ease-in-out infinite;
-}
-.card-bounce:hover {
-  animation: cardBounce 0.9s ease-in-out infinite;
-}
-
-@keyframes cardBounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-12px); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .card-bounce,
-  .card-bounce:hover {
-    animation: none;
-  }
-}
-
 
 ::selection {
-  background: rgba(22, 101, 52, 0.2);
+  background: hsl(var(--primary) / 0.18);
 }
 
 ::-webkit-scrollbar {
@@ -181,12 +98,12 @@ button:not(:disabled):hover::before {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: hsl(var(--border));
   border-radius: 8px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: hsl(var(--muted-foreground) / 0.5);
 }
 
 /* ── Print support ────────────────────────────────────────────
@@ -210,7 +127,7 @@ button:not(:disabled):hover::before {
     visibility: hidden;
   }
 
-loo  /* Make printable areas visible by default. A targeted exam print adds
+  /* Make printable areas visible by default. A targeted exam print adds
      .print-target so only that exam is shown. */
   .print-area,
   .print-area *,
@@ -235,7 +152,7 @@ loo  /* Make printable areas visible by default. A targeted exam print adds
   /* Default: show the results table */
   .print-area {
     position: absolute;
-    left: 0;
+    inset-inline-start: 0;
     top: 0;
     width: 100%;
     padding: 0;

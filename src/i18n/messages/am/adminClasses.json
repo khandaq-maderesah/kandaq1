@@ -1,0 +1,61 @@
+{
+  "title": "ክፍሎች",
+  "description": "ክፍሎችን ይፍጠሩ እና ያስተካክሉ። መምህራን የሚመደቡት ከ«ተጠቃሚዎች» ገጽ ነው።",
+  "add": "ክፍል ጨምር",
+  "searchPlaceholder": "በክፍል፣ በመምህር ወይም በዓመት ይፈልጉ",
+  "searchLabel": "ክፍሎችን ፈልግ",
+  "summary": "ከ{total} ውስጥ {shown, plural, one {# ክፍል ይታያል} other {# ክፍሎች ይታያሉ}}",
+  "table": {
+    "class": "ክፍል",
+    "section": "ሴክሽን",
+    "teacher": "መምህር",
+    "year": "የትምህርት ዘመን",
+    "students": "ተማሪዎች",
+    "actions": "ተግባራት"
+  },
+  "unassigned": "ያልተመደበ",
+  "noSection": "ሴክሽን የለም",
+  "viewStudents": "የ{name} ተማሪዎችን ተመልከት",
+  "studentCount": "{count, plural, =0 {ተማሪ የለም} one {# ተማሪ} other {# ተማሪዎች}}",
+  "editClass": "አስተካክል፦ {name}",
+  "deleteClass": "ሰርዝ፦ {name}",
+  "form": {
+    "createTitle": "ክፍል ጨምር",
+    "createDescription": "መምህራን የሚመደቡት በ«ተጠቃሚዎች» ገጽ ላይ ሲመዘግቧቸው ወይም ሲያስተካክሏቸው ነው።",
+    "editTitle": "ክፍል አስተካክል",
+    "editDescription": "የክፍሉን መረጃ ያሻሽሉ።",
+    "name": "የክፍል ስም",
+    "namePlaceholder": "ለምሳሌ፦ 5ኛ ክፍል",
+    "grade": "ደረጃ",
+    "gradePlaceholder": "ለምሳሌ፦ 5",
+    "section": "ሴክሽን",
+    "sectionPlaceholder": "ለምሳሌ፦ ሀ",
+    "year": "የትምህርት ዘመን",
+    "yearPlaceholder": "ለምሳሌ፦ 2026-2027",
+    "create": "ክፍል ፍጠር"
+  },
+  "delete": {
+    "title": "{name} ይሰረዝ?",
+    "description": "ይህ ክፍሉን ሙሉ በሙሉ ያስወግዳል፤ ሊቀለበስ አይችልም።",
+    "withStudents": "{count, plural, one {# ተማሪ አሁንም በዚህ ክፍል ውስጥ አለ።} other {# ተማሪዎች አሁንም በዚህ ክፍል ውስጥ አሉ።}} እንዲታዩ ለማድረግ መጀመሪያ ወደ ሌላ ክፍል ያዛውሯቸው።",
+    "confirm": "ክፍል ሰርዝ"
+  },
+  "toast": {
+    "created": "ክፍሉ ተፈጥሯል።",
+    "updated": "ክፍሉ ተሻሽሏል።",
+    "deleted": "{name} ተሰርዟል።"
+  },
+  "empty": {
+    "title": "እስካሁን ክፍል የለም",
+    "description": "ተማሪዎችን መመዝገብ ለመጀመር የመጀመሪያውን ክፍል ይፍጠሩ።",
+    "search": "ከፍለጋዎ ጋር የሚዛመድ ክፍል የለም።"
+  },
+  "studentsDialog": {
+    "title": "የ{name} ተማሪዎች",
+    "meta": "{year} · {section} · {teacher}",
+    "empty": "በዚህ ክፍል ውስጥ እስካሁን ተማሪ የለም።",
+    "roll": "ተ.ቁ. {roll}",
+    "noRoll": "ተራ ቁጥር የለም",
+    "noPhone": "ስልክ የለም"
+  }
+}

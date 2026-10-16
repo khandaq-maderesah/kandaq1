@@ -1,20 +1,49 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { useParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
+import { toast } from 'sonner'
 import { useAuth } from '@/context/AuthContext'
 import { rtdb } from '@/lib/database'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Loader2, Save, ArrowLeft, CheckCircle2 } from 'lucide-react'
-import type { Exam, Student } from '@/types'
-import { computeExam, examTotalMax, fmt, toNumber, EXAM_TYPE_LABELS } from '@/lib/examMath'
+import { Badge } from '@/components/ui/badge'
+import { Skeleton } from '@/components/ui/skeleton'
+import { PageHeader, EmptyState, TableContainer } from '@/components/ui/page'
+import { Loader2, Save, ArrowLeft, CheckCircle2, PencilLine, Info, AlertTriangle, Users } from 'lucide-react'
+import type { Exam } from '@/types'
+import {
+  computeExam,
+  examTotalMax,
+  examTypeKey,
+  toNumber,
+  DEFAULT_SUBJECT_MAX,
+} from '@/lib/examMath'
+import {
+  useExamFormat,
+  StudentCell,
+  SubjectHead,
+  stickyCellClass,
+  stickyHeadClass,
+} from '@/components/ExamResultsSheet'
+import { cn } from '@/lib/utils'
+
+/** A student on the mark sheet. `inactive` = kept from the recorded exam rows only. */
+interface SheetStudent {
+  id: string
+  name: string
+  rollNumber?: string
+  inactive: boolean
+}
 
 interface LiveRow {
   studentId: string
   studentName: string
   rollNumber?: string
+  inactive: boolean
   total: number
   average: number
   percentage: number
@@ -22,15 +51,16 @@ interface LiveRow {
 }
 
 export default function MarkExamPage() {
+  const t = useTranslations('teacherExams.mark')
+  const tx = useTranslations('exams')
+  const f = useExamFormat()
   const { id } = useParams<{ id: string }>()
-  const router = useRouter()
   const { user } = useAuth()
   const [exam, setExam] = useState<Exam | null>(null)
-  const [students, setStudents] = useState<Student[]>([])
+  const [students, setStudents] = useState<SheetStudent[]>([])
   const [marks, setMarks] = useState<Record<string, Record<string, string>>>({})
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [savedFlash, setSavedFlash] = useState('')
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -39,36 +69,63 @@ export default function MarkExamPage() {
       try {
         const ex = await rtdb.getExam(id)
         if (!ex) {
-          setError('Exam not found.')
+          setError(t('notFound'))
           setLoading(false)
           return
         }
         // Only this exam's class needs its students — no full-school download.
         const clsStudentsRaw = await rtdb.getStudentsByClass(ex.classId)
-        const clsStudents = clsStudentsRaw.filter((s) => s.isActive)
-        setStudents(clsStudents)
+        const active: SheetStudent[] = clsStudentsRaw
+          .filter((s) => s.isActive !== false)
+          .map((s) => ({ id: s.id, name: s.name, rollNumber: s.rollNumber, inactive: false }))
+        // Students already recorded on this exam who are no longer active
+        // (archived or moved) keep their recorded row.
+        const activeIds = new Set(active.map((s) => s.id))
+        const recorded: SheetStudent[] = Object.values(ex.rows || {})
+          .filter((r) => r?.studentId && !activeIds.has(r.studentId))
+          .map((r) => ({ id: r.studentId, name: r.studentName, rollNumber: r.rollNumber, inactive: true }))
+        const all = [...active, ...recorded]
+        setStudents(all)
         setExam(ex)
 
         const init: Record<string, Record<string, string>> = {}
-        clsStudents.forEach((st) => {
+        all.forEach((st) => {
           init[st.id] = {}
           ex.subjects.forEach((sub) => {
-            const row = ex.rows?.[st.id]
-            const v = row?.marks?.[sub]
+            const v = ex.rows?.[st.id]?.marks?.[sub]
             init[st.id][sub] = v != null ? String(v) : ''
           })
         })
         setMarks(init)
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load exam')
+        console.error(err)
+        setError(t('loadError'))
       } finally {
         setLoading(false)
       }
     }
     load()
-  }, [id])
+  }, [id]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const totalMax = exam ? examTotalMax(exam.subjects, exam.subjectMax) : 0
+  const subjectMax = (sub: string) => exam?.subjectMax?.[sub] ?? DEFAULT_SUBJECT_MAX
+
+  const isInvalid = (raw: string | undefined, max: number) => {
+    if (raw == null || raw.trim() === '') return false
+    const n = Number(raw)
+    return !Number.isFinite(n) || n < 0 || n > max
+  }
+
+  const invalidCount = useMemo(() => {
+    if (!exam) return 0
+    let n = 0
+    students.forEach((st) =>
+      exam.subjects.forEach((sub) => {
+        if (isInvalid(marks[st.id]?.[sub], exam.subjectMax?.[sub] ?? DEFAULT_SUBJECT_MAX)) n++
+      })
+    )
+    return n
+  }, [exam, students, marks])
 
   const liveRows = useMemo<LiveRow[]>(() => {
     if (!exam) return []
@@ -78,7 +135,16 @@ export default function MarkExamPage() {
       exam.subjects.forEach((sub) => (total += toNumber(m[sub])))
       const average = exam.subjects.length ? total / exam.subjects.length : 0
       const percentage = totalMax ? (total / totalMax) * 100 : 0
-      return { studentId: st.id, studentName: st.name, rollNumber: st.rollNumber, total, average, percentage, rank: 0 }
+      return {
+        studentId: st.id,
+        studentName: st.name,
+        rollNumber: st.rollNumber,
+        inactive: st.inactive,
+        total,
+        average,
+        percentage,
+        rank: 0,
+      }
     })
     const sorted = [...arr].sort((a, b) => b.total - a.total)
     let prevTotal: number | null = null
@@ -103,18 +169,22 @@ export default function MarkExamPage() {
 
   const handleSave = async () => {
     if (!exam || !user) return
+    if (invalidCount > 0) {
+      toast.error(t('invalidToast', { count: invalidCount }))
+      return
+    }
     setSaving(true)
     setError('')
-    setSavedFlash('')
     try {
       const rows: Exam['rows'] = {}
       students.forEach((st) => {
         const m: Record<string, number> = {}
         exam.subjects.forEach((sub) => (m[sub] = toNumber(marks[st.id]?.[sub])))
+        const prev = exam.rows?.[st.id]
         rows[st.id] = {
           studentId: st.id,
-          studentName: st.name,
-          rollNumber: st.rollNumber,
+          studentName: prev && st.inactive ? prev.studentName : st.name,
+          rollNumber: prev && st.inactive ? prev.rollNumber : st.rollNumber,
           marks: m,
           total: 0,
           average: 0,
@@ -134,18 +204,30 @@ export default function MarkExamPage() {
         details: exam.title,
       })
       setExam({ ...computed, status: 'saved', updatedAt: now })
-      setSavedFlash('Results saved successfully.')
+      toast.success(t('savedToast'))
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save results')
+      console.error(err)
+      toast.error(t('saveError'))
     } finally {
       setSaving(false)
     }
   }
 
+  const backLink = (
+    <Link href="/teacher/exams" className={buttonVariants({ variant: 'outline' })}>
+      <ArrowLeft className="rtl:rotate-180" /> {t('backToExams')}
+    </Link>
+  )
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-green-600" />
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <Skeleton className="h-8 w-64 max-w-full" />
+          <Skeleton className="h-4 w-96 max-w-full" />
+        </div>
+        <Skeleton className="h-12 w-full rounded-xl" />
+        <Skeleton className="h-96 w-full rounded-xl" />
       </div>
     )
   }
@@ -154,16 +236,12 @@ export default function MarkExamPage() {
     return (
       <div className="space-y-4">
         <Alert variant="destructive">
-          <AlertDescription>{error || 'Exam not found.'}</AlertDescription>
+          <AlertDescription>{error || t('notFound')}</AlertDescription>
         </Alert>
-        <Button variant="outline" onClick={() => router.push('/teacher/exams')}>
-          <ArrowLeft className="h-4 w-4 mr-2" /> Back to exams
-        </Button>
+        {backLink}
       </div>
     )
   }
-
-  const subjectMax = (sub: string) => exam.subjectMax?.[sub] ?? 100
 
   const classStat = (sub: string) => {
     const vals = liveRows.map((r) => toNumber(marks[r.studentId]?.[sub]))
@@ -172,106 +250,175 @@ export default function MarkExamPage() {
     return { max, average: vals.length ? sum / vals.length : 0 }
   }
 
+  const meta = [
+    tx(examTypeKey(exam.type)),
+    exam.className,
+    exam.section ? tx('sheet.section', { section: exam.section }) : null,
+    tx('sheet.totalMarks', { total: f.int(totalMax) }),
+    tx('sheet.studentCount', { count: students.length }),
+  ].filter(Boolean) as string[]
+
+  const saveButton = (
+    <Button onClick={handleSave} disabled={saving || students.length === 0}>
+      {saving ? <Loader2 className="animate-spin" /> : <Save />}
+      {t('save')}
+    </Button>
+  )
+
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-bold text-gray-900">{exam.title}</h1>
-            {exam.status === 'saved' && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700">
-                <CheckCircle2 className="h-3.5 w-3.5" /> Saved
-              </span>
+      <PageHeader
+        title={
+          <span className="flex flex-wrap items-center gap-3">
+            {exam.title}
+            {exam.status === 'saved' ? (
+              <Badge variant="success">
+                <CheckCircle2 /> {t('saved')}
+              </Badge>
+            ) : (
+              <Badge variant="warning">
+                <PencilLine /> {t('draft')}
+              </Badge>
             )}
-          </div>
-          <p className="text-gray-600 mt-1">
-            {EXAM_TYPE_LABELS[exam.type]} • {exam.className}
-            {exam.section ? ` • Section ${exam.section}` : ''} • Total Marks: {totalMax} • {students.length} students
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => router.push('/teacher/exams')}>
-            <ArrowLeft className="h-4 w-4 mr-2" /> Back
-          </Button>
-          <Button onClick={handleSave} disabled={saving}>
-            {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
-            Save Results
-          </Button>
-        </div>
-      </div>
+          </span>
+        }
+        description={
+          <span className="flex flex-wrap gap-x-2 gap-y-1">
+            {meta.map((m, i) => (
+              <span key={i} className="flex items-center gap-2">
+                {i > 0 && <span aria-hidden="true">·</span>}
+                {m}
+              </span>
+            ))}
+          </span>
+        }
+        actions={
+          <>
+            {backLink}
+            {saveButton}
+          </>
+        }
+      />
 
-      {(error || savedFlash) && (
-        <Alert variant={error ? 'destructive' : 'success'}>
-          <AlertDescription>{error || savedFlash}</AlertDescription>
+      {error && (
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
 
-      <div className="overflow-hidden rounded-xl border border-gray-200 shadow-md">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm border-collapse border border-gray-200 [&_th]:border [&_th]:border-gray-200 [&_td]:border [&_td]:border-gray-200">
+      {students.length === 0 ? (
+        <EmptyState icon={Users} title={t('noStudents')} />
+      ) : (
+        <>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <p className="flex items-start gap-2 text-sm text-muted-foreground">
+              <Info className="mt-0.5 h-4 w-4 shrink-0" />
+              {t('instructions')}
+            </p>
+            {invalidCount > 0 && (
+              <Badge variant="destructive" className="self-start sm:self-auto" role="status">
+                <AlertTriangle /> {t('invalidCount', { count: invalidCount })}
+              </Badge>
+            )}
+          </div>
+
+          <TableContainer className="max-h-[70vh] overflow-y-auto [&_td]:py-2 [&_thead_th]:sticky [&_thead_th]:top-0 [&_thead_th]:z-20 [&_thead_th]:!bg-muted [&_thead_th:first-child]:z-30">
             <thead>
-              <tr className="bg-slate-50 text-left text-slate-600">
-                <th className="px-2 py-2 font-medium">Roll</th>
-                <th className="px-2 py-2 font-medium">Student</th>
+              <tr>
+                <th className={stickyHeadClass}>{tx('table.student')}</th>
                 {exam.subjects.map((sub) => (
-                  <th key={sub} className="px-2 py-2 text-center font-medium">
-                    {sub}
-                    <div className="text-[10px] font-normal text-slate-400">/ {subjectMax(sub)}</div>
-                  </th>
+                  <SubjectHead key={sub} subject={sub} max={subjectMax(sub)} />
                 ))}
-                <th className="px-2 py-2 text-center font-medium">Total</th>
-                <th className="px-2 py-2 text-center font-medium">Avg</th>
-                <th className="px-2 py-2 text-center font-medium">%</th>
-                <th className="px-2 py-2 text-center font-medium">Rank</th>
+                <th className="!text-center">{tx('table.total')}</th>
+                <th className="!text-center">{tx('table.average')}</th>
+                <th className="!text-center">{tx('table.percent')}</th>
+                <th className="!text-center">{tx('table.rank')}</th>
               </tr>
             </thead>
             <tbody>
               {liveRows.map((r) => (
-                <tr key={r.studentId} className="hover:bg-gray-50">
-                  <td className="px-2 py-1.5">{r.rollNumber || '—'}</td>
-                  <td className="px-2 py-1.5 font-medium text-gray-900">{r.studentName}</td>
-                  {exam.subjects.map((sub) => (
-                    <td key={sub} className="px-2 py-1.5">
-                      <Input
-                        type="number"
-                        min={0}
-                        max={subjectMax(sub)}
-                        step={0.5}
-                        value={marks[r.studentId]?.[sub] ?? ''}
-                        onChange={(e) => setMark(r.studentId, sub, e.target.value)}
-                        className="h-8 w-20 mx-auto text-center"
-                        aria-label={`${r.studentName} - ${sub}`}
-                      />
-                    </td>
-                  ))}
-                  <td className="px-2 py-1.5 text-center font-semibold">{fmt(r.total)}</td>
-                  <td className="px-2 py-1.5 text-center">{fmt(r.average)}</td>
-                  <td className="px-2 py-1.5 text-center">{fmt(r.percentage)}%</td>
-                  <td className="px-2 py-1.5 text-center font-semibold">{r.rank}</td>
+                <tr key={r.studentId}>
+                  <td className={stickyCellClass}>
+                    <StudentCell
+                      name={r.studentName}
+                      roll={r.rollNumber}
+                      extra={
+                        r.inactive ? (
+                          <Badge variant="outline" title={t('notActiveHint')}>
+                            {t('notActive')}
+                          </Badge>
+                        ) : undefined
+                      }
+                    />
+                  </td>
+                  {exam.subjects.map((sub) => {
+                    const max = subjectMax(sub)
+                    const raw = marks[r.studentId]?.[sub] ?? ''
+                    const bad = isInvalid(raw, max)
+                    return (
+                      <td key={sub} className="text-center">
+                        <Input
+                          type="number"
+                          inputMode="decimal"
+                          min={0}
+                          max={max}
+                          step={0.5}
+                          value={raw}
+                          onChange={(e) => setMark(r.studentId, sub, e.target.value)}
+                          onFocus={(e) => e.currentTarget.select()}
+                          className={cn(
+                            'mx-auto h-10 w-20 text-center tabular-nums',
+                            bad && 'border-destructive bg-destructive/10 text-destructive focus-visible:ring-destructive'
+                          )}
+                          aria-label={t('markFor', { subject: sub, name: r.studentName })}
+                          aria-invalid={bad || undefined}
+                          title={bad ? t('rangeError', { max }) : t('rangeHint', { max })}
+                        />
+                      </td>
+                    )
+                  })}
+                  <td className="text-center font-semibold tabular-nums">{f.num(r.total)}</td>
+                  <td className="text-center tabular-nums">{f.avg(r.average)}</td>
+                  <td className="text-center tabular-nums">{f.pct(r.percentage)}</td>
+                  <td className="text-center font-semibold tabular-nums">{f.int(r.rank)}</td>
                 </tr>
               ))}
             </tbody>
             <tfoot>
-              <tr className="bg-slate-50 text-xs text-slate-600">
-                <td colSpan={2} className="px-2 py-1 font-semibold">Class Average</td>
+              <tr className="border-t bg-muted/40 text-xs text-muted-foreground">
+                <td className={cn(stickyCellClass, '!bg-muted font-semibold text-foreground')}>
+                  {tx('table.classAverage')}
+                </td>
                 {exam.subjects.map((sub) => (
-                  <td key={sub} className="px-2 py-1 text-center">{fmt(classStat(sub).average)}</td>
+                  <td key={sub} className="text-center tabular-nums">
+                    {f.avg(classStat(sub).average)}
+                  </td>
                 ))}
-                <td className="px-2 py-1 text-center">{fmt(liveRows.reduce((s, r) => s + r.total, 0) / (liveRows.length || 1))}</td>
+                <td className="text-center tabular-nums">
+                  {f.avg(liveRows.reduce((s, r) => s + r.total, 0) / (liveRows.length || 1))}
+                </td>
                 <td colSpan={3}></td>
               </tr>
-              <tr className="bg-slate-50 text-xs text-slate-600">
-                <td colSpan={2} className="px-2 py-1 font-semibold">Highest</td>
+              <tr className="border-t bg-muted/40 text-xs text-muted-foreground">
+                <td className={cn(stickyCellClass, '!bg-muted font-semibold text-foreground')}>
+                  {tx('table.highest')}
+                </td>
                 {exam.subjects.map((sub) => (
-                  <td key={sub} className="px-2 py-1 text-center">{fmt(classStat(sub).max, 0)}</td>
+                  <td key={sub} className="text-center tabular-nums">
+                    {f.num(classStat(sub).max)}
+                  </td>
                 ))}
-                <td className="px-2 py-1 text-center">{liveRows.length ? fmt(Math.max(...liveRows.map((r) => r.total))) : '—'}</td>
+                <td className="text-center tabular-nums">
+                  {liveRows.length ? f.num(Math.max(...liveRows.map((r) => r.total))) : '—'}
+                </td>
                 <td colSpan={3}></td>
               </tr>
             </tfoot>
-          </table>
-        </div>
-      </div>
+          </TableContainer>
+
+          <div className="flex justify-end">{saveButton}</div>
+        </>
+      )}
     </div>
   )
 }

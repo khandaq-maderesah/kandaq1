@@ -1,0 +1,55 @@
+{
+  "nav": {
+    "signIn": "Seeni"
+  },
+  "hero": {
+    "eyebrow": "Waltajjii bulchiinsa mana barumsaa",
+    "title": "Mana barumsaa keessan guutuu bakka tokkoo bulchaa",
+    "subtitle": "Khendeq manneen barumsaa argama akka galmeessan, barattootaa fi barsiisota akka bulchan, qormaata akka geggeessan fi maatii akka beeksisan, afaan isin filattaniin gargaara.",
+    "cta": "Seeni",
+    "secondary": "Waan keessatti argamu ilaali"
+  },
+  "features": {
+    "title": "Wanta mana barumsaaf barbaachisu hunda",
+    "subtitle": "Meeshaalee salphaa bulchitootaa fi barsiisotaaf, bilbila kamiin iyyuu akka gaariitti akka hojjetaniif qophaa'an.",
+    "attendance": {
+      "title": "Argama guyyaa guyyaa",
+      "description": "Barsiisonni argame, hafe ykn booda dhufe sekondii muraasa keessatti mallatteessu. Bulchitoonni haala guutuu battalumatti argu."
+    },
+    "students": {
+      "title": "Galmee barattootaa",
+      "description": "Kutaa, suuraa fi odeeffannoo quunnamtii maatii barataa hundaa bakka tokkotti sirnaan qabadhaa."
+    },
+    "exams": {
+      "title": "Qormaata fi bu'aa",
+      "description": "Qormaata uumaa, qabxii galchaa fi waraqaa bu'aa ifa ta'e kutaa tokkoon tokkoof maxxansaa."
+    },
+    "parents": {
+      "title": "Hordoffii maatii",
+      "description": "Barattoonni irra deddeebiin hafan ofumaan ni mallatteeffamu; lakkoofsi bilbila maatii isaanii bilbiluuf qophaa'ee jira."
+    },
+    "reports": {
+      "title": "Gabaasota",
+      "description": "Chaartiin adeemsa argamaa, qabxii fi baay'ina kutaalee rakkoo dafanii akka adda baastan isin gargaara."
+    },
+    "languages": {
+      "title": "Manneen barumsaa hedduu, afaanota hedduu",
+      "description": "Manni barumsaa tokkoon tokkoon bakka dhuunfaa mataa isaa qaba; fayyadamaan hundi immoo afaan mataa isaa filachuu danda'a."
+    }
+  },
+  "footer": {
+    "copyright": "© {year} Khendeq. Mirgi hundi seeraan kan eegame dha."
+  },
+  "errorPage": {
+    "title": "Rakkoon uumameera",
+    "description": "Dogoggorri hin eegamne uumameera. Maaloo irra deebi'aa yaalaa.",
+    "retry": "Irra deebi'ii yaali",
+    "home": "Gara fuula duraatti deebi'i"
+  },
+  "notFound": {
+    "code": "404",
+    "title": "Fuulli hin argamne",
+    "description": "Dhiifama, fuulli isin barbaaddan hin jiru ykn bakka biraatti ce'eera.",
+    "home": "Gara fuula duraatti deebi'i"
+  }
+}

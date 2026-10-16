@@ -1,0 +1,46 @@
+{
+  "title": "መገኘት መዝግብ",
+  "description": "ዛሬ የተገኙትን ምልክት አድርገው ያስቀምጡ።",
+  "filters": {
+    "class": "ክፍል",
+    "classPlaceholder": "ክፍል ይምረጡ",
+    "date": "ቀን"
+  },
+  "status": {
+    "present": "የተገኘ",
+    "absent": "ቀሪ",
+    "late": "ያረፈደ",
+    "excused": "በፈቃድ",
+    "unmarked": "ያልተመዘገበ"
+  },
+  "markAll": {
+    "label": "ለሁሉም ምልክት አድርግ",
+    "present": "ሁሉም ተገኝተዋል",
+    "absent": "ሁሉም ቀሪ",
+    "excused": "ሁሉም በፈቃድ",
+    "clear": "ሁሉንም አጽዳ"
+  },
+  "list": {
+    "title": "ተማሪዎች",
+    "statusGroup": "የ{name} መገኘት"
+  },
+  "saveBar": {
+    "progress": "ከ{total} ውስጥ {marked} ተመዝግበዋል",
+    "unsaved": "ያልተቀመጡ ለውጦች አሉ",
+    "allSaved": "ሁሉም ለውጦች ተቀምጠዋል",
+    "save": "መገኘት አስቀምጥ"
+  },
+  "empty": {
+    "noClasses": "እስካሁን ምንም ክፍል አልተመደበልዎትም።",
+    "noClassesHint": "ክፍል እንዲመድብልዎ የትምህርት ቤቱን አስተዳዳሪ ይጠይቁ።",
+    "noStudents": "በዚህ ክፍል ውስጥ ተማሪ የለም።",
+    "noStudentsHint": "ተማሪዎችን ከ«የእኔ ክፍሎች» ገጽ ይጨምሩ።"
+  },
+  "toast": {
+    "saved": "መገኘት ተመዝግቧል።",
+    "nothingToSave": "ከማስቀመጥዎ በፊት ቢያንስ አንድ ተማሪ ምልክት ያድርጉ።",
+    "loadClassesFailed": "ክፍሎችዎን መጫን አልተቻለም።",
+    "loadStudentsFailed": "ተማሪዎቹን መጫን አልተቻለም።",
+    "saveFailed": "መገኘትን ማስቀመጥ አልተቻለም። እባክዎ እንደገና ይሞክሩ።"
+  }
+}

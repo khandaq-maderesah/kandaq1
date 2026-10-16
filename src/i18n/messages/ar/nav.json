@@ -1,0 +1,30 @@
+{
+  "dashboard": "لوحة التحكم",
+  "schools": "المدارس",
+  "allSchools": "جميع المدارس",
+  "users": "المستخدمون",
+  "teachers": "المعلّمون",
+  "classes": "الفصول",
+  "students": "الطلاب",
+  "attendance": "الحضور والغياب",
+  "takeAttendance": "تسجيل الحضور",
+  "history": "السجل",
+  "results": "النتائج",
+  "exams": "الامتحانات والنتائج",
+  "reports": "التقارير",
+  "requests": "الطلبات",
+  "myRequests": "طلباتي",
+  "settings": "الإعدادات",
+  "profile": "الملف الشخصي",
+  "signOut": "تسجيل الخروج",
+  "openMenu": "فتح القائمة",
+  "closeMenu": "إغلاق القائمة",
+  "notifications": "الإشعارات",
+  "switchSchool": "تبديل المدرسة",
+  "sections": {
+    "overview": "نظرة عامة",
+    "people": "الأفراد",
+    "academics": "الشؤون الأكاديمية",
+    "administration": "الإدارة"
+  }
+}

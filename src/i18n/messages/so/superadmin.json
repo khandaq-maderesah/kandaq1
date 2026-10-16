@@ -1,0 +1,60 @@
+{
+  "title": "Dugsiyada",
+  "description": "Samee dugsiyo, mid kasta u magacaw maamule, oo fur dugsi kasta si aad u maamusho.",
+  "newSchool": "Dugsi cusub",
+  "stats": {
+    "total": "Dugsiyada",
+    "active": "Firfircoon",
+    "suspended": "La hakiyay",
+    "users": "Isticmaalayaasha"
+  },
+  "empty": {
+    "title": "Weli dugsi ma jiro",
+    "description": "Samee dugsiga ugu horreeya si aad u bilowdo."
+  },
+  "card": {
+    "noContact": "Xog xiriir ma jirto",
+    "admins": "{count, plural, =0 {Maamule ma jiro} one {# maamule} other {# maamule}}",
+    "teachers": "{count, plural, =0 {Macallin ma jiro} one {# macallin} other {# macallin}}",
+    "noAdminYet": "Dugsigan weli maamule ma laha.",
+    "open": "Fur",
+    "addAdmin": "Ku dar maamule",
+    "suspend": "Hakii",
+    "reactivate": "Dib u hawlgeli"
+  },
+  "create": {
+    "title": "Dugsi cusub",
+    "description": "Dugsigu wuxuu ku bilaabmayaa isagoo madhan. Kadib maamulihiisa ayaa ku dari doona fasallada, macallimiinta iyo ardayda.",
+    "name": "Magaca dugsiga",
+    "namePlaceholder": "Tusaale: Khendeq Medresah",
+    "nameAm": "Magaca oo Amxaari ah (SMS-ka)",
+    "address": "Cinwaanka",
+    "phone": "Lambarka taleefanka",
+    "timezone": "Aagga waqtiga",
+    "submit": "Samee dugsiga",
+    "created": "{name} waa la sameeyay. Hadda ku dar akoonka maamulihiisa.",
+    "failed": "Dugsiga lama samayn karin. Fadlan isku day mar kale."
+  },
+  "admin": {
+    "title": "Maamule cusub oo loogu talagalay {school}",
+    "description": "Maamuluhu wuxuu ku gali doonaa iimaylkan iyo furahan sirta ah ee ku meel gaarka ah, goor dambena wuu beddeli karaa furaha sirta.",
+    "fullName": "Magaca oo buuxa",
+    "email": "Iimayl",
+    "phone": "Lambarka taleefanka",
+    "password": "Furaha sirta ku meel gaarka ah",
+    "passwordHint": "Ugu yaraan 6 xaraf",
+    "submit": "Samee maamule",
+    "created": "Akoon maamule ayaa loo sameeyay {email}.",
+    "failed": "Akoonka maamulaha lama samayn karin."
+  },
+  "suspend": {
+    "title": "Ma hakinaysaa {name}?",
+    "description": "Maamulayaasha iyo macallimiinta dugsigan ma geli karaan ilaa aad dib u hawlgeliso.",
+    "confirm": "Hakii dugsiga"
+  },
+  "toast": {
+    "suspended": "{name} waa la hakiyay.",
+    "reactivated": "{name} dib ayaa loo hawlgeliyay.",
+    "updateFailed": "Dugsiga lama cusboonaysiin karin. Fadlan isku day mar kale."
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "absence": {
+    "label": "የቀሪ ማሳወቂያዎች",
+    "title": "የቀሪ ማሳወቂያዎች",
+    "description": "በተከታታይ {streak} ቀን ወይም ከዚያ በላይ የቀሩ ተማሪዎች",
+    "scopeLabel": "የሚታዩ ማሳወቂያዎች",
+    "scopeAll": "ሁሉም ክፍሎች",
+    "scopeMine": "የእኔ ክፍሎች",
+    "empty": "በተከታታይ {streak} ቀን የቀረ ተማሪ የለም።",
+    "classWithSection": "{className} · ሴክሽን {section}",
+    "streak": "{count, plural, one {# ቀን ቀሪ} other {# ቀናት ቀሪ}}",
+    "call": "ደውል",
+    "callParent": "ለ{name} ወላጅ ደውል",
+    "select": "ምረጥ፦ {name}",
+    "dismiss": "እንደተደወለ ምልክት አድርግና አስወግድ ({count})",
+    "dismissed": "{count, plural, one {ማሳወቂያው ተወግዷል።} other {# ማሳወቂያዎች ተወግደዋል።}}",
+    "dismissFailed": "ማሳወቂያውን ማስወገድ አልተቻለም። እባክዎ እንደገና ይሞክሩ።"
+  },
+  "reminders": {
+    "label": "የመገኘት አስታዋሾች",
+    "title": "የመገኘት አስታዋሾች",
+    "description": "መገኘት ያልተመዘገበባቸው ክፍሎች",
+    "emptyAdmin": "እስካሁን የሁሉም ክፍሎች መገኘት ተመዝግቧል።",
+    "emptyTeacher": "የሁሉንም ክፍሎችዎን መገኘት መዝግበዋል።",
+    "adminLine": "{teacher} የዛሬውን መገኘት እስካሁን አልመዘገቡም።",
+    "teacherLine": "እባክዎ የዛሬውን መገኘት ይመዝግቡ። እስካሁን አልተመዘገበም።",
+    "markResolved": "እንደተጠናቀቀ ምልክት አድርግ",
+    "resolved": "አስታዋሹ ተዘግቷል።",
+    "resolveFailed": "አስታዋሹን መዝጋት አልተቻለም። እባክዎ እንደገና ይሞክሩ።"
+  },
+  "announcements": {
+    "label": "ማስታወቂያዎች",
+    "title": "ማስታወቂያዎች",
+    "empty": "እስካሁን ለእርስዎ ምንም ማስታወቂያ የለም።",
+    "count": "{count, plural, =0 {ማስታወቂያ የለም} one {# ማስታወቂያ} other {# ማስታወቂያዎች}}",
+    "postedBy": "ያወጣው፦ {name}",
+    "openAttachment": "ክፈት፦ {name}",
+    "audience": {
+      "label": "ማን ማየት ይችላል",
+      "everyone": "ሁሉም",
+      "teachers": "መምህራን ብቻ",
+      "admins": "አስተዳዳሪዎች ብቻ"
+    },
+    "form": {
+      "heading": "አዲስ ማስታወቂያ",
+      "title": "ርዕስ",
+      "titlePlaceholder": "የማስታወቂያው ርዕስ",
+      "message": "መልእክት",
+      "messagePlaceholder": "መልእክቱን ይጻፉ…",
+      "attachments": "የተያያዙ ፋይሎች",
+      "removeAttachment": "አስወግድ፦ {name}",
+      "addFile": "ፋይል ጨምር",
+      "publish": "ይፋ አድርግ",
+      "missingFields": "እባክዎ ርዕስና መልእክት ሁለቱንም ያስገቡ።"
+    },
+    "toast": {
+      "published": "ማስታወቂያው ይፋ ሆኗል።",
+      "publishFailed": "ማስታወቂያውን ይፋ ማድረግ አልተቻለም። እባክዎ እንደገና ይሞክሩ።",
+      "filesAdded": "{count, plural, one {ፋይሉ ወደ ማስታወቂያው ተጨምሯል።} other {# ፋይሎች ወደ ማስታወቂያው ተጨምረዋል።}}",
+      "uploadFailed": "ፋይሉን መስቀል አልተቻለም። እባክዎ እንደገና ይሞክሩ።",
+      "deleted": "ማስታወቂያው ተሰርዟል።",
+      "deleteFailed": "ማስታወቂያውን መሰረዝ አልተቻለም። እባክዎ እንደገና ይሞክሩ።"
+    },
+    "delete": {
+      "action": "ማስታወቂያ ሰርዝ",
+      "title": "ይህ ማስታወቂያ ይሰረዝ?",
+      "description": "«{title}» ለሁሉም ሰው ይወገዳል። ይህ ተግባር ሊቀለበስ አይችልም።"
+    }
+  },
+  "install": {
+    "title": "Khendeq መተግበሪያን ይጫኑ",
+    "descriptionIos": "Khendeq እንደ መተግበሪያ እንዲጠቀሙበት ወደ መነሻ ገጽዎ ያክሉት።",
+    "description": "በፍጥነት ለመክፈትና ያለ ኢንተርኔት ለመጠቀም መተግበሪያውን በመሣሪያዎ ላይ ይጫኑ።",
+    "install": "መተግበሪያውን ጫን",
+    "notNow": "አሁን አይደለም",
+    "dismiss": "ዝጋ",
+    "iosHowTo": "ወደ መነሻ ገጽ እንዴት እንደሚጨመር",
+    "iosStep1": "በSafari ውስጥ የ«Share» ቁልፍን ይንኩ።",
+    "iosStep2": "ወደ ታች ይውረዱና «Add to Home Screen»ን ይንኩ።",
+    "iosStep3": "«Add»ን ይንኩ። Khendeq በመነሻ ገጽዎ ላይ ይታያል።"
+  }
+}

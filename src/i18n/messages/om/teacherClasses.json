@@ -1,0 +1,58 @@
+{
+  "title": "Kutaalee koo",
+  "description": "Kutaalee keessanii fi barattoota isaanii. Barattoota haaraa dabalaa ykn odeeffannoo isaanii haaromsaa.",
+  "classCard": {
+    "grade": "Kutaa {grade}",
+    "section": "Garee {section}",
+    "select": "Barattoota {name} agarsiisi",
+    "selected": "Filatame"
+  },
+  "registrationClosed": "Galmeen barattootaa cufameera. Garuu barattoota jiran gulaaluu ni dandeessu.",
+  "form": {
+    "addTitle": "Barataa dabali",
+    "addDescription": "Lakkoofsi tartiibaa kutaa tokkoon tokkoof ofumaan yaadame.",
+    "editTitle": "{name} gulaali",
+    "editDescription": "Iddoowwan isin jijjiirtan qofatu haaromfama.",
+    "class": "Kutaa",
+    "classLocked": "Barataa kana gara kutaa biraatti dabarsuuf, tarree barattootaa keessatti \"Dabarsuuf gaafadhu\" fayyadamaa.",
+    "name": "Maqaa barataa",
+    "namePlaceholder": "Maqaa guutuu",
+    "gender": "Saala",
+    "genderPlaceholder": "Saala filadhaa",
+    "age": "Umurii",
+    "agePlaceholder": "Fkn. 10",
+    "parentLanguage": "Afaan maatii",
+    "parentLanguagePlaceholder": "Afaan filadhaa",
+    "parentPhone": "Bilbila maatii",
+    "alternativePhone": "Bilbila biraa (dirqama miti)",
+    "phonePlaceholder": "09XX XXX XXX",
+    "rollNumber": "Lakkoofsa tartiibaa",
+    "rollTaken": "Lakkoofsi tartiibaa kun kutaa kana keessatti duraanuu qabameera.",
+    "rollHint": "Kan yaadame: {roll}. Tartiiba lakkoofsotaa jijjiiruuf isa jijjiiruu ni dandeessu.",
+    "photo": "Suuraa barataa",
+    "submitAdd": "Barataa dabali",
+    "submitEdit": "Jijjiirama olkaa'i",
+    "cancelEdit": "Gulaaluu dhiisi"
+  },
+  "list": {
+    "title": "Barattoota {name}",
+    "description": "Barataa haaromsuuf \"Gulaali\" tuqaa. Barataa haquuf ykn dabarsuuf baafata gochaalee fayyadamaa.",
+    "roll": "Lakk. {roll}",
+    "age": "{age, plural, one {Waggaa #} other {Waggaa #}}",
+    "edit": "{name} gulaali",
+    "empty": "Ammaaf kutaa kana keessa barataan hin jiru.",
+    "emptyHint": "Barataa jalqabaa unka kanaan dabalaa."
+  },
+  "empty": {
+    "noClasses": "Hanga ammaatti kutaan isinitti kenname hin jiru.",
+    "noClassesHint": "Akka kutaan isiniif kennamu bulchaa mana barumsaa gaafadhaa."
+  },
+  "toast": {
+    "loadFailed": "Kutaalee keessan fe'uun hin danda'amne.",
+    "added": "Galmeen {name} lakkoofsa tartiibaa {roll}n dabalameera.",
+    "updated": "Odeeffannoon {name} haaromfameera.",
+    "saveFailed": "Barataa olkaa'uun hin danda'amne. Maaloo irra deebi'aa yaalaa.",
+    "registrationClosed": "Galmeen barattootaa cufameera. Bulchaan mana barumsaa Qindaa'ina keessatti banuu qaba.",
+    "rollTaken": "Lakkoofsi tartiibaa {roll} kutaa kana keessatti duraanuu qabameera."
+  }
+}

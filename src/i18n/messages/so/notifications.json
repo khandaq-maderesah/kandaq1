@@ -1,0 +1,82 @@
+{
+  "absence": {
+    "label": "Digniinta maqnaanshaha",
+    "title": "Digniinta maqnaanshaha",
+    "description": "Ardayda maqnaa {streak} maalmood ama ka badan oo isku xiga",
+    "scopeLabel": "Tus digniinaha",
+    "scopeAll": "Dhammaan fasallada",
+    "scopeMine": "Fasalladayda",
+    "empty": "Ma jiro arday gaaray {streak} maalmood oo maqnaansho ah oo isku xiga.",
+    "classWithSection": "{className} · Qaybta {section}",
+    "streak": "{count, plural, one {# maalin oo maqan} other {# maalmood oo maqan}}",
+    "call": "Wac",
+    "callParent": "Wac waalidka {name}",
+    "select": "Dooro {name}",
+    "dismiss": "Calaamadee in la la xiriiray oo xir ({count})",
+    "dismissed": "{count, plural, one {Digniinta waa la xiray.} other {# digniin ayaa la xiray.}}",
+    "dismissFailed": "Digniinta lama xiri karin. Fadlan isku day mar kale."
+  },
+  "reminders": {
+    "label": "Xusuusinta xaadiriska",
+    "title": "Xusuusinta xaadiriska",
+    "description": "Fasallada aan xaadiriska laga qaadin",
+    "emptyAdmin": "Dhammaan fasallada xaadiriska waa laga qaaday ilaa hadda.",
+    "emptyTeacher": "Xaadiriska waad ka qaadday dhammaan fasalladaada.",
+    "adminLine": "Macallin {teacher} weli ma qaadin xaadiriska maanta.",
+    "teacherLine": "Fadlan qaado xaadiriska maanta. Weli lama qaadin.",
+    "markResolved": "Calaamadee in la xalliyay",
+    "resolved": "Xusuusinta waa la xalliyay.",
+    "resolveFailed": "Xusuusinta lama xallin karin. Fadlan isku day mar kale."
+  },
+  "announcements": {
+    "label": "Wargelinta",
+    "title": "Wargelinta",
+    "empty": "Weli wargelin laguuma soo dirin.",
+    "count": "{count, plural, =0 {Wargelin ma jirto} one {# wargelin} other {# wargelin}}",
+    "postedBy": "Waxaa daabacay {name}",
+    "openAttachment": "Fur {name}",
+    "audience": {
+      "label": "Yaa arki kara",
+      "everyone": "Qof walba",
+      "teachers": "Macallimiinta oo keliya",
+      "admins": "Maamulayaasha oo keliya"
+    },
+    "form": {
+      "heading": "Wargelin cusub",
+      "title": "Ciwaanka",
+      "titlePlaceholder": "Ciwaanka wargelinta",
+      "message": "Fariinta",
+      "messagePlaceholder": "Qor fariinta…",
+      "attachments": "Faylasha ku lifaaqan",
+      "removeAttachment": "Ka saar {name}",
+      "addFile": "Ku dar fayl",
+      "publish": "Daabac",
+      "missingFields": "Fadlan ku dar ciwaan iyo fariin labadaba."
+    },
+    "toast": {
+      "published": "Wargelinta waa la daabacay.",
+      "publishFailed": "Wargelinta lama daabici karin. Fadlan isku day mar kale.",
+      "filesAdded": "{count, plural, one {Fayl ayaa lagu daray wargelinta.} other {# fayl ayaa lagu daray wargelinta.}}",
+      "uploadFailed": "Faylka lama soo gelin karin. Fadlan isku day mar kale.",
+      "deleted": "Wargelinta waa la tirtiray.",
+      "deleteFailed": "Wargelinta lama tirtiri karin. Fadlan isku day mar kale."
+    },
+    "delete": {
+      "action": "Tirtir wargelinta",
+      "title": "Ma tirtiraysaa wargelintan?",
+      "description": "“{title}” waa laga saari doonaa qof walba. Dib looma soo celin karo."
+    }
+  },
+  "install": {
+    "title": "Ku rakib Khendeq",
+    "descriptionIos": "Ku dar Khendeq shaashadda hore si aad ugu isticmaasho sida app oo kale.",
+    "description": "Ku rakib app-ka qalabkaaga si aad si degdeg ah ugu gasho, internet la'aanna ugu isticmaasho.",
+    "install": "Ku rakib app-ka",
+    "notNow": "Hadda maya",
+    "dismiss": "Xir",
+    "iosHowTo": "Sida loogu daro shaashadda hore",
+    "iosStep1": "Safari gudihiisa, taabo badhanka Share.",
+    "iosStep2": "Hoos u dhaadhac oo taabo “Add to Home Screen”.",
+    "iosStep3": "Taabo “Add”. Khendeq wuxuu ka soo muuqan doonaa shaashaddaada hore."
+  }
+}

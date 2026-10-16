@@ -1,53 +1,80 @@
 /**
- * Convert a Firebase Authentication error into a friendly, actionable message.
+ * Convert a Firebase Authentication (or app-level sign-in) error into a
+ * translation key under `auth.errors.*`.
  *
  * The raw SDK errors (e.g. "Firebase: Error (auth/network-request-failed).")
- * are cryptic and don't tell the user what to do next. Dashboard/sign-in pages
- * should surface these human-readable messages instead.
+ * are cryptic and don't tell the user what to do next. Screens translate the
+ * returned key instead:
+ *
+ *   const err = getAuthErrorKey(error)
+ *   t(`errors.${err.key}`, { code: err.code })   // with useTranslations('auth')
  */
-export function getAuthErrorMessage(error: unknown): string {
-  const code = getErrorCode(error)
+export type AuthErrorKey =
+  | 'invalidEmail'
+  | 'invalidCredential'
+  | 'userDisabled'
+  | 'tooManyRequests'
+  | 'emailInUse'
+  | 'weakPassword'
+  | 'network'
+  | 'unauthorizedDomain'
+  | 'configuration'
+  | 'accountInactive'
+  | 'schoolSuspended'
+  | 'noSchool'
+  | 'unknownWithCode'
+  | 'unknown'
 
+export interface AuthErrorInfo {
+  /** Key under `auth.errors`. */
+  key: AuthErrorKey
+  /** The raw error code (may be empty). Used by `unknownWithCode`. */
+  code: string
+}
+
+export function getAuthErrorKey(error: unknown): AuthErrorInfo {
+  const code = getErrorCode(error)
+  return { key: keyForCode(code), code }
+}
+
+/** @deprecated Use getAuthErrorKey — kept as an alias for older callers. */
+export const getAuthErrorMessage = getAuthErrorKey
+
+function keyForCode(code: string): AuthErrorKey {
   switch (code) {
     case 'auth/invalid-email':
-      return 'Please enter a valid email address.'
+      return 'invalidEmail'
     case 'auth/invalid-credential':
     case 'auth/user-not-found':
     case 'auth/wrong-password':
-      return 'Incorrect email or password. Please try again.'
+      return 'invalidCredential'
     case 'auth/user-disabled':
-      return 'This account has been disabled. Please contact the administrator.'
+      return 'userDisabled'
     case 'auth/too-many-requests':
-      return 'Too many failed attempts. Please wait a few minutes and try again.'
+      return 'tooManyRequests'
     case 'auth/email-already-in-use':
-      return 'An account with this email already exists.'
+      return 'emailInUse'
     case 'auth/weak-password':
-      return 'Password must be at least 6 characters.'
+      return 'weakPassword'
     case 'auth/network-request-failed':
     case 'auth/internal-error':
-      return (
-        'Check your internet connection, ' +
-        'disable any ad-blocker, VPN, or proxy, and try again.'
-      )
+      return 'network'
     case 'auth/unauthorized-domain':
-      return 'This domain is not authorized to sign in. Add it under ' +
-        'Firebase Console > Authentication > Settings > Authorized domains.'
+      return 'unauthorizedDomain'
+    // Deployment problems (invalid API key, sign-in method disabled). Details
+    // are logged by the caller; users only need to know whom to contact.
     case 'auth/api-key-not-valid':
-      return 'The Firebase API key is invalid. Check your .env.local configuration.'
+    case 'auth/invalid-api-key':
     case 'auth/operation-not-allowed':
-      return 'Email/password sign-in is not enabled for this project. ' +
-        'Enable it in Firebase Console > Authentication > Sign-in method.'
+      return 'configuration'
     case 'app/account-inactive':
-      return 'This account has been deactivated. Please contact your school administrator.'
+      return 'accountInactive'
     case 'app/school-suspended':
-      return "Your school's account is suspended. Please contact the platform administrator."
+      return 'schoolSuspended'
     case 'app/no-school':
-      return 'This account is not linked to a school. Please contact the platform administrator.'
+      return 'noSchool'
     default:
-      if (code) {
-        return `Login failed (${code}). Please try again.`
-      }
-      return 'Login failed. Please try again.'
+      return code ? 'unknownWithCode' : 'unknown'
   }
 }
 

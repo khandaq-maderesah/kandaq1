@@ -1,0 +1,60 @@
+{
+  "title": "Manneen barumsaa",
+  "description": "Manneen barumsaa uumaa, tokkoon tokkoon isaaniitiif bulchaa kennaa, akkasumas bulchuuf mana barumsaa kamiyyuu banaa.",
+  "newSchool": "Mana barumsaa haaraa",
+  "stats": {
+    "total": "Manneen barumsaa",
+    "active": "Hojii irra",
+    "suspended": "Dhorkame",
+    "users": "Fayyadamtoota"
+  },
+  "empty": {
+    "title": "Ammaaf manni barumsaa hin jiru",
+    "description": "Jalqabuuf mana barumsaa jalqabaa uumaa."
+  },
+  "card": {
+    "noContact": "Odeeffannoo quunnamtii hin qabu",
+    "admins": "{count, plural, =0 {Bulchaan hin jiru} one {Bulchaa tokko} other {Bulchitoota #}}",
+    "teachers": "{count, plural, =0 {Barsiisaan hin jiru} one {Barsiisaa tokko} other {Barsiisota #}}",
+    "noAdminYet": "Manni barumsaa kun ammaaf bulchaa hin qabu.",
+    "open": "Bani",
+    "addAdmin": "Bulchaa dabali",
+    "suspend": "Dhorki",
+    "reactivate": "Deebisii hojiirra oolchi"
+  },
+  "create": {
+    "title": "Mana barumsaa haaraa",
+    "description": "Manni barumsaa duwwaa jalqaba. Achii bulchaan isaa kutaalee, barsiisotaa fi barattoota dabala.",
+    "name": "Maqaa mana barumsaa",
+    "namePlaceholder": "Fkn. Khendeq Medresah",
+    "nameAm": "Maqaa Afaan Amaaraatiin (SMS'f)",
+    "address": "Teessoo",
+    "phone": "Lakk. bilbilaa",
+    "timezone": "Naannoo yeroo",
+    "submit": "Mana barumsaa uumi",
+    "created": "Manni barumsaa {name} uumameera. Amma herrega bulchaa isaa dabalaa.",
+    "failed": "Mana barumsaa uumuun hin danda'amne. Maaloo irra deebi'aa yaalaa."
+  },
+  "admin": {
+    "title": "Bulchaa haaraa {school}f",
+    "description": "Bulchaan imeelii fi jecha icciitii yeroo kanaan seena; booda jecha icciitii jijjiiruu ni danda'a.",
+    "fullName": "Maqaa guutuu",
+    "email": "Imeelii",
+    "phone": "Lakk. bilbilaa",
+    "password": "Jecha icciitii yeroo",
+    "passwordHint": "Yoo xiqqaate qubee 6",
+    "submit": "Bulchaa uumi",
+    "created": "Herregni bulchaa {email}f uumameera.",
+    "failed": "Herrega bulchaa uumuun hin danda'amne."
+  },
+  "suspend": {
+    "title": "Mana barumsaa {name} dhorkitu?",
+    "description": "Hanga isin deebiftanii hojiirra oolchitanitti bulchitoonni fi barsiisonni isaa seenuu hin danda'an.",
+    "confirm": "Mana barumsaa dhorki"
+  },
+  "toast": {
+    "suspended": "Manni barumsaa {name} dhorkameera.",
+    "reactivated": "Manni barumsaa {name} deebi'ee hojiirra ooleera.",
+    "updateFailed": "Mana barumsaa haaromsuun hin danda'amne. Maaloo irra deebi'aa yaalaa."
+  }
+}

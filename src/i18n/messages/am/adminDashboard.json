@@ -1,0 +1,134 @@
+{
+  "title": "ዳሽቦርድ",
+  "description": "የተማሪዎች፣ የመምህራን እና የመገኘት አጠቃላይ እይታ",
+  "todayDate": "{gregorian} · {ethiopian}",
+  "kpi": {
+    "totalStudents": "ጠቅላላ ተማሪዎች",
+    "totalHint": "ወንድ {male} · ሴት {female}",
+    "maleStudents": "ወንድ ተማሪዎች",
+    "femaleStudents": "ሴት ተማሪዎች",
+    "percentOfTotal": "ከሁሉም ተማሪዎች {percent}%",
+    "teachers": "መምህራን",
+    "classes": "ክፍሎች",
+    "absentToday": "ዛሬ ቀሪ",
+    "absentWeekHint": "{count, plural, =0 {ባለፉት 7 ቀናት ምንም} one {ባለፉት 7 ቀናት #} other {ባለፉት 7 ቀናት #}}"
+  },
+  "students": {
+    "title": "ተማሪዎች",
+    "titleMale": "ወንድ ተማሪዎች",
+    "titleFemale": "ሴት ተማሪዎች",
+    "description": "ሙሉ መረጃውን ለማየት ተማሪ ይምረጡ።",
+    "searchPlaceholder": "በስም፣ በተራ ቁጥር ወይም በስልክ ይፈልጉ",
+    "searchLabel": "ተማሪዎችን ፈልግ",
+    "empty": "ምንም ተማሪ አልተገኘም",
+    "table": {
+      "photo": "ፎቶ",
+      "name": "ስም",
+      "roll": "ተ.ቁ.",
+      "age": "ዕድሜ",
+      "class": "ክፍል",
+      "section": "ሴክሽን",
+      "parentPhone": "የወላጅ ስልክ"
+    }
+  },
+  "teachers": {
+    "title": "መምህራን",
+    "description": "ሁሉም የመምህራን መለያዎች።",
+    "searchPlaceholder": "በስም፣ በኢሜይል ወይም በስልክ ይፈልጉ",
+    "searchLabel": "መምህራንን ፈልግ",
+    "empty": "ምንም መምህር አልተገኘም",
+    "table": {
+      "name": "ስም",
+      "email": "ኢሜይል",
+      "phone": "ስልክ",
+      "classes": "የተመደቡ ክፍሎች",
+      "status": "ሁኔታ"
+    }
+  },
+  "classes": {
+    "title": "ክፍሎች",
+    "description": "ሁሉም ክፍሎች እና የተመደቡላቸው መምህራን።",
+    "searchPlaceholder": "ክፍል ወይም መምህር ይፈልጉ",
+    "searchLabel": "ክፍሎችን ፈልግ",
+    "empty": "ምንም ክፍል አልተገኘም",
+    "table": {
+      "class": "ክፍል",
+      "grade": "ደረጃ",
+      "section": "ሴክሽን",
+      "teacher": "መምህር",
+      "students": "ተማሪዎች",
+      "academicYear": "የትምህርት ዘመን"
+    }
+  },
+  "absent": {
+    "title": "ቀሪ ተማሪዎች",
+    "descriptionDay": "በ{date} የቀሩ ተማሪዎች ከወላጆቻቸው ስልክ ጋር። ቀደም ያሉ ቀሪዎችን ለማየት ሌላ ቀን ወይም «ሁሉም ቀናት»ን ይምረጡ።",
+    "descriptionPeriod": "በተመረጠው ጊዜ ውስጥ የቀሩ ተማሪዎች ከወላጆቻቸው ስልክ ጋር።",
+    "descriptionAll": "በሁሉም ክፍሎች ከተቀመጡ የመገኘት መዝገቦች የተገኙ ቀሪዎች ከወላጆቻቸው ስልክ ጋር።",
+    "period": "ጊዜ",
+    "periods": {
+      "today": "አንድ ቀን",
+      "thisWeek": "በዚህ ሳምንት",
+      "lastWeek": "ያለፈው ሳምንት",
+      "last2Weeks": "ያለፉት 2 ሳምንታት",
+      "last3Weeks": "ያለፉት 3 ሳምንታት",
+      "thisMonth": "በዚህ ወር"
+    },
+    "date": "ቀን",
+    "allDates": "ሁሉም ቀናት",
+    "allDatesOverrides": "«ሁሉም ቀናት» ከተመረጠ የጊዜ ምርጫው አይሠራም።",
+    "searchPlaceholder": "ተማሪ፣ ስልክ፣ ክፍል ወይም ሴክሽን ይፈልጉ",
+    "searchLabel": "ቀሪዎችን ፈልግ",
+    "copyNumbers": "ቁጥሮችን ቅዳ",
+    "copyNumbersHint": "የሚታዩትን የወላጅ ስልክ ቁጥሮች በሙሉ ቅዳ",
+    "clearStale": "የተሰረዙትን አጽዳ",
+    "clearStaleHint": "የተሰረዙ ተማሪዎችን የቀሪ መዝገቦች አስወግድ",
+    "sendSms": "ኤስኤምኤስ ላክ",
+    "sendSmsHint": "የቀሪ መልእክቱ ተሞልቶ የኤስኤምኤስ መተግበሪያዎ ይከፈታል",
+    "altPhone": "ተጨማሪ፦ {phone}",
+    "call": "{phone} ደውል",
+    "emptySearch": "ከፍለጋዎ ጋር የሚዛመድ ቀሪ ተማሪ የለም።",
+    "emptyAll": "እስካሁን የተመዘገበ ቀሪ የለም።",
+    "emptyPeriod": "በተመረጠው ጊዜ ውስጥ ቀሪ የለም።",
+    "emptyDay": "በ{date} የተመዘገበ ቀሪ የለም።",
+    "table": {
+      "date": "ቀን",
+      "student": "ተማሪ",
+      "class": "ክፍል",
+      "section": "ሴክሽን",
+      "parentPhone": "የወላጅ ስልክ",
+      "action": "ተግባር"
+    },
+    "toast": {
+      "nothingStale": "የሚጸዳ ነገር የለም። ሁሉም ቀሪዎች ያሉ ተማሪዎች ናቸው።",
+      "cleared": "{count, plural, one {# የቀሪ መዝገብ ተጸድቷል።} other {# የቀሪ መዝገቦች ተጸድተዋል።}}",
+      "clearFailed": "የቀሪ መዝገቦቹን ማጽዳት አልተቻለም።",
+      "noNumbers": "የሚቀዳ የወላጅ ስልክ ቁጥር የለም።",
+      "copied": "{count, plural, one {# ስልክ ቁጥር ተቀድቷል።} other {# ስልክ ቁጥሮች ተቀድተዋል።}}",
+      "copyBlocked": "አሳሽዎ ቅጂውን ከልክሏል። እባክዎ ቁጥሮቹን በእጅ ይቅዱ።"
+    },
+    "confirm": {
+      "title": "የተሰረዙ ተማሪዎች ቀሪ መዝገቦች ይጽዱ?",
+      "description": "{count, plural, one {# የቀሪ መዝገብ ከአሁን በኋላ የሌለ ተማሪ ነው። ይሰረዛል። ይህ ተግባር ሊቀለበስ አይችልም።} other {# የቀሪ መዝገቦች ከአሁን በኋላ የሌሉ ተማሪዎች ናቸው። ይሰረዛሉ። ይህ ተግባር ሊቀለበስ አይችልም።}}",
+      "action": "መዝገቦቹን ሰርዝ"
+    }
+  },
+  "charts": {
+    "byClassTitle": "ተማሪዎች በክፍል",
+    "byClassDescription": "በየክፍሉ ያሉ ወንድ እና ሴት ተማሪዎች",
+    "noStudents": "እስካሁን የተማሪ መረጃ የለም።",
+    "teacherLabel": "ኡስታዝ {name}",
+    "statusTitle": "የመገኘት ሁኔታ",
+    "statusDescription": "የ{className} ዕለታዊ መገኘት · ያለፉት 7 ቀናት",
+    "classLabel": "ክፍል",
+    "noAttendance": "ለዚህ ክፍል እስካሁን መገኘት አልተመዘገበም።",
+    "male": "ወንድ",
+    "female": "ሴት",
+    "present": "የተገኘ",
+    "absent": "ቀሪ",
+    "late": "ያረፈደ",
+    "excused": "በፈቃድ",
+    "total": "ድምር፦ {count}",
+    "unassigned": "ያልተመደበ"
+  }
+}

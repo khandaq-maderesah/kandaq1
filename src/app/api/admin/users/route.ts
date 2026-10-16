@@ -4,6 +4,7 @@ import {
   assertCanManageSchool,
   syncUserClaims,
   errorStatus,
+  errorCode,
   HttpError,
 } from '@/lib/firebase/admin'
 import { getAuth } from 'firebase-admin/auth'
@@ -30,18 +31,18 @@ export async function POST(request: Request) {
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ ok: false, error: 'Invalid JSON body.' }, { status: 400 })
+    return NextResponse.json({ ok: false, error: 'Invalid JSON body.', code: 'invalid' }, { status: 400 })
   }
   const { name, email, password, phone, role, assignedClassIds } = body || {}
 
   if (!email || !password || !name || !role) {
     return NextResponse.json(
-      { ok: false, error: 'name, email, password and role are required.' },
+      { ok: false, error: 'name, email, password and role are required.', code: 'invalid' },
       { status: 400 }
     )
   }
   if (!CREATABLE_ROLES.includes(role)) {
-    return NextResponse.json({ ok: false, error: 'role must be admin or teacher.' }, { status: 400 })
+    return NextResponse.json({ ok: false, error: 'role must be admin or teacher.', code: 'invalid' }, { status: 400 })
   }
 
   try {
@@ -118,7 +119,7 @@ export async function POST(request: Request) {
   } catch (err: any) {
     console.error('Create user failed:', err)
     return NextResponse.json(
-      { ok: false, error: err?.message || 'Failed to create user' },
+      { ok: false, error: err?.message || 'Failed to create user', code: errorCode(err) },
       { status: errorStatus(err) }
     )
   }

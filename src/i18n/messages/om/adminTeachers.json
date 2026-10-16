@@ -1,0 +1,82 @@
+{
+  "title": "Fayyadamtoota",
+  "description": "Herrega bulchaa mana barumsaa fi barsiisotaa uumaa, bulchaas.",
+  "add": "Fayyadamaa dabali",
+  "searchPlaceholder": "Maqaa, imeelii ykn bilbilaan barbaadi",
+  "searchLabel": "Fayyadamtoota barbaadi",
+  "roleFilter": "Gaheen calali",
+  "allRoles": "Gahee hunda",
+  "summary": "{total} keessaa {shown, plural, one {fayyadamaan # agarsiifamaa jira} other {fayyadamtoonni # agarsiifamaa jiru}}",
+  "you": "Isin",
+  "table": {
+    "name": "Maqaa",
+    "email": "Imeelii",
+    "role": "Gahee",
+    "phone": "Bilbila",
+    "classes": "Kutaalee",
+    "status": "Haala",
+    "actions": "Gochaalee"
+  },
+  "noClasses": "Kutaa hin qabu",
+  "classCount": "{count, plural, =0 {Kutaa hin qabu} one {Kutaa tokko} other {Kutaalee #}}",
+  "actions": {
+    "editClasses": "Kutaalee kennaman gulaali",
+    "deactivate": "Hojii irraa dhaabi",
+    "activate": "Hojiirra oolchi",
+    "delete": "Fayyadamaa haqi",
+    "more": "Gochaalee dabalataa {name}",
+    "cannotDeleteSelf": "Herrega mataa keessanii haquu hin dandeessan"
+  },
+  "form": {
+    "createTitle": "Fayyadamaa dabali",
+    "createDescription": "Herrega bulchaa mana barumsaa ykn barsiisaa odeeffannoo seensaa waliin uumaa.",
+    "name": "Maqaa guutuu",
+    "namePlaceholder": "Fakkeenyaaf: Ahmed Ali",
+    "email": "Imeelii",
+    "emailPlaceholder": "teacher@school.com",
+    "phone": "Lakk. bilbilaa (dirqama miti)",
+    "phonePlaceholder": "Fakkeenyaaf: 0911 223344",
+    "password": "Jecha icciitii yeroo",
+    "passwordPlaceholder": "Yoo xiqqaate qubee 6",
+    "role": "Gahee",
+    "roleHint": "Bulchitoonni mana barumsaa hayyama guutuu qabu; fayyadamtoota biroos bulchuu danda'u.",
+    "classes": "Kutaalee kenni",
+    "classesHint": "Kutaalee barsiisaan kun barsiisu filadhaa.",
+    "noClassesYet": "Ammaaf kutaan hin jiru. Dursa kutaalee uumaatii booda barsiisaa ramadaa.",
+    "create": "Fayyadamaa uumi"
+  },
+  "assign": {
+    "title": "Kutaalee kennaman gulaali",
+    "description": "Kutaalee {name} barsiisu filadhaa. Barattoonni kutaalee isaanii keessa turu.",
+    "currentlyAssigned": "{name}f kennameera",
+    "currentlyAssignedOther": "Barsiisaa biraaf kennameera",
+    "save": "Ramaddii olkaa'i"
+  },
+  "delete": {
+    "title": "{name} haqxu?",
+    "description": "Herregni {email} ni haqama, kana booda seenuu hin danda'u. Kana booda deebisuun hin danda'amu.",
+    "confirm": "Fayyadamaa haqi"
+  },
+  "toast": {
+    "adminCreated": "Herregni bulchaa mana barumsaa uumameera.",
+    "teacherCreated": "Herregni barsiisaa uumameera.",
+    "assigned": "Kutaaleen {name} haaromfameera.",
+    "activated": "Herregni {name} hojiirra ooleera.",
+    "deactivated": "Herregni {name} hojii irraa dhaabbateera.",
+    "deleted": "Herregni {name} haqameera.",
+    "loadError": "Fayyadamtoota fe'uun hin danda'amne. Seerri kuusa odeeffannoo (database rules) maxxanfamuu isaa mirkaneeffadhaatii fuula haaromsaa.",
+    "unexpectedResponse": "Saarvarri deebii hin eegamne deebiseera ({status}). Fuula haaromsaatii irra deebi'aa yaalaa."
+  },
+  "empty": {
+    "title": "Ammaaf fayyadamaan hin jiru",
+    "description": "Akka seenuu danda'aniif barsiisotaa fi bulchitoota mana barumsaa dabalaa.",
+    "search": "Fayyadamaan barbaacha keessaniin wal simu hin jiru."
+  },
+  "csv": {
+    "name": "Maqaa",
+    "email": "Imeelii",
+    "role": "Gahee",
+    "phone": "Bilbila",
+    "status": "Haala"
+  }
+}

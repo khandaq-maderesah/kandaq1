@@ -1,33 +1,43 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { useAuth } from '@/context/AuthContext'
 import { rtdb } from '@/lib/database'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Button, buttonVariants } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Loader2, Printer, Download, ArrowLeft, Award, X } from 'lucide-react'
+import { Label } from '@/components/ui/label'
+import { Select } from '@/components/ui/select'
+import { Skeleton } from '@/components/ui/skeleton'
+import { PageHeader, EmptyState } from '@/components/ui/page'
+import { Printer, Download, ArrowLeft, Award, X, School, FileText } from 'lucide-react'
 import type { Class, Exam, Student } from '@/types'
-import { computeOverall, fmt, EXAM_TYPE_LABELS, mergedSubjects } from '@/lib/examMath'
+import { computeOverall, mergedSubjects } from '@/lib/examMath'
+import { OverallResultsSheet, useExamCsv } from '@/components/ExamResultsSheet'
 import {
   CertificateOverlay,
   buildCertificateStudent,
   type CertificateStudent,
 } from '@/components/CertificateOverlay'
-import { exportToCsv, dateStamp } from '@/lib/exportCsv'
+
+const LEGACY_YEAR = 'Legacy'
 
 export default function OverallResultsPage() {
+  const t = useTranslations('teacherExams')
+  const tx = useTranslations('exams')
+  const tc = useTranslations('common')
+  const csv = useExamCsv()
   const { user, school } = useAuth()
-  const router = useRouter()
   const [classes, setClasses] = useState<Class[]>([])
   const [exams, setExams] = useState<Exam[]>([])
   const [students, setStudents] = useState<Student[]>([])
   const [classId, setClassId] = useState('')
-  const [yearFilter, setYearFilter] = useState('') // empty = "All Years"
+  const [yearFilter, setYearFilter] = useState('') // empty = all years
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [certStudent, setCertStudent] = useState<CertificateStudent | null>(null)
+  const certCloseRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     if (!user) return
@@ -49,7 +59,8 @@ export default function OverallResultsPage() {
         setStudents(st)
         if (!classId && myClasses.length) setClassId(myClasses[0].id)
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load data')
+        console.error(err)
+        setError(t('overall.loadError'))
       } finally {
         setLoading(false)
       }
@@ -72,7 +83,7 @@ export default function OverallResultsPage() {
   const availableYears = useMemo(() => {
     const years = new Set<string>()
     classExams.forEach((e) => {
-      years.add(e.academicYear || 'Legacy')
+      years.add(e.academicYear || LEGACY_YEAR)
     })
     return [...years].sort()
   }, [classExams])
@@ -82,7 +93,7 @@ export default function OverallResultsPage() {
     () =>
       !yearFilter
         ? classExams
-        : classExams.filter((e) => (e.academicYear || 'Legacy') === yearFilter),
+        : classExams.filter((e) => (e.academicYear || LEGACY_YEAR) === yearFilter),
     [classExams, yearFilter],
   )
 
@@ -103,56 +114,58 @@ export default function OverallResultsPage() {
   }, [filteredExams, overallRows])
 
   const selClass = classes.find((c) => c.id === classId)
+  const yearLabel = (y: string) =>
+    !y ? tx('years.all') : y === LEGACY_YEAR ? tx('years.legacy') : y
 
-  const handleExport = () => {
-    const headers = [
-      'Roll',
-      'Student',
-      ...subjectColumns.map((c) => `${c.subject} / ${c.max}`),
-      'Grand Total',
-      'Percentage %',
-      'Rank',
-    ]
-    const rows = overallRows.map((r) => [
-      r.rollNumber || '',
-      r.studentName,
-      ...r.perSubject.map((p) => p.total),
-      r.grandTotal,
-      fmt(r.percentage),
-      r.rank,
-    ])
-    exportToCsv(`overall-result-${selClass?.name || classId}-${dateStamp()}.csv`, headers, rows)
-  }
+  // Certificate preview: close on Escape and move focus into the dialog.
+  useEffect(() => {
+    if (!certStudent) return
+    certCloseRef.current?.focus()
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setCertStudent(null)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [certStudent])
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-green-600" />
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <Skeleton className="h-8 w-56" />
+          <Skeleton className="h-4 w-96 max-w-full" />
+        </div>
+        <Skeleton className="h-10 w-full max-w-sm" />
+        <Skeleton className="h-96 w-full rounded-xl" />
       </div>
     )
   }
 
+  const hasExams = classExams.length > 0
+
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Overall Result</h1>
-          <p className="text-gray-600 mt-1">
-            Merged result combining all saved exams (Mid, Assignment, Final)
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => router.push('/teacher/exams')}>
-            <ArrowLeft className="h-4 w-4 mr-2" /> Exams
-          </Button>
-          <Button variant="outline" onClick={handleExport} disabled={!classExams.length}>
-            <Download className="h-4 w-4 mr-2" /> Download CSV
-          </Button>
-          <Button variant="outline" onClick={() => window.print()} disabled={!classExams.length}>
-            <Printer className="h-4 w-4 mr-2" /> Print
-          </Button>
-        </div>
-      </div>
+      <PageHeader
+        title={t('overall.title')}
+        description={t('overall.description')}
+        actions={
+          <>
+            <Link href="/teacher/exams" className={buttonVariants({ variant: 'outline' })}>
+              <ArrowLeft className="rtl:rotate-180" /> {t('overall.exams')}
+            </Link>
+            <Button
+              variant="outline"
+              onClick={() => csv.exportOverall(selClass?.name || classId, subjectColumns, overallRows)}
+              disabled={!hasExams}
+            >
+              <Download /> {t('overall.downloadCsv')}
+            </Button>
+            <Button variant="outline" onClick={() => window.print()} disabled={!hasExams}>
+              <Printer /> {tc('actions.print')}
+            </Button>
+          </>
+        }
+      />
 
       {error && (
         <Alert variant="destructive">
@@ -160,149 +173,118 @@ export default function OverallResultsPage() {
         </Alert>
       )}
 
-      <Card className="border-0 shadow-md">
-        <CardHeader className="space-y-3">
-          <CardTitle className="flex items-center gap-2">
-            <Award className="h-5 w-5" /> Select Class
-          </CardTitle>
-          <select
+      <div className="no-print grid gap-4 sm:grid-cols-2 lg:max-w-2xl">
+        <div className="space-y-2">
+          <Label htmlFor="overall-class">{t('overall.class')}</Label>
+          <Select
+            id="overall-class"
             value={classId}
-            onChange={(e) => setClassId(e.target.value)}
-            className="flex h-10 w-full max-w-sm rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            onChange={(e) => {
+              setClassId(e.target.value)
+              setYearFilter('')
+            }}
           >
-            <option value="">Select a class</option>
+            <option value="">{t('overall.selectClass')}</option>
             {classes.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
                 {c.section ? ` • ${c.section}` : ''}
               </option>
             ))}
-          </select>
-          {classId && availableYears.length > 0 && (
-            <label className="flex items-center gap-2 text-sm text-gray-600">
-              <span className="font-medium">Academic Year:</span>
-              <select
-                value={yearFilter}
-                onChange={(e) => setYearFilter(e.target.value)}
-                className="h-9 rounded-md border border-input bg-background px-3 py-1 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <option value="">All Years</option>
-                {availableYears.map((y) => (
-                  <option key={y} value={y}>
-                    {y}
-                  </option>
-                ))}
-              </select>
-            </label>
-          )}
-          <CardDescription>
-            {classExams.length
-              ? `${filteredExams.length} exam(s) merged (${yearFilter || 'All years'}) · ${overallRows.length} students`
-              : 'No saved exams found for this class yet.'}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {!classId ? (
-            <p className="text-gray-500 py-8 text-center">
-              Please select a class to see the overall result.
-            </p>
-          ) : classExams.length === 0 ? (
-            <p className="text-gray-500 py-8 text-center">
-              No saved exams for this class yet. Save results first, then return here to merge them.
-            </p>
-          ) : (
-            <div className="no-print mb-3 text-sm text-slate-500">
-              Showing overall totals. Use <b>Print</b> or <b>Download CSV</b> to save a copy.
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {classExams.length > 0 && (
-        <div className="print-area overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-md">
-          <div className="border-b-2 border-slate-800 p-4 pb-2">
-            <h2 className="text-lg font-bold text-slate-900">{school?.name} — Overall Result</h2>
-            <p className="text-sm text-slate-600">
-              {selClass?.name}
-              {selClass?.section ? ` • Section ${selClass.section}` : ''} • {yearFilter || 'All years'} •{' '}
-              {filteredExams.map((e) => EXAM_TYPE_LABELS[e.type]).join(', ')}
-            </p>
-          </div>
-          <table className="w-full text-sm border-collapse border border-slate-300 [&_th]:border [&_th]:border-slate-300 [&_th]:bg-slate-100 [&_th]:px-2 [&_th]:py-1.5 [&_td]:border [&_td]:border-slate-300 [&_td]:px-2 [&_td]:py-1.5">
-            <thead>
-              <tr className="text-left text-slate-700">
-                <th>Roll</th>
-                <th>Student</th>
-                {subjectColumns.map((c) => (
-                  <th key={c.subject} className="text-center">
-                    {c.subject}
-                    <div className="text-[10px] font-normal text-slate-400">/ {c.max}</div>
-                  </th>
-                ))}
-                <th className="text-center">Grand Total</th>
-                <th className="text-center">%</th>
-                <th className="text-center">Rank</th>
-                <th className="text-center">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {overallRows.map((r) => (
-                <tr key={r.studentId}>
-                  <td>{r.rollNumber || '—'}</td>
-                  <td className="font-medium">{r.studentName}</td>
-                  {r.perSubject.map((p) => (
-                    <td key={p.subject} className="text-center">
-                      {fmt(p.total)}
-                    </td>
-                  ))}
-                  <td className="text-center font-semibold">{fmt(r.grandTotal)}</td>
-                  <td className="text-center">{fmt(r.percentage)}%</td>
-                  <td className="text-center font-semibold">{r.rank}</td>
-                  <td className="text-center">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => {
-                        const stu = students.find((s) => s.id === r.studentId)
-                        if (stu) setCertStudent(buildCertificateStudent(stu, selClass, classExams))
-                      }}
-                    >
-                      <Award className="h-4 w-4 mr-1" /> Certificate
-                    </Button>
-                  </td>
-                </tr>
+          </Select>
+        </div>
+        {classId && availableYears.length > 0 && (
+          <div className="space-y-2">
+            <Label htmlFor="overall-year">{tx('years.label')}</Label>
+            <Select id="overall-year" value={yearFilter} onChange={(e) => setYearFilter(e.target.value)}>
+              <option value="">{tx('years.all')}</option>
+              {availableYears.map((y) => (
+                <option key={y} value={y}>
+                  {yearLabel(y)}
+                </option>
               ))}
-            </tbody>
-          </table>
-          <div className="px-4 py-2 text-xs text-slate-500">
-            Generated: {new Date().toLocaleString()}
+            </Select>
           </div>
+        )}
+      </div>
+
+      {!classId ? (
+        <EmptyState icon={School} title={t('overall.selectClassHint')} />
+      ) : !hasExams ? (
+        <EmptyState
+          icon={FileText}
+          title={t('overall.noExamsTitle')}
+          description={t('overall.noExamsDescription')}
+        />
+      ) : (
+        <div className="rounded-xl border bg-card p-4 shadow-sm sm:p-5">
+          <OverallResultsSheet
+            schoolName={school?.name}
+            className={selClass?.name || classId}
+            section={selClass?.section}
+            yearLabel={yearLabel(yearFilter)}
+            exams={filteredExams}
+            rows={overallRows}
+            columns={subjectColumns}
+            actionHeader={tc('fields.actions')}
+            renderAction={(r) => (
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-10 sm:h-9"
+                aria-label={t('overall.certificateFor', { name: r.studentName })}
+                onClick={() => {
+                  const stu = students.find((s) => s.id === r.studentId)
+                  if (stu) setCertStudent(buildCertificateStudent(stu, selClass, classExams))
+                }}
+              >
+                <Award /> {t('overall.certificate')}
+              </Button>
+            )}
+          />
         </div>
       )}
 
-      {/* ── Certificate preview modal ──────────────────────────── */}
+      {/* ── Certificate preview ───────────────────────────────────────
+          Rendered in place (not portalled) so the print rules in globals.css
+          (.cert-print) can show only the certificate. The backdrop is hidden
+          by `visibility` when printing; do not add no-print to this wrapper
+          or the certificate itself would not print. */}
       {certStudent && (
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4 no-print"
+          className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-black/60 p-2 sm:p-4"
           onClick={() => setCertStudent(null)}
         >
           <div
-            className="cert-print relative w-full shrink-0 rounded-xl bg-white p-6 shadow-2xl"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="cert-title"
+            aria-describedby="cert-desc"
+            className="cert-print relative my-auto w-full max-w-5xl shrink-0 rounded-xl border bg-card p-3 shadow-xl sm:p-6 print:border-0 print:bg-transparent print:shadow-none"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="mb-4 flex items-center justify-between no-print">
-              <h3 className="text-lg font-bold text-gray-900">Certificate — {certStudent.name}</h3>
+            <div className="no-print mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0">
+                <h3 id="cert-title" className="truncate text-lg font-semibold text-foreground">
+                  {t('overall.certificateTitle', { name: certStudent.name })}
+                </h3>
+                <p id="cert-desc" className="text-sm text-muted-foreground">
+                  {t('overall.certificateDescription')}
+                </p>
+              </div>
               <div className="flex items-center gap-2">
-                <Button size="sm" onClick={() => window.print()}>
-                  <Printer className="h-4 w-4 mr-1" /> Print
+                <Button onClick={() => window.print()}>
+                  <Printer /> {tc('actions.print')}
                 </Button>
-                <Button size="sm" variant="outline" onClick={() => setCertStudent(null)}>
-                  <X className="h-4 w-4" /> Close
+                <Button ref={certCloseRef} variant="outline" onClick={() => setCertStudent(null)}>
+                  <X /> {tc('actions.close')}
                 </Button>
               </div>
             </div>
-            <div className="w-full">
-              <CertificateOverlay student={certStudent} debug={false} />
+            <div className="w-full overflow-x-auto print:overflow-visible">
+              <div className="min-w-[36rem] print:min-w-0">
+                <CertificateOverlay student={certStudent} debug={false} />
+              </div>
             </div>
           </div>
         </div>

@@ -1,0 +1,69 @@
+{
+  "types": {
+    "mid": "الامتحان النصفي",
+    "assignment": "الواجبات",
+    "final": "الامتحان النهائي"
+  },
+  "years": {
+    "label": "العام الدراسي",
+    "all": "جميع الأعوام",
+    "legacy": "بدون عام دراسي"
+  },
+  "table": {
+    "roll": "الرقم",
+    "student": "الطالب",
+    "total": "المجموع",
+    "average": "المعدل",
+    "percent": "%",
+    "rank": "الترتيب",
+    "grandTotal": "المجموع الكلي",
+    "outOf": "من {max}",
+    "maxMarks": "الدرجة العظمى: {max}",
+    "classAverage": "معدل الفصل",
+    "highest": "الأعلى",
+    "lowest": "الأدنى",
+    "noRoll": "—",
+    "rollShort": "رقم {roll}"
+  },
+  "sheet": {
+    "section": "الشعبة {section}",
+    "totalMarks": "مجموع الدرجات: {total}",
+    "studentCount": "{count, plural, =0 {لا يوجد طلاب} zero {لا يوجد طلاب} one {طالب واحد} two {طالبان} few {# طلاب} many {# طالبًا} other {# طالب}}",
+    "noRows": "لا يوجد طلاب في هذا الكشف."
+  },
+  "overall": {
+    "heading": "{school} — النتيجة الإجمالية",
+    "headingNoSchool": "النتيجة الإجمالية",
+    "examsMerged": "{count, plural, =0 {لم يُدمج أي امتحان} zero {لم يُدمج أي امتحان} one {امتحان واحد مدمج} two {امتحانان مدمجان} few {# امتحانات مدمجة} many {# امتحانًا مدمجًا} other {# امتحان مدمج}}",
+    "generated": "أُنشئ في {date}",
+    "noStudents": "لا يوجد طلاب نشطون في هذا الفصل."
+  },
+  "csv": {
+    "roll": "الرقم",
+    "student": "الطالب",
+    "total": "المجموع",
+    "average": "المعدل",
+    "percentage": "النسبة %",
+    "rank": "الترتيب",
+    "grandTotal": "المجموع الكلي",
+    "subjectOutOf": "{subject} / {max}",
+    "overallFile": "النتيجة-الإجمالية"
+  },
+  "certificate": {
+    "subject": "المادة",
+    "total": "المجموع",
+    "grandTotal": "المجموع الكلي",
+    "average": "المعدل",
+    "nextGrade": "الصف التالي",
+    "promoted": "منقول",
+    "notPromoted": "غير منقول",
+    "subjects": {
+      "seerah": "السيرة",
+      "aqeedah": "العقيدة",
+      "hadith": "الحديث",
+      "zikr": "الأذكار",
+      "arabic": "اللغة العربية",
+      "fiqh": "الفقه"
+    }
+  }
+}

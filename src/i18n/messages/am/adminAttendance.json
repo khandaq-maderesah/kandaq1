@@ -1,0 +1,51 @@
+{
+  "title": "መገኘት",
+  "description": "ለማንኛውም ክፍል መገኘት ይመዝግቡ፤ መዝገቦችንም ይመልከቱ",
+  "tabs": {
+    "label": "የመገኘት ገጾች",
+    "mark": "መገኘት መዝግብ",
+    "records": "መዝገቦች"
+  },
+  "mark": {
+    "class": "ክፍል",
+    "date": "ቀን",
+    "ethiopianDate": "የኢትዮጵያ ቀን፦ {date}",
+    "allPresent": "ሁሉም ተገኝተዋል",
+    "allAbsent": "ሁሉም ቀሪ",
+    "allExcused": "ሁሉም በፈቃድ",
+    "clear": "አጽዳ",
+    "noStudents": "በዚህ ክፍል ውስጥ ንቁ ተማሪ የለም",
+    "noClasses": "እስካሁን ምንም ክፍል የለም",
+    "progress": "ከ{total} ውስጥ {marked} ተመዝግበዋል",
+    "save": "መገኘት አስቀምጥ",
+    "roll": "ተ.ቁ. {roll}",
+    "statusGroup": "የ{name} መገኘት"
+  },
+  "records": {
+    "class": "ክፍል",
+    "allClasses": "ሁሉም ክፍሎች",
+    "date": "ቀን",
+    "dateHint": "ያለፉትን 90 ቀናት ለማየት ባዶ ይተዉት",
+    "title": "መዝገቦች",
+    "count": "{count, plural, one {# መዝገብ} other {# መዝገቦች}}",
+    "empty": "ለተመረጡት ማጣሪያዎች ምንም የመገኘት መዝገብ የለም",
+    "table": {
+      "date": "ቀን",
+      "student": "ተማሪ",
+      "class": "ክፍል",
+      "status": "ሁኔታ"
+    }
+  },
+  "status": {
+    "present": "የተገኘ",
+    "absent": "ቀሪ",
+    "late": "ያረፈደ",
+    "excused": "በፈቃድ"
+  },
+  "toast": {
+    "saved": "መገኘት ተመዝግቧል",
+    "saveFailed": "መገኘትን ማስቀመጥ አልተቻለም",
+    "loadFailed": "የመገኘት መረጃ መጫን አልተቻለም",
+    "studentsFailed": "ተማሪዎችን መጫን አልተቻለም"
+  }
+}

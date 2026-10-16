@@ -1,0 +1,61 @@
+{
+  "title": "Kutaalee",
+  "description": "Kutaalee uumaa fi gulaalaa. Barsiisonni fuula Fayyadamtootaa irraa ramadamu.",
+  "add": "Kutaa dabali",
+  "searchPlaceholder": "Kutaa, barsiisaa ykn baraan barbaadi",
+  "searchLabel": "Kutaalee barbaadi",
+  "summary": "{total} keessaa {shown, plural, one {kutaan # agarsiifamaa jira} other {kutaaleen # agarsiifamaa jiru}}",
+  "table": {
+    "class": "Kutaa",
+    "section": "Garee",
+    "teacher": "Barsiisaa",
+    "year": "Bara barnootaa",
+    "students": "Barattoota",
+    "actions": "Gochaalee"
+  },
+  "unassigned": "Hin ramadamne",
+  "noSection": "Garee hin qabu",
+  "viewStudents": "Barattoota {name} ilaali",
+  "studentCount": "{count, plural, =0 {Barataan hin jiru} one {Barataa tokko} other {Barattoota #}}",
+  "editClass": "{name} gulaali",
+  "deleteClass": "{name} haqi",
+  "form": {
+    "createTitle": "Kutaa dabali",
+    "createDescription": "Barsiisonni yeroo isin fuula Fayyadamtootaa irratti galmeessitan ykn gulaaltan ramadamu.",
+    "editTitle": "Kutaa gulaali",
+    "editDescription": "Odeeffannoo kutaa haaromsaa.",
+    "name": "Maqaa kutaa",
+    "namePlaceholder": "Fakkeenyaaf: Kutaa 5",
+    "grade": "Sadarkaa kutaa",
+    "gradePlaceholder": "Fakkeenyaaf: 5",
+    "section": "Garee",
+    "sectionPlaceholder": "Fakkeenyaaf: A",
+    "year": "Bara barnootaa",
+    "yearPlaceholder": "Fakkeenyaaf: 2026-2027",
+    "create": "Kutaa uumi"
+  },
+  "delete": {
+    "title": "{name} haqxu?",
+    "description": "Kun kutaa yeroo hundaaf haqa; kana booda deebisuun hin danda'amu.",
+    "withStudents": "{count, plural, one {Barataan # ammallee kutaa kana keessa jira.} other {Barattoonni # ammallee kutaa kana keessa jiru.}} Akka mul'achuu itti fufaniif dursa gara kutaa biraatti dabarsaa.",
+    "confirm": "Kutaa haqi"
+  },
+  "toast": {
+    "created": "Kutaan uumameera.",
+    "updated": "Kutaan haaromfameera.",
+    "deleted": "Kutaan {name} haqameera."
+  },
+  "empty": {
+    "title": "Ammaaf kutaan hin jiru",
+    "description": "Barattoota galmeessuu jalqabuuf kutaa jalqabaa uumaa.",
+    "search": "Kutaan barbaacha keessaniin wal simu hin jiru."
+  },
+  "studentsDialog": {
+    "title": "Barattoota {name}",
+    "meta": "{year} · {section} · {teacher}",
+    "empty": "Ammaaf kutaa kana keessa barataan hin jiru.",
+    "roll": "Lakk. {roll}",
+    "noRoll": "Lakkoofsa tartiibaa hin qabu",
+    "noPhone": "Bilbila hin qabu"
+  }
+}

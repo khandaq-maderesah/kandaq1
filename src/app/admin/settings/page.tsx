@@ -1,6 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
+import { toast } from 'sonner'
+import { Loader2, Lock, Unlock, Save, UserPlus } from 'lucide-react'
 import { rtdb } from '@/lib/database'
 import { useAuth } from '@/context/AuthContext'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
@@ -8,9 +11,13 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Loader2, Save, School, Phone, MapPin, CalendarDays, UserPlus, Lock } from 'lucide-react'
+import { Skeleton } from '@/components/ui/skeleton'
+import { PageHeader } from '@/components/ui/page'
+import { cn } from '@/lib/utils'
 
 export default function SettingsPage() {
+  const t = useTranslations('adminSettings')
+  const tc = useTranslations('common')
   const { school, refreshSchool } = useAuth()
   const [schoolName, setSchoolName] = useState('')
   const [schoolNameAm, setSchoolNameAm] = useState('')
@@ -18,9 +25,9 @@ export default function SettingsPage() {
   const [phone, setPhone] = useState('')
   const [academicYear, setAcademicYear] = useState('')
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [success, setSuccess] = useState('')
-  const [error, setError] = useState('')
+  const [formError, setFormError] = useState('')
   const [registrationOpen, setRegistrationOpen] = useState(true)
   const [savingRegister, setSavingRegister] = useState(false)
 
@@ -36,8 +43,9 @@ export default function SettingsPage() {
         setPhone(school?.phone || '')
         setAcademicYear(s.academicYear || '')
         setRegistrationOpen(s.registrationOpen !== 'false')
-      } catch {
-        setError('Failed to load settings')
+      } catch (err) {
+        console.error('Loading settings failed', err)
+        setLoadError(true)
       } finally {
         setLoading(false)
       }
@@ -48,12 +56,17 @@ export default function SettingsPage() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
+    setFormError('')
+    if (!school) {
+      setFormError(t('school.noSchool'))
+      return
+    }
+    if (!schoolName.trim()) {
+      setFormError(t('school.nameRequired'))
+      return
+    }
     setSaving(true)
-    setError('')
-    setSuccess('')
     try {
-      if (!school) throw new Error('No school selected')
-      if (!schoolName.trim()) throw new Error('School name is required')
       await rtdb.updateSchool(school.id, {
         name: schoolName.trim(),
         nameAm: schoolNameAm.trim(),
@@ -63,9 +76,10 @@ export default function SettingsPage() {
       })
       await rtdb.updateSettings({ academicYear })
       await refreshSchool()
-      setSuccess('Settings saved successfully')
-    } catch (err: any) {
-      setError(err.message || 'Failed to save settings')
+      toast.success(t('school.saved'))
+    } catch (err) {
+      console.error('Saving settings failed', err)
+      toast.error(t('school.failed'))
     } finally {
       setSaving(false)
     }
@@ -73,19 +87,14 @@ export default function SettingsPage() {
 
   const handleToggleRegistration = async () => {
     setSavingRegister(true)
-    setError('')
-    setSuccess('')
     const next = !registrationOpen
     try {
       await rtdb.updateSettings({ registrationOpen: next ? 'true' : 'false' })
       setRegistrationOpen(next)
-      setSuccess(
-        next
-          ? 'Student registration opened. Teachers can now register new students.'
-          : 'Student registration closed. Teachers can no longer register new students.'
-      )
-    } catch (err: any) {
-      setError(err.message || 'Failed to update registration')
+      toast.success(next ? t('registration.opened') : t('registration.closed'))
+    } catch (err) {
+      console.error('Updating registration failed', err)
+      toast.error(t('registration.failed'))
     } finally {
       setSavingRegister(false)
     }
@@ -93,162 +102,139 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-green-600" />
+      <div className="max-w-3xl space-y-6" aria-busy="true">
+        <Skeleton className="h-9 w-40" />
+        <Skeleton className="h-96 w-full rounded-xl" />
+        <Skeleton className="h-36 w-full rounded-xl" />
       </div>
     )
   }
 
   return (
-    <div className="space-y-6 max-w-3xl">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-        <p className="text-gray-600 mt-1">Manage your school information</p>
-      </div>
+    <div className="max-w-3xl">
+      <PageHeader title={t('title')} description={t('description')} />
 
-      {error && (
-        <Alert variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-      {success && (
-        <Alert variant="success">
-          <AlertDescription>{success}</AlertDescription>
-        </Alert>
-      )}
+      <div className="space-y-6">
+        {loadError && (
+          <Alert variant="destructive">
+            <AlertDescription>{t('school.loadFailed')}</AlertDescription>
+          </Alert>
+        )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <School className="h-5 w-5" /> School Information
-          </CardTitle>
-          <CardDescription>
-            These details are shown across the system and on printed reports.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSave} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="schoolName">School Name</Label>
-              <div className="relative">
-                <School className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input
-                  id="schoolName"
-                  placeholder="e.g. Khendeq Medresah"
-                  value={schoolName}
-                  onChange={(e) => setSchoolName(e.target.value)}
-                  className="pl-10"
-                />
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('school.title')}</CardTitle>
+            <CardDescription>{t('school.description')}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSave} className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="schoolName">{t('school.name')}</Label>
+                  <Input
+                    id="schoolName"
+                    placeholder={t('school.namePlaceholder')}
+                    value={schoolName}
+                    onChange={(e) => {
+                      setSchoolName(e.target.value)
+                      setFormError('')
+                    }}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="schoolNameAm">{t('school.nameAm')}</Label>
+                  <Input
+                    id="schoolNameAm"
+                    lang="am"
+                    value={schoolNameAm}
+                    onChange={(e) => setSchoolNameAm(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="address">{t('school.address')}</Label>
+                  <Input
+                    id="address"
+                    placeholder={t('school.addressPlaceholder')}
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phone">{t('school.phone')}</Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    dir="ltr"
+                    className="text-start"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="academicYear">{t('school.academicYear')}</Label>
+                  <Input
+                    id="academicYear"
+                    placeholder={t('school.academicYearPlaceholder')}
+                    value={academicYear}
+                    onChange={(e) => setAcademicYear(e.target.value)}
+                  />
+                </div>
               </div>
-            </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="schoolNameAm">School Name in Amharic (used in SMS)</Label>
-              <div className="relative">
-                <School className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input
-                  id="schoolNameAm"
-                  placeholder="e.g. ኸንደቅ መድረሳ"
-                  value={schoolNameAm}
-                  onChange={(e) => setSchoolNameAm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="address">Address</Label>
-              <div className="relative">
-                <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input
-                  id="address"
-                  placeholder="Street, City"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="phone">Contact Phone</Label>
-              <div className="relative">
-                <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input
-                  id="phone"
-                  type="tel"
-                  placeholder="03XX-XXXXXXX"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="academicYear">Academic Year</Label>
-              <div className="relative">
-                <CalendarDays className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input
-                  id="academicYear"
-                  placeholder="e.g. 2026-2027"
-                  value={academicYear}
-                  onChange={(e) => setAcademicYear(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-
-            <Button type="submit" disabled={saving}>
-              {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
-              Save Settings
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <UserPlus className="h-5 w-5" /> Student Registration
-          </CardTitle>
-          <CardDescription>Control whether teachers can register new students</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="flex items-start gap-3">
-              <span className={`mt-0.5 inline-flex items-center justify-center rounded-lg p-2 ${registrationOpen ? 'bg-emerald-100' : 'bg-red-100'}`}>
-                <Lock className={`h-5 w-5 ${registrationOpen ? 'text-emerald-600' : 'text-red-600'}`} />
-              </span>
-              <div>
-                <p className="font-medium text-gray-900">
-                  {registrationOpen ? 'Registration is OPEN' : 'Registration is CLOSED'}
-                </p>
-                <p className="text-sm text-gray-500 mt-0.5">
-                  {registrationOpen
-                    ? 'Teachers can register new students.'
-                    : 'Teachers cannot register new students until you open registration again. Existing student records can still be edited.'}
-                </p>
-              </div>
-            </div>
-            <Button
-              type="button"
-              variant={registrationOpen ? 'destructive' : 'default'}
-              disabled={savingRegister}
-              onClick={handleToggleRegistration}
-            >
-              {savingRegister ? (
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
-              ) : registrationOpen ? (
-                <Lock className="h-4 w-4 mr-2" />
-              ) : (
-                <UserPlus className="h-4 w-4 mr-2" />
+              {formError && (
+                <Alert variant="destructive">
+                  <AlertDescription>{formError}</AlertDescription>
+                </Alert>
               )}
-              {registrationOpen ? 'Close Student Registration' : 'Open Student Registration'}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+
+              <Button type="submit" disabled={saving}>
+                {saving ? <Loader2 className="animate-spin" /> : <Save />}
+                {saving ? tc('status.saving') : t('school.save')}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('registration.title')}</CardTitle>
+            <CardDescription>{t('registration.description')}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-3">
+                <span
+                  className={cn(
+                    'flex h-10 w-10 shrink-0 items-center justify-center rounded-lg',
+                    registrationOpen ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive'
+                  )}
+                >
+                  {registrationOpen ? <Unlock className="h-5 w-5" /> : <Lock className="h-5 w-5" />}
+                </span>
+                <div>
+                  <p className="font-medium text-foreground">
+                    {registrationOpen ? t('registration.openStatus') : t('registration.closedStatus')}
+                  </p>
+                  <p className="mt-0.5 text-sm text-muted-foreground">
+                    {registrationOpen ? t('registration.openHint') : t('registration.closedHint')}
+                  </p>
+                </div>
+              </div>
+              <Button
+                type="button"
+                variant={registrationOpen ? 'outline' : 'default'}
+                className={cn('shrink-0', registrationOpen && 'text-destructive hover:text-destructive')}
+                disabled={savingRegister}
+                onClick={handleToggleRegistration}
+              >
+                {savingRegister ? <Loader2 className="animate-spin" /> : registrationOpen ? <Lock /> : <UserPlus />}
+                {registrationOpen ? t('registration.close') : t('registration.open')}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }

@@ -1,0 +1,44 @@
+{
+  "title": "Fuula jalqabaa",
+  "description": "Haala har'aa kutaalee keessanii fi barattoota hafan kan quunnamuu qabdan.",
+  "stats": {
+    "students": "Barattoota koo",
+    "absentToday": "Har'a kan hafan",
+    "presentToday": "Har'a kan argaman",
+    "classes": "Kutaalee koo"
+  },
+  "requests": {
+    "title": "Gaaffiiwwan koo",
+    "pending": "{count, plural, =0 {Gaaffiin eeggachaa jiru hin jiru} one {Gaaffii tokkotu raggaasisa eeggachaa jira} other {Gaaffiiwwan #tu raggaasisa eeggachaa jiru}}",
+    "recent": "Murtee dhiyoo",
+    "noRecent": "Ammaaf murteen hin jiru.",
+    "viewAll": "Gaaffiiwwan koo ilaali",
+    "decided": "{student} · {date}"
+  },
+  "absent": {
+    "title": "Barattoota hafan",
+    "description": "Barattoota kutaalee keessan keessaa hafan, odeeffannoo quunnamtii maatii isaanii waliin. Bilbiluuf lakkoofsa tuqaa.",
+    "class": "Kutaa",
+    "allClasses": "Kutaalee koo hunda",
+    "date": "Guyyaa",
+    "allDates": "Guyyaa hunda",
+    "search": "Barbaadi",
+    "searchPlaceholder": "Barataa, kutaa ykn bilbila",
+    "count": "{count, plural, =0 {Hafuun hin jiru} one {Hafuu tokko} other {Hafuu #}}",
+    "emptySearch": "Barataan hafe barbaacha keessaniin wal simu hin jiru.",
+    "emptyAll": "Hanga ammaatti kutaalee keessan keessatti hafuun galmaa'e hin jiru.",
+    "emptyDate": "Guyyaa {date} hafuun galmaa'e hin jiru.",
+    "noClasses": "Hanga ammaatti kutaan isinitti kenname hin jiru.",
+    "callNumber": "{phone} bilbili"
+  },
+  "table": {
+    "date": "Guyyaa",
+    "student": "Barataa",
+    "class": "Kutaa",
+    "parentPhone": "Bilbila maatii",
+    "alternativePhone": "Bilbila biraa"
+  },
+  "toast": {
+    "loadFailed": "Odeeffannoo fuula jalqabaa fe'uun hin danda'amne. Walqunnamtii keessan mirkaneeffadhaa."
+  }
+}

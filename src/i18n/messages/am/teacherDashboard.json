@@ -1,0 +1,44 @@
+{
+  "title": "ዳሽቦርድ",
+  "description": "የዛሬው የክፍሎችዎ ሁኔታ እና ሊያገኟቸው የሚገቡ ቀሪ ተማሪዎች።",
+  "stats": {
+    "students": "የእኔ ተማሪዎች",
+    "absentToday": "ዛሬ ቀሪ",
+    "presentToday": "ዛሬ የተገኙ",
+    "classes": "የእኔ ክፍሎች"
+  },
+  "requests": {
+    "title": "የእኔ ጥያቄዎች",
+    "pending": "{count, plural, =0 {የሚጠባበቅ ጥያቄ የለም} one {ማጽደቅ የሚጠብቅ # ጥያቄ} other {ማጽደቅ የሚጠብቁ # ጥያቄዎች}}",
+    "recent": "የቅርብ ጊዜ ውሳኔዎች",
+    "noRecent": "እስካሁን ምንም ውሳኔ የለም።",
+    "viewAll": "ጥያቄዎቼን ተመልከት",
+    "decided": "{student} · {date}"
+  },
+  "absent": {
+    "title": "ቀሪ ተማሪዎች",
+    "description": "በክፍሎችዎ ያሉ ቀሪ ተማሪዎች ከወላጆቻቸው ስልክ ቁጥር ጋር። ለመደወል ቁጥሩን ይንኩ።",
+    "class": "ክፍል",
+    "allClasses": "ሁሉም ክፍሎቼ",
+    "date": "ቀን",
+    "allDates": "ሁሉም ቀናት",
+    "search": "ፈልግ",
+    "searchPlaceholder": "ተማሪ፣ ክፍል ወይም ስልክ",
+    "count": "{count, plural, =0 {ቀሪ የለም} one {# ቀሪ} other {# ቀሪዎች}}",
+    "emptySearch": "ከፍለጋዎ ጋር የሚዛመድ ቀሪ ተማሪ የለም።",
+    "emptyAll": "በክፍሎችዎ እስካሁን የተመዘገበ ቀሪ የለም።",
+    "emptyDate": "ለ{date} የተመዘገበ ቀሪ የለም።",
+    "noClasses": "እስካሁን ምንም ክፍል አልተመደበልዎትም።",
+    "callNumber": "{phone} ደውል"
+  },
+  "table": {
+    "date": "ቀን",
+    "student": "ተማሪ",
+    "class": "ክፍል",
+    "parentPhone": "የወላጅ ስልክ",
+    "alternativePhone": "ተጨማሪ ስልክ"
+  },
+  "toast": {
+    "loadFailed": "የዳሽቦርድ መረጃ መጫን አልተቻለም። የኢንተርኔት ግንኙነትዎን ያረጋግጡ።"
+  }
+}

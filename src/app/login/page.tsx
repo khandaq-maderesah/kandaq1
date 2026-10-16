@@ -1,46 +1,61 @@
 'use client'
 
 import { useState, FormEvent } from 'react'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { sendPasswordResetEmail } from 'firebase/auth'
+import { ArrowLeft, Eye, EyeOff, KeyRound, Loader2, Lock, Mail } from 'lucide-react'
 import { auth } from '@/lib/firebase/config'
+import { getAuthErrorKey, type AuthErrorInfo } from '@/lib/firebase/authErrors'
 import { useLogin } from '@/hooks/useAuth'
-import NeonWaveBackground from '@/components/NeonWaveBackground'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Lock, Mail, Loader2, KeyRound } from 'lucide-react'
+import { LanguageSwitcher } from '@/components/shell/LanguageSwitcher'
 import { homePathFor } from '@/components/ProtectedRoute'
 
 export default function LoginPage() {
+  const t = useTranslations('auth')
+  const tc = useTranslations('common')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [error, setError] = useState<AuthErrorInfo | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [forgotMode, setForgotMode] = useState(false)
-  const [resetMsg, setResetMsg] = useState('')
+  const [resetSent, setResetSent] = useState(false)
   const [resetError, setResetError] = useState('')
   const [sending, setSending] = useState(false)
 
   const loginUser = useLogin()
   const router = useRouter()
 
+  const errorText = (info: AuthErrorInfo) => t(`errors.${info.key}`, { code: info.code })
+
   const handleForgotPassword = async () => {
-    setResetMsg('')
+    setResetSent(false)
     setResetError('')
     if (!email.trim()) {
-      setResetError('Please enter your email address.')
+      setResetError(t('forgot.emailRequired'))
       return
     }
     setSending(true)
     try {
       await sendPasswordResetEmail(auth, email.trim())
-      setResetMsg('Password reset email sent. Please check your inbox.')
-    } catch (err: any) {
-      setResetError(err.message || 'Failed to send reset email. Please try again.')
+      setResetSent(true)
+    } catch (err) {
+      const info = getAuthErrorKey(err)
+      if (info.key === 'unknown' || info.key === 'unknownWithCode' || info.key === 'configuration') {
+        console.error('Password reset failed', err)
+        setResetError(t('forgot.failed'))
+      } else {
+        setResetError(errorText(info))
+      }
     } finally {
       setSending(false)
     }
@@ -48,7 +63,7 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
-    setError('')
+    setError(null)
 
     if (forgotMode) {
       await handleForgotPassword()
@@ -56,7 +71,6 @@ export default function LoginPage() {
     }
 
     setIsLoading(true)
-
     const result = await loginUser(email, password)
 
     if (result.success) {
@@ -66,154 +80,146 @@ export default function LoginPage() {
       const role = result.profile?.role
       router.replace(role ? homePathFor(role, role !== 'superadmin') : '/dashboard')
     } else {
-      setError(result.error || 'Login failed')
+      setError(result.error)
     }
 
     setIsLoading(false)
   }
 
+  const switchMode = (forgot: boolean) => {
+    setForgotMode(forgot)
+    setError(null)
+    setResetSent(false)
+    setResetError('')
+  }
+
   return (
-    <div className="relative min-h-screen flex items-center justify-center overflow-hidden p-4" style={{ background: '#0a0518' }}>
-      <NeonWaveBackground />
-      <Card className="relative w-full max-w-md rounded-2xl border-0 shadow-2xl">
-        <CardHeader className='space-y-1 pt-8'>
-          <div className='mx-auto mb-3 h-16 w-16 overflow-hidden rounded-2xl bg-white shadow-lg ring-2 ring-green-500/20'>
-            <Image src='/image/khandaq-logo.png' alt='Khendeq Medresah logo' width={64} height={64} className='h-full w-full object-cover' />
-          </div>
-          <CardTitle className="text-2xl font-bold text-center">
-            Khendeq Medresah Students Management System
-          </CardTitle>
-          <CardDescription className="text-center">
-            {forgotMode ? 'Reset your password' : 'Sign in to your account to continue'}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {forgotMode ? (
-              <>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="you@example.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="pl-10"
-                      required
-                    />
-                  </div>
+    <div className="flex min-h-screen flex-col bg-background">
+      <header className="mx-auto flex w-full max-w-6xl items-center justify-between gap-2 px-4 py-4 sm:px-6">
+        <Link href="/" className={cn(buttonVariants({ variant: 'ghost', size: 'sm' }), 'text-muted-foreground')}>
+          <ArrowLeft className="rtl:rotate-180" />
+          {t('backHome')}
+        </Link>
+        <LanguageSwitcher showLabel />
+      </header>
+
+      <main className="flex flex-1 items-center justify-center px-4 pb-16">
+        <Card className="w-full max-w-md">
+          <CardHeader className="items-center pt-8 text-center">
+            <Image
+              src="/image/khandaq-logo.png"
+              alt=""
+              width={56}
+              height={56}
+              priority
+              className="mb-2 h-14 w-14 rounded-xl border object-cover"
+            />
+            <p className="text-sm font-medium text-muted-foreground">{tc('appName')}</p>
+            <CardTitle className="text-2xl">{forgotMode ? t('forgot.title') : t('title')}</CardTitle>
+            <CardDescription>{forgotMode ? t('forgot.subtitle') : t('subtitle')}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {!forgotMode && error && (
+                <Alert variant="destructive">
+                  <AlertDescription>{errorText(error)}</AlertDescription>
+                </Alert>
+              )}
+
+              <div className="space-y-2">
+                <Label htmlFor="email">{tc('fields.email')}</Label>
+                <div className="relative">
+                  <Mail className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    id="email"
+                    type="email"
+                    autoComplete="email"
+                    inputMode="email"
+                    dir="ltr"
+                    placeholder={t('emailPlaceholder')}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="ps-10 text-start"
+                    required
+                  />
                 </div>
+              </div>
 
-                {resetError && (
-                  <Alert variant="destructive">
-                    <AlertDescription>{resetError}</AlertDescription>
-                  </Alert>
-                )}
-                {resetMsg && (
-                  <Alert variant="success">
-                    <AlertDescription>{resetMsg}</AlertDescription>
-                  </Alert>
-                )}
-
-                <Button type="submit" className="w-full" disabled={sending}>
-                  {sending ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Sending...
-                    </>
-                  ) : (
-                    <>
-                      <KeyRound className="mr-2 h-4 w-4" />
-                      Send Password Reset Link
-                    </>
+              {forgotMode ? (
+                <>
+                  {resetError && (
+                    <Alert variant="destructive">
+                      <AlertDescription>{resetError}</AlertDescription>
+                    </Alert>
                   )}
-                </Button>
-
-                <p className="text-center text-sm text-gray-600">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setForgotMode(false)
-                      setResetMsg('')
-                      setResetError('')
-                    }}
-                    className="text-green-600 hover:underline"
-                  >
-                    Back to sign in
-                  </button>
-                </p>
-              </>
-            ) : (
-              <>
-                {error && (
-                  <Alert variant="destructive">
-                    <AlertDescription>{error}</AlertDescription>
-                  </Alert>
-                )}
-
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="admin@khandaqmadresah.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="pl-10"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="password">Password</Label>
-                    <button
-                      type="button"
-                      onClick={() => setForgotMode(true)}
-                      className="text-sm text-green-600 hover:underline"
-                    >
-                      Forgot password?
-                    </button>
-                  </div>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input
-                      id="password"
-                      type="password"
-                      placeholder="••••••••"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="pl-10"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Signing in...
-                    </>
-                  ) : (
-                    'Sign In'
+                  {resetSent && (
+                    <Alert variant="success">
+                      <AlertDescription>{t('forgot.sent')}</AlertDescription>
+                    </Alert>
                   )}
-                </Button>
-              </>
-            )}
-          </form>
 
-          <div className="mt-4 text-center text-sm text-gray-600">
-            <p>Need access? Contact the madresah administrator to create your account.</p>
-          </div>
-        </CardContent>
-      </Card>
+                  <Button type="submit" className="w-full" disabled={sending}>
+                    {sending ? <Loader2 className="animate-spin" /> : <KeyRound />}
+                    {sending ? t('forgot.sending') : t('forgot.send')}
+                  </Button>
+
+                  <div className="text-center">
+                    <Button type="button" variant="link" onClick={() => switchMode(false)}>
+                      {t('forgot.back')}
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <Label htmlFor="password">{tc('fields.password')}</Label>
+                      <Button
+                        type="button"
+                        variant="link"
+                        className="h-auto p-0 text-sm"
+                        onClick={() => switchMode(true)}
+                      >
+                        {t('forgotPassword')}
+                      </Button>
+                    </div>
+                    <div className="relative">
+                      <Lock className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        id="password"
+                        type={showPassword ? 'text' : 'password'}
+                        autoComplete="current-password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="pe-11 ps-10"
+                        required
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon-sm"
+                        className="absolute end-1 top-1/2 -translate-y-1/2 text-muted-foreground"
+                        onClick={() => setShowPassword((v) => !v)}
+                        aria-label={showPassword ? t('hidePassword') : t('showPassword')}
+                        aria-pressed={showPassword}
+                      >
+                        {showPassword ? <EyeOff /> : <Eye />}
+                      </Button>
+                    </div>
+                  </div>
+
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading && <Loader2 className="animate-spin" />}
+                    {isLoading ? t('signingIn') : t('signIn')}
+                  </Button>
+                </>
+              )}
+            </form>
+
+            <p className="mt-6 text-center text-sm text-muted-foreground">{t('noAccount')}</p>
+          </CardContent>
+        </Card>
+      </main>
     </div>
   )
 }

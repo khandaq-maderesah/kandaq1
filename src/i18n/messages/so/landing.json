@@ -1,0 +1,55 @@
+{
+  "nav": {
+    "signIn": "Gal"
+  },
+  "hero": {
+    "eyebrow": "Madal maamulka dugsiyada",
+    "title": "Dugsigaaga oo dhan ka maamul hal meel",
+    "subtitle": "Khendeq wuxuu dugsiyada ka caawiyaa qaadashada xaadiriska, maamulka ardayda iyo macallimiinta, qabashada imtixaannada iyo la socodsiinta waalidka, adigoo isticmaalaya luqadda aad doorbiddo.",
+    "cta": "Gal",
+    "secondary": "Eeg waxa ku jira"
+  },
+  "features": {
+    "title": "Wax kasta oo dugsi u baahan yahay",
+    "subtitle": "Qalab fudud oo loogu talagalay maamulayaasha iyo macallimiinta, kuna shaqeeya si fiican taleefan kasta.",
+    "attendance": {
+      "title": "Xaadiriska maalinlaha ah",
+      "description": "Macallimiintu ilbiriqsiyo gudahood ayay ku calaamadeeyaan jooga, maqan ama daahay. Maamulayaashuna isla markiiba waxay arkaan xaaladda oo dhan."
+    },
+    "students": {
+      "title": "Diiwaanka ardayda",
+      "description": "Fasalka, sawirka iyo lambarrada waalidka arday kasta ku hay hal meel oo habaysan."
+    },
+    "exams": {
+      "title": "Imtixaannada iyo natiijooyinka",
+      "description": "Samee imtixaanno, geli buundooyinka oo daabac warqado natiijo oo cad oo fasal kasta ah."
+    },
+    "parents": {
+      "title": "La socodka waalidka",
+      "description": "Ardayda maqnaanshahoodu soo noqnoqdo si toos ah ayaa loo calaamadeeyaa, iyadoo lambarka waalidkood diyaar u yahay in la waco."
+    },
+    "reports": {
+      "title": "Warbixinnada",
+      "description": "Jaantusyada isbeddelka xaadiriska, buundooyinka iyo tirada fasallada ayaa kaa caawinaya inaad dhibaatooyinka goor hore ogaato."
+    },
+    "languages": {
+      "title": "Dugsiyo badan, luqado badan",
+      "description": "Dugsi kastaa wuxuu leeyahay meel u gaar ah oo qarsoon, isticmaale kastaana wuxuu dooran karaa luqaddiisa."
+    }
+  },
+  "footer": {
+    "copyright": "© {year} Khendeq. Xuquuqda oo dhan way dhowran tahay."
+  },
+  "errorPage": {
+    "title": "Cillad ayaa dhacday",
+    "description": "Cillad lama filaan ah ayaa dhacday. Fadlan isku day mar kale.",
+    "retry": "Isku day mar kale",
+    "home": "Tag bogga hore"
+  },
+  "notFound": {
+    "code": "404",
+    "title": "Bogga lama helin",
+    "description": "Raali ahow, boggii aad raadinaysay ma jiro ama meel kale ayaa loo raray.",
+    "home": "Tag bogga hore"
+  }
+}

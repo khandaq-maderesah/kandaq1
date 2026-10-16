@@ -1,0 +1,58 @@
+{
+  "title": "My classes",
+  "description": "Your classes and their students. Add new students or update their details.",
+  "classCard": {
+    "grade": "Grade {grade}",
+    "section": "Section {section}",
+    "select": "Show students of {name}",
+    "selected": "Selected"
+  },
+  "registrationClosed": "Student registration is closed. You can still edit existing students.",
+  "form": {
+    "addTitle": "Add a student",
+    "addDescription": "The roll number is suggested automatically for each class.",
+    "editTitle": "Edit {name}",
+    "editDescription": "Only the fields you change are updated.",
+    "class": "Class",
+    "classLocked": "To move this student to another class, use Request move in the students list.",
+    "name": "Student name",
+    "namePlaceholder": "Full name",
+    "gender": "Gender",
+    "genderPlaceholder": "Select gender",
+    "age": "Age",
+    "agePlaceholder": "e.g. 10",
+    "parentLanguage": "Parent language",
+    "parentLanguagePlaceholder": "Select language",
+    "parentPhone": "Parent phone",
+    "alternativePhone": "Alternative phone (optional)",
+    "phonePlaceholder": "09XX XXX XXX",
+    "rollNumber": "Roll number",
+    "rollTaken": "This roll number is already used in this class.",
+    "rollHint": "Suggested: {roll}. You can change it to rearrange roll numbers.",
+    "photo": "Student photo",
+    "submitAdd": "Add student",
+    "submitEdit": "Save changes",
+    "cancelEdit": "Cancel editing"
+  },
+  "list": {
+    "title": "Students in {name}",
+    "description": "Tap Edit to update a student. To delete or move one, use the actions menu.",
+    "roll": "Roll {roll}",
+    "age": "{age, plural, one {# year} other {# years}}",
+    "edit": "Edit {name}",
+    "empty": "No students in this class yet.",
+    "emptyHint": "Add the first student with the form."
+  },
+  "empty": {
+    "noClasses": "No classes assigned to you yet.",
+    "noClassesHint": "Ask a school admin to assign you a class."
+  },
+  "toast": {
+    "loadFailed": "Could not load your classes.",
+    "added": "{name} was added with roll number {roll}.",
+    "updated": "{name} was updated.",
+    "saveFailed": "Could not save the student. Please try again.",
+    "registrationClosed": "Student registration is closed. A school admin must open it in Settings.",
+    "rollTaken": "Roll number {roll} is already used in this class."
+  }
+}

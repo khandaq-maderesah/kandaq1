@@ -1,0 +1,30 @@
+{
+  "dashboard": "Dashboard",
+  "schools": "Schools",
+  "allSchools": "All schools",
+  "users": "Users",
+  "teachers": "Teachers",
+  "classes": "Classes",
+  "students": "Students",
+  "attendance": "Attendance",
+  "takeAttendance": "Take attendance",
+  "history": "History",
+  "results": "Results",
+  "exams": "Exams & results",
+  "reports": "Reports",
+  "requests": "Requests",
+  "myRequests": "My requests",
+  "settings": "Settings",
+  "profile": "Profile",
+  "signOut": "Sign out",
+  "openMenu": "Open menu",
+  "closeMenu": "Close menu",
+  "notifications": "Notifications",
+  "switchSchool": "Switch school",
+  "sections": {
+    "overview": "Overview",
+    "people": "People",
+    "academics": "Academics",
+    "administration": "Administration"
+  }
+}

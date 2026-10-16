@@ -1,0 +1,36 @@
+{
+  "title": "የእኔ ተማሪዎች",
+  "description": "በተመደቡልዎ ክፍሎች ያሉ ተማሪዎች። ተማሪን ለመሰረዝ ወይም ለማዛወር ለትምህርት ቤቱ አስተዳዳሪ ጥያቄ ይላኩ።",
+  "filters": {
+    "search": "ተማሪዎችን ፈልግ",
+    "searchPlaceholder": "ስም፣ ተራ ቁጥር ወይም ስልክ",
+    "class": "ክፍል",
+    "allClasses": "ሁሉም ክፍሎቼ"
+  },
+  "table": {
+    "photo": "ፎቶ",
+    "student": "ተማሪ",
+    "roll": "ተ.ቁ.",
+    "age": "ዕድሜ",
+    "class": "ክፍል",
+    "gender": "ጾታ",
+    "parentPhone": "የወላጅ ስልክ",
+    "alternativePhone": "ተጨማሪ ስልክ",
+    "actions": "ተግባራት"
+  },
+  "card": {
+    "roll": "ተ.ቁ. {roll}",
+    "age": "{age, plural, one {# ዓመት} other {# ዓመት}}"
+  },
+  "viewDetails": "የ{name} ዝርዝር መረጃ ተመልከት",
+  "callNumber": "{phone} ደውል",
+  "empty": {
+    "noClasses": "እስካሁን ምንም ክፍል አልተመደበልዎትም።",
+    "noClassesHint": "ክፍል እንዲመድብልዎ የትምህርት ቤቱን አስተዳዳሪ ይጠይቁ።",
+    "noStudents": "ምንም ተማሪ አልተገኘም።",
+    "noStudentsHint": "ተማሪዎችን ከ«የእኔ ክፍሎች» ገጽ ይጨምሩ።"
+  },
+  "toast": {
+    "loadFailed": "ተማሪዎችዎን መጫን አልተቻለም።"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "dashboard": "Fuula jalqabaa",
+  "schools": "Manneen barumsaa",
+  "allSchools": "Manneen barumsaa hunda",
+  "users": "Fayyadamtoota",
+  "teachers": "Barsiisota",
+  "classes": "Kutaalee",
+  "students": "Barattoota",
+  "attendance": "Argama",
+  "takeAttendance": "Argama galmeessi",
+  "history": "Seenaa",
+  "results": "Bu'aa",
+  "exams": "Qormaata fi bu'aa",
+  "reports": "Gabaasota",
+  "requests": "Gaaffiiwwan",
+  "myRequests": "Gaaffiiwwan koo",
+  "settings": "Qindaa'ina",
+  "profile": "Piroofaayilii",
+  "signOut": "Ba'i",
+  "openMenu": "Baafata bani",
+  "closeMenu": "Baafata cufi",
+  "notifications": "Beeksisota",
+  "switchSchool": "Mana barumsaa jijjiiri",
+  "sections": {
+    "overview": "Waliigala",
+    "people": "Namoota",
+    "academics": "Barnoota",
+    "administration": "Bulchiinsa"
+  }
+}

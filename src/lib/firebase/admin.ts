@@ -35,9 +35,37 @@ export function getAdminApp() {
 
 /** Error carrying the HTTP status an API route should respond with. */
 export class HttpError extends Error {
-  constructor(public status: number, message: string) {
+  constructor(public status: number, message: string, public code?: ApiErrorCode) {
     super(message)
   }
+}
+
+/**
+ * Stable error codes returned to the browser as `{ code }`, which screens
+ * translate (src/lib/apiErrors.ts). Firebase Auth codes (auth/...) pass through.
+ */
+export type ApiErrorCode =
+  | 'invalid'
+  | 'session-expired'
+  | 'forbidden'
+  | 'school-suspended'
+  | 'other-school'
+  | 'not-found'
+  | 'cannot-delete-self'
+  | 'internal'
+
+const STATUS_CODES: Record<number, ApiErrorCode> = {
+  400: 'invalid',
+  401: 'session-expired',
+  403: 'forbidden',
+  404: 'not-found',
+}
+
+export function errorCode(err: unknown): string {
+  if (err instanceof HttpError) return err.code ?? STATUS_CODES[err.status] ?? 'internal'
+  const code = (err as { code?: unknown })?.code
+  if (typeof code === 'string' && code.startsWith('auth/')) return code
+  return 'internal'
 }
 
 export interface Caller {
@@ -73,7 +101,7 @@ export async function requireAdmin(request: Request) {
   if (profile.role === 'admin') {
     if (!profile.schoolId) throw new HttpError(403, 'Admin is not linked to a school.')
     const status = (await db.ref(`schoolInfo/${profile.schoolId}/status`).get()).val()
-    if (status !== 'active') throw new HttpError(403, 'This school is suspended.')
+    if (status !== 'active') throw new HttpError(403, 'This school is suspended.', 'school-suspended')
   }
 
   const caller: Caller = { uid, role: profile.role, schoolId: profile.schoolId }
@@ -84,7 +112,7 @@ export async function requireAdmin(request: Request) {
 export function assertCanManageSchool(caller: Caller, schoolId: string | undefined) {
   if (caller.role === 'superadmin') return
   if (!schoolId || caller.schoolId !== schoolId) {
-    throw new HttpError(403, 'You can only manage your own school.')
+    throw new HttpError(403, 'You can only manage your own school.', 'other-school')
   }
 }
 
@@ -100,5 +128,8 @@ export async function syncUserClaims(uid: string, role: string, schoolId?: strin
 
 /** HTTP status for an error caught in an API route. */
 export function errorStatus(err: unknown): number {
-  return err instanceof HttpError ? err.status : 500
+  if (err instanceof HttpError) return err.status
+  // Firebase Auth input problems (email already used, weak password, ...) are the caller's fault.
+  const code = (err as { code?: unknown })?.code
+  return typeof code === 'string' && code.startsWith('auth/') ? 400 : 500
 }

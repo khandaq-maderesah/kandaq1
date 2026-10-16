@@ -1,0 +1,36 @@
+{
+  "title": "Ardaydayda",
+  "description": "Ardayda fasallada laguu qoondeeyay. Si aad arday u tirtirto ama u wareejiso, codsi u dir maamulaha dugsiga.",
+  "filters": {
+    "search": "Raadi arday",
+    "searchPlaceholder": "Magac, lambarka taxanaha ama taleefan",
+    "class": "Fasalka",
+    "allClasses": "Dhammaan fasalladayda"
+  },
+  "table": {
+    "photo": "Sawir",
+    "student": "Ardayga",
+    "roll": "Lambar",
+    "age": "Da'da",
+    "class": "Fasalka",
+    "gender": "Jinsiga",
+    "parentPhone": "Taleefanka waalidka",
+    "alternativePhone": "Taleefan kale",
+    "actions": "Ficillo"
+  },
+  "card": {
+    "roll": "Lambar {roll}",
+    "age": "{age, plural, one {# sano} other {# sano}}"
+  },
+  "viewDetails": "Eeg faahfaahinta {name}",
+  "callNumber": "Wac {phone}",
+  "empty": {
+    "noClasses": "Weli laguuma qoondayn wax fasal ah.",
+    "noClassesHint": "Fadlan maamulaha dugsiga ka codso inuu fasal kuu qoondeeyo.",
+    "noStudents": "Arday lama helin.",
+    "noStudentsHint": "Ardayda ku dar bogga Fasalladayda."
+  },
+  "toast": {
+    "loadFailed": "Ardaydaada lama soo rari karin."
+  }
+}

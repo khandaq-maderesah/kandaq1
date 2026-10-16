@@ -1,0 +1,71 @@
+{
+  "title": "Gabaasota",
+  "description": "Waliigala argamaa mana barumsaa keessanii",
+  "actions": {
+    "studentCsv": "CSV barattootaa",
+    "summaryCsv": "CSV cuunfaa"
+  },
+  "filters": {
+    "from": "Irraa",
+    "to": "Hanga",
+    "hint": "Lakkoofsonni armaan gadii hundi daangaa guyyaa kana hordofu. Yeroo hundaaf duwwaa dhiisaa.",
+    "clear": "Guyyaawwan qulqulleessi",
+    "ethRange": "Akka Lakkoofsa Habashaa: {from} – {to}",
+    "ethFrom": "Akka Lakkoofsa Habashaa: {date} irraa",
+    "ethTo": "Akka Lakkoofsa Habashaa: hanga {date}"
+  },
+  "kpi": {
+    "students": "Barattoota hojii irra jiran",
+    "classes": "Kutaalee",
+    "teachers": "Barsiisota",
+    "records": "Galmeewwan argamaa",
+    "rateHint": "{percent}% argame"
+  },
+  "charts": {
+    "byStatusTitle": "Argama akka haalaatti",
+    "byStatusDescription": "Qooda galmeewwanii daangaa filatame keessatti",
+    "dailyTitle": "Argama guyyaa guyyaa dhiyoo",
+    "dailyDescription": "Guyyoota galmee qaban 7 dhumaa",
+    "noData": "Ammaaf odeeffannoon argamaa hin jiru.",
+    "percent": "{percent}%",
+    "total": "Ida'ama: {count}",
+    "pieTooltip": "{name}: {value} ({percent}%)"
+  },
+  "status": {
+    "present": "Argame",
+    "absent": "Hafe",
+    "late": "Booda dhufe",
+    "excused": "Hayyamaan"
+  },
+  "summary": {
+    "title": "Cuunfaa argama barattootaa",
+    "count": "{count, plural, one {Barataa hojii irra jiru tokko} other {Barattoota hojii irra jiran #}}",
+    "empty": "Barataan hojii irra jiru hin jiru",
+    "table": {
+      "student": "Barataa",
+      "class": "Kutaa",
+      "present": "Argame",
+      "absent": "Hafe",
+      "late": "Booda dhufe",
+      "excused": "Hayyamaan",
+      "total": "Ida'ama",
+      "rate": "Harka"
+    }
+  },
+  "csv": {
+    "metric": "Safartuu",
+    "value": "Gatii",
+    "totalStudents": "Barattoota hojii irra jiran",
+    "totalClasses": "Kutaalee",
+    "totalTeachers": "Barsiisota",
+    "records": "Galmeewwan argamaa (daangaa)",
+    "present": "Argame",
+    "absent": "Hafe",
+    "late": "Booda dhufe",
+    "excused": "Hayyamaan",
+    "name": "Maqaa",
+    "class": "Kutaa",
+    "total": "Ida'ama",
+    "rate": "Harka %"
+  }
+}

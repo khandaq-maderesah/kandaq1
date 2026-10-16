@@ -1,0 +1,61 @@
+{
+  "avatar": {
+    "photoOf": "Photo of {name}",
+    "photo": "Student photo"
+  },
+  "photo": {
+    "capturedAlt": "Captured student photo",
+    "retake": "Retake photo",
+    "remove": "Remove photo",
+    "frontCamera": "Front camera",
+    "backCamera": "Back camera",
+    "take": "Take photo",
+    "flip": "Flip camera",
+    "upload": "Upload from gallery",
+    "hint": "Use the front (selfie) or back camera and press Flip camera to switch. You can retake the photo as many times as you like before saving.",
+    "cameraUnavailable": "Camera not available. Allow camera access for this site, or upload a photo from your gallery instead.",
+    "notImage": "Please choose an image file."
+  },
+  "detail": {
+    "title": "Student details",
+    "viewPhoto": "View photo",
+    "closePhoto": "Close photo",
+    "classNotAssigned": "Class not assigned",
+    "classWithSection": "{name} · Section {section}",
+    "roll": "Roll {roll}",
+    "rollNumber": "Roll number",
+    "age": "Age",
+    "gender": "Gender",
+    "class": "Class",
+    "section": "Section",
+    "studentId": "Student ID",
+    "parentLanguage": "Parent language",
+    "phoneHeading": "Phone",
+    "parentPhone": "Parent phone",
+    "alternativePhone": "Alternative phone",
+    "registrationHeading": "Registration",
+    "registeredOn": "Registered on",
+    "lastUpdated": "Last updated",
+    "createdBy": "Created by",
+    "ustaz": "Ustaz {name}",
+    "systemRecovered": "System (auto-recovered)",
+    "admin": "Admin",
+    "attendanceHeading": "Attendance history",
+    "noAttendance": "No attendance records yet for this student.",
+    "calendarFilter": "Ethiopian calendar filter",
+    "ethYear": "Ethiopian year",
+    "ethMonth": "Ethiopian month",
+    "allYear": "All year",
+    "noAttendanceInPeriod": "No attendance recorded in the selected Ethiopian period.",
+    "records": "{count, plural, one {record} other {records}}",
+    "ethiopianSuffix": "{date} (Ethiopian)",
+    "legendItem": "{status}: {count}",
+    "callParent": "Call parent",
+    "status": {
+      "present": "Present",
+      "absent": "Absent",
+      "late": "Late",
+      "excused": "Excused"
+    }
+  }
+}

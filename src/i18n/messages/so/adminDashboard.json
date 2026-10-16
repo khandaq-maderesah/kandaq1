@@ -1,0 +1,134 @@
+{
+  "title": "Bogga guud",
+  "description": "Guudmarka ardayda, macallimiinta iyo xaadiriska",
+  "todayDate": "{gregorian} · {ethiopian}",
+  "kpi": {
+    "totalStudents": "Wadarta ardayda",
+    "totalHint": "{male} lab · {female} dheddig",
+    "maleStudents": "Ardayda lab",
+    "femaleStudents": "Ardayda dheddig",
+    "percentOfTotal": "{percent}% dhammaan ardayda",
+    "teachers": "Macallimiinta",
+    "classes": "Fasallada",
+    "absentToday": "Maqan maanta",
+    "absentWeekHint": "{count, plural, =0 {Midna 7-dii maalmood ee u dambeeyay} one {# 7-dii maalmood ee u dambeeyay} other {# 7-dii maalmood ee u dambeeyay}}"
+  },
+  "students": {
+    "title": "Ardayda",
+    "titleMale": "Ardayda lab",
+    "titleFemale": "Ardayda dheddig",
+    "description": "Dooro arday si aad u aragto xogtiisa oo dhammaystiran.",
+    "searchPlaceholder": "Ku raadi magac, lambarka taxanaha ama taleefan",
+    "searchLabel": "Raadi arday",
+    "empty": "Arday lama helin",
+    "table": {
+      "photo": "Sawir",
+      "name": "Magaca",
+      "roll": "Lambar",
+      "age": "Da'da",
+      "class": "Fasalka",
+      "section": "Qaybta",
+      "parentPhone": "Taleefanka waalidka"
+    }
+  },
+  "teachers": {
+    "title": "Macallimiinta",
+    "description": "Dhammaan akoonnada macallimiinta.",
+    "searchPlaceholder": "Ku raadi magac, iimayl ama taleefan",
+    "searchLabel": "Raadi macallimiinta",
+    "empty": "Macallin lama helin",
+    "table": {
+      "name": "Magaca",
+      "email": "Iimayl",
+      "phone": "Taleefanka",
+      "classes": "Fasallada loo qoondeeyay",
+      "status": "Xaaladda"
+    }
+  },
+  "classes": {
+    "title": "Fasallada",
+    "description": "Dhammaan fasallada iyo macallimiinta loo qoondeeyay.",
+    "searchPlaceholder": "Raadi fasal ama macallin",
+    "searchLabel": "Raadi fasallada",
+    "empty": "Fasal lama helin",
+    "table": {
+      "class": "Fasalka",
+      "grade": "Heerka",
+      "section": "Qaybta",
+      "teacher": "Macallinka",
+      "students": "Ardayda",
+      "academicYear": "Sannad-dugsiyeedka"
+    }
+  },
+  "absent": {
+    "title": "Ardayda maqan",
+    "descriptionDay": "Maqnaanshaha {date}, oo ay la socdaan lambarrada waalidka. Dooro taariikh kale ama \"Dhammaan taariikhaha\" si aad u aragto maqnaanshihii hore.",
+    "descriptionPeriod": "Maqnaanshaha muddada la doortay, oo ay la socdaan lambarrada waalidka.",
+    "descriptionAll": "Maqnaanshaha laga helay xaadiriska la kaydiyay ee dhammaan fasallada, oo ay la socdaan lambarrada waalidka.",
+    "period": "Muddada",
+    "periods": {
+      "today": "Hal maalin",
+      "thisWeek": "Toddobaadkan",
+      "lastWeek": "Toddobaadkii hore",
+      "last2Weeks": "2-dii toddobaad ee u dambeeyay",
+      "last3Weeks": "3-dii toddobaad ee u dambeeyay",
+      "thisMonth": "Bishan"
+    },
+    "date": "Taariikhda",
+    "allDates": "Dhammaan taariikhaha",
+    "allDatesOverrides": "\"Dhammaan taariikhaha\" ayaa ka mudnaan badan muddada.",
+    "searchPlaceholder": "Raadi arday, taleefan, fasal ama qayb",
+    "searchLabel": "Raadi maqnaanshaha",
+    "copyNumbers": "Koobiyee lambarrada",
+    "copyNumbersHint": "Koobiyee dhammaan lambarrada waalidka ee muuqda",
+    "clearStale": "Nadiifi kuwa la tirtiray",
+    "clearStaleHint": "Ka saar maqnaanshaha ardayda la tirtiray",
+    "sendSms": "Dir SMS",
+    "sendSmsHint": "Fur barnaamijka SMS-ka oo fariinta maqnaanshaha ku diyaarsan tahay",
+    "altPhone": "Kale: {phone}",
+    "call": "Wac {phone}",
+    "emptySearch": "Ma jiraan arday maqan oo raadintaada u dhigma.",
+    "emptyAll": "Weli maqnaansho lama diiwaangelin.",
+    "emptyPeriod": "Muddada la doortay maqnaansho kuma jiro.",
+    "emptyDay": "Wax maqnaansho ah lama diiwaangelin {date}.",
+    "table": {
+      "date": "Taariikhda",
+      "student": "Ardayga",
+      "class": "Fasalka",
+      "section": "Qaybta",
+      "parentPhone": "Taleefanka waalidka",
+      "action": "Ficil"
+    },
+    "toast": {
+      "nothingStale": "Wax la nadiifiyo ma jiro. Dhammaan maqnaanshuhu waxay ka tirsan yihiin arday jira.",
+      "cleared": "{count, plural, one {# diiwaan maqnaansho ayaa la nadiifiyay.} other {# diiwaan maqnaansho ayaa la nadiifiyay.}}",
+      "clearFailed": "Diiwaannada maqnaanshaha lama nadiifin karin.",
+      "noNumbers": "Ma jiraan lambarro waalid oo la koobiyeeyo.",
+      "copied": "{count, plural, one {# lambar taleefan ayaa la koobiyeeyay.} other {# lambar taleefan ayaa la koobiyeeyay.}}",
+      "copyBlocked": "Biraawsarkaagu wuu xannibay koobiyeynta. Fadlan lambarrada gacanta ku koobiyee."
+    },
+    "confirm": {
+      "title": "Ma nadiifinaysaa maqnaanshaha ardayda la tirtiray?",
+      "description": "{count, plural, one {# diiwaan maqnaansho wuxuu ka tirsan yahay arday aan hadda jirin. Waa la tirtiri doonaa. Dib looma soo celin karo.} other {# diiwaan maqnaansho waxay ka tirsan yihiin arday aan hadda jirin. Waa la tirtiri doonaa. Dib looma soo celin karo.}}",
+      "action": "Tirtir diiwaannada"
+    }
+  },
+  "charts": {
+    "byClassTitle": "Ardayda fasal kasta",
+    "byClassDescription": "Ardayda lab iyo dheddig ee fasal kasta",
+    "noStudents": "Weli xog arday ma jirto.",
+    "teacherLabel": "Ustaad {name}",
+    "statusTitle": "Xaaladda xaadiriska",
+    "statusDescription": "Xaadiriska maalinlaha ah ee {className} · 7-dii maalmood ee u dambeeyay",
+    "classLabel": "Fasalka",
+    "noAttendance": "Weli xaadiris looma diiwaangelin fasalkan.",
+    "male": "Lab",
+    "female": "Dheddig",
+    "present": "Jooga",
+    "absent": "Maqan",
+    "late": "Daahay",
+    "excused": "Fasax",
+    "total": "Wadarta: {count}",
+    "unassigned": "Aan loo qoondayn"
+  }
+}

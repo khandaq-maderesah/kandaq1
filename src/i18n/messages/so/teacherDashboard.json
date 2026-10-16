@@ -1,0 +1,44 @@
+{
+  "title": "Bogga guud",
+  "description": "Xaaladda maanta ee fasalladaada, iyo ardayda maqan ee aad la xiriiri karto waalidkood.",
+  "stats": {
+    "students": "Ardaydayda",
+    "absentToday": "Maqan maanta",
+    "presentToday": "Jooga maanta",
+    "classes": "Fasalladayda"
+  },
+  "requests": {
+    "title": "Codsiyadayda",
+    "pending": "{count, plural, =0 {Ma jiro codsi sugaya} one {# codsi ayaa sugaya ansixin} other {# codsi ayaa sugaya ansixin}}",
+    "recent": "Go'aannadii ugu dambeeyay",
+    "noRecent": "Weli go'aan lama gaarin.",
+    "viewAll": "Eeg codsiyadayda",
+    "decided": "{student} · {date}"
+  },
+  "absent": {
+    "title": "Ardayda maqan",
+    "description": "Ardayda ka maqan fasalladaada iyo lambarrada waalidkood. Taabo lambar si aad u wacdo.",
+    "class": "Fasalka",
+    "allClasses": "Dhammaan fasalladayda",
+    "date": "Taariikhda",
+    "allDates": "Dhammaan taariikhaha",
+    "search": "Raadi",
+    "searchPlaceholder": "Arday, fasal ama taleefan",
+    "count": "{count, plural, =0 {Maqnaansho ma jiro} one {# maqnaansho} other {# maqnaansho}}",
+    "emptySearch": "Ma jiraan arday maqan oo raadintaada u dhigma.",
+    "emptyAll": "Weli maqnaansho lagama diiwaangelin fasalladaada.",
+    "emptyDate": "Wax maqnaansho ah lama diiwaangelin {date}.",
+    "noClasses": "Weli laguuma qoondayn wax fasal ah.",
+    "callNumber": "Wac {phone}"
+  },
+  "table": {
+    "date": "Taariikhda",
+    "student": "Ardayga",
+    "class": "Fasalka",
+    "parentPhone": "Taleefanka waalidka",
+    "alternativePhone": "Taleefan kale"
+  },
+  "toast": {
+    "loadFailed": "Xogta bogga guud lama soo rari karin. Fadlan hubi xiriirkaaga."
+  }
+}
