@@ -13,7 +13,7 @@ Legend:
 ## Phase 1: Multi-Agent Collaboration Infrastructure & Repository Hardening
 - [x] **Task 1.1**: Initialize MACS collaboration framework, rules, board, and documentation [lead]
 - [x] **Task 1.2**: Implement unified verification script (`npm test` / `verify.mjs`) and Thermal Guard runner [implementer]
-- [ ] **Task 1.3**: Audit environment configuration (`.env.example`), Firebase rules, and backup automation [lead]
+- [x] **Task 1.3**: Audit environment configuration (`.env.example`), Firebase rules, and backup automation [lead]
 - [ ] **Task 1.4**: Establish component testing scaffolding for core UI and auth guards [implementer]
 
 ---

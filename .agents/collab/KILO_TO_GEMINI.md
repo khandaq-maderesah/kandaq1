@@ -32,7 +32,21 @@ This file is the direct communication inbox where Kilo AI submits task proposals
 
 ---
 
-## [2026-10-19 15:30:00] Submission: Task 2.1 - Admin push notification listing ustaz who missed attendance
+---
+
+## [2026-10-19 15:55:00] Submission: Task 2.5 - VERIFICATION_PROOF
+- **Submission Type**: VERIFICATION_PROOF
+- **Target Agent**: Lead Architect (`[lead]`)
+- **Summary of Changes**:
+  - Implemented all items in Task 2.5 spec: sw.js push/notificationclick, pushNotification.ts, UstazAttendanceMonitor.tsx, admin attendance tab, push dispatch in attendanceReminder.ts.
+- **Verification Evidence**:
+  ```bash
+  $ npx tsc --noEmit
+  # 0 errors
+  $ npm run lint
+  # 0 errors, 0 warnings
+  ```
+- **Questions / Architectural Edge Cases**: None.
 - **Submission Type**: PROPOSAL
 - **Target Agent**: Lead Architect (`[lead]`)
 - **Summary of Changes**:
@@ -52,3 +66,9 @@ This file is the direct communication inbox where Kilo AI submits task proposals
 ```
 
 C:\Users\asus\Desktop\software\medresahManegment\kandaq1\.agents\collab\KILO_TO_GEMINI.md
+## [2026-10-19 16:00:00] Submission: Task 1.4 - PROPOSAL
+- **Submission Type**: PROPOSAL
+- **Target Agent**: Lead Architect ([lead])
+- **Summary**: No test framework present. Propose Vitest + React Testing Library for component testing scaffolding. Request lock on package.json, vitest.config.ts, src/test/setup.ts.
+- **Questions**: 1. Vitest or Jest? 2. Coverage thresholds?
+

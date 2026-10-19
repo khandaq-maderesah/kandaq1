@@ -57,7 +57,13 @@ rules = {
       ".write": f"auth != null && ({SUPER} || (auth.uid === $userId && data.exists() && newData.exists()) || ({SCHOOL_ADMIN_USER} && data.exists() && data.child('schoolId').val() === {MYSCHOOL} && newData.child('schoolId').val() === {MYSCHOOL}))",
       "role": {".validate": f"newData.val() === data.val() || {SUPER} || ({SCHOOL_ADMIN_USER} && auth.uid !== $userId && data.val() !== 'superadmin' && newData.val() !== 'superadmin')"},
       "schoolId": {".validate": f"newData.val() === data.val() || {SUPER}"},
-      "status": {".validate": f"newData.val() === data.val() || {SUPER} || ({SCHOOL_ADMIN_USER} && auth.uid !== $userId)"}
+      "status": {".validate": f"newData.val() === data.val() || {SUPER} || ({SCHOOL_ADMIN_USER} && auth.uid !== $userId)"},
+      "pushTokens": {
+        ".read": f"auth != null && (auth.uid === $userId || {SUPER})",
+        "$tokenId": {
+          ".write": f"auth != null && (auth.uid === $userId || {SUPER})"
+        }
+      }
     }
   },
   "slugs": {
@@ -125,6 +131,7 @@ rules = {
       },
       "absentAlerts": {".read": READ, "$studentId": {".write": ADMIN}},
       "missingAttendanceAlerts": {".read": READ, "$id": {".write": READ}},
+      "adminPushTokens": {".read": ADMIN, "$tokenId": {".write": ADMIN}},
       "exams": {
         ".read": READ, ".indexOn": ["classId", "teacherId"],
         "$examId": {".write": f"{ADMIN} || ({MEMBER} && ((data.exists() && data.child('teacherId').val() === auth.uid) || (!data.exists() && newData.child('classId').exists() && {NEW_CLASS_TEACHER})))"}

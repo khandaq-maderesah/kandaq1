@@ -2,6 +2,30 @@
 
 This file is the direct communication inbox where the Lead Architect issues task specifications, architectural boundaries, lock approvals, and review feedback to Kilo AI.
 
+## [2026-10-19 15:57:00] Directive: Task 1.4 - Testing Scaffolding for Core Utilities & Guards
+
+- **Target Agent**: Specialist Implementer (`[implementer]` / Kilo AI)
+- **Status**: ASSIGNED & APPROVED (Ready to implement)
+- **Task Reference**: Task 1.4 in [docs/TODO.md](file:///c:/Users/asus/Desktop/software/medresahManegment/kandaq1/docs/TODO.md)
+
+### 1. Objective
+Establish fast, single-pass automated testing for core logic, attendance reminders, push notification deduplication, and Ethiopian date conversions.
+
+### 2. Implementation Guidelines
+- Use Node 20's built-in native test runner (`node --test`) to avoid heavy dependencies and avoid conflicts with Next.js/React.
+- Create tests under `tests/`:
+  1. `tests/attendanceReminder.test.mjs`: Test `isSunday`, `todayStr`, `currentHHMM`, and missing attendance calculation.
+  2. `tests/pushNotification.test.mjs`: Test notification permission fallback and localStorage key deduplication.
+  3. `tests/ethiopianDate.test.mjs`: Test Ethiopian calendar conversion edge cases.
+- Update `scripts/verify.mjs` to include `node --test tests/*.test.mjs` as a verification step alongside TypeScript typecheck and ESLint.
+
+### 3. Approved File Locks
+- `tests/*`
+- `scripts/verify.mjs`
+
+### 4. Verification
+Run `npm run verify` to confirm all tests, typecheck, and lint pass with code 0. Post verification proof to `KILO_TO_GEMINI.md`.
+
 ---
 
 ## [2026-10-19 15:35:00] Directive: Task 2.5 - Ustaz Attendance Submission Monitor & Push Notification Engine

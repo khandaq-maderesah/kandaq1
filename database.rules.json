@@ -16,6 +16,12 @@
         },
         "status": {
           ".validate": "newData.val() === data.val() || root.child('users/' + auth.uid).child('role').val() === 'superadmin' || (root.child('users/' + auth.uid).child('role').val() === 'admin' && root.child('users/' + auth.uid).child('schoolId').val() != null && root.child('users/' + auth.uid).child('status').val() !== 'inactive' && auth.uid !== $userId)"
+        },
+        "pushTokens": {
+          ".read": "auth != null && (auth.uid === $userId || root.child('users/' + auth.uid).child('role').val() === 'superadmin')",
+          "$tokenId": {
+            ".write": "auth != null && (auth.uid === $userId || root.child('users/' + auth.uid).child('role').val() === 'superadmin')"
+          }
         }
       }
     },
@@ -139,6 +145,12 @@
           ".read": "auth != null && (root.child('users/' + auth.uid).child('role').val() === 'superadmin' || (root.child('users/' + auth.uid).child('schoolId').val() === $schoolId && root.child('users/' + auth.uid).child('status').val() !== 'inactive' && root.child('schoolInfo/' + $schoolId + '/status').val() === 'active'))",
           "$id": {
             ".write": "auth != null && (root.child('users/' + auth.uid).child('role').val() === 'superadmin' || (root.child('users/' + auth.uid).child('schoolId').val() === $schoolId && root.child('users/' + auth.uid).child('status').val() !== 'inactive' && root.child('schoolInfo/' + $schoolId + '/status').val() === 'active'))"
+          }
+        },
+        "adminPushTokens": {
+          ".read": "auth != null && (root.child('users/' + auth.uid).child('role').val() === 'superadmin' || ((root.child('users/' + auth.uid).child('schoolId').val() === $schoolId && root.child('users/' + auth.uid).child('status').val() !== 'inactive' && root.child('schoolInfo/' + $schoolId + '/status').val() === 'active') && root.child('users/' + auth.uid).child('role').val() === 'admin'))",
+          "$tokenId": {
+            ".write": "auth != null && (root.child('users/' + auth.uid).child('role').val() === 'superadmin' || ((root.child('users/' + auth.uid).child('schoolId').val() === $schoolId && root.child('users/' + auth.uid).child('status').val() !== 'inactive' && root.child('schoolInfo/' + $schoolId + '/status').val() === 'active') && root.child('users/' + auth.uid).child('role').val() === 'admin'))"
           }
         },
         "exams": {
