@@ -4,37 +4,113 @@ This file is the direct communication inbox where the Lead Architect issues task
 
 ---
 
-## Directives Template
+## [2026-10-19 15:35:00] Directive: Task 2.5 - Ustaz Attendance Submission Monitor & Push Notification Engine
 
-```markdown
-## [YYYY-MM-DD HH:MM:SS] Directive: Task <Task ID> - <Title>
-- **Target Agent**: Kilo AI (`[implementer]`)
-- **Status**: [ASSIGNED | REVISION_REQUESTED | APPROVED]
-- **Scope & Boundaries**:
-  - Target modules: ...
-  - Invariants to preserve: ...
-- **Approved File Locks**:
-  - `path/to/file1.ts`
-  - `path/to/file2.tsx`
-- **Acceptance Criteria**:
-  1. ...
-  2. ...
-- **Required Verification**:
-  - `npx tsc --noEmit`
-  - `npm run lint`
-  - Specific test commands: ...
+- **Target Agent**: Specialist Implementer (`[implementer]` / Kilo AI)
+- **Status**: ASSIGNED & APPROVED (Ready to implement)
+- **Task Reference**: Task 2.5 in [docs/TODO.md](file:///c:/Users/asus/Desktop/software/medresahManegment/kandaq1/docs/TODO.md)
+
+### 1. Feature Context & Requirements
+The project owner requested:
+> *"Let the admin know which ustaz have taken attendance or not, since the time is known let the admin notified with the list of ustazes that didn't take attendance... use push notification for this also."*
+
+### 2. Architectural Design & Boundaries
+
+#### A. Service Worker Push Extension (`public/sw.js`)
+Extend the existing service worker to support standard browser push and local notifications:
+```javascript
+// Push event listener (for Web Push / background notifications)
+self.addEventListener('push', (event) => {
+  const data = event.data ? event.data.json() : {}
+  const title = data.title || 'KMMS Notification'
+  const options = {
+    body: data.body || '',
+    icon: '/icons/icon-192.png',
+    badge: '/icons/icon-192.png',
+    data: data.url || '/admin/attendance',
+  }
+  event.waitUntil(self.registration.showNotification(title, options))
+})
+
+// Notification click listener: focuses open tab or opens target URL
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close()
+  const targetUrl = event.notification.data || '/admin/attendance'
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+      for (const client of windowClients) {
+        if (client.url.includes(targetUrl) && 'focus' in client) {
+          return client.focus()
+        }
+      }
+      if (clients.openWindow) {
+        return clients.openWindow(targetUrl)
+      }
+    })
+  )
+})
 ```
+
+#### B. Push Notification Helper (`src/lib/pushNotification.ts`)
+Create a robust browser push client helper:
+1. `isNotificationSupported()`: Checks `'Notification' in window && 'serviceWorker' in navigator`.
+2. `getNotificationPermission()`: Returns `Notification.permission` (`'granted' | 'denied' | 'default'`).
+3. `requestNotificationPermission()`: Requests browser permission via `Notification.requestPermission()`.
+4. `showBrowserNotification({ title, body, url, tag })`:
+   - Checks permission.
+   - If Service Worker active: `reg.showNotification(title, { body, icon: '/icons/icon-192.png', data: url, tag })`.
+   - Fallback: `new Notification(title, { body, icon: '/icons/icon-192.png' })`.
+   - Prevents duplicate alerts on the same day using `localStorage` timestamp keys.
+
+#### C. Live Admin Monitor Component (`src/components/admin/UstazAttendanceMonitor.tsx`)
+Create a dedicated component for admins:
+1. **Data Inputs**:
+   - Subscribes to or accepts `classes`, `users` (filtered by `role === 'teacher'`), and today's `attendance` records (using `todayStr()`).
+2. **Computed Ustaz Status List**:
+   - For every active class with an assigned Ustaz:
+     - Detects whether an attendance record exists for today (`date === today`).
+     - Extracts submission timestamp or status (`submitted` vs `missing`).
+3. **UI Elements**:
+   - **Header Stats**: Summary cards showing `Total Ustazes/Classes`, `Submitted (X)`, `Missing Attendance (Y)`.
+   - **Filter Controls**: Quick filter pills: `All`, `Missing Only` (highlighted red/warning), `Submitted Only` (green).
+   - **Interactive Table/Cards**:
+     - Ustaz Name & Contact Phone.
+     - Assigned Class & Section.
+     - Status Badge (`Submitted` with checkmark vs `Pending / Not Taken` with alert icon).
+     - Direct Action: "Call Ustaz" phone link, "SMS Ustaz" or "Copy Phone".
+   - **Push Notification Toggle**:
+     - A banner or button: `"Enable Desktop/Mobile Push Alerts"`.
+     - Displays current permission badge (`Enabled`, `Blocked`, or `Prompt`).
+     - Allows testing notification with a "Send Test Alert" button.
+
+#### D. Integration into Admin Attendance Page (`src/app/admin/attendance/page.tsx`)
+- Add a new tab or section: e.g. `tabs: 'mark' | 'records' | 'ustaz-status'`.
+- Default to or prominently show the Ustaz attendance status so admins instantly see who has submitted today without guessing.
+
+#### E. Automated Push Triggering (`src/lib/attendanceReminder.ts`)
+- In `runMissingAttendanceCheck`, when admin notification time (`ADMIN_NOTIFY_TIME` = 18:30) is reached or reminders are triggered:
+  - If missing classes exist and browser notification permission is `'granted'`:
+  - Format a concise push notification:
+    - Title: `"KMMS: Missing Attendance Alert"`
+    - Body: `"${missingCount} Ustaz(es) haven't taken today's attendance: ${missingNames.join(', ')}"`
+    - URL: `"/admin/attendance"`
+  - Dispatch via `showBrowserNotification()`.
 
 ---
 
-## Active Directives
+### 3. Approved File Mutex Locks
+You are granted exclusive locks on:
+- `public/sw.js`
+- `src/lib/pushNotification.ts`
+- `src/components/admin/UstazAttendanceMonitor.tsx`
+- `src/app/admin/attendance/page.tsx`
+- `src/lib/attendanceReminder.ts`
 
-### [2026-10-19 15:15:14] Directive: Welcome Kilo AI & MACS Setup Briefing
-- **Target Agent**: Kilo AI (`[implementer]`)
-- **Status**: ASSIGNED
-- **Scope & Boundaries**:
-  - Lead Architect is finalizing Phase 1 (MACS Scaffolding, Governance, Skills, Documentation).
-  - Review [.agents/collab/RULES.md](file:///c:/Users/asus/Desktop/software/medresahManegment/kandaq1/.agents/collab/RULES.md) and [AGENTS.md](file:///c:/Users/asus/Desktop/software/medresahManegment/kandaq1/AGENTS.md).
-  - Prepare for incoming Phase 2 tasks assigned to `[implementer]` in [docs/TODO.md](file:///c:/Users/asus/Desktop/software/medresahManegment/kandaq1/docs/TODO.md).
-- **Approved File Locks**: None currently. Wait for Task 1.1 merge before picking up Task 1.2 or 2.x.
-- **Required Verification**: Run `npx tsc --noEmit` and `npm run lint` before submitting any task proposals.
+---
+
+### 4. Definition of Done & Verification
+Before submitting to `KILO_TO_GEMINI.md`:
+1. Run `npm run verify` (`npx tsc --noEmit` and `npm run lint`).
+2. Verify zero TypeScript errors and zero lint violations.
+3. Test locally in browser: verify permission prompt and table rendering.
+4. Post your proposal and terminal verification output in [.agents/collab/KILO_TO_GEMINI.md](file:///c:/Users/asus/Desktop/software/medresahManegment/kandaq1/.agents/collab/KILO_TO_GEMINI.md).

@@ -33,4 +33,10 @@ Allowed Headers:
 - **To**: Specialist Implementer (Kilo AI) & Human Owner
 - **Details**: Tasks 1.1 and 1.2 marked MERGED. All active locks in `BOARD.json` released. Repository ready for Phase 1 continuation or Phase 2 assignment.
 
+## [2026-10-19 15:35:00] [APPROVAL] Task 2.5: Ustaz Attendance Submission Monitor & Admin Push Notification Engine
+- **From**: Lead Architect (Antigravity / Gemini)
+- **To**: Specialist Implementer (Kilo AI) & Human Owner
+- **Details**: Architected feature per owner request. Authorized file locks on `public/sw.js`, `src/lib/pushNotification.ts`, `src/components/admin/UstazAttendanceMonitor.tsx`, `src/app/admin/attendance/page.tsx`, and `src/lib/attendanceReminder.ts`. Directive posted to `GEMINI_TO_KILO.md`.
+
+
 
