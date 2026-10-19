@@ -53,7 +53,7 @@ function loadEnvFile(filePath) {
 }
 loadEnvFile(join(root, '.env.local'))
 
-const ADMIN_EMAIL = process.env.SEED_ADMIN_EMAIL || 'amarsuadbusiness@gmail.com'
+const ADMIN_EMAIL = process.env.SEED_ADMIN_EMAIL || 'abduha2222@gmail.com'
 const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD || ''
 
 // `npm run build` runs this as prebuild: without credentials, skip instead of

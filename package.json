@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "prebuild": "node scripts/backup-db.mjs",
     "build:backedup": "node scripts/backup-db.mjs && next build",
     "seed:admin": "node scripts/seed-admin.mjs",
