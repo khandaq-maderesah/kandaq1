@@ -87,3 +87,47 @@ STATUS: ALL VERIFICATION CHECKS PASSED
 Exit Code: 0
 ```
 
+---
+
+## [2026-10-19 15:41:00] Task 2.5: Implement Ustaz Attendance Submission Monitor & Admin Push Notification Engine
+
+- **Assigned Agents**: Specialist Implementer (`[implementer]` / Kilo AI) & Lead Architect (`[lead]` / Antigravity Gemini)
+- **Status**: Completed & Verified
+
+### Summary of Changes
+1. **Service Worker Push & Notification Click**:
+   - Updated `public/sw.js` with `push` event listener and `notificationclick` handler focusing the window and routing to `/admin/attendance`.
+2. **Push Notification Service (`src/lib/pushNotification.ts`)**:
+   - Implemented `isNotificationSupported`, `getNotificationPermission`, `requestNotificationPermission`, and `showBrowserNotification`.
+   - Handled duplicate alert prevention via daily localStorage tag keying.
+3. **Live Ustaz Attendance Monitor (`src/components/admin/UstazAttendanceMonitor.tsx`)**:
+   - Built a comprehensive dashboard widget displaying total, submitted, and missing counts.
+   - Filter tabs: `All`, `Missing Only` (red alert border), and `Submitted Only`.
+   - Direct Ustaz call/SMS links (`tel:`, `sms:`), copy phone number action, and real-time status badges.
+   - Interactive push notification enable/test action banner.
+4. **Admin Attendance Integration (`src/app/admin/attendance/page.tsx`)**:
+   - Added `'ustaz-status'` tab to the attendance navigation.
+   - Integrated `<UstazAttendanceMonitor />` with live class, user, and attendance feeds.
+5. **Scheduler & Automated Dispatch (`src/lib/attendanceReminder.ts` & `src/lib/attendanceReminderServer.ts`)**:
+   - Client: triggers `showBrowserNotification` with list of missing Ustaz names when admin cutoff time (`ADMIN_NOTIFY_TIME` = 18:30) is reached.
+   - Server: added Firebase Cloud Messaging multicast dispatch in `attendanceReminderServer.ts` targeting registered `adminPushTokens`.
+
+### Verification Evidence
+```text
+> kmms@1.0.0 verify
+> node scripts/verify.mjs
+
+========================================
+KMMS SINGLE-PASS VERIFICATION RUNNER
+========================================
+
+Checking TypeScript Typecheck... [PASS] (5.35s)
+Checking ESLint Static Analysis... [PASS] (6.61s)
+
+========================================
+STATUS: ALL VERIFICATION CHECKS PASSED
+========================================
+Exit Code: 0
+```
+
+

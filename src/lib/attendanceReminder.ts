@@ -1,5 +1,6 @@
 import { rtdb } from '@/lib/database'
 import type { Class, Attendance, User, MissingAttendanceAlert } from '@/types'
+import { showBrowserNotification } from './pushNotification'
 import { ADMIN_NOTIFY_TIME, TEACHER_NOTIFY_TIME, CHECK_INTERVAL_MS } from './reminderConstants'
 
 export { ADMIN_NOTIFY_TIME, TEACHER_NOTIFY_TIME, CHECK_INTERVAL_MS }
@@ -115,6 +116,7 @@ export async function runMissingAttendanceCheck(
   const teacherDue = isPastHHMM(TEACHER_NOTIFY_TIME, now)
   const nowIso = now.toISOString()
   let changed = false
+  const missingNames: string[] = []
 
   for (const m of missing) {
     const prev = existingById.get(m.id)
@@ -144,14 +146,31 @@ export async function runMissingAttendanceCheck(
 
     // Skip redundant writes: a write every 60s for every missing class keeps
     // waking every subscriber even when nothing changed.
-    if (prev && prev.adminNotified === record.adminNotified && prev.teacherNotified === record.teacherNotified && prev.resolved === record.resolved) {
+    if (
+      prev &&
+      prev.adminNotified === record.adminNotified &&
+      prev.teacherNotified === record.teacherNotified &&
+      prev.resolved === record.resolved
+    ) {
       continue
     }
+
     changed = true
     await rtdb.setMissingAttendanceAlert(m.id, record)
+    if (adminDue && (!prev || !prev.adminNotified)) {
+      missingNames.push(m.teacherName)
+    }
   }
 
-  // Auto-resolve any open reminder whose attendance was eventually recorded.
+  // Dispatch browser push notification to admin when admin window reached.
+  if (adminDue && missingNames.length > 0) {
+    showBrowserNotification({
+      title: 'KMMS: Missing Attendance Alert',
+      body: `${missingNames.length} Ustaz(es) haven't taken today's attendance: ${missingNames.join(', ')}`,
+      url: '/admin/attendance',
+      tag: `missing-attendance-${todayStr(now)}`,
+    }).catch(() => {})
+  }
   for (const ex of existingById.values()) {
     if (ex.resolved) continue
     if (recordedKeys.has(`${ex.classId}_${ex.date}`)) {

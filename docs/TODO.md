@@ -23,10 +23,10 @@ Legend:
 - [ ] **Task 2.2**: Audit all i18n translation namespaces (English & Amharic) for consistent Madrasa/Ustaz terminology [implementer]
 - [ ] **Task 2.3**: Verify student photo upload, compression, and Cloud Storage security rule enforcement [implementer]
 - [ ] **Task 2.4**: Verify database backup and restore scripts with automated dry-run validation [lead]
-- [ ] **Task 2.5**: Implement Ustaz Attendance Submission Monitor & Admin Push Notification Engine [implementer]
-  - Subtask 2.5a: Browser Push Notification Service & Service Worker Extension (`public/sw.js`, `src/lib/pushNotification.ts`)
-  - Subtask 2.5b: Admin Live Ustaz Attendance Status Table/Widget (Submitted vs Missing Ustazes)
-  - Subtask 2.5c: Automated Push Notification Trigger upon Missing Attendance Cutoff Time
+- [x] **Task 2.5**: Implement Ustaz Attendance Submission Monitor & Admin Push Notification Engine [implementer & lead]
+  - [x] Subtask 2.5a: Browser Push Notification Service & Service Worker Extension (`public/sw.js`, `src/lib/pushNotification.ts`)
+  - [x] Subtask 2.5b: Admin Live Ustaz Attendance Status Table/Widget (Submitted vs Missing Ustazes)
+  - [x] Subtask 2.5c: Automated Push Notification Trigger upon Missing Attendance Cutoff Time
 
 ---
 

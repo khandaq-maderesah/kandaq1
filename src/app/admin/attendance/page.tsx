@@ -16,6 +16,7 @@ import {
   Users,
   type LucideIcon,
 } from 'lucide-react'
+import UstazAttendanceMonitor from '@/components/admin/UstazAttendanceMonitor'
 import { rtdb } from '@/lib/database'
 import { useAuth } from '@/context/AuthContext'
 import { cn, daysAgoISO } from '@/lib/utils'
@@ -28,7 +29,7 @@ import { Select } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { EmptyState, PageHeader, StatCard, TableContainer } from '@/components/ui/page'
 import { useEthiopianDate } from '@/hooks/useEthiopianDate'
-import type { Attendance, Class, Student, AttendanceStatus } from '@/types'
+import type { Attendance, Class, Student, AttendanceStatus, User } from '@/types'
 
 const today = () => new Date().toISOString().slice(0, 10)
 
@@ -70,10 +71,11 @@ export default function AttendancePage() {
   const eth = useEthiopianDate()
   const { user } = useAuth()
 
-  const [tab, setTab] = useState<'mark' | 'records'>('mark')
+  const [tab, setTab] = useState<'mark' | 'records' | 'ustaz-status'>('mark')
 
   const [classes, setClasses] = useState<Class[]>([])
   const [records, setRecords] = useState<Attendance[]>([])
+  const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [filterClassId, setFilterClassId] = useState('')
   const [filterDate, setFilterDate] = useState(today())
@@ -89,12 +91,14 @@ export default function AttendancePage() {
   const loadData = useCallback(async (showLoader = false) => {
     if (showLoader) setLoading(true)
     try {
-      const [attendanceList, classList] = await Promise.all([
+      const [attendanceList, classList, userList] = await Promise.all([
         rtdb.getAllAttendanceSince(daysAgoISO(90)),
         rtdb.getAllClasses(),
+        rtdb.getAllUsers(),
       ])
       setRecords(attendanceList)
       setClasses(classList)
+      setUsers(userList)
       setLoadError(false)
       setClassId((current) => (classList.length > 0 && !current ? classList[0].id : current))
     } catch {
@@ -228,6 +232,7 @@ export default function AttendancePage() {
           [
             ['mark', ClipboardList, t('tabs.mark')],
             ['records', Calendar, t('tabs.records')],
+            ['ustaz-status', Users, 'Ustaz Status'],
           ] as const
         ).map(([key, Icon, label]) => (
           <button
@@ -252,7 +257,9 @@ export default function AttendancePage() {
         </Alert>
       )}
 
-      {tab === 'mark' ? (
+      {tab === 'ustaz-status' ? (
+        <UstazAttendanceMonitor classes={classes} users={users} attendance={records} />
+      ) : tab === 'mark' ? (
         <div className="space-y-4">
           {/* Toolbar */}
           <div className="rounded-xl border bg-card p-4 shadow-sm sm:p-5">

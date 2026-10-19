@@ -170,16 +170,33 @@ async function checkSchool(
     result.missing++
   }
 
-  // Auto-resolve any open reminder whose attendance was eventually recorded.
-  for (const ex of existing) {
-    if (ex.resolved) continue
-    if (recordedKeys.has(`${ex.classId}_${ex.date}`)) {
-      await db.ref(`${base}/missingAttendanceAlerts/${ex.id}`).update({
-        resolved: true,
-        resolvedAt: nowIso,
-        updatedAt: nowIso,
-      })
-      result.resolved++
+  // Dispatch push notifications to registered admin push tokens if admin alert triggered
+  if (result.flaggedAdmin > 0 && adminDue) {
+    try {
+      const tokensSnap = await db.ref(`${base}/adminPushTokens`).get()
+      if (tokensSnap.exists()) {
+        const tokens: string[] = []
+        tokensSnap.forEach((child) => {
+          const val = child.val()
+          if (typeof val === 'string') tokens.push(val)
+          else if (val?.token) tokens.push(val.token)
+        })
+        if (tokens.length > 0) {
+          const { getMessaging } = await import('firebase-admin/messaging')
+          await getMessaging().sendEachForMulticast({
+            tokens,
+            notification: {
+              title: 'KMMS: Missing Attendance Alert',
+              body: `${result.flaggedAdmin} class(es) have missing attendance today.`,
+            },
+            data: {
+              url: '/admin/attendance',
+            },
+          })
+        }
+      }
+    } catch (pushErr) {
+      console.warn('Optional FCM push notification skipped or failed:', pushErr)
     }
   }
 
