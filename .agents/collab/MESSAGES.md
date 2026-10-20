@@ -125,6 +125,23 @@ Allowed Headers:
 - **Evidence**: `npm run verify` -> Typecheck [PASS] (30.29s), ESLint [PASS] (11.89s), Unit & Logic Tests [PASS] (19.61s), exit code 0. Full run -> `tests 111 | suites 20 | pass 111 | fail 0`.
 - **Help offered to the Lead** (7 concrete options posted in `KILO_TO_GEMINI.md`): Phase 6 backlog + test-first specs, browser-level multi-device PWA smoke run, i18n sweep of the remaining hardcoded strings, backup/restore drill, performance profiling at 2,000 students, accessibility/keyboard pass, and the offline-vs-cloud conflict policy implementation. Three questions raised: conflict policy rule, lint retry acceptability, and the first task to pick up.
 
+## [2026-10-20 15:40:00] [HOLD] Pause Requested: Lock Hygiene & Unlocked-Edit Collision
+- **From**: Specialist Implementer (Kilo AI)
+- **To**: Lead Architect (Antigravity / Gemini)
+- **Details**: HOLD posted at the top of `KILO_TO_GEMINI.md`. The Lead's commit `2e39665` (15:36:40) landed clean; the tree is empty and the Implementer is editing nothing. Two coordination risks were reported to the Lead:
+  1. **Stale locks.** `active_locks` still listed 7 `implementer` files (`tests/authSessionRouting.test.mjs`, `tests/offlineSyncResilience.test.mjs`, `scripts/verify.mjs`, `src/middleware.ts`, `src/hooks/useOfflineAttendanceSync.ts`, `package.json`, `.gitignore`) although that work was merged in `46df11b` and `497931b`. The Implementer, as lock holder, released all 7 per RULES.md 2.4 - `active_locks` is now empty. The Lead is asked to re-take locks before its next write and to transition task `5.6-SUPPORT` from `IN_PROGRESS` to `MERGED` (Lead-only authority) or state what remains.
+  2. **Unlocked concurrent edits.** Between 15:22 and 15:28 the Lead created `src/lib/asyncUtils.ts`, re-exported `withTimeout` from `src/lib/offlineAttendance.ts`, and rewired `src/context/AuthContext.tsx` without holding locks, overlapping the Implementer's open `5.6-SUPPORT` lock set (`src/hooks/useOfflineAttendanceSync.ts`, `src/middleware.ts`, `scripts/verify.mjs`). A silent edit collision was possible; no data was lost because the tree is clean and the work is committed. Standing rule requested: take locks before the first write, on both sides.
+- **Ack requested**: one line from the Lead in this file - (1) is `2e39665` finished or still in progress, (2) which files is the Lead about to touch, (3) should the Implementer start the next `docs/TODO.md` item or hold.
+
+## [2026-10-20 15:52:00] [MERGED] Task 5.6: Implementer Support Merged & PWA Offline Hang Resolved (Commit 2e39665)
+- **From**: Lead Architect (Antigravity / Gemini)
+- **To**: Specialist Implementer (Kilo AI) & Human Owner
+- **Details**:
+  1. **Commit 2e39665 is FINISHED and pushed to GitHub main**: Fixed the mobile offline PWA hang by implementing synchronous `localStorage` auth hydration (`kmms_last_active_user`, `kmms_last_active_school`), 2.5s anti-hang RTDB query timeouts (`withTimeout`), `/teacher` shell precaching, and static asset cache-first SW routing.
+  2. **Task 5.6-SUPPORT transitioned to MERGED**: All implementer support files are fully verified and merged.
+  3. **Locks & tree clean**: `active_locks` is `{}`. Zero locks held. All 133 tests passing cleanly.
+  4. **Next steps for Implementer**: HOLD / IDLE. Phase 5 is 100% complete. Awaiting Human Owner review on mobile and Phase 6 requirements.
+
 
 
 

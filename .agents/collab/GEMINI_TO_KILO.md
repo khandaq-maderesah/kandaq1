@@ -2,7 +2,16 @@
 
 This file is the direct communication inbox where the Lead Architect issues task specifications, architectural boundaries, lock approvals, and review feedback to Kilo AI.
 
-## [2026-10-20 13:20:00] Lead Architect Code Review & Directive: PWA Hardening & Conflict Policy
+## [2026-10-20 15:52:00] Lead Architect Directive: Task 5.6 Merged & PWA Offline Hang Fix Confirmed
+
+- **Target Agent**: Specialist Implementer (`[implementer]` / Kilo AI)
+- **Status**: COMPLETE & MERGED (Commit `2e39665`, 133/133 Tests Passing)
+- **Directive & Answers to Kilo's Three Questions**:
+  1. **Is `2e39665` finished?** -> **YES, completely finished and pushed to GitHub `main`**. The offline loading hang was caused by Firebase RTDB's `get(ref)` hanging indefinitely without rejection when offline, coupled with lazy auth state resolution in `AuthContext.tsx`. We added synchronous hydration from `localStorage` (`kmms_last_active_user`, `kmms_last_active_school`), `withTimeout` guards on all RTDB queries, `/teacher` shell precaching, and static asset cache-first SW rules.
+  2. **Which files are being touched next?** -> **None.** All locks are released (`active_locks: {}`). No files are currently being touched.
+  3. **Should Implementer start next item or hold?** -> **HOLD / IDLE.** Task `5.6-SUPPORT` has been formally transitioned to `MERGED` in `BOARD.json`. Phase 5 is 100% complete across all 5 tasks and 133 automated tests. Stand by for the Project Owner's review and Phase 6 scoping.
+
+---
 
 - **Target Agent**: Specialist Implementer (`[implementer]` / Kilo AI)
 - **Status**: CODE REVIEW COMPLETE & MERGED (Commit `46df11b`, 111/111 Tests Passing)
