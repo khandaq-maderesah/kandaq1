@@ -205,6 +205,142 @@ STATUS: ALL VERIFICATION CHECKS PASSED
 Exit Code: 0
 ```
 
+---
 
+## [2026-10-20 09:30:00] Tasks 2.1, 2.2, 2.3, 2.4: Phase 2 Sign-off & Repository Hardening
 
+- **Assigned Agents**: Lead Architect (`[lead]` / Antigravity Gemini) & Specialist Implementer (`[implementer]` / Kilo AI)
+- **Status**: Completed, Verified & Merged
+- **Phase**: Phase 2: Role Isolation & Ustaz/Madrasa Workflow Polish (100% Complete)
 
+### Summary of Changes
+1. **Task 2.1 (RTDB Rules & Ustaz Role Scoping)**:
+   - Audited all security rules in `database.rules.json` and `scripts/generate-db-rules.py`.
+   - Hardened `studentPhotos/$studentId/photo` with `.validate: !newData.exists() || (newData.isString() && newData.val().length < 150000)` preventing payload bloat.
+   - Enforced class-scoped teacher isolation via `PHOTO_CLASS_TEACHER` and `NEW_CLASS_TEACHER`.
+   - Added `tests/authRoleGuard.test.mjs` (4 tests).
+2. **Task 2.2 (Multi-Lingual Terminology Audit)**:
+   - Audited all 27 translation namespaces across 5 locales (`en`, `am`, `om`, `so`, `ar`) in `src/i18n/messages/`.
+   - Verified that user-facing strings consistently enforce Islamic educational standards (Madrasa / Ustaz / Talib).
+   - Created `tests/i18nTerminology.test.mjs` (3 tests) validating no prohibited terms (`school`, `teacher`, `አስተማሪ`, `ትምህርት ቤት`) appear in translation values.
+3. **Task 2.3 (Student Photo Compression & Cloud Storage Rules)**:
+   - Verified client-side downscaling and compression in `src/components/StudentPhotoCapture.tsx` (`MAX_DIMENSION = 360`, `JPEG_QUALITY = 0.62`, payload 15-35 KB).
+   - Audited `storage.rules` confirming strict size boundaries (25MB announcements, 2MB PNG branding, catch-all deny).
+   - Added `tests/photoStorage.test.mjs` (3 tests).
+4. **Task 2.4 (Database Backup & Restore Pipeline)**:
+   - Refactored `scripts/restore-students-from-backup.mjs` to support modern multi-tenant `schoolData` JSON backups alongside legacy flat backups and gzipped archives.
+   - Added exported parsing and validation utilities with CLI execution guards.
+   - Added automated dry-run test suite `tests/backupRestore.test.mjs` (5 tests).
+5. **Unified Verification Expansion**:
+   - Expanded test runner to 7 test suites containing 30 automated tests (`tests/*.test.mjs`).
+   - All tests execute cleanly in under 4 seconds via native Node test runner.
+
+### Verification Evidence
+```text
+> kmms@1.0.0 verify
+> node scripts/verify.mjs
+
+========================================
+KMMS SINGLE-PASS VERIFICATION RUNNER
+========================================
+
+Checking TypeScript Typecheck... [PASS] (7.20s)
+Checking ESLint Static Analysis... [PASS] (8.45s)
+Checking Unit & Logic Tests (Node Test Runner)... [PASS] (3.77s)
+
+========================================
+STATUS: ALL VERIFICATION CHECKS PASSED
+========================================
+Exit Code: 0
+```
+
+---
+
+## [2026-10-20 09:42:00] Tasks 3.1, 3.2, 3.3: Phase 3 Sign-off & Dual-Calendar Analytics Engine
+
+- **Assigned Agents**: Lead Architect (`[lead]` / Antigravity Gemini) & Specialist Implementer (`[implementer]` / Kilo AI)
+- **Status**: Completed, Verified & Merged
+- **Phase**: Phase 3: Dual-Calendar & Attendance Analytics Engine (100% Complete)
+
+### Summary of Changes
+1. **Task 3.1 (Ethiopian Calendar Edge Cases)**:
+   - Expanded `tests/ethiopianDate.test.mjs` with comprehensive edge cases.
+   - Tested Enkutatash (Ethiopian New Year 2017: 2024-09-11), Pagume month 13 (2024-09-06 -> 2016-13-01), Gregorian year boundary transition (2024-12-31 to 2025-01-01 within Tahsas 2017), and ISO timestamp / timezone robustness (6 tests).
+2. **Task 3.2 (High-Performance Attendance Overview Aggregation)**:
+   - Created `src/lib/attendanceAnalytics.ts` with `aggregateAttendanceOverview()`.
+   - Replaced multiple array filter/find passes with O(1) Maps for users, classes, and active students.
+   - Built single-pass demographic gender breakdown and 7-day daily attendance classification (present, absent, late, excused).
+   - Created `tests/attendanceAggregation.test.mjs` (3 tests) including high-volume benchmark (processes 2,000 students and 10,000 attendance records in < 26ms).
+3. **Task 3.3 (Superadmin Multi-Madrasa Dashboard Analytics)**:
+   - Implemented real-time search input by madrasa name, city/address, or slug in `src/app/superadmin/page.tsx`.
+   - Added filter pill buttons (`All`, `Active`, `Suspended`).
+   - Enhanced platform-wide metric computation (active vs suspended madrasas, total ustazes, total admins, average ustazes per madrasa).
+   - Created `tests/superadminAnalytics.test.mjs` (3 tests).
+4. **Verification Expansion**:
+   - Expanded test runner to 9 test suites containing 37 automated unit & logic tests (`tests/*.test.mjs`).
+   - All 37 tests execute in under 5 seconds with zero external package dependencies.
+
+### Verification Evidence
+```text
+> kmms@1.0.0 verify
+> node scripts/verify.mjs
+
+========================================
+KMMS SINGLE-PASS VERIFICATION RUNNER
+========================================
+
+Checking TypeScript Typecheck... [PASS] (13.35s)
+Checking ESLint Static Analysis... [PASS] (8.58s)
+Checking Unit & Logic Tests (Node Test Runner)... [PASS] (4.06s)
+
+========================================
+STATUS: ALL VERIFICATION CHECKS PASSED
+========================================
+Exit Code: 0
+```
+
+---
+
+## [2026-10-20 09:49:00] Tasks 4.1, 4.2, 4.3: Phase 4 Sign-off & Notifications/Student ID Infrastructure
+
+- **Assigned Agents**: Lead Architect (`[lead]` / Antigravity Gemini) & Specialist Implementer (`[implementer]` / Kilo AI)
+- **Status**: Completed, Verified & Merged
+- **Phase**: Phase 4: Notifications & Student Identification Infrastructure (100% Complete)
+
+### Summary of Changes
+1. **Task 4.1 (Pluggable SMS Provider Client Adapter)**:
+   - Created `src/lib/server/smsAdapter.ts` with pluggable `SmsProvider` interface.
+   - Built `SandboxSmsProvider` for zero-cost, in-memory simulated delivery during development and tests.
+   - Built `AfroMessageSmsProvider` for production Ethiopian SMS delivery (AfroMessage HTTP API).
+   - Added phone number normalizer `normalizePhoneNumber` converting Ethiopian local numbers (`09...`, `07...`, `251...`) into E.164 international standard (`+251...`).
+   - Created `tests/smsAdapter.test.mjs` (5 tests).
+2. **Task 4.2 (Human Credentials & Production SMS Webhook Gateway)**:
+   - Created authenticated Admin API route `src/app/api/admin/sms/route.ts` requiring Admin/Superadmin session and school management authorization.
+   - Implemented automatic RTDB audit log recording under `schoolData/{schoolId}/audit` for every dispatched SMS.
+   - Documented production SMS gateway environment variables (`SMS_PROVIDER`, `SMS_API_KEY`, `SMS_SENDER_NAME`, `SMS_IDENTIFIER_ID`) in `.env.example`.
+3. **Task 4.3 (Printable Student ID Card Batch Generator with Barcode Verification)**:
+   - Created `src/lib/idCardBarcode.ts` with verification code generation (`KMMS-{ROLL}-{HASH}`) and scalable Code 39 SVG barcode generator.
+   - Built `src/components/admin/PrintableStudentIdCard.tsx` with standard CR80 credit-card dimensions (85.6mm x 54mm) and `@media print` 2x4 batch grid layout for A4 printing.
+   - Created `tests/idCardBarcode.test.mjs` (3 tests).
+4. **Complete Repository Test Suite**:
+   - Expanded test runner to 11 test suites containing 45 automated unit & logic tests (`tests/*.test.mjs`).
+   - All 45 tests execute cleanly in under 4 seconds via native Node test runner.
+
+### Verification Evidence
+```text
+> kmms@1.0.0 verify
+> node scripts/verify.mjs
+
+========================================
+KMMS SINGLE-PASS VERIFICATION RUNNER
+========================================
+
+Checking TypeScript Typecheck... [PASS] (5.60s)
+Checking ESLint Static Analysis... [PASS] (8.10s)
+Checking Unit & Logic Tests (Node Test Runner)... [PASS] (3.91s)
+
+========================================
+STATUS: ALL VERIFICATION CHECKS PASSED
+========================================
+Exit Code: 0
+```

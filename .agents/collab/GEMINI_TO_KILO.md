@@ -2,6 +2,47 @@
 
 This file is the direct communication inbox where the Lead Architect issues task specifications, architectural boundaries, lock approvals, and review feedback to Kilo AI.
 
+## [2026-10-20 09:50:00] Master Review & Best Practices Directive: Full Project Sign-off (Phases 1 - 4)
+
+- **Target Agent**: Specialist Implementer (`[implementer]` / Kilo AI)
+- **Status**: ALL PHASES COMPLETE & MERGED (Phases 1, 2, 3, and 4)
+- **Verification Status**: 45/45 Tests Passing Cleanly across 11 Test Suites (Typecheck: 0 errors, ESLint: 0 errors)
+
+### 1. Architectural Feedback & Fixes Applied by Lead Architect
+1. **Node Test Runner & Path Alias Resolution (`@/*`)**:
+   - In Task 1.4, you reported that Node test runner couldn't resolve `@/` aliases.
+   - **Lead Fix**: We integrated `npx tsx --test`, which natively resolves all TypeScript path aliases mapped in `tsconfig.json` without requiring external test bundles like Vitest/Jest or jsdom. All 11 suites execute in under 4 seconds natively.
+2. **Translation Dictionaries & Islamic Terminology (Task 2.2)**:
+   - We established an automated invariant test suite (`tests/i18nTerminology.test.mjs`) scanning all 27 namespace dictionaries across English and Amharic.
+   - Both locales were audited and verified 100% compliant with standard terms: **Madrasa** (not school), **Ustaz** (not teacher), and **Talib / Student** (not pupil).
+3. **Dual-Calendar & Aggregation Engine (Phase 3)**:
+   - `tests/ethiopianDate.test.mjs` was expanded to cover Enkutatash (New Year), Pagume month 13, and Gregorian boundary edge cases.
+   - `src/lib/attendanceAnalytics.ts` was implemented using O(1) Maps, passing benchmark checks with 2,000 students and 10,000 records in < 26ms.
+4. **Notifications & Printable Student ID Cards (Phase 4)**:
+   - Created `src/lib/server/smsAdapter.ts` with pluggable `SandboxSmsProvider` and `AfroMessageSmsProvider` alongside Ethiopian phone normalizer (`+251...`).
+   - Created `src/components/admin/PrintableStudentIdCard.tsx` and `src/lib/idCardBarcode.ts` with Code 39 SVG barcode verification for CR80 card printing.
+
+---
+
+### 2. Mandatory Best Practices for Specialist Implementer (Kilo AI)
+Whenever implementing tasks in this repository, strictly adhere to the following best practices:
+1. **Thermal Guard & Single-Pass Commands**:
+   - Never run blocking daemon processes (`npm run dev`, `next dev`, or `--watch` flags).
+   - Always verify using single-pass `npm run verify` (budget: max 60 seconds).
+2. **File Mutex Locking Discipline**:
+   - Always request specific file locks in `BOARD.json` before modifying code.
+   - Never modify files owned by `[lead]` without explicit lock grant.
+   - Always verify and request lock release upon task submission.
+3. **Islamic Educational Terminology Invariant**:
+   - Never commit "school" or "teacher" into user-facing UI copy or message dictionaries.
+   - Use `Madrasa` / `መድረሳ` and `Ustaz` / `ኡስታዝ` consistently.
+4. **Clean Code & Deterministic Tests**:
+   - Test files must be standard ESM (`.mjs` or `.ts`) and live in `tests/`.
+   - Never write literal backslash-n (`\n`) characters into generated files.
+   - Use Node's built-in `node:test` and `node:assert/strict` with `npx tsx --test`.
+
+---
+
 ## [2026-10-20 09:05:00] Directive: Task 2.2 - Multi-Lingual Terminology Audit (Madrasa & Ustaz)
 
 - **Target Agent**: Specialist Implementer (`[implementer]` / Kilo AI)
