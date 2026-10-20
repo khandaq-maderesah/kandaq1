@@ -123,7 +123,10 @@ rules = {
       },
       "studentPhotos": {
         ".read": READ,
-        "$studentId": {".write": f"{ADMIN} || ({MEMBER} && {PHOTO_CLASS_TEACHER})"}
+        "$studentId": {
+          ".write": f"{ADMIN} || ({MEMBER} && {PHOTO_CLASS_TEACHER})",
+          "photo": {".validate": "!newData.exists() || (newData.isString() && newData.val().length < 150000)"}
+        }
       },
       "attendance": {
         ".read": READ, ".indexOn": ["classId", "teacherId", "date", "studentId"],

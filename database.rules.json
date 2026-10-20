@@ -120,7 +120,10 @@
         "studentPhotos": {
           ".read": "auth != null && (root.child('users/' + auth.uid).child('role').val() === 'superadmin' || (root.child('users/' + auth.uid).child('schoolId').val() === $schoolId && root.child('users/' + auth.uid).child('status').val() !== 'inactive' && root.child('schoolInfo/' + $schoolId + '/status').val() === 'active'))",
           "$studentId": {
-            ".write": "auth != null && (root.child('users/' + auth.uid).child('role').val() === 'superadmin' || ((root.child('users/' + auth.uid).child('schoolId').val() === $schoolId && root.child('users/' + auth.uid).child('status').val() !== 'inactive' && root.child('schoolInfo/' + $schoolId + '/status').val() === 'active') && root.child('users/' + auth.uid).child('role').val() === 'admin')) || ((root.child('users/' + auth.uid).child('schoolId').val() === $schoolId && root.child('users/' + auth.uid).child('status').val() !== 'inactive' && root.child('schoolInfo/' + $schoolId + '/status').val() === 'active') && root.child('schoolData/' + $schoolId + '/classes/' + root.child('schoolData/' + $schoolId + '/students/' + $studentId + '/classId').val() + '/teacherId').val() === auth.uid)"
+            ".write": "auth != null && (root.child('users/' + auth.uid).child('role').val() === 'superadmin' || ((root.child('users/' + auth.uid).child('schoolId').val() === $schoolId && root.child('users/' + auth.uid).child('status').val() !== 'inactive' && root.child('schoolInfo/' + $schoolId + '/status').val() === 'active') && root.child('users/' + auth.uid).child('role').val() === 'admin')) || ((root.child('users/' + auth.uid).child('schoolId').val() === $schoolId && root.child('users/' + auth.uid).child('status').val() !== 'inactive' && root.child('schoolInfo/' + $schoolId + '/status').val() === 'active') && root.child('schoolData/' + $schoolId + '/classes/' + root.child('schoolData/' + $schoolId + '/students/' + $studentId + '/classId').val() + '/teacherId').val() === auth.uid)",
+            "photo": {
+              ".validate": "!newData.exists() || (newData.isString() && newData.val().length < 150000)"
+            }
           }
         },
         "attendance": {
