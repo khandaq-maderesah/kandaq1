@@ -29,7 +29,7 @@ const checks = [
   },
   {
     name: 'Unit & Logic Tests (Node Test Runner)',
-    command: 'npx tsx --test tests/attendanceReminder.test.mjs tests/ethiopianDate.test.mjs tests/pushNotification.test.mjs',
+    command: 'npx tsx --test tests/attendanceReminder.test.mjs tests/ethiopianDate.test.mjs tests/pushNotification.test.mjs tests/authRoleGuard.test.mjs',
     timeout: 60000
   }
 ];
