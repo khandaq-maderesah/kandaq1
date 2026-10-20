@@ -563,3 +563,56 @@ $ npx tsx --test tests/*.test.mjs
 ℹ pass 127
 ℹ fail 0
 ```
+
+---
+
+## [2026-10-20 20:20:00] PWA Offline Loading Hang Resolution & Task 5.6 Completion
+
+- **Lead Architect**: Antigravity (Gemini) & Specialist Implementer (Kilo AI)
+- **Status**: COMPLETE & VERIFIED (Commits `2e39665` & `62361d1`, 133/133 Tests Passing Cleanly across 17 Suites)
+
+### Root Cause Analysis of "Stuck on Loading Rotation Screen"
+When opening the PWA or app on mobile while offline (`mms.khendeq.com`):
+1. **Firebase RTDB `get(ref)` offline hang**: In Firebase Web SDK RTDB, `get(ref)` creates an internal websocket listener that waits indefinitely for reconnection when offline without rejecting. Because `AuthContext` called `await get(ref(db, 'users/' + fbUser.uid))` inside `onAuthStateChanged`, the Promise never settled, preventing `setLoading(false)` from ever executing.
+2. **Auth Guard Spinner trap**: Both `ProtectedRoute.tsx` and `DashboardPage.tsx` render full-screen rotating spinners (`animate-spin` / `Loader2`) while `loading: true`. Because `loading` remained true indefinitely, mobile screens hung forever.
+3. **Uncached Shell routes**: In `sw.js`, `/teacher` was missing from `PRECACHE_SHELL`, causing offline navigations to fall back to `/dashboard` which hung indefinitely if `!user && !loading`.
+4. **Static JS/CSS asset caching**: Next.js immutable static chunks (`/_next/static/*`) were not served cache-first in `sw.js`.
+
+### Summary of Implementations & Fixes
+1. **Synchronous `localStorage` Auth Hydration (`src/context/AuthContext.tsx`)**:
+   - Initialized `user` and `school` synchronously from `kmms_last_active_user` and `kmms_last_active_school` in `useState` lazy initializers.
+   - If the browser is offline and a cached user exists, initialized `loading: false` immediately on startup, eliminating the full-screen spinner completely.
+   - Added anti-hang `safetyTimer` (100ms when offline, 2000ms when online) guaranteeing `loading` resolves even on slow networks.
+   - Bypassed network RTDB calls entirely when `!navigator.onLine`.
+2. **Async Timeout Protection (`src/lib/asyncUtils.ts` & `src/lib/offlineAttendance.ts`)**:
+   - Implemented `withTimeout(promise, ms, fallback)` to guarantee no RTDB call hangs longer than 2.5 seconds.
+   - Applied `withTimeout` to `getSchool`, `users` lookup, `getAllClasses`, and `getStudentsByClass`.
+3. **Offline Ustaz Dashboard & Attendance Loading (`src/app/teacher/page.tsx` & `src/app/teacher/attendance/page.tsx`)**:
+   - Ustaz classes and students load instantly from `localStorage` (`kmms_teacher_classes_${user.uid}`, `kmms_class_students_${classId}`) when offline.
+4. **Service Worker v3 Upgrade (`public/sw.js`)**:
+   - Added `/teacher` to `PRECACHE_SHELL`.
+   - Implemented cache-first routing for immutable `_next/static/` chunks for instant offline boot.
+   - Improved navigation fallback routing for `/teacher/*` subroutes.
+5. **Dashboard Route Defense (`src/app/dashboard/page.tsx`)**:
+   - Fixed unauthenticated redirect bug so `/dashboard` redirects to `/login` when `!loading && !user` instead of spinning indefinitely.
+6. **Automated Test Scaffolding (`tests/pwaOffline.test.mjs`)**:
+   - Added 6 new unit tests verifying `withTimeout`, localStorage hydration, safety timer, and service worker caching strategies (total 133 tests).
+
+### Verification Evidence
+```text
+> kmms@1.0.0 test
+> node scripts/verify.mjs
+
+========================================
+KMMS SINGLE-PASS VERIFICATION RUNNER
+========================================
+
+Checking TypeScript Typecheck... [PASS] (19.76s)
+Checking ESLint Static Analysis... [PASS] (54.42s)
+Checking Unit & Logic Tests (Node Test Runner)... [PASS] (16.68s)
+
+========================================
+STATUS: ALL VERIFICATION CHECKS PASSED
+========================================
+Exit Code: 0
+```
