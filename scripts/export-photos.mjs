@@ -81,7 +81,10 @@ async function main() {
     console.log('✓ Signed in as:', ADMIN_EMAIL)
   } catch (err) {
     console.error('✗ Could not sign in.', err.message || err)
-    process.exit(1)
+    // Do not call process.exit() here: the Firebase SDK still holds open async
+// handles and an abrupt exit crashes Node with a libuv assertion on Windows.
+    process.exitCode = 1
+    return
   }
 
   const [studentsSnap, photosSnap] = await Promise.all([
@@ -150,7 +153,8 @@ async function main() {
 
   const photoOnly = manifest.filter((r) => r.name.includes('photo only') || r.name === 'photo-only')
   console.log(`\nPhoto-only students (need a name): ${photoOnly.length}`)
-  process.exit(0)
+  process.exitCode = 0
+  return
 }
 
 main().catch((err) => {

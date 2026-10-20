@@ -114,12 +114,21 @@ async function main(fileArg, APPLY = false) {
     return snap.exists() ? snap.val() : {}
   }
 
+  if (!ADMIN_EMAIL || !ADMIN_PASSWORD) {
+    console.error('✗ Could not sign in. Set SEED_ADMIN_EMAIL / SEED_ADMIN_PASSWORD.')
+    process.exitCode = 1
+    return
+  }
+
   try {
     await signInWithEmailAndPassword(getAuth(app), ADMIN_EMAIL, ADMIN_PASSWORD)
     console.log('✓ Signed in as:', ADMIN_EMAIL)
   } catch (err) {
     console.error('✗ Could not sign in. Set SEED_ADMIN_EMAIL / SEED_ADMIN_PASSWORD.', err.message || err)
-    process.exit(1)
+    // Do not call process.exit() here: the Firebase SDK still holds open async
+    // handles and an abrupt exit crashes Node with a libuv assertion on Windows.
+    process.exitCode = 1
+    return
   }
 
   console.log(`\nReading backup: ${fileArg}`)
@@ -179,7 +188,8 @@ async function main(fileArg, APPLY = false) {
 
   if (!APPLY) {
     console.log('Dry-run complete. Re-run with --apply to write.')
-    process.exit(0)
+    process.exitCode = 0
+    return
   }
 
   let written = 0
@@ -198,7 +208,7 @@ async function main(fileArg, APPLY = false) {
   console.log(
     `✓ Verification: ${Object.keys(check).length} students, ${named} named, ${withPhone} with parentPhone.`
   )
-  process.exit(0)
+  process.exitCode = 0
 }
 
 const isMain = process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]
@@ -212,6 +222,6 @@ if (isMain) {
   const APPLY = process.argv.slice(2).includes('--apply')
   main(fileArg, APPLY).catch((err) => {
     console.error('✗ Failed:', err.message || err)
-    process.exit(1)
+    process.exitCode = 1
   })
 }

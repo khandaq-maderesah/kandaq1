@@ -72,7 +72,10 @@ async function main() {
     console.log('✓ Signed in as:', ADMIN_EMAIL)
   } catch (err) {
     console.error('✗ Could not sign in.', err.message || err)
-    process.exit(1)
+    // Do not call process.exit() here: the Firebase SDK still holds open async
+// handles and an abrupt exit crashes Node with a libuv assertion on Windows.
+    process.exitCode = 1
+    return
   }
 
   console.log(`Mode: ${APPLY ? 'APPLY (will write)' : 'DRY-RUN (nothing written)'}`)
@@ -156,7 +159,8 @@ async function main() {
 
   if (!APPLY) {
     console.log('Dry-run complete. Re-run with --apply to write.')
-    process.exit(0)
+    process.exitCode = 0
+    return
   }
 
   let written = 0
@@ -165,7 +169,8 @@ async function main() {
     written++
   }
   console.log(`\n✓ Wrote ${written} student record(s).`)
-  process.exit(0)
+  process.exitCode = 0
+  return
 }
 
 main().catch((err) => {

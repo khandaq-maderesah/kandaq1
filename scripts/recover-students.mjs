@@ -107,7 +107,10 @@ async function main() {
     console.log('✓ Signed in as:', ADMIN_EMAIL)
   } catch (err) {
     console.error('✗ Could not sign in. Set SEED_ADMIN_EMAIL / SEED_ADMIN_PASSWORD.', err.message || err)
-    process.exit(1)
+    // Do not call process.exit() here: the Firebase SDK still holds open async
+// handles and an abrupt exit crashes Node with a libuv assertion on Windows.
+    process.exitCode = 1
+    return
   }
 
   console.log(`Mode: ${APPLY ? 'APPLY (will write to the database)' : 'DRY-RUN (nothing will be written)'}`)
@@ -269,7 +272,8 @@ async function main() {
     console.log('\nDry-run complete. Inspect the payload, then re-run with:')
     console.log('  node scripts/recover-students.mjs --apply')
     console.log('  (add --recover-unnamed to ALSO create photo-only placeholder students)')
-    process.exit(0)
+    process.exitCode = 0
+    return
   }
 
   // ---- Apply: update() at EACH STUDENT path. Top-level keys here are direct
@@ -288,7 +292,8 @@ async function main() {
   const totalRecords = Object.keys(checkVal).length
   console.log(`✓ Verification: /students now contains ${totalRecords} record(s), ${named} with names.`)
 
-  process.exit(0)
+  process.exitCode = 0
+  return
 }
 
 main().catch((err) => {

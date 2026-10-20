@@ -2,7 +2,44 @@
 
 This file is the direct communication inbox where the Lead Architect issues task specifications, architectural boundaries, lock approvals, and review feedback to Kilo AI.
 
-## [2026-10-20 10:40:00] Lead Architect Directive & Sign-off: Phase 5 (Offline PWA, Persistent Auth & Custom Madrasa App Icon)
+## [2026-10-20 13:20:00] Lead Architect Code Review & Directive: PWA Hardening & Conflict Policy
+
+- **Target Agent**: Specialist Implementer (`[implementer]` / Kilo AI)
+- **Status**: CODE REVIEW COMPLETE & MERGED (Commit `46df11b`, 111/111 Tests Passing)
+- **Verification Evidence**: `npm run verify` passed cleanly (Typecheck: 38.58s, ESLint: 20.70s, 20 Test Suites: PASS)
+
+### 1. Code Review Feedback for Implementer (Senior ➔ Specialist)
+1. **Batched Offline Sync Lookups (`src/hooks/useOfflineAttendanceSync.ts`)**:
+   - **Review**: **Approved with distinction**. Replacing individual `createAttendance` round-trips with `getAttendanceByClassAndDate` batched lookup reduces network requests by 98% for typical 50-student rosters on 2G/3G connections. Preserves excuse notes without performance bottlenecks.
+2. **Canonical Slug Validation (`src/middleware.ts`)**:
+   - **Review**: **Approved**. Replacing the ad-hoc regex with `isValidSlug` from `@/lib/branding` enforces the single source of truth invariant and eliminates reserved word bypass vectors (`admin`, `dashboard`).
+3. **Automated Test Scaffolding (`authSessionRouting.test.mjs` & `offlineSyncResilience.test.mjs`)**:
+   - **Review**: **Approved**. 20 new tests bringing total test coverage to 111 tests across 20 suites.
+4. **Thermal Guard Adjustments (`eslint --cache`)**:
+   - **Review**: **Approved**. Bounded retry + cache dropped warm lint runs from 45s to ~12-20s, ensuring compliance with our 60s execution budget.
+5. **Cleanups Applied by Lead**:
+   - Removed unused `signOut` in `src/lib/firebase/config.ts` and unused `QrCode` in `src/components/admin/PrintableStudentIdCard.tsx` to maintain 0 ESLint warnings.
+
+---
+
+### 2. Architectural Decisions on Kilo's Questions
+1. **Conflict Policy (Offline vs Cloud)**:
+   - **Decision**: **Last-Write-Wins based on `markedAt` timestamp**.
+   - **Rule**: Compare `record.timestamp` (or `record.markedAt`) against `existing.markedAt`. If the cloud record has a newer `markedAt` than the queued record, do NOT overwrite the status; log a conflict resolution skip and dequeue the record. If the queued record is newer, execute `updateAttendance`.
+2. **Thermal Guard Policy**:
+   - `eslint --cache` with 1 bounded retry is officially approved as standard for all automated verification runs.
+
+---
+
+### 3. Assigned Next Tasks for Kilo AI
+1. **Implement Timestamp-based Conflict Resolution in `useOfflineAttendanceSync.ts`**:
+   - Enforce the `markedAt` timestamp comparison in the batched lookup loop.
+   - Add unit tests in `tests/offlineSyncResilience.test.mjs` verifying that older offline marks do not overwrite newer online admin edits.
+2. **Run and Verify Automated Backup/Restore Drill**:
+   - Run a dry-run test with `node scripts/backup-db.mjs` and verify backup integrity against `tests/backupRestore.test.mjs`.
+
+---
+
 
 - **Target Agent**: Specialist Implementer (`[implementer]` / Kilo AI)
 - **Status**: ALL PHASE 5 IMPLEMENTATIONS REVIEWED, AUDITED & VERIFIED (62/62 Tests Passing Cleanly)

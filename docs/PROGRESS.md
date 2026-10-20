@@ -481,3 +481,39 @@ $ curl.exe -I https://mms.khendeq.com/dashboard
 HTTP/1.1 307 Temporary Redirect
 Location: https://mms.khendeq.com/login?from=%2Fdashboard
 ```
+
+---
+
+## [2026-10-20 13:10:00] Support Round 2 - Residual Fixes, 20 New Tests & Help Offer (Implementer: Kilo AI)
+
+### Summary of Changes
+1. **Offline auto-sync no longer wipes notes** (`src/hooks/useOfflineAttendanceSync.ts`): the sync path still used `rtdb.createAttendance` (a `set`), so every offline record synced over an existing cloud record erased `note` / `excuseNote`. It now resolves the existing records with one batched lookup per class and day (`getAttendanceByClassAndDate`) and patches them with `updateAttendance`, falling back to a per-record lookup when the batch read fails. The sync also drops from two round trips per student to one read per class/day plus one write per student, which matters on the weak connections the offline mode targets.
+2. **Single source of truth for branded slugs** (`src/middleware.ts`): the middleware kept its own weaker `SLUG_PATTERN`, which accepted `a--b` and reserved words such as `admin`, `dashboard` and `m`. It now uses the canonical `isValidSlug` from `src/lib/branding.ts`.
+3. **New suite `tests/authSessionRouting.test.mjs` (11 tests)**: real behavioural tests of the session middleware (protected routes without a session bounce to `/login?from=...`, branded devices land on `/m/{slug}`, invalid and reserved slugs fall back to `/login`, signed-in users are pushed off `/` and `/login`, every protected prefix is guarded, the matcher is complete), the role home matrix and the Secure-only-on-https session cookie.
+4. **New suite `tests/offlineSyncResilience.test.mjs` (9 tests)**: retry accounting (a failed record's counter grows on every failed attempt, only failed records are counted, a fresh mark resets the counter) and the cloud-write safety contract (the sync hook patches instead of overwriting, uses a batched lookup, the Ustaz page keeps update-if-exists, a pending queue syncs on mount).
+5. **Thermal guard hardening**: `npm run lint` now runs `eslint . --cache` (37s -> 23.5s warm, 11.9s in the last verify run) and `scripts/verify.mjs` retries the lint step once if the 60s budget kills it (it tripped twice under machine load). `.eslintcache` is gitignored.
+
+### Verification Evidence
+```text
+$ npm run verify
+Checking TypeScript Typecheck... [PASS] (30.29s)
+Checking ESLint Static Analysis... [PASS] (11.89s)
+Checking Unit & Logic Tests (Node Test Runner)... [PASS] (19.61s)
+STATUS: ALL VERIFICATION CHECKS PASSED
+Exit Code: 0
+
+$ npx tsx --test tests/<16 suites>
+info tests 111
+info suites 20
+info pass 111
+info fail 0
+info cancelled 0
+info skipped 0
+info todo 0
+info duration_ms 7198.5308
+```
+
+### Open Questions for the Lead
+1. Conflict policy for an offline record versus a newer cloud record for the same `classId_date_studentId`.
+2. Whether `eslint --cache` plus one bounded lint retry is acceptable under the Thermal Guard rule.
+3. Which of the seven offered help items to start with (Phase 6 backlog + test-first specs, browser-level PWA smoke run, i18n sweep of the remaining hardcoded strings, backup/restore drill, performance profiling at 2,000 students, accessibility pass, or the conflict policy implementation).

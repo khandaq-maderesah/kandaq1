@@ -7,7 +7,9 @@ import { rtdb } from '@/lib/database'
 import {
   getOfflineAttendanceQueue,
   isBrowserOnline,
+  resolveAttendanceConflict,
   syncOfflineAttendance,
+  type CloudAttendanceMark,
   type QueuedAttendanceRecord,
 } from '@/lib/offlineAttendance'
 
@@ -36,18 +38,20 @@ export function useOfflineAttendanceSync() {
       }
     }
 
-    const knownIds = new Set<string>()
+    const existingMarks = new Map<string, CloudAttendanceMark>()
     const failedLookups = new Set<string>()
     await Promise.all(
       Array.from(groups.entries()).map(async ([key, group]) => {
         try {
           const existing = await rtdb.getAttendanceByClassAndDate(group.classId, group.date)
-          existing.forEach((row) => knownIds.add(row.id))
+          existing.forEach((row) => existingMarks.set(row.id, { markedAt: row.markedAt }))
         } catch {
           failedLookups.add(key)
         }
       })
     )
+
+    let conflicts = 0
 
     setSyncing(true)
     try {
@@ -64,12 +68,21 @@ export function useOfflineAttendanceSync() {
           markedBy: record.markedBy,
           markedAt: new Date(record.timestamp).toISOString(),
         }
-        // Update instead of overwrite when the record already exists in the cloud,
-        // so notes / excuse notes that were added in the app are preserved.
-        const alreadyExists = failedLookups.has(`${record.classId}|${record.date}`)
-          ? Boolean(await rtdb.getAttendance(record.id))
-          : knownIds.has(record.id)
-        if (alreadyExists) {
+        // Last-write-wins: a newer cloud edit (for example an admin correction)
+        // wins over the offline mark, otherwise the offline mark is applied.
+        const existing = failedLookups.has(`${record.classId}|${record.date}`)
+          ? await rtdb.getAttendance(record.id)
+          : existingMarks.get(record.id)
+        const action = resolveAttendanceConflict(record, existing)
+
+        if (action === 'skip') {
+          conflicts += 1
+          console.info(
+            `[offline-sync] Skipped ${record.id}: the cloud record (${existing?.markedAt}) is newer than the offline mark (${payload.markedAt}).`
+          )
+          return
+        }
+        if (action === 'update') {
           await rtdb.updateAttendance(record.id, payload)
         } else {
           await rtdb.createAttendance(record.id, payload)
@@ -81,6 +94,9 @@ export function useOfflineAttendanceSync() {
       }
       if (result.failed > 0) {
         toast.error(t('offline.syncFailed', { count: result.failed }))
+      }
+      if (conflicts > 0) {
+        console.info(`[offline-sync] ${conflicts} offline record(s) were skipped because the cloud copy was newer.`)
       }
     } catch (err) {
       console.error('Offline attendance sync failed:', err)

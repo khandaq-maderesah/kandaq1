@@ -124,7 +124,8 @@ async function main() {
     } else {
       console.log('  Existing password unchanged. Use "Forgot password" on /login if needed.')
     }
-    process.exit(0)
+    process.exitCode = 0
+    return
   } catch (err) {
     console.error('✗ Seed failed:', err.message || err)
     process.exit(1)

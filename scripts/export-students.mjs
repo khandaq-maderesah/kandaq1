@@ -87,13 +87,17 @@ async function main() {
     console.log('✓ Signed in as:', ADMIN_EMAIL)
   } catch (err) {
     console.error('✗ Could not sign in.', err.message || err)
-    process.exit(1)
+    // Do not call process.exit() here: the Firebase SDK still holds open async
+// handles and an abrupt exit crashes Node with a libuv assertion on Windows.
+    process.exitCode = 1
+    return
   }
 
   const snap = await get(ref(db, 'students'))
   if (!snap.exists()) {
     console.log('No students found.')
-    process.exit(0)
+    process.exitCode = 0
+    return
   }
 
   const rows = [COLUMNS.join(',')]
@@ -117,7 +121,8 @@ async function main() {
   console.log('phones / other fields, save it, then run:')
   console.log('  npm run apply:students -- <path-to-csv>            (dry-run)')
   console.log('  npm run apply:students -- <path-to-csv> --apply    (write)')
-  process.exit(0)
+  process.exitCode = 0
+  return
 }
 
 main().catch((err) => {

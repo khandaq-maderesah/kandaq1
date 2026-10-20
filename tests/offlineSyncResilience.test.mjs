@@ -7,6 +7,7 @@ const {
   getOfflineAttendanceQueue,
   enqueueOfflineAttendance,
   clearOfflineAttendanceQueue,
+  resolveAttendanceConflict,
   syncOfflineAttendance,
 } = await import('../src/lib/offlineAttendance.ts')
 
@@ -181,5 +182,105 @@ describe('Cloud write safety during sync', () => {
       /if \(isBrowserOnline\(\) && getOfflineAttendanceQueue\(\)\.length > 0\)/,
       'The hook must sync a pending queue on mount'
     )
+  })
+
+  test('the sync hook resolves conflicts with the last-write-wins rule', () => {
+    assert.match(hook, /resolveAttendanceConflict\(record, existing\)/)
+    assert.match(hook, /if \(action === 'skip'\)/)
+    assert.match(hook, /if \(action === 'update'\)/)
+  })
+})
+
+describe('Last-write-wins conflict resolution', () => {
+  const OFFLINE_MARK = 1792480000000 // 2026-10-20T09:46:40Z
+  const NEWER_CLOUD_MARK = new Date(OFFLINE_MARK + 60 * 60 * 1000).toISOString()
+  const OLDER_CLOUD_MARK = new Date(OFFLINE_MARK - 60 * 60 * 1000).toISOString()
+
+  test('a record that does not exist in the cloud is created', () => {
+    assert.equal(resolveAttendanceConflict({ timestamp: OFFLINE_MARK }), 'create')
+    assert.equal(resolveAttendanceConflict({ timestamp: OFFLINE_MARK }, null), 'create')
+  })
+
+  test('an older offline mark does not overwrite a newer online edit', () => {
+    assert.equal(
+      resolveAttendanceConflict({ timestamp: OFFLINE_MARK }, { markedAt: NEWER_CLOUD_MARK }),
+      'skip'
+    )
+  })
+
+  test('a newer offline mark updates the cloud record', () => {
+    assert.equal(
+      resolveAttendanceConflict({ timestamp: OFFLINE_MARK }, { markedAt: OLDER_CLOUD_MARK }),
+      'update'
+    )
+  })
+
+  test('an equal timestamp keeps the offline mark', () => {
+    assert.equal(
+      resolveAttendanceConflict(
+        { timestamp: OFFLINE_MARK },
+        { markedAt: new Date(OFFLINE_MARK).toISOString() }
+      ),
+      'update'
+    )
+  })
+
+  test('a cloud record without a parsable timestamp never blocks the offline mark', () => {
+    assert.equal(resolveAttendanceConflict({ timestamp: OFFLINE_MARK }, {}), 'update')
+    assert.equal(
+      resolveAttendanceConflict({ timestamp: OFFLINE_MARK }, { markedAt: 'not-a-date' }),
+      'update'
+    )
+  })
+
+  test('the cloud value survives a full sync of a stale offline mark', async () => {
+    const storage = createStorage()
+    installBrowser(storage)
+    clearOfflineAttendanceQueue()
+
+    try {
+      enqueueOfflineAttendance([makeRecord(1, { timestamp: OFFLINE_MARK })])
+
+      // The cloud already holds a newer correction made by an admin online.
+      const cloud = { id: 'class1_2026-10-20_student1', status: 'excused', markedAt: NEWER_CLOUD_MARK }
+
+      let writes = 0
+      const result = await syncOfflineAttendance(async (record) => {
+        const action = resolveAttendanceConflict(record, cloud)
+        if (action === 'skip') return
+        writes += 1
+      })
+
+      assert.equal(writes, 0, 'A stale offline mark must not be written to the cloud')
+      assert.equal(result.synced, 1, 'The skipped record is dequeued, not retried forever')
+      assert.equal(result.failed, 0)
+      assert.equal(getOfflineAttendanceQueue().length, 0)
+    } finally {
+      uninstallBrowser()
+    }
+  })
+
+  test('a fresh offline mark is written over an older cloud record', async () => {
+    const storage = createStorage()
+    installBrowser(storage)
+    clearOfflineAttendanceQueue()
+
+    try {
+      enqueueOfflineAttendance([makeRecord(1, { timestamp: OFFLINE_MARK })])
+
+      const cloud = { id: 'class1_2026-10-20_student1', status: 'present', markedAt: OLDER_CLOUD_MARK }
+
+      let writes = 0
+      await syncOfflineAttendance(async (record) => {
+        const action = resolveAttendanceConflict(record, cloud)
+        if (action === 'skip') return
+        writes += 1
+      })
+
+      assert.equal(writes, 1)
+      assert.equal(getOfflineAttendanceQueue().length, 0)
+    } finally {
+      uninstallBrowser()
+    }
   })
 })

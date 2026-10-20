@@ -87,7 +87,10 @@ async function main() {
     console.log('✓ Signed in as:', ADMIN_EMAIL)
   } catch (err) {
     console.error('✗ Could not sign in. Set SEED_ADMIN_EMAIL / SEED_ADMIN_PASSWORD.', err.message || err)
-    process.exit(1)
+    // Do not call process.exit() here: the Firebase SDK still holds open async
+    // handles and an abrupt exit crashes Node with a libuv assertion on Windows.
+    process.exitCode = 1
+    return
   }
 
   const dump = {}
@@ -121,10 +124,10 @@ async function main() {
   writeFileSync(file, JSON.stringify(dump, null, 2))
   console.log(`\n✓ Backup written: ${file}`)
   console.log(`  Total records: ${total}`)
-  process.exit(0)
+  process.exitCode = 0
 }
 
 main().catch((err) => {
   console.error('✗ Backup failed:', err.message || err)
-  process.exit(1)
+  process.exitCode = 1
 })

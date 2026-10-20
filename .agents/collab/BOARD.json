@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "MACS Live Collaboration Board",
   "description": "State management for multi-agent coordination, file mutex locking, and task lifecycles",
-  "updated_at": "2026-10-20T10:52:00+03:00",
+  "updated_at": "2026-10-20T10:04:45.724Z",
   "agents": {
     "lead": {
       "agent_name": "Antigravity (Gemini)",
@@ -14,12 +14,20 @@
     "implementer": {
       "agent_name": "KiloCode (Kilo AI)",
       "role": "Specialist Implementer",
-      "status": "IDLE",
-      "current_task": null,
-      "last_heartbeat": "2026-10-20T10:52:00+03:00"
+      "status": "BUSY",
+      "current_task": "5.6-SUPPORT",
+      "last_heartbeat": "2026-10-20T10:04:45.724Z"
     }
   },
-  "active_locks": {},
+  "active_locks": {
+    "tests/authSessionRouting.test.mjs": "implementer",
+    "tests/offlineSyncResilience.test.mjs": "implementer",
+    "scripts/verify.mjs": "implementer",
+    "src/middleware.ts": "implementer",
+    "src/hooks/useOfflineAttendanceSync.ts": "implementer",
+    "package.json": "implementer",
+    ".gitignore": "implementer"
+  },
   "tasks": [
     {
       "id": "1.1",
@@ -220,6 +228,24 @@
       "locked_files": [],
       "created_at": "2026-10-20T07:28:36.790Z",
       "updated_at": "2026-10-20T10:52:00+03:00"
+    },
+    {
+      "id": "5.6",
+      "phase": "Phase 5: Offline-First Attendance & PWA Experience",
+      "title": "Support round 2: residual sync-path and middleware fixes, session-routing + sync-resilience test suites, thermal guard hardening",
+      "assignee": "implementer",
+      "status": "IN_PROGRESS",
+      "locked_files": [
+        "tests/authSessionRouting.test.mjs",
+        "tests/offlineSyncResilience.test.mjs",
+        "scripts/verify.mjs",
+        "src/middleware.ts",
+        "src/hooks/useOfflineAttendanceSync.ts",
+        "package.json",
+        ".gitignore"
+      ],
+      "created_at": "2026-10-20T10:04:45.724Z",
+      "updated_at": "2026-10-20T10:04:45.724Z"
     }
   ]
 }

@@ -102,6 +102,42 @@ export interface SyncResult {
   errors: string[]
 }
 
+/** What the sync engine should do with a queued record. */
+export type AttendanceConflictAction = 'create' | 'update' | 'skip'
+
+/** A queued (offline) attendance mark. */
+export interface QueuedAttendanceMark {
+  /** Epoch milliseconds of the moment the mark was taken offline. */
+  timestamp: number
+}
+
+/** The attendance record that already exists in the cloud. */
+export interface CloudAttendanceMark {
+  /** ISO timestamp of the last cloud edit. */
+  markedAt?: string
+}
+
+/**
+ * Last-write-wins conflict resolution between a queued offline mark and the
+ * record that already exists in the cloud.
+ *
+ * - No cloud record              -> 'create' (write a new record)
+ * - Cloud record is newer        -> 'skip'   (keep the cloud value, dequeue the mark)
+ * - Queued mark is newer         -> 'update' (patch the cloud record)
+ *
+ * A cloud record without a parsable `markedAt` is treated as older, so a valid
+ * offline mark is never lost because of missing metadata.
+ */
+export function resolveAttendanceConflict(
+  queued: QueuedAttendanceMark,
+  existing?: CloudAttendanceMark | null
+): AttendanceConflictAction {
+  if (!existing) return 'create'
+  const cloudAt = existing.markedAt ? Date.parse(existing.markedAt) : Number.NaN
+  if (!Number.isFinite(cloudAt)) return 'update'
+  return cloudAt > queued.timestamp ? 'skip' : 'update'
+}
+
 /**
  * Dispatches all pending offline records to Firebase RTDB.
  * Takes the database submit function as parameter to remain decoupled and testable.

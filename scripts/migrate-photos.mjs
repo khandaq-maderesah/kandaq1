@@ -86,7 +86,8 @@ async function main() {
   const snap = await get(ref(db, 'students'))
   if (!snap.exists()) {
     console.log('No students found — nothing to migrate.')
-    process.exit(0)
+    process.exitCode = 0
+    return
   }
 
   let moved = 0
@@ -146,7 +147,8 @@ async function main() {
     console.log('✓ Nothing to do.')
   }
 
-  process.exit(0)
+  process.exitCode = 0
+  return
 }
 
 main().catch((err) => {
