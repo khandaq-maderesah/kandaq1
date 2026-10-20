@@ -5,20 +5,28 @@ import { useRouter } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { homePathFor } from '@/components/ProtectedRoute'
+import { OfflineScreen } from '@/components/OfflineScreen'
 
 /** Generic entry point: sends each user to their role's home screen. */
 export default function DashboardPage() {
-  const { user, school, loading } = useAuth()
+  const { user, school, loading, stalled, offline } = useAuth()
   const router = useRouter()
 
   useEffect(() => {
     if (loading) return
     if (!user) {
+      // Offline without a session: the offline screen explains the situation
+      // instead of leaving an endless spinner on screen.
+      if (stalled) return
       router.replace('/login')
       return
     }
     router.replace(homePathFor(user.role, !!school))
-  }, [loading, user, school, router])
+  }, [loading, user, school, router, stalled])
+
+  if (!loading && !user && stalled && offline) {
+    return <OfflineScreen />
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center">

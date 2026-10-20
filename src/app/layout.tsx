@@ -3,6 +3,8 @@ import { Inter, Noto_Sans_Ethiopic, Noto_Sans_Arabic } from "next/font/google"
 import "./globals.css"
 import { AuthProvider } from "@/context/AuthContext"
 import { InstallAppPrompt } from "@/components/InstallAppPrompt"
+import { NetworkStatus } from "@/components/NetworkStatus"
+import { ServiceWorkerRegistrar } from "@/components/ServiceWorkerRegistrar"
 import { I18nProvider } from "@/i18n/I18nProvider"
 import { LOCALE_STORAGE_KEY } from "@/i18n/config"
 import { ThemeProvider, THEME_STORAGE_KEY } from "@/components/theme/ThemeProvider"
@@ -68,6 +70,13 @@ export const viewport: Viewport = {
 // users never see a white flash.
 const bootScript = `try{var d=document.documentElement;var l=localStorage.getItem(${JSON.stringify(LOCALE_STORAGE_KEY)});if(l){d.lang=l;d.dir=l==='ar'?'rtl':'ltr'}var t=localStorage.getItem(${JSON.stringify(THEME_STORAGE_KEY)});if(t==='dark'||(t!=='light'&&matchMedia('(prefers-color-scheme: dark)').matches))d.classList.add('dark')}catch(e){}`
 
+// Safety net for the offline start. If the app is opened without a network and
+// the bundle never boots (its chunks were not cached, so the server-rendered
+// spinner would stay on screen forever), send the user to the branded offline
+// page instead of an endless loader. Online starts are left alone: the app
+// shows its own error state.
+const offlineBootGuard = `setTimeout(function(){try{if(window.__kmmsBooted)return;if(navigator.onLine)return;window.location.replace('/offline.html')}catch(e){}},10000)`
+
 export default function RootLayout({
   children,
 }: {
@@ -77,17 +86,20 @@ export default function RootLayout({
     <html lang="en" dir="ltr" suppressHydrationWarning className={`${latin.variable} ${ethiopic.variable} ${arabic.variable}`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: bootScript }} />
+        <script dangerouslySetInnerHTML={{ __html: offlineBootGuard }} />
       </head>
       <body className="antialiased">
         <ThemeProvider>
           <I18nProvider>
             <AuthProvider>
+              <NetworkStatus />
               {children}
               <InstallAppPrompt />
             </AuthProvider>
             <ThemedToaster />
           </I18nProvider>
         </ThemeProvider>
+        <ServiceWorkerRegistrar />
       </body>
     </html>
   )

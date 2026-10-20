@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#f5f6f8" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0e1117" media="(prefers-color-scheme: dark)" />
+    <title>MMS</title>
+    <style>
+      :root {
+        --bg: #f5f6f8;
+        --card: #ffffff;
+        --border: #e4e6eb;
+        --fg: #10131a;
+        --muted: #5b6472;
+        --primary: #214dc4;
+        --primary-soft: rgba(33, 77, 196, 0.1);
+        --shadow: 0 1px 2px rgba(16, 19, 26, 0.04), 0 12px 32px rgba(16, 19, 26, 0.06);
+      }
+      html.dark {
+        --bg: #0e1117;
+        --card: #151a22;
+        --border: #242c38;
+        --fg: #eef1f6;
+        --muted: #9aa4b2;
+        --primary: #6f96ff;
+        --primary-soft: rgba(111, 150, 255, 0.14);
+        --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 32px rgba(0, 0, 0, 0.35);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+      }
+      body {
+        background: var(--bg);
+        color: var(--fg);
+        font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Ethiopic", "Noto Sans Arabic", sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        -webkit-font-smoothing: antialiased;
+      }
+      .card {
+        width: 100%;
+        max-width: 380px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        box-shadow: var(--shadow);
+        padding: 32px 24px 28px;
+        text-align: center;
+      }
+      .mark {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 20px;
+        border-radius: 999px;
+        background: var(--primary-soft);
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .mark svg {
+        width: 30px;
+        height: 30px;
+      }
+      h1 {
+        margin: 0 0 8px;
+        font-size: 18px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+      p {
+        margin: 0;
+        font-size: 14px;
+        line-height: 1.6;
+        color: var(--muted);
+      }
+      button {
+        margin-top: 24px;
+        width: 100%;
+        height: 44px;
+        border: 0;
+        border-radius: 12px;
+        background: var(--primary);
+        color: #fff;
+        font-size: 14px;
+        font-weight: 600;
+        font-family: inherit;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+      button:active {
+        transform: translateY(1px);
+      }
+      button svg {
+        width: 16px;
+        height: 16px;
+      }
+      .hint {
+        margin-top: 14px;
+        font-size: 12px;
+        color: var(--muted);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+      }
+      .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 999px;
+        background: #d9822b;
+      }
+      @media (prefers-reduced-motion: no-preference) {
+        .pulse {
+          animation: pulse 2.4s ease-in-out infinite;
+        }
+        @keyframes pulse {
+          0%,
+          100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.45;
+          }
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="card" role="alert" aria-live="polite">
+      <div class="mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 8.5a15 15 0 0 1 10-3 15 15 0 0 1 10 3v9a15 15 0 0 1-10-3 15 15 0 0 1-10 3z" />
+          <path d="M12 5.5v9" />
+          <path d="M3 3l18 18" />
+        </svg>
+      </div>
+      <h1 id="title">You are offline</h1>
+      <p id="description">
+        KMMS cannot reach the server right now. Anything you save stays on this device and syncs automatically once the
+        connection is back.
+      </p>
+      <button id="retry" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12a9 9 0 1 1-2.64-6.36" />
+          <path d="M21 3v6h-6" />
+        </svg>
+        <span id="retryLabel">Try again</span>
+      </button>
+      <div class="hint"><span class="dot pulse"></span><span id="waiting">Waiting for a connection…</span></div>
+    </main>
+    <script>
+      (function () {
+        var STRINGS = {
+          en: {
+            dir: 'ltr',
+            title: 'You are offline',
+            description:
+              'KMMS cannot reach the server right now. Anything you save stays on this device and syncs automatically once the connection is back.',
+            retry: 'Try again',
+            waiting: 'Waiting for a connection…',
+          },
+          am: {
+            dir: 'ltr',
+            title: 'ከመርበት ውጭ ነዎት',
+            description:
+              'KMMS አሁን ከአገልግዎ ጋር መገናኘት አይችልም። የሚቀመጡት ሁሉ በዚህ መሣሪያ ላይ ይቀመጣል እና አንበርት ሲመለስ በራሱ ይስጋራል።',
+            retry: 'እንደገና ሞክር',
+            waiting: 'ግንኙነት እየተጠበቀ ነው…',
+          },
+          ar: {
+            dir: 'rtl',
+            title: 'أنت غير متصل بالإنترنت',
+            description:
+              'لا يستطيع KMMS الوصول إلى الخادم الآن. يبقى كل ما تحفظه على هذا الجهاز، ويتزامن تلقائياً بمجرد عودة الاتصال.',
+            retry: 'إعادة المحاولة',
+            waiting: 'في انتظار الاتصال…',
+          },
+          om: {
+            dir: 'ltr',
+            title: 'Maqaan dhaabbataa',
+            description:
+              'KMMS hin qofti fayyaa dhaabbataa qabu. Yaan hin barbadaa qabu hin dhaabbataa kanaa keessatti fudhatama. Ayyana yoo fudhatama yookaan dhaabbataa deebi’ee tureetti ofi.',
+            retry: 'Irra deebi’ii yaali',
+            waiting: 'Dhaabbataa eegamaa…',
+          },
+          so: {
+            dir: 'ltr',
+            title: 'Ma offline ahaad',
+            description:
+              'KMMS ma hadda serverka ma gaari karo. Waxaad kaydisay wuxuu ku jiraa qalabkana wuxuuna isbeddelay marka xiriirku dib u soo baxo.',
+            retry: 'Isku day mar kale',
+            waiting: 'Xiriir la filayaa…',
+          },
+        }
+
+        function readLocale() {
+          try {
+            var stored = localStorage.getItem('khandaq_locale')
+            if (stored && STRINGS[stored]) return stored
+            var preferred = (navigator.languages && navigator.languages[0]) || navigator.language || 'en'
+            var base = preferred.toLowerCase().split('-')[0]
+            return STRINGS[base] ? base : 'en'
+          } catch (err) {
+            return 'en'
+          }
+        }
+
+        var locale = readLocale()
+        var strings = STRINGS[locale]
+        document.documentElement.lang = locale
+        document.documentElement.dir = strings.dir
+        document.getElementById('title').textContent = strings.title
+        document.getElementById('description').textContent = strings.description
+        document.getElementById('retryLabel').textContent = strings.retry
+        document.getElementById('waiting').textContent = strings.waiting
+
+        try {
+          var theme = localStorage.getItem('khandaq_theme')
+          if (theme === 'dark' || (theme !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark')
+          }
+        } catch (err) {
+          /* ignore */
+        }
+
+        function retry() {
+          window.location.reload()
+        }
+        document.getElementById('retry').addEventListener('click', retry)
+        window.addEventListener('online', retry)
+      })()
+    </script>
+  </body>
+</html>

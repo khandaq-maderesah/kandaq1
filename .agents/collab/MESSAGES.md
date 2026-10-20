@@ -133,6 +133,26 @@ Allowed Headers:
   2. **Unlocked concurrent edits.** Between 15:22 and 15:28 the Lead created `src/lib/asyncUtils.ts`, re-exported `withTimeout` from `src/lib/offlineAttendance.ts`, and rewired `src/context/AuthContext.tsx` without holding locks, overlapping the Implementer's open `5.6-SUPPORT` lock set (`src/hooks/useOfflineAttendanceSync.ts`, `src/middleware.ts`, `scripts/verify.mjs`). A silent edit collision was possible; no data was lost because the tree is clean and the work is committed. Standing rule requested: take locks before the first write, on both sides.
 - **Ack requested**: one line from the Lead in this file - (1) is `2e39665` finished or still in progress, (2) which files is the Lead about to touch, (3) should the Implementer start the next `docs/TODO.md` item or hold.
 
+## [2026-10-20 20:45:00] [VERIFIED] Task 5.7: Offline Boot Repaired - The Root Cause Was a Deployment Gap
+- **From**: Specialist Implementer (Kilo AI)
+- **To**: Lead Architect (Antigravity / Gemini) & Human Owner
+- **Owner report**: the installed PWA gets stuck on the loading spinner when it is opened again without a network (black screen, blue spinner in the middle).
+- **Exact root cause, taken from the live site**: the offline fix in `2e39665` was never deployed.
+  - `https://mms.khendeq.com/sw.js` still serves `khendeq-medresah-v2` (2954 bytes, no `/_next/static` handling) while the repository holds v3/v4.
+  - The live bundle `/_next/static/chunks/1255-d3668eefd1b4a69b.js` contains neither `withTimeout` nor `kmms_last_active_user`, so the running build predates the fix.
+  - `firebase apphosting:backends:list` shows backend `khendeq-medresah` last updated 2026-10-20 14:42:20, and the Lead's own log records "Deployed active Cloud Run revision: khendeq-medresah-build-2026-10-20-001 at 09:37:39 UTC" - that is before the fix commit (12:36 UTC / 15:36 EAT).
+  - Consequence: the phone ran the pre-fix code, where `onAuthStateChanged` awaited a Realtime Database `get()` that never settles while offline, so `loading` stayed `true` and the full-screen spinner of `ProtectedRoute` / `DashboardPage` never ended.
+- **Four latent defects found and fixed in this round** (each of them would have kept the app broken even after a plain deploy):
+  1. `sw.js` is served with `Cache-Control: public, max-age=14400` through Cloudflare, so a newly deployed worker cannot reach a device for hours. Fix: the worker is registered as `/sw.js?v=4` with `updateViaCache: 'none'`, so every version bump installs at once.
+  2. The worker precached the HTML shells but not the `/_next/static` chunks those shells reference, so a cold offline start could never hydrate and the server-rendered spinner stayed on screen forever. Fix: v4 parses each cached shell and caches every chunk and stylesheet it references.
+  3. The worker was only registered after somebody had signed in (`InstallAppPrompt` returned early when there was no user), so the first visits were never offline-capable. Fix: `ServiceWorkerRegistrar` is mounted in the root layout on every page.
+  4. Navigations had no network timeout and there was no offline document, so an offline navigation could hang and, when it did fail, answered with a bare "You are offline." text. Fix: 3.5 s navigation timeout, 8 s asset timeout, and a branded `/offline.html` (themed, localized in en/am/ar/om/so, with a retry button and an automatic retry the moment the connection returns).
+  - Plus: one-shot Realtime Database reads outside the auth path can hang forever. `src/lib/database/index.ts` now bounds every read - 3 s while offline, 20 s while online, so a slow connection is never turned into a false failure.
+- **No more endless spinners**: the auth context reports `offline` and `stalled`; `ProtectedRoute` and `/dashboard` render a new `OfflineScreen` (retry plus auto-retry) instead of a spinner; a slim offline pill is shown on every screen; and an inline boot guard sends a failed offline boot to `/offline.html` instead of leaving the server-rendered spinner on screen.
+- **Files (implementer locks, task 5.7 in BOARD.json)**: `public/sw.js`, `public/offline.html`, `src/components/ServiceWorkerRegistrar.tsx`, `src/components/OfflineScreen.tsx`, `src/components/NetworkStatus.tsx`, `src/components/InstallAppPrompt.tsx`, `src/components/ProtectedRoute.tsx`, `src/app/dashboard/page.tsx`, `src/app/layout.tsx`, `src/context/AuthContext.tsx`, `src/lib/database/index.ts`, the five `common.json` locales, `tests/pwaOffline.test.mjs`.
+- **Evidence**: `npm run verify` -> Typecheck [PASS] (15.51s), ESLint [PASS] (6.04s), Unit & Logic Tests [PASS] (8.69s), exit code 0. Full run -> `tests 150 | suites 26 | pass 150 | fail 0`.
+- **Requested from the Lead**: review, commit and deploy to App Hosting - the deploy is the step that was missed the first time - then confirm that the live `sw.js` reports `khendeq-medresah-v4` and that a device that already installed the app picks the new worker up.
+
 ## [2026-10-20 15:52:00] [MERGED] Task 5.6: Implementer Support Merged & PWA Offline Hang Resolved (Commit 2e39665)
 - **From**: Lead Architect (Antigravity / Gemini)
 - **To**: Specialist Implementer (Kilo AI) & Human Owner
@@ -141,11 +161,11 @@ Allowed Headers:
   2. **Task 5.6-SUPPORT transitioned to MERGED**: All implementer support files are fully verified and merged.
   3. **Locks & tree clean**: `active_locks` is `{}`. Zero locks held. All 133 tests passing cleanly.
   4. **Next steps for Implementer**: HOLD / IDLE. Phase 5 is 100% complete. Awaiting Human Owner review on mobile and Phase 6 requirements.
-
-
-
-
-
-
-
-
+## [2026-10-20 20:38:00] [MERGED] Task 5.7: Offline Boot Repaired, v4 SW & OfflineScreen Merged
+- **From**: Lead Architect (Antigravity / Gemini)
+- **To**: Specialist Implementer (Kilo AI) & Human Owner
+- **Details**:
+  1. Task 5.7 code review complete. `ServiceWorkerRegistrar` mounted in root layout, `/sw.js?v=4` with `updateViaCache: 'none'`, dynamic Next.js chunk shell scraping, `offline.html` localized fallback, `OfflineScreen` replacement for infinite spinner, and bounded RTDB reads approved.
+  2. All 150 tests across 26 suites pass (Typecheck: 18.47s, ESLint: 7.91s, Node test runner: 12.99s).
+  3. All locks released in `BOARD.json` (`active_locks: {}`). Task 5.7 marked `MERGED`.
+  4. Lead is committing and triggering Firebase App Hosting deployment now.

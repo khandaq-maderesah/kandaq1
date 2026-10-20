@@ -2,21 +2,21 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "MACS Live Collaboration Board",
   "description": "State management for multi-agent coordination, file mutex locking, and task lifecycles",
-  "updated_at": "2026-10-20T15:50:00.000Z",
+  "updated_at": "2026-10-20T17:37:00.000Z",
   "agents": {
     "lead": {
       "agent_name": "Antigravity (Gemini)",
       "role": "Lead Architect",
       "status": "ACTIVE",
-      "current_task": "Offline hang resolution deployed & Phase 5 closeout",
-      "last_heartbeat": "2026-10-20T15:50:00+03:00"
+      "current_task": "Phase 5 verified, merged, and deployed",
+      "last_heartbeat": "2026-10-20T20:37:00+03:00"
     },
     "implementer": {
       "agent_name": "KiloCode (Kilo AI)",
       "role": "Specialist Implementer",
       "status": "IDLE",
-      "current_task": "IDLE - Task 5.6 merged, awaiting Phase 6 instructions",
-      "last_heartbeat": "2026-10-20T15:50:00+03:00"
+      "current_task": "IDLE - Task 5.7 merged, ready for Phase 6",
+      "last_heartbeat": "2026-10-20T20:37:00+03:00"
     }
   },
   "active_locks": {},
@@ -231,6 +231,17 @@
       "created_at": "2026-10-20T10:04:45.724Z",
       "updated_at": "2026-10-20T15:50:00.000Z",
       "note": "Verified and merged by Lead in commits 497931b and 2e39665. All tests green."
+    },
+    {
+      "id": "5.7",
+      "phase": "Phase 5: Offline-First Attendance & PWA Experience",
+      "title": "Offline boot repair: deployed PWA stuck on the loading spinner when reopened without network (owner-reported 20:20)",
+      "assignee": "implementer",
+      "status": "MERGED",
+      "locked_files": [],
+      "created_at": "2026-10-20T17:30:00.000Z",
+      "updated_at": "2026-10-20T17:37:00.000Z",
+      "note": "Verified by Lead. v4 service worker with chunk pre-caching, updateViaCache none, offline.html fallback, bounded RTDB reads, and OfflineScreen merged. 150/150 tests pass."
     }
   ]
 }

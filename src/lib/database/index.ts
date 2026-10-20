@@ -1,8 +1,28 @@
 import { app, db } from '@/lib/firebase/config'
 import { getStorage, ref as storageRef, uploadBytes, deleteObject } from 'firebase/storage'
 import { BRANDING_FILES, brandingStoragePath, type BrandingFile, type PublicBranding } from '@/lib/branding'
-import { ref, get, set, update, remove, onValue, query, orderByChild, equalTo, startAt, type QueryConstraint, type Unsubscribe } from 'firebase/database'
+import { ref, get as rtdbGet, set, update, remove, onValue, query, orderByChild, equalTo, startAt, type QueryConstraint, type Unsubscribe, type DataSnapshot } from 'firebase/database'
 import type { User, Class, Student, Attendance, AbsentAlert, MissingAttendanceAlert, Exam, Announcement, School, ChangeRequest, DeletionReason, StudentArchive } from '@/types'
+import { withTimeout } from '@/lib/asyncUtils'
+
+/**
+ * One-shot reads never hang.
+ *
+ * The Realtime Database keeps a websocket open, and `get()` waits for it. With
+ * no connection that promise can stay pending for a long time, which used to
+ * leave a screen spinning forever. A hard timeout turns it into a normal
+ * error the screens can handle.
+ *
+ * Offline the timeout is short (fail fast, show the offline state); online it
+ * is generous, so a slow connection is never turned into a false failure.
+ */
+const READ_TIMEOUT_OFFLINE_MS = 3000
+const READ_TIMEOUT_ONLINE_MS = 20000
+
+function get(reference: Parameters<typeof rtdbGet>[0]): Promise<DataSnapshot> {
+  const offline = typeof navigator !== 'undefined' && !navigator.onLine
+  return withTimeout(rtdbGet(reference), offline ? READ_TIMEOUT_OFFLINE_MS : READ_TIMEOUT_ONLINE_MS)
+}
 
 /**
  * Realtime Database rejects `undefined` anywhere in a write (e.g. an empty,

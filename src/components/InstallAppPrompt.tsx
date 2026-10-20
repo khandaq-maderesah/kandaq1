@@ -63,10 +63,9 @@ export function InstallAppPrompt() {
     window.addEventListener('beforeinstallprompt', onPrompt)
     window.addEventListener('appinstalled', onInstalled)
 
-    // Register the service worker for app-like / offline support.
-    if ('serviceWorker' in navigator && window.isSecureContext) {
-      navigator.serviceWorker.register('/sw.js').catch(() => {})
-    }
+    // NOTE: the service worker is registered by <ServiceWorkerRegistrar /> in
+    // the root layout, so offline support is active from the very first visit
+    // and not only after somebody signs in.
 
     return () => {
       window.removeEventListener('beforeinstallprompt', onPrompt)

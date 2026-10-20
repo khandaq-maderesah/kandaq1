@@ -28,6 +28,13 @@ interface AuthContextType {
   user: User | null
   firebaseUser: FirebaseUser | null
   loading: boolean
+  /** True when the device has no network connection right now. */
+  offline: boolean
+  /**
+   * True when the session could not be resolved in time (usually because the
+   * network is gone). The UI shows the offline screen instead of spinning.
+   */
+  stalled: boolean
   /**
    * Signs in. With `schoolId` (the branded /m/{slug} sign-in page), only that
    * madrasa's accounts are accepted; a platform admin opens that madrasa.
@@ -185,6 +192,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [brandingTick, setBrandingTick] = useState(0)
   const { setLocale } = useLocaleSettings()
 
+  // The device's connection state, kept live so the UI can say "offline"
+  // instead of looking frozen.
+  const [offline, setOffline] = useState<boolean>(() => {
+    if (typeof navigator === 'undefined') return false
+    return !navigator.onLine
+  })
+
+  // Set when the session could not be resolved in time.
+  const [stalled, setStalled] = useState(false)
+
+  useEffect(() => {
+    const update = () => setOffline(!navigator.onLine)
+    window.addEventListener('online', update)
+    window.addEventListener('offline', update)
+    return () => {
+      window.removeEventListener('online', update)
+      window.removeEventListener('offline', update)
+    }
+  }, [])
+
   // A signed-in user's saved language wins over this browser's choice.
   const applyProfileLocale = useCallback(
     (profile: User) => {
@@ -251,6 +278,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             /* ignore */
           }
         }
+        // The session did not resolve in time: the UI must say so instead of
+        // spinning forever.
+        setStalled(true)
         setLoading(false)
       }
     }, isOffline ? 100 : 2000)
@@ -370,7 +400,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setBranding(null)
       return
     }
-    getPublicBranding(school.id)
+    // Offline: branding is decoration, never block on it.
+    if (offline) {
+      setBranding(null)
+      return
+    }
+    withTimeout(getPublicBranding(school.id), 2500)
       .then((b) => {
         if (!active) return
         setBranding(b)
@@ -381,7 +416,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       active = false
     }
-  }, [school, user, brandingTick])
+  }, [school, user, brandingTick, offline])
 
   const login = async (email: string, password: string, opts?: { schoolId?: string }) => {
     const result = await signInWithEmailAndPassword(auth, email, password)
@@ -453,6 +488,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       user,
       firebaseUser,
       loading,
+      offline,
+      stalled,
       login,
       logout,
       isAdmin,

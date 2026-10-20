@@ -2,6 +2,7 @@ import { test, describe, beforeEach, afterEach } from 'node:test'
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import path from 'node:path'
+import vm from 'node:vm'
 
 const {
   getOfflineAttendanceQueue,
@@ -441,5 +442,259 @@ describe('Async timeout & anti-hang offline guarantees', () => {
     assert.ok(sw.includes("url.pathname.startsWith('/_next/static/')"), 'Must handle static assets')
     assert.ok(sw.includes('PRECACHE_SHELL'), 'Must precache shell')
     assert.ok(sw.includes("'/teacher'"), 'Must precache /teacher in shell')
+  })
+})
+
+// ==================== Task 5.7: offline boot repair ====================
+// The owner reported the installed app getting stuck on the loading spinner
+// when it is opened again without a network. The tests below pin the three
+// things that made that possible: the service worker must serve a bootable
+// page offline, no request may hang, and the UI must never show an endless
+// spinner.
+
+describe('Offline boot repair: the service worker can serve a bootable page offline', () => {
+  const swSource = read(path.join('public', 'sw.js'))
+  const ORIGIN = 'https://app.test'
+
+  const keyOf = (request) => {
+    const raw = typeof request === 'string' ? request : request.url
+    return raw.startsWith('/') ? ORIGIN + raw : raw
+  }
+
+  /**
+   * Runs public/sw.js in a sandbox with a fake Cache API and a fake network,
+   * so the real fetch handler can be exercised.
+   */
+  function runServiceWorker({ online = false, seed = {}, html } = {}) {
+    const listeners = {}
+    const store = new Map(
+      Object.entries(seed).map(([key, body]) => [key.startsWith('/') ? ORIGIN + key : key, new Response(body)])
+    )
+    const fetchCalls = []
+
+    const cache = {
+      async put(request, response) {
+        store.set(keyOf(request), response)
+      },
+      async match(request) {
+        return store.get(keyOf(request))
+      },
+      async add(url) {
+        store.set(keyOf(url), new Response('cached:' + url))
+      },
+    }
+    const caches = {
+      async open() {
+        return cache
+      },
+      async keys() {
+        return ['khendeq-medresah-v4']
+      },
+      async delete() {
+        return true
+      },
+    }
+    const fakeFetch = async (request) => {
+      const url = typeof request === 'string' ? request : request.url
+      fetchCalls.push(url)
+      if (!online) throw new TypeError('Failed to fetch')
+      const body = html ?? 'network:' + url
+      return new Response(body, { status: 200, headers: { 'Content-Type': 'text/html' } })
+    }
+    const clients = { claim() {}, matchAll: async () => [] }
+    const self = {
+      addEventListener(type, handler) {
+        listeners[type] = listeners[type] || []
+        listeners[type].push(handler)
+      },
+      skipWaiting() {},
+      clients,
+      location: { origin: ORIGIN },
+      registration: { showNotification: async () => {} },
+    }
+    const context = vm.createContext({
+      self,
+      caches,
+      fetch: fakeFetch,
+      Response,
+      // In a browser a relative URL resolves against the worker's scope.
+      Request: class TestRequest extends Request {
+        constructor(input, init) {
+          super(typeof input === 'string' && input.startsWith('/') ? ORIGIN + input : input, init)
+        }
+      },
+      URL,
+      AbortController,
+      setTimeout,
+      clearTimeout,
+      console,
+      location: { origin: ORIGIN },
+      clients,
+    })
+    vm.runInContext(swSource, context)
+
+    async function dispatch(type, event) {
+      const waits = []
+      const enriched = { ...event, waitUntil: (promise) => waits.push(promise) }
+      for (const handler of listeners[type] || []) handler(enriched)
+      await Promise.all(waits)
+      return enriched
+    }
+
+    async function fetchEvent(request) {
+      let responded = null
+      await dispatch('fetch', {
+        request,
+        respondWith(promise) {
+          responded = promise
+        },
+      })
+      return responded ? await responded : null
+    }
+
+    return { store, fetchCalls, dispatch, fetchEvent }
+  }
+
+  const navigation = (path) => ({ method: 'GET', url: ORIGIN + path, mode: 'navigate' })
+
+  test('an offline navigation serves the cached shell of that area', async () => {
+    const sw = runServiceWorker({ online: false, seed: { '/teacher/attendance': '<html>attendance shell</html>' } })
+    const response = await sw.fetchEvent(navigation('/teacher'))
+    assert.ok(response, 'The navigation must be answered')
+    assert.match(await response.text(), /attendance shell/)
+  })
+
+  test('an offline navigation without any cached page serves the offline document', async () => {
+    const sw = runServiceWorker({ online: false, seed: { '/offline.html': '<html>offline document</html>' } })
+    const response = await sw.fetchEvent(navigation('/admin/students'))
+    assert.ok(response)
+    assert.match(await response.text(), /offline document/)
+  })
+
+  test('an offline navigation without any cached page at all answers 503', async () => {
+    const sw = runServiceWorker({ online: false })
+    const response = await sw.fetchEvent(navigation('/admin/students'))
+    assert.equal(response.status, 503)
+    assert.match(await response.text(), /You are offline\./)
+  })
+
+  test('an online navigation is answered by the network', async () => {
+    const sw = runServiceWorker({ online: true })
+    const response = await sw.fetchEvent(navigation('/dashboard'))
+    assert.equal(response.status, 200)
+    assert.match(await response.text(), /network:/)
+  })
+
+  test('a build asset that is not cached fails loudly instead of with an empty body', async () => {
+    const sw = runServiceWorker({ online: false })
+    const response = await sw.fetchEvent({
+      method: 'GET',
+      url: ORIGIN + '/_next/static/chunks/app-1234.js',
+      mode: 'cors',
+    })
+    assert.equal(response.status, 504, 'A missing build asset must be an explicit error')
+    assert.notEqual((await response.text()).length, 0, 'The error body must not be empty')
+  })
+
+  test('a cached build asset is served without touching the network', async () => {
+    const sw = runServiceWorker({
+      online: false,
+      seed: { '/_next/static/chunks/app-1234.js': 'console.log("boot")' },
+    })
+    const response = await sw.fetchEvent({
+      method: 'GET',
+      url: ORIGIN + '/_next/static/chunks/app-1234.js',
+      mode: 'cors',
+    })
+    assert.equal(response.status, 200)
+    assert.match(await response.text(), /console\.log/)
+    assert.equal(sw.fetchCalls.length, 0, 'A cached asset must not hit the network')
+  })
+
+  test('installing the worker caches the build assets the app shell needs', async () => {
+    const sw = runServiceWorker({
+      online: true,
+      html: '<html><script src="/_next/static/chunks/app-1234.js"></script><link href="/_next/static/css/app-5678.css" /></html>',
+    })
+    await sw.dispatch('install', {})
+    assert.ok(
+      sw.store.has(ORIGIN + '/_next/static/chunks/app-1234.js'),
+      'The chunk the shell references must be cached, or the app can never hydrate offline'
+    )
+    assert.ok(
+      sw.store.has(ORIGIN + '/_next/static/css/app-5678.css'),
+      'The stylesheet the shell references must be cached too'
+    )
+    assert.ok(sw.store.has(ORIGIN + '/offline.html'), 'The offline document must be precached')
+  })
+
+  test('every network attempt of the worker is bounded by a timeout', () => {
+    assert.match(swSource, /AbortController/)
+    assert.match(swSource, /NAV_TIMEOUT_MS/)
+    assert.match(swSource, /ASSET_TIMEOUT_MS/)
+  })
+
+  test('the worker never lets a request hang without answering', () => {
+    assert.match(swSource, /event\.respondWith/)
+    assert.match(swSource, /X-Offline/)
+  })
+})
+
+describe('Offline boot repair: the app never shows an endless spinner', () => {
+  const layout = read(path.join('src', 'app', 'layout.tsx'))
+  const auth = read(path.join('src', 'context', 'AuthContext.tsx'))
+  const protectedRoute = read(path.join('src', 'components', 'ProtectedRoute.tsx'))
+  const dashboard = read(path.join('src', 'app', 'dashboard', 'page.tsx'))
+  const registrar = read(path.join('src', 'components', 'ServiceWorkerRegistrar.tsx'))
+  const installPrompt = read(path.join('src', 'components', 'InstallAppPrompt.tsx'))
+  const dataLayer = read(path.join('src', 'lib', 'database', 'index.ts'))
+
+  test('the offline document exists, is localized and is offered by the worker', () => {
+    const offlineHtml = read(path.join('public', 'offline.html'))
+    for (const locale of ['en', 'am', 'ar', 'om', 'so']) {
+      assert.ok(offlineHtml.includes(`${locale}:`), `The offline document must carry ${locale} copy`)
+    }
+    assert.ok(offlineHtml.includes('prefers-color-scheme: dark'), 'The offline document must follow the theme')
+    assert.match(read(path.join('public', 'sw.js')), /OFFLINE_URL = '\/offline\.html'/)
+  })
+
+  test('the service worker is registered on every page, not only after signing in', () => {
+    assert.ok(layout.includes('<ServiceWorkerRegistrar />'), 'The registrar must be mounted in the root layout')
+    assert.ok(!installPrompt.includes("register('/sw.js')"), 'Registration must not depend on a signed-in user')
+  })
+
+  test('the worker is registered with a version so updates reach the device', () => {
+    assert.match(registrar, /SW_URL = `\/sw\.js\?v=/)
+    assert.match(registrar, /updateViaCache: 'none'/)
+  })
+
+  test('a failed offline boot lands on the branded offline page', () => {
+    assert.ok(layout.includes('/offline.html'), 'The layout needs the offline boot guard')
+    assert.ok(layout.includes('__kmmsBooted'), 'The boot guard needs to know the app booted')
+  })
+
+  test('the session exposes the offline and stalled states', () => {
+    assert.match(auth, /offline: boolean/)
+    assert.match(auth, /stalled: boolean/)
+    assert.match(auth, /setStalled\(true\)/)
+  })
+
+  test('protected routes and the dashboard show the offline screen instead of spinning', () => {
+    assert.ok(protectedRoute.includes('<OfflineScreen />'))
+    assert.ok(dashboard.includes('<OfflineScreen />'))
+  })
+
+  test('one-shot realtime reads can no longer hang forever', () => {
+    assert.match(dataLayer, /READ_TIMEOUT_OFFLINE_MS/)
+    assert.match(dataLayer, /withTimeout\(rtdbGet\(reference\)/)
+  })
+
+  test('the offline copy exists in every supported language', () => {
+    for (const locale of ['en', 'am', 'ar', 'om', 'so']) {
+      const common = JSON.parse(read(path.join('src', 'i18n', 'messages', locale, 'common.json')))
+      for (const key of ['title', 'description', 'retry', 'waiting', 'banner']) {
+        assert.ok(common.offline?.[key], `common.offline.${key} is missing in ${locale}`)
+      }
+    }
   })
 })

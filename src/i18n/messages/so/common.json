@@ -39,6 +39,13 @@
     "showLess": "Tus in yar",
     "selectAll": "Dooro dhammaan"
   },
+  "offline": {
+    "title": "Ma offline ahaad",
+    "description": "KMMS ma hadda serverka ma gaari karo. Waxaad kaydisay wuxuu ku jiraa qalabkana wuxuuna isbeddelay marka xiriirku dib u soo baxo.",
+    "retry": "Isku day mar kale",
+    "waiting": "Xiriir la filayaa…",
+    "banner": "Ma offline ahaad — isbeddelku waxaa lagu keydiyay qalabka"
+  },
   "status": {
     "loading": "Waa la soo rarayaa…",
     "saving": "Waa la kaydinayaa…",

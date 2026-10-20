@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation'
 import { useEffect } from 'react'
 import { UserRole } from '@/types'
 import { signInPath } from '@/lib/brandMemory'
+import { OfflineScreen } from '@/components/OfflineScreen'
 
 interface ProtectedRouteProps {
   children: React.ReactNode
@@ -25,7 +26,7 @@ export function ProtectedRoute({
   allowedRoles,
   redirectTo,
 }: ProtectedRouteProps) {
-  const { user, loading, isAdmin, isTeacher, isSuperAdmin, school } = useAuth()
+  const { user, loading, isAdmin, isTeacher, isSuperAdmin, school, stalled, offline } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
 
@@ -45,6 +46,10 @@ export function ProtectedRoute({
     if (loading) return
 
     if (!user) {
+      // Offline without a usable session: the offline screen explains why
+      // nothing happens, instead of bouncing to a sign-in page that cannot
+      // reach the server either.
+      if (stalled) return
       router.push(redirectTo ?? signInPath())
       return
     }
@@ -52,7 +57,7 @@ export function ProtectedRoute({
     if (!hasAccess) {
       router.push(homePathFor(user.role, !!school))
     }
-  }, [user, loading, hasAccess, school, router, redirectTo, pathname])
+  }, [user, loading, hasAccess, school, router, redirectTo, pathname, stalled])
 
   if (loading) {
     return (
@@ -62,9 +67,13 @@ export function ProtectedRoute({
     )
   }
 
-  if (!user || !hasAccess) {
-    return null
+  if (!user) {
+    // Offline without a usable session: say so instead of bouncing to a
+    // sign-in page that cannot reach the server either.
+    return stalled && offline ? <OfflineScreen /> : null
   }
+
+  if (!hasAccess) return null
 
   return <>{children}</>
 }

@@ -33,6 +33,13 @@
     "showLess": "Show less",
     "selectAll": "Select all"
   },
+  "offline": {
+    "title": "You are offline",
+    "description": "KMMS cannot reach the server right now. Anything you save stays on this device and syncs automatically once the connection is back.",
+    "retry": "Try again",
+    "waiting": "Waiting for a connection…",
+    "banner": "Offline — changes are saved on this device"
+  },
   "status": {
     "loading": "Loading…",
     "saving": "Saving…",
