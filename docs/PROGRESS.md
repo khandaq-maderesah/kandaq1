@@ -436,3 +436,48 @@ info skipped 0
 info todo 0
 info duration_ms 2369.9142
 ```
+
+---
+
+## [2026-10-20 12:38:00] Production Rollout: Firebase App Hosting Deployment & Live Verification
+
+- **Lead Architect**: Antigravity (Gemini)
+- **Environment**: Firebase App Hosting (`khendeq-8e17f` / `khendeq-medresah` on Cloud Run `europe-west4`)
+- **Live URL**: `https://mms.khendeq.com` & `https://khendeq-medresah--khendeq-8e17f.europe-west4.hosted.app`
+- **Active Cloud Run Revision**: `khendeq-medresah-build-2026-10-20-001`
+
+### Root Cause Analysis & Resolution
+- **Issue**: Pushing git commits to GitHub remotes (`origin` / `kandaq1-old`) did not automatically deploy to production because Firebase App Hosting backend `khendeq-medresah` had automatic builds (ABIU) disabled and was not wired to auto-build on push. The live site was serving an older revision from 2026-10-16.
+- **Action Taken**: Ran `firebase deploy --only apphosting --project khendeq-8e17f --non-interactive`. Triggered Cloud Build `78359f1b-5d3a-4ce5-8e8d-d5b8724d57ad`, compiled Next.js production build, pushed the container image, and rolled out new revision `khendeq-medresah-build-2026-10-20-001`.
+
+### Verification Evidence
+```text
+=== Deploying to 'khendeq-8e17f'...
+i  deploying apphosting
+i  apphosting: Found backend(s) khendeq-medresah
+i  apphosting: Zipped source for backend khendeq-medresah
+i  apphosting: Uploading source for backend khendeq-medresah...
++  apphosting: Rollout for backend khendeq-medresah complete!
++  apphosting: Your backend is now deployed at:
+	https://khendeq-medresah--khendeq-8e17f.europe-west4.hosted.app
++  Deploy complete!
+
+$ gcloud run revisions list --service khendeq-medresah --region europe-west4 --project khendeq-8e17f --limit 1
+REVISION: khendeq-medresah-build-2026-10-20-001  ACTIVE: yes  DEPLOYED: 2026-10-20 09:37:39 UTC
+
+$ curl.exe -I -b "khandaq_session=true" https://mms.khendeq.com/
+HTTP/1.1 307 Temporary Redirect
+Location: https://mms.khendeq.com/dashboard
+x-fah-adapter: nextjs-14.0.21
+x-fah-middleware: true
+
+$ curl.exe -I -b "khandaq_session=true" https://mms.khendeq.com/login
+HTTP/1.1 307 Temporary Redirect
+Location: https://mms.khendeq.com/dashboard
+x-fah-adapter: nextjs-14.0.21
+x-fah-middleware: true
+
+$ curl.exe -I https://mms.khendeq.com/dashboard
+HTTP/1.1 307 Temporary Redirect
+Location: https://mms.khendeq.com/login?from=%2Fdashboard
+```
