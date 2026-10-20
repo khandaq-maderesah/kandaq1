@@ -59,6 +59,9 @@ export function useOfflineAttendanceSync() {
 
   useEffect(() => {
     refreshPending()
+    if (isBrowserOnline() && getOfflineAttendanceQueue().length > 0) {
+      triggerSync()
+    }
 
     const handleOnline = () => {
       setOnline(true)

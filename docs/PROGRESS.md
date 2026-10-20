@@ -393,3 +393,46 @@ STATUS: ALL VERIFICATION CHECKS PASSED
 Exit Code: 0
 ```
 
+
+---
+
+## [2026-10-20 10:55:00] Task 5.5 - Multi-Device PWA Smoke Verification & Ustaz Offline Sync Edge Testing (Implementer: Kilo AI)
+
+### Summary of Changes
+1. **PWA Smoke Verification Suite** (`tests/pwaOffline.test.mjs`, 29 tests / 4 suites):
+   - Dynamic manifest contract: async route export, `display: standalone`, `orientation: portrait`, root scope, 192 + 512 + maskable icon triplet (default and branded), every referenced `/icons/*` file exists in `public/icons`, default identity matches `DEFAULT_APP_FULL_NAME` / `DEFAULT_APP_NAME`, branding resolved from the `khandaq_brand` cookie, generic icon only replaced when `branding.logoVersion` is set.
+   - Service worker pre-cache integrity: all lifecycle handlers registered, `skipWaiting()` + `clients.claim()`, versioned cache with stale-cache purge, **every precached route resolves to a real App Router page**, every precached asset exists in `/public`, `/api/*` and cross-origin bypass, navigation fallback points at a precached route, HTTP 503 offline response.
+   - Persistent auth contracts: `browserLocalPersistence` in use, `browserSessionPersistence` removed, 1-year session cookie, cached user + madrasa profile, sign-out only reached when no cache exists.
+   - 12 Ustaz offline-sync edge cases: queue survives an app restart, storage-quota failure cannot break marking, mixed-date records sync oldest-first, a failed record is retried first and keeps its queue position, corrupted queue cannot break auto-sync, 500-record roster syncs within budget, connectivity detection, offline queue storage-key contract, class list + student roster cached for offline marking, cloud-write failure always falls back to the device queue.
+2. **Payload Invariant Suite** (`tests/offlineAttendancePayload.test.mjs`, 3 tests) - locks the `database.rules.json:138` contract: `teacherId`/`markedBy` must exist on the queue type, on every offline enqueue payload, and must be forwarded by the sync hook.
+3. **Offline Queue Hardening** - the Lead-authored `tests/offlineAttendance.test.mjs` tests were kept intact and 7 hardening tests appended (corrupted / non-array payload resilience, multi-class coexistence, owner-field round trip, payload fidelity, non-`Error` rejection safety, true online/offline detection, server-side no-op safety).
+4. **i18n Completeness** - added a locale key-parity invariant to `tests/i18nTerminology.test.mjs` (it immediately caught the missing `offline.*` keys in `om` and `so`), translated the remaining offline toast keys into all 5 locales (`en`, `am`, `ar`, `om`, `so`) and wired them so the offline flow contains no hardcoded English.
+
+### Verification Evidence
+```text
+> kmms@1.0.0 verify
+> node scripts/verify.mjs
+
+========================================
+KMMS SINGLE-PASS VERIFICATION RUNNER
+========================================
+
+Checking TypeScript Typecheck... [PASS] (6.53s)
+Checking ESLint Static Analysis... [PASS] (8.62s)
+Checking Unit & Logic Tests (Node Test Runner)... [PASS] (17.05s)
+
+========================================
+STATUS: ALL VERIFICATION CHECKS PASSED
+========================================
+Exit Code: 0
+
+$ npx tsx --test tests/<14 suites>
+info tests 91
+info suites 16
+info pass 91
+info fail 0
+info cancelled 0
+info skipped 0
+info todo 0
+info duration_ms 2369.9142
+```

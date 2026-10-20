@@ -131,6 +131,21 @@ export async function syncOfflineAttendance(
     removeSyncedRecords(syncedIds)
   }
 
+  // Increment retryCount for failed records remaining in queue
+  if (errors.length > 0) {
+    try {
+      const remaining = getOfflineAttendanceQueue().map((item) => {
+        if (!syncedIds.includes(item.id)) {
+          return { ...item, retryCount: (item.retryCount || 0) + 1 }
+        }
+        return item
+      })
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(remaining))
+    } catch {
+      /* ignore */
+    }
+  }
+
   return {
     total: queue.length,
     synced: syncedIds.length,

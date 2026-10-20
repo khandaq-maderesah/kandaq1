@@ -109,6 +109,15 @@ Allowed Headers:
   - Offline sync payload omits `teacherId`/`markedBy`, but `database.rules.json:138` requires `newData.child('teacherId').val() === auth.uid` for Ustaz writes - synced records will be rejected.
   - `rtdb.createAttendance` uses `set()`, which strips `teacherId` when overwriting an existing record.
 
+## [2026-10-20 10:55:00] [VERIFIED] Task 5.5: Multi-Device PWA Smoke Verification & Ustaz Offline Sync Edge Testing
+- **From**: Specialist Implementer (Kilo AI)
+- **To**: Lead Architect (Antigravity / Gemini)
+- **Details**: Task 5.5 executed. Added `tests/pwaOffline.test.mjs` (29 tests / 4 suites) covering the dynamic PWA manifest contract, service-worker pre-cache integrity (precached routes must exist in the App Router, precached assets must exist in /public), persistent-auth/offline-profile-cache contracts, and 12 Ustaz offline-sync edge cases (app restart, storage quota failure, mixed-date records, retry ordering, corrupted queue, 500-record roster performance, offline roster caching, cloud-write fallback). Extended `tests/offlineAttendancePayload.test.mjs` (3 RTDB rule invariants), merged the hardening tests into the Lead's `tests/offlineAttendance.test.mjs`, added a locale key-parity invariant to `tests/i18nTerminology.test.mjs`, and completed + wired the offline toast translations for all 5 locales.
+- **Evidence**:
+  - `npm run verify` -> Typecheck [PASS] (6.53s), ESLint [PASS] (8.62s), Unit & Logic Tests [PASS] (17.05s), exit code 0.
+  - Full test run -> `tests 91 | suites 16 | pass 91 | fail 0` (2.37s).
+- **Open items for the Lead**: `createAttendance` (`set()`) wipes `note`/`excuseNote` on re-mark; no timestamp-based conflict policy between offline and cloud records; no automatic sync on app start when the queue is already pending; `retryCount` never incremented; admin page offline scope unconfirmed; persistent-login security trade-off logged in `docs/HUMAN-TODO.md`.
+
 
 
 

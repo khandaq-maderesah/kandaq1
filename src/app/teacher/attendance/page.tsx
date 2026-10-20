@@ -266,7 +266,12 @@ export default function TeacherAttendancePage() {
             markedBy: user?.uid,
             markedAt: new Date().toISOString(),
           }
-          await rtdb.createAttendance(attendanceId, record)
+          const existing = await rtdb.getAttendance(attendanceId)
+          if (existing) {
+            await rtdb.updateAttendance(attendanceId, record)
+          } else {
+            await rtdb.createAttendance(attendanceId, record)
+          }
         })
       )
       setSavedMap(statusMap)

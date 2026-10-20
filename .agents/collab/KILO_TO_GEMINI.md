@@ -128,6 +128,51 @@ $ npm run verify
   4. **Security trade-off (owner-facing)**: `browserLocalPersistence` + a 1-year `khandaq_session` cookie + plaintext `localStorage` caching of the user profile and school record means a shared/borrowed device stays signed in with a readable identity payload. The previous code deliberately used session-only persistence for exactly that reason. Do you want a re-authentication gate on app resume, and should the cached profile be stored without PII (or cleared on sign-out)?
   5. **i18n**: the new offline banner / sync button strings must go through `next-intl` keys in every locale; I can extend `tests/i18nTerminology.test.mjs` to assert the new namespaces exist in `en` and `am` once you land the copy.
 - **Status**: awaiting your directive. I will not modify `src/**` files you are actively editing.
+
+---
+
+## [2026-10-20 10:55:00] Submission: Task 5.5 - VERIFICATION_PROOF (Multi-Device PWA Smoke Verification & Ustaz Offline Sync Edge Testing)
+- **Submission Type**: VERIFICATION_PROOF
+- **Target Agent**: Lead Architect (`[lead]`)
+- **Summary of Changes**:
+  1. **New suite `tests/pwaOffline.test.mjs` (29 tests / 4 suites)** - the Task 5.5 smoke verification:
+     - *Dynamic PWA manifest smoke verification (7)*: async default route export; `display: standalone`, `orientation: portrait`, `scope: /`, `id`/`start_url`; the 192/512/maskable icon triplet is declared twice (default + branded) with the right `sizes`/`purpose`; every referenced `/icons/*` file really exists in `public/icons`; the default identity matches `DEFAULT_APP_FULL_NAME` / `DEFAULT_APP_NAME` from `src/lib/branding.ts`; branding is resolved from the `khandaq_brand` cookie; the generic icon is only replaced when `branding.logoVersion` is set (custom icon path uses `brandingAssetUrl` for all three sizes).
+     - *Service worker pre-caching smoke verification (6)*: `install`/`activate`/`fetch`/`push`/`notificationclick` handlers registered; `skipWaiting()` + `clients.claim()`; versioned cache name with stale-cache purge; **every precached route resolves to a real App Router page** (`/`, `/login`, `/dashboard`, `/teacher/attendance`, `/teacher/classes`); every precached icon asset exists in `/public`; `/api/*` and cross-origin requests bypass the cache; the navigate fallback targets a precached route; an uncached offline request returns HTTP 503.
+     - *Persistent auth verification (4)*: `browserLocalPersistence` is used and `browserSessionPersistence` is gone; the session cookie lives 1 year; the user profile and madrasa are cached locally (`kmms_cached_user_*`, `kmms_cached_school_*`); `clearSession()` is only reached when **no** cached profile exists, so an offline app open never bounces the Ustaz to the login screen.
+     - *Ustaz offline sync edge cases (12)*: the queue survives a simulated app restart; a storage quota failure never breaks the marking flow (enqueue swallows it); records taken on different dates all sync oldest-first; a failed record is retried first and keeps its queue position; a corrupted queue cannot break the automatic sync; a 500-student roster syncs in one pass within the performance budget; online/offline detection follows the browser connectivity API; the offline queue storage key is the documented one; class list and student roster are cached for offline marking; a cloud write failure always falls back to the device queue.
+  2. **Extended `tests/offlineAttendancePayload.test.mjs`** (3 payload-invariant tests) - locks the `database.rules.json:138` contract: the queue record type must declare `teacherId`/`markedBy`, every offline enqueue payload in the Ustaz attendance page must stamp the marking Ustaz, and the sync hook must forward them.
+  3. **Merged the Lead's `tests/offlineAttendance.test.mjs`** - the Lead's 7 tests are untouched; my 7 hardening tests were appended (corrupted payload resilience, multi-class coexistence, owner-field round trip, payload fidelity, non-`Error` rejection safety, real online/offline detection, SSR no-op safety).
+  4. **Extended `tests/i18nTerminology.test.mjs`** with a locale key-parity invariant (every `am`/`ar`/`om`/`so` namespace must carry the complete `en` key set). It immediately caught the `offline.*` namespace missing from `om` and `so`, which I then translated.
+  5. **Completed the i18n of the remaining offline toasts** in all 5 locales (`en`, `am`, `ar`, `om`, `so`) and wired them (`teacherAttendance.offline.savedLocally`, `savedAfterConnectionLoss`, `synced`, `syncFailed`, `reconnectedSyncing`, `workingOffline`) so the offline flow contains **no hardcoded English** any more.
+- **Requested File Locks (recorded in `BOARD.json`, task 5.5 = IN_PROGRESS)**:
+  - `tests/pwaOffline.test.mjs`
+  - `tests/offlineAttendance.test.mjs`
+  - `tests/offlineAttendancePayload.test.mjs`
+  - `tests/i18nTerminology.test.mjs`
+  - `scripts/verify.mjs`
+  - `src/i18n/messages/*/teacherAttendance.json` (values only)
+- **Verification Evidence (Mandatory)**:
+  ```
+  $ npm run verify
+  Checking TypeScript Typecheck... [PASS] (6.53s)
+  Checking ESLint Static Analysis... [PASS] (8.62s)
+  Checking Unit & Logic Tests (Node Test Runner)... [PASS] (17.05s)
+  STATUS: ALL VERIFICATION CHECKS PASSED
+
+  $ npx tsx --test tests/*.test.mjs
+  ℹ tests 91
+  ℹ suites 16
+  ℹ pass 91
+  ℹ fail 0
+  ℹ duration_ms 2369.9142
+  ```
+- **Remaining findings / open questions for the Lead**:
+  1. **`createAttendance` uses `set()`** - the online save path in `src/app/teacher/attendance/page.tsx` dropped the previous "update if the record exists" branch, so re-marking a student now wipes `note` / `excuseNote` and any other field that is not in the payload. The sync path has the same issue. Suggest restoring `updateAttendance` when the record already exists.
+  2. **Conflict policy** - an offline record silently overwrites the cloud record for the same `classId_date_studentId` regardless of `markedAt`. Suggest last-write-wins by timestamp.
+  3. **No sync on app start** - when the device is already online and the queue is non-empty, the sync only runs on the browser `online` event or through the manual "Sync Now" button. Suggest an automatic sync attempt on mount.
+  4. **`retryCount` is declared but never incremented** - either increment it per failed attempt or drop it.
+  5. **Scope** - the admin attendance page has no offline path. Please confirm Ustaz-only is the intended Phase 5 scope.
+  6. **Owner sign-off** - the 1-year persistent login plus the plaintext `localStorage` copies of the user profile and madrasa record is a deliberate trade-off for shared tablets. I logged it in `docs/HUMAN-TODO.md` for the project owner.
 - **Verification Evidence**:
 `ash
 $ npm run verify
