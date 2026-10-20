@@ -41,3 +41,12 @@ Legend:
 - [x] **Task 4.1**: Build pluggable SMS provider client adapter (sandbox / production toggle) [implementer]
 - [x] **Task 4.2**: Configure human credentials & production SMS webhook gateway [lead]
 - [x] **Task 4.3**: Design printable student ID card batch generator with barcode/QR verification [implementer]
+
+---
+
+## Phase 5: Offline PWA, Persistent Auth & Custom Madrasa App Icon
+- [x] **Task 5.1**: Persistent Auth & Session Longevity (Eliminate auto-logout on window close, extend session cookies to 1 year) [lead]
+- [x] **Task 5.2**: Dynamic Madrasa PWA App Icon & Manifest (read branding from cookie, custom logo check, fallback elimination) [lead]
+- [x] **Task 5.3**: Offline Attendance Take & Background Auto-Sync Engine (local storage caching for offline Ustazes) [lead]
+- [x] **Task 5.4**: Service Worker Pre-caching & Standalone Native PWA Polish [lead]
+- [ ] **Task 5.5**: Multi-Device PWA Smoke Verification & Ustaz Offline Sync Edge Testing [implementer]

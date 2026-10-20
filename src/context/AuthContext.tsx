@@ -87,10 +87,33 @@ async function resolveSchool(profile: User): Promise<School | null> {
   }
 
   if (!profile.schoolId) throw accessError('app/no-school')
-  const school = await getSchool(profile.schoolId)
-  if (!school) throw accessError('app/no-school')
-  if (school.status === 'suspended') throw accessError('app/school-suspended')
-  return school
+  try {
+    const school = await getSchool(profile.schoolId)
+    if (!school) throw accessError('app/no-school')
+    if (school.status === 'suspended') throw accessError('app/school-suspended')
+    try {
+      localStorage.setItem('kmms_cached_school_' + profile.schoolId, JSON.stringify(school))
+    } catch {
+      /* ignore */
+    }
+    return school
+  } catch (err: unknown) {
+    if (err && typeof err === 'object' && 'code' in err) {
+      throw err // accessError
+    }
+    // Try cached school if network failed
+    if (typeof window !== 'undefined') {
+      const cached = localStorage.getItem('kmms_cached_school_' + profile.schoolId)
+      if (cached) {
+        try {
+          return JSON.parse(cached) as School
+        } catch {
+          /* ignore */
+        }
+      }
+    }
+    throw err
+  }
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -133,21 +156,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setFirebaseUser(fbUser)
 
       if (fbUser) {
-        // Let server-side middleware know the user is signed in (non-httpOnly defense-in-depth)
-        document.cookie = 'khandaq_session=true; path=/; SameSite=Lax; Max-Age=86400'
+        // Keep session alive for 1 year (31,536,000s) across app reopens
+        document.cookie = 'khandaq_session=true; path=/; SameSite=Lax; Max-Age=31536000'
         // Fetch user data from Realtime Database
         try {
           const snapshot = await get(ref(db, 'users/' + fbUser.uid))
           if (snapshot.exists()) {
             const profile = { ...(snapshot.val() as Omit<User, 'uid'>), uid: fbUser.uid } as User
+            try {
+              localStorage.setItem('kmms_cached_user_' + fbUser.uid, JSON.stringify(profile))
+            } catch {
+              /* ignore */
+            }
             applySchool(await resolveSchool(profile))
             applyProfileLocale(profile)
             setUser(profile)
           }
         } catch (error) {
-          // Suspended school / deactivated account / missing school: sign out.
-          console.error('Error loading user profile:', error)
-          await clearSession()
+          // If network / offline error, restore from local cache rather than signing out
+          const cached = typeof window !== 'undefined' ? localStorage.getItem('kmms_cached_user_' + fbUser.uid) : null
+          if (cached) {
+            try {
+              const profile = JSON.parse(cached) as User
+              setUser(profile)
+              const cachedSchoolStr = profile.schoolId ? localStorage.getItem('kmms_cached_school_' + profile.schoolId) : null
+              if (cachedSchoolStr) {
+                applySchool(JSON.parse(cachedSchoolStr) as School)
+              }
+              applyProfileLocale(profile)
+            } catch {
+              await clearSession()
+            }
+          } else {
+            console.error('Error loading user profile:', error)
+            await clearSession()
+          }
         }
       } else {
         document.cookie = 'khandaq_session=; path=/; Max-Age=0'
@@ -188,7 +231,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // based on this cookie, and it is NOT guaranteed to be written yet when
     // `onAuthStateChanged` fires. Setting it here prevents a logged-in user from
     // being bounced straight back to /login right after signing in.
-    document.cookie = 'khandaq_session=true; path=/; SameSite=Lax; Max-Age=86400'
+    document.cookie = 'khandaq_session=true; path=/; SameSite=Lax; Max-Age=31536000'
     setFirebaseUser(result.user)
 
     // Load the profile immediately so the caller can redirect straight to the
@@ -198,6 +241,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     let profile: User | null = null
     if (snapshot.exists()) {
       profile = { ...(snapshot.val() as Omit<User, 'uid'>), uid: result.user.uid } as User
+      try {
+        localStorage.setItem('kmms_cached_user_' + result.user.uid, JSON.stringify(profile))
+      } catch {
+        /* ignore */
+      }
       try {
         if (opts?.schoolId) {
           // Branded sign-in: the account must belong to this madrasa.

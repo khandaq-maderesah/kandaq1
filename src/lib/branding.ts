@@ -20,6 +20,7 @@ export interface PublicBranding {
   logoVersion?: number
 }
 
+export const BRAND_COOKIE = 'khandaq_brand'
 export const DEFAULT_APP_NAME = 'MMS'
 export const DEFAULT_APP_FULL_NAME = 'MMS — Madrasa Management System'
 export const APP_NAME_MAX = 20

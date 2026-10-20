@@ -3,9 +3,29 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
-import { Check, ClipboardCheck, Clock, Loader2, RotateCcw, Save, ShieldCheck, Users, X, type LucideIcon } from 'lucide-react'
+import {
+  Check,
+  ClipboardCheck,
+  Clock,
+  Loader2,
+  RefreshCw,
+  RotateCcw,
+  Save,
+  ShieldCheck,
+  Users,
+  Wifi,
+  WifiOff,
+  X,
+  type LucideIcon,
+} from 'lucide-react'
 import { rtdb } from '@/lib/database'
 import { useAuth } from '@/context/AuthContext'
+import { useOfflineAttendanceSync } from '@/hooks/useOfflineAttendanceSync'
+import {
+  enqueueOfflineAttendance,
+  isBrowserOnline,
+  type QueuedAttendanceRecord,
+} from '@/lib/offlineAttendance'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -57,6 +77,7 @@ const STATUSES: {
 export default function TeacherAttendancePage() {
   const t = useTranslations('teacherAttendance')
   const { user } = useAuth()
+  const { isOnline, pendingCount, isSyncing, syncNow, refreshPending } = useOfflineAttendanceSync()
   const [classes, setClasses] = useState<Class[]>([])
   const [students, setStudents] = useState<Student[]>([])
   const [classId, setClassId] = useState('')
@@ -74,11 +95,28 @@ export default function TeacherAttendancePage() {
         const classList = await rtdb.getAllClasses()
         const myClasses = classList.filter((c) => c.teacherId === user.uid && c.isActive !== false)
         setClasses(myClasses)
+        try {
+          localStorage.setItem(`kmms_teacher_classes_${user.uid}`, JSON.stringify(myClasses))
+        } catch {
+          /* ignore */
+        }
         if (myClasses.length > 0) {
           setClassId(myClasses[0].id)
         }
       } catch {
-        toast.error(t('toast.loadClassesFailed'))
+        // Fallback to offline cached classes for Ustaz
+        const cached = typeof window !== 'undefined' ? localStorage.getItem(`kmms_teacher_classes_${user.uid}`) : null
+        if (cached) {
+          try {
+            const parsed = JSON.parse(cached) as Class[]
+            setClasses(parsed)
+            if (parsed.length > 0) setClassId(parsed[0].id)
+          } catch {
+            toast.error(t('toast.loadClassesFailed'))
+          }
+        } else {
+          toast.error(t('toast.loadClassesFailed'))
+        }
       } finally {
         setLoading(false)
       }
@@ -104,6 +142,11 @@ export default function TeacherAttendancePage() {
             (a.rollNumber || '').localeCompare(b.rollNumber || '', undefined, { numeric: true })
           )
         setStudents(activeStudents)
+        try {
+          localStorage.setItem(`kmms_class_students_${classId}`, JSON.stringify(activeStudents))
+        } catch {
+          /* ignore */
+        }
 
         const activeIds = new Set(activeStudents.map((s) => s.id))
         const map: Record<string, AttendanceStatus> = {}
@@ -113,7 +156,18 @@ export default function TeacherAttendancePage() {
         setStatusMap(map)
         setSavedMap(map)
       } catch {
-        toast.error(t('toast.loadStudentsFailed'))
+        // Fallback to offline cached students for this class
+        const cached = typeof window !== 'undefined' ? localStorage.getItem(`kmms_class_students_${classId}`) : null
+        if (cached) {
+          try {
+            const parsed = JSON.parse(cached) as Student[]
+            setStudents(parsed)
+          } catch {
+            toast.error(t('toast.loadStudentsFailed'))
+          }
+        } else {
+          toast.error(t('toast.loadStudentsFailed'))
+        }
       } finally {
         setLoadingStudents(false)
       }
@@ -163,15 +217,45 @@ export default function TeacherAttendancePage() {
       return
     }
     setSaving(true)
+    const className = classes.find((c) => c.id === classId)?.name || ''
+    const recordsToEnqueue: QueuedAttendanceRecord[] = []
+
+    // If completely offline, save directly to device offline queue
+    if (!isBrowserOnline()) {
+      students.forEach((s) => {
+        const status = statusMap[s.id]
+        if (!status) return
+        recordsToEnqueue.push({
+          id: `${classId}_${date}_${s.id}`,
+          studentId: s.id,
+          classId,
+          date,
+          status,
+          studentName: s.name,
+          className,
+          teacherId: user?.uid,
+          markedBy: user?.uid,
+          timestamp: Date.now(),
+          retryCount: 0,
+        })
+      })
+      enqueueOfflineAttendance(recordsToEnqueue)
+      setSavedMap(statusMap)
+      refreshPending()
+      setSaving(false)
+      toast.success(t('offline.savedLocally'))
+      return
+    }
+
+    // If online, try direct cloud save with offline fallback
     try {
-      const className = classes.find((c) => c.id === classId)?.name || ''
       await Promise.all(
         students.map(async (s) => {
           const status = statusMap[s.id]
           if (!status) return
           const attendanceId = `${classId}_${date}_${s.id}`
-          const existing = await rtdb.getAttendance(attendanceId)
           const record = {
+            id: attendanceId,
             studentId: s.id,
             classId,
             date,
@@ -182,17 +266,34 @@ export default function TeacherAttendancePage() {
             markedBy: user?.uid,
             markedAt: new Date().toISOString(),
           }
-          if (existing) {
-            await rtdb.updateAttendance(attendanceId, { ...record, id: attendanceId })
-          } else {
-            await rtdb.createAttendance(attendanceId, { ...record, id: attendanceId })
-          }
+          await rtdb.createAttendance(attendanceId, record)
         })
       )
       setSavedMap(statusMap)
       toast.success(t('toast.saved'))
     } catch {
-      toast.error(t('toast.saveFailed'))
+      // Network failed during save: fallback to offline device queue
+      students.forEach((s) => {
+        const status = statusMap[s.id]
+        if (!status) return
+        recordsToEnqueue.push({
+          id: `${classId}_${date}_${s.id}`,
+          studentId: s.id,
+          classId,
+          date,
+          status,
+          studentName: s.name,
+          className,
+          teacherId: user?.uid,
+          markedBy: user?.uid,
+          timestamp: Date.now(),
+          retryCount: 0,
+        })
+      })
+      enqueueOfflineAttendance(recordsToEnqueue)
+      setSavedMap(statusMap)
+      refreshPending()
+      toast.warning(t('offline.savedAfterConnectionLoss'))
     } finally {
       setSaving(false)
     }
@@ -215,6 +316,57 @@ export default function TeacherAttendancePage() {
   return (
     <div>
       <PageHeader title={t('title')} description={t('description')} />
+
+      {/* Offline & Sync Status Banner */}
+      {(!isOnline || pendingCount > 0) && (
+        <div
+          className={cn(
+            'mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border p-3.5 shadow-sm transition-all sm:p-4',
+            !isOnline
+              ? 'border-amber-500/30 bg-amber-500/10 text-amber-900 dark:text-amber-200'
+              : 'border-blue-500/30 bg-blue-500/10 text-blue-900 dark:text-blue-200'
+          )}
+        >
+          <div className="flex items-center gap-2.5 text-sm font-medium">
+            {!isOnline ? (
+              <span className="flex items-center gap-1.5 rounded-md bg-amber-500/20 px-2 py-1 text-xs font-semibold uppercase tracking-wider text-amber-700 dark:text-amber-300">
+                <WifiOff className="h-3.5 w-3.5" /> {t('offline.mode')}
+              </span>
+            ) : (
+              <span className="flex items-center gap-1.5 rounded-md bg-blue-500/20 px-2 py-1 text-xs font-semibold uppercase tracking-wider text-blue-700 dark:text-blue-300">
+                <Wifi className="h-3.5 w-3.5" /> {t('offline.reconnected')}
+              </span>
+            )}
+            <span>
+              {!isOnline
+                ? t('offline.offlineNotice')
+                : t('offline.reconnectedNotice')}
+              {pendingCount > 0 && ` (${t('offline.queuedRecords', { count: pendingCount })})`}
+            </span>
+          </div>
+
+          {pendingCount > 0 && (
+            <Button
+              type="button"
+              size="sm"
+              variant={isOnline ? 'default' : 'outline'}
+              disabled={isSyncing || !isOnline}
+              onClick={() => syncNow()}
+              className="h-8 gap-1.5 text-xs font-medium"
+            >
+              {isSyncing ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" /> {t('offline.syncing')}
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="h-3.5 w-3.5" /> {t('offline.syncNow', { count: pendingCount })}
+                </>
+              )}
+            </Button>
+          )}
+        </div>
+      )}
 
       {classes.length === 0 ? (
         <EmptyState icon={ClipboardCheck} title={t('empty.noClasses')} description={t('empty.noClassesHint')} />

@@ -42,5 +42,20 @@
     "loadClassesFailed": "Kutaalee keessan fe'uun hin danda'amne.",
     "loadStudentsFailed": "Barattoota fe'uun hin danda'amne.",
     "saveFailed": "Argama olkaa'uun hin danda'amne. Maaloo irra deebi'aa yaalaa."
+  },
+  "offline": {
+    "mode": "Galaa dhalaa",
+    "reconnected": "Deebii'ameera",
+    "offlineNotice": "Galmeen xaadiriskaa qabxii itti fufuun kaydiiruun kaa'aa.",
+    "reconnectedNotice": "Xiriirka interneetii deebii'ameera.",
+    "queuedRecords": "{count} galmeen waliin eegaa",
+    "syncNow": "Yeroo ammaa qabxii fufii ({count})",
+    "syncing": "Qabxii fufaa jira...",
+    "savedLocally": "Argama kana kutaa irratti kaydiame. Ofiitti deebi'aan qabxii fufuun ofiitti.",
+    "savedAfterConnectionLoss": "Xiriirkiin xumaadame. Argama galaa dhalaa kaydiame, ofiitti qabxii fufuun.",
+    "synced": "{count} galmeen argamaa qabxii fufiin ofiitti.",
+    "syncFailed": "{count} galmeen hin qabxii fuffamne. Ofiitti irra deebi'aa yaalaa.",
+    "reconnectedSyncing": "Xiriirka interneetii deebii'ameera. Galmeen argamaa qabxii fufaa jira...",
+    "workingOffline": "Xiriirka interneetii hin jiru. Galaa dhalaa keessa jirnaa jira."
   }
 }

@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app'
 import { getApps, type FirebaseApp } from 'firebase/app'
-import { getAuth, setPersistence, browserSessionPersistence, signOut, type Auth } from 'firebase/auth'
+import { getAuth, setPersistence, browserLocalPersistence, signOut, type Auth } from 'firebase/auth'
 import { getDatabase, type Database } from 'firebase/database'
 
 const firebaseConfig = {
@@ -32,18 +32,10 @@ if (typeof window !== 'undefined') {
     _auth = getAuth(_app)
     _db = getDatabase(_app)
 
-    // SECURITY: require email + password on every fresh open of the app.
-    // Use SESSION-only persistence so the login is cleared when the app is
-    // closed. This stops a borrowed/left-open phone from staying logged in
-    // (the PWA will always ask for credentials when it is reopened).
-    // If a user was previously signed in under the old (local) persistence,
-    // migrate/sign them out so the new setting takes effect cleanly.
-    setPersistence(_auth, browserSessionPersistence).catch(async () => {
-      try {
-        await signOut(_auth!)
-      } catch {
-        /* ignore */
-      }
+    // PWA & Mobile Native Experience: Keep Ustaz/Admin signed in across app reopens.
+    // Use LOCAL persistence so the user stays logged in even when the app or window is closed.
+    setPersistence(_auth, browserLocalPersistence).catch((err) => {
+      console.warn('Could not set browserLocalPersistence:', err)
     })
   } catch (err) {
     console.error('Firebase initialization failed. Check NEXT_PUBLIC_FIREBASE_* env vars.', err)

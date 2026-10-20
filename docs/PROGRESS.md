@@ -344,3 +344,52 @@ STATUS: ALL VERIFICATION CHECKS PASSED
 ========================================
 Exit Code: 0
 ```
+
+---
+
+## [2026-10-20 10:40:00] Phase 5: Offline PWA, Persistent Auth & Custom Madrasa App Icon
+
+- **Assigned Agents**: Lead Architect (`[lead]` / Antigravity Gemini) & Specialist Implementer (`[implementer]` / Kilo AI)
+- **Status**: Completed, Verified & Merged
+- **Phase**: Phase 5: Offline PWA, Persistent Auth & Custom Madrasa App Icon (100% Complete)
+
+### Summary of Changes
+1. **Task 5.1 (Persistent Auth & Auto-Logout Elimination)**:
+   - Root cause diagnosed and eliminated: `src/lib/firebase/config.ts` was previously forcing `browserSessionPersistence`, clearing tokens on window close.
+   - Upgraded to `browserLocalPersistence` and extended the `khandaq_session` cookie from 24h to 1 year (`Max-Age=31536000`).
+   - Added offline user profile and school caching (`kmms_cached_user_*`, `kmms_cached_school_*`) in `src/context/AuthContext.tsx`. When offline, `resolveSchool()` and `onAuthStateChanged` recover from device cache instead of triggering `clearSession()`.
+2. **Task 5.2 (Dynamic Root PWA App Icon & Manifest)**:
+   - Made `src/app/manifest.ts` dynamic and async, reading the `khandaq_brand` cookie and public branding from Realtime Database.
+   - When a madrasa has uploaded a custom logo (`logoVersion > 0`), the PWA install manifest dynamically serves the custom high-resolution icons (`icon-192.png`, `icon-512.png`, `icon-maskable-512.png`). The generic default logo is never shown when custom branding is present.
+3. **Task 5.3 (Offline Attendance Engine & Auto-Sync Hook)**:
+   - Built `src/lib/offlineAttendance.ts` with local device queueing, deduplication by `id`, and batch synchronization to Firebase RTDB.
+   - Added `teacherId` and `markedBy` to the offline record payload to satisfy RTDB security rule `database.rules.json:138`.
+   - Built `src/hooks/useOfflineAttendanceSync.ts` with real-time online/offline network listeners and auto-sync trigger on reconnect.
+4. **Task 5.4 (Teacher Attendance Page Offline Mode & UI Banner)**:
+   - Updated `src/app/teacher/attendance/page.tsx` with local caching for assigned classes and enrolled students.
+   - Wired offline fallback into `handleSave`: if offline or if network fails, attendance is safely queued on device.
+   - Added a pixel-perfect, responsive offline/sync status banner displaying network state, queued records count, and a manual "Sync Now" trigger with localized strings across all 5 languages (`en`, `am`, `ar`, `om`, `so`).
+5. **Task 5.5 (Service Worker Pre-caching & Verification Suite)**:
+   - Upgraded `public/sw.js` to `v2` with pre-caching for navigation routes (`/`, `/login`, `/dashboard`, `/teacher/attendance`, `/teacher/classes`) and app icons in the `install` event.
+   - Added `tests/offlineAttendance.test.mjs` with comprehensive queue, sync, resilience, and payload invariant tests.
+   - Single-pass verification runner (`scripts/verify.mjs`) verified 62/62 tests passing cleanly across 12 test suites in under 35 seconds.
+
+### Verification Evidence
+```text
+> kmms@1.0.0 verify
+> node scripts/verify.mjs
+
+========================================
+KMMS SINGLE-PASS VERIFICATION RUNNER
+========================================
+
+Checking TypeScript Typecheck... [PASS] (12.34s)
+Checking ESLint Static Analysis... [PASS] (9.52s)
+Checking Unit & Logic Tests (Node Test Runner)... [PASS] (12.69s)
+
+========================================
+STATUS: ALL VERIFICATION CHECKS PASSED
+========================================
+Exit Code: 0
+```
+

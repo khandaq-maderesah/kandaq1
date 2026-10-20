@@ -42,5 +42,20 @@
     "loadClassesFailed": "Could not load your classes.",
     "loadStudentsFailed": "Could not load the students.",
     "saveFailed": "Could not save attendance. Please try again."
+  },
+  "offline": {
+    "mode": "Offline Mode",
+    "reconnected": "Reconnected",
+    "offlineNotice": "Attendance marks will be saved locally on your device.",
+    "reconnectedNotice": "Connection restored.",
+    "queuedRecords": "{count} record(s) queued",
+    "syncNow": "Sync Now ({count})",
+    "syncing": "Syncing...",
+    "savedLocally": "Attendance saved on this device. It will sync automatically when you are back online.",
+    "savedAfterConnectionLoss": "Connection lost. Attendance saved offline and will sync automatically.",
+    "synced": "Synced {count} offline attendance record(s) to the cloud.",
+    "syncFailed": "Could not sync {count} record(s). Will retry automatically.",
+    "reconnectedSyncing": "Internet reconnected. Syncing offline records...",
+    "workingOffline": "No internet connection. Working in offline mode."
   }
 }

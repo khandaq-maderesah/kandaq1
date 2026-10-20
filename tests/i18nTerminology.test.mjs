@@ -104,4 +104,51 @@ describe('i18n Islamic Educational Terminology Invariants', () => {
     assert.equal(amNav.schools, 'መድረሳዎች')
     assert.equal(amCommon.roles.teacher, 'ኡስታዝ')
   })
+
+  test('every supported locale carries the complete English key set', () => {
+    const messagesRoot = path.resolve('src/i18n/messages')
+    const locales = ['am', 'ar', 'om', 'so']
+    const enFiles = fs.readdirSync(enDir).filter(f => f.endsWith('.json'))
+
+    function flattenKeys(obj, prefix = '') {
+      const out = []
+      for (const [key, value] of Object.entries(obj ?? {})) {
+        const next = prefix ? `${prefix}.${key}` : key
+        if (value && typeof value === 'object' && !Array.isArray(value)) {
+          out.push(...flattenKeys(value, next))
+        } else {
+          out.push(next)
+        }
+      }
+      return out
+    }
+
+    const violations = []
+
+    for (const locale of locales) {
+      const localeDir = path.join(messagesRoot, locale)
+      const localeFiles = fs.readdirSync(localeDir).filter(f => f.endsWith('.json'))
+
+      for (const file of enFiles) {
+        if (!localeFiles.includes(file)) {
+          violations.push({ locale, file, missing: 'namespace file missing' })
+          continue
+        }
+        const enKeys = flattenKeys(JSON.parse(fs.readFileSync(path.join(enDir, file), 'utf8')))
+        const localeKeys = new Set(
+          flattenKeys(JSON.parse(fs.readFileSync(path.join(localeDir, file), 'utf8')))
+        )
+        const missing = enKeys.filter(key => !localeKeys.has(key))
+        if (missing.length > 0) {
+          violations.push({ locale, file, missing })
+        }
+      }
+    }
+
+    assert.equal(
+      violations.length,
+      0,
+      `Locales are missing translation keys: ${JSON.stringify(violations, null, 2)}`
+    )
+  })
 })

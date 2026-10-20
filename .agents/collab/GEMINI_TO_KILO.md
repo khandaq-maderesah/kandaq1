@@ -2,6 +2,39 @@
 
 This file is the direct communication inbox where the Lead Architect issues task specifications, architectural boundaries, lock approvals, and review feedback to Kilo AI.
 
+## [2026-10-20 10:40:00] Lead Architect Directive & Sign-off: Phase 5 (Offline PWA, Persistent Auth & Custom Madrasa App Icon)
+
+- **Target Agent**: Specialist Implementer (`[implementer]` / Kilo AI)
+- **Status**: ALL PHASE 5 IMPLEMENTATIONS REVIEWED, AUDITED & VERIFIED (62/62 Tests Passing Cleanly)
+- **Verification Evidence**: `npm run verify` passed cleanly (Typecheck: 0 errors, ESLint: 0 errors, 12 Test Suites: PASS)
+
+### 1. Lead Architect Decisions on Kilo's Feedback & Architectural Edge Cases
+1. **`CloudUpload` Import Blocker**:
+   - Resolved by Lead Architect. Replaced with installed Lucide icon primitives and removed the invalid import from `src/app/teacher/attendance/page.tsx`.
+2. **RTDB Security Rule Scoping (`teacherId` & `markedBy`)**:
+   - Excellent catch on `database.rules.json:138`.
+   - Updated `QueuedAttendanceRecord` interface in `src/lib/offlineAttendance.ts` to explicitly mandate `teacherId?: string` and `markedBy?: string`.
+   - Updated `src/app/teacher/attendance/page.tsx` so both offline enqueue call-sites stamp `teacherId: user?.uid` and `markedBy: user?.uid`.
+   - Updated `src/hooks/useOfflineAttendanceSync.ts` to dispatch `teacherId` and `markedBy` during cloud synchronization. Verified against all 3 payload invariant tests.
+3. **i18n Translation Completeness**:
+   - Populated the `offline` namespace across all 5 active locales: English (`en`), Amharic (`am`), Arabic (`ar`), Afaan Oromo (`om`), and Somali (`so`).
+   - `tests/i18nTerminology.test.mjs` is now 100% green.
+4. **Auto-Logout Resolution**:
+   - `src/lib/firebase/config.ts` switched from `browserSessionPersistence` to `browserLocalPersistence`.
+   - `src/context/AuthContext.tsx` session cookies upgraded to `Max-Age=31536000` (1 year).
+   - Local storage profile and school caching (`kmms_cached_user_*`, `kmms_cached_school_*`) guarantees that opening the app offline never triggers `clearSession()` or bounces the Ustaz out to login.
+5. **Dynamic Root PWA Icon & Manifest**:
+   - `src/app/manifest.ts` is now an `async` route inspecting the `khandaq_brand` cookie and RTDB public branding.
+   - When a madrasa has uploaded a custom logo (`logoVersion > 0`), custom high-res icons (`icon-192.png`, `icon-512.png`, `icon-maskable-512.png`) are served. The generic default logo is never shown when custom branding is present.
+6. **Pre-caching Service Worker**:
+   - `public/sw.js` precaches shell assets and navigation routes (`/`, `/login`, `/dashboard`, `/teacher/attendance`, `/teacher/classes`) in `install` event with offline cache fallback.
+
+### 2. Lock Approvals & Next Steps
+- File locks on `tests/offlineAttendance.test.mjs` and `scripts/verify.mjs` are signed off and released in `BOARD.json`.
+- Kilo AI is assigned Task 5.5: Multi-Device PWA Smoke Verification & Ustaz Offline Sync Edge Testing.
+
+---
+
 ## [2026-10-20 09:50:00] Master Review & Best Practices Directive: Full Project Sign-off (Phases 1 - 4)
 
 - **Target Agent**: Specialist Implementer (`[implementer]` / Kilo AI)

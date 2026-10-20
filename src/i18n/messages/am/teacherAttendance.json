@@ -42,5 +42,20 @@
     "loadClassesFailed": "ክፍሎችዎን መጫን አልተቻለም።",
     "loadStudentsFailed": "ተማሪዎቹን መጫን አልተቻለም።",
     "saveFailed": "መገኘትን ማስቀመጥ አልተቻለም። እባክዎ እንደገና ይሞክሩ።"
+  },
+  "offline": {
+    "mode": "ከመስመር ውጭ ሁነታ",
+    "reconnected": "ኢንተርኔት ተገናኝቷል",
+    "offlineNotice": "የመገኘት መረጃው በመሣሪያዎ ላይ ይቀመጣል።",
+    "reconnectedNotice": "የኢንተርኔት ግንኙነት ተመልሷል።",
+    "queuedRecords": "{count} መዝገቦች በመጠባበቅ ላይ ናቸው",
+    "syncNow": "አሁን አመሳስል ({count})",
+    "syncing": "በማመሳሰል ላይ...",
+    "savedLocally": "መገኘቱ በዚህ መሣሪያ ላይ ተቀምጧል። ስር የመስመር ግንኙነት ሲመለስ በራሱ ይመሳሳል።",
+    "savedAfterConnectionLoss": "የግንኙነት ስህሰት ተከስቷል። መገኘቱ ከመስመር ውጭ ተቀምጧል እና በራሱ ይመሳሳል።",
+    "synced": "{count} የመገኘት መዝገቦች ወደ አመላሪ ተመሳስለዋል።",
+    "syncFailed": "{count} መዝገቦች መመሳሰል አልተቻለም። በራሱ እንደገና ይሞክራል።",
+    "reconnectedSyncing": "የኢንተርኔት ግንኙነት ተመልሷል። የመገኘት መዝገቦች በመመሳሰል ላይ ናቸው...",
+    "workingOffline": "የኢንተርኔት ግንኙነት የለም። ከመስመር ውጭ በመስራት ላይ እንሆናለን።"
   }
 }

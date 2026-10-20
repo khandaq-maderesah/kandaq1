@@ -42,5 +42,20 @@
     "loadClassesFailed": "Fasalladaada lama soo rari karin.",
     "loadStudentsFailed": "Ardayda lama soo rari karin.",
     "saveFailed": "Xaadiriska lama kaydin karin. Fadlan isku day mar kale."
+  },
+  "offline": {
+    "mode": "Xaalad la'aan internet ah",
+    "reconnected": "Xiriirku wuu soo noqday",
+    "offlineNotice": "Diiwaangelinta xaadirka waxaa lagu keydiyay aad kasta.",
+    "reconnectedNotice": "Xiriirka internetku wuu soo noqday.",
+    "queuedRecords": "{count} diiwaangelin waxaa laga filan yahay",
+    "syncNow": "Isku darka hadda ({count})",
+    "syncing": "Waa isku darka jira...",
+    "savedLocally": "Xaadirka waxaa lagu keydiyay qalabkaan. Waxay isugu xiriiri doontaa marka aad internetto u soo noqoto.",
+    "savedAfterConnectionLoss": "Xiriirku wuu xumaadamey. Xaadirka waxaa lagu keydiyay internet ka bax, waxay isugu xiriiri doontaa.",
+    "synced": "{count} diiwaangelin xaadirka ayaa daraw la ahaa.",
+    "syncFailed": "{count} diiwaangelin lama xiriirin karin. Waxaa la isku dayi doonaa.",
+    "reconnectedSyncing": "Xiriirka internetku wuu soo noqday. Diiwaangelinta xaadirka ayaa isku darka jira...",
+    "workingOffline": "Xiriir internet ma jiro. Waxaan ku shaqeeyaa xaalad offline ah."
   }
 }

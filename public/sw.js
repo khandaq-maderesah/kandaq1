@@ -2,9 +2,30 @@
 // Strategy: network-first for same-origin GET requests (excluding /api),
 // falling back to a cached copy only when offline. Cross-origin (Firebase)
 // and API requests are left untouched to avoid serving stale data.
-const CACHE = 'khendeq-medresah-v1'
+const CACHE = 'khendeq-medresah-v2'
+const PRECACHE_SHELL = [
+  '/',
+  '/login',
+  '/dashboard',
+  '/teacher/attendance',
+  '/teacher/classes',
+  '/icons/icon-192.png',
+  '/icons/icon-512.png',
+  '/icons/icon-maskable-512.png',
+]
 
-self.addEventListener('install', () => {
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE).then(async (cache) => {
+      for (const url of PRECACHE_SHELL) {
+        try {
+          await cache.add(url)
+        } catch {
+          // Ignore individual asset fetch failures during initial install
+        }
+      }
+    })
+  )
   self.skipWaiting()
 })
 
