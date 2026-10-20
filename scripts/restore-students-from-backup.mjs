@@ -56,49 +56,64 @@ loadEnvFile(join(root, '.env.local'))
 
 const ADMIN_EMAIL = process.env.SEED_ADMIN_EMAIL || 'abduha2222@gmail.com'
 const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD || ''
-const fileArg = process.argv.slice(2).find((a) => !a.startsWith('--'))
-const APPLY = process.argv.slice(2).includes('--apply')
 
-if (!fileArg) {
-  console.error('Usage: node scripts/restore-students-from-backup.mjs <backup.json[.gz]> [--apply]')
-  process.exit(1)
+export function hasName(rec) {
+  return Boolean(rec && typeof rec.name === 'string' && rec.name.trim().length > 0)
 }
 
-const app = initializeApp({
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-})
-const db = getDatabase(app)
-
-async function readVal(path) {
-  const snap = await get(ref(db, path))
-  return snap.exists() ? snap.val() : {}
-}
-
-function hasName(rec) {
-  return rec && typeof rec.name === 'string' && rec.name.trim().length > 0
-}
-
-function parseBackupFile(path) {
-  let raw
-  if (path.endsWith('.gz')) raw = gunzipSync(readFileSync(path))
-  else raw = readFileSync(path, 'utf8')
-  const data = JSON.parse(raw)
-  // Accept both { students: {..} } full exports and bare { id: rec } objects.
+export function parseBackupData(data) {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
+    throw new Error('Invalid backup data: must be an object.')
+  }
+  // 1. Multi-tenant modern format: { schoolData: { [schoolId]: { students: { [id]: rec } } } }
+  if (data.schoolData && typeof data.schoolData === 'object') {
+    const combined = {}
+    for (const [schoolId, sData] of Object.entries(data.schoolData)) {
+      if (sData?.students && typeof sData.students === 'object') {
+        for (const [id, rec] of Object.entries(sData.students)) {
+          combined[id] = { schoolId, ...rec }
+        }
+      }
+    }
+    if (Object.keys(combined).length > 0) return combined
+    throw new Error('Could not find a "students" record collection in schoolData.')
+  }
+  // 2. Legacy full export format: { students: { ... } }
   if (data.students && typeof data.students === 'object' && !Array.isArray(data.students)) {
     return data.students
   }
-  if (data && typeof data === 'object' && !Array.isArray(data)) {
+  // 3. Flat student dict format: { [id]: { name: ... } }
+  const values = Object.values(data)
+  if (values.length > 0 && values.some(hasName)) {
     return data
   }
   throw new Error('Could not find a "students" record collection in the file.')
 }
-async function main() {
+
+export function parseBackupFile(path) {
+  let raw
+  if (path.endsWith('.gz')) raw = gunzipSync(readFileSync(path))
+  else raw = readFileSync(path, 'utf8')
+  return parseBackupData(JSON.parse(raw))
+}
+
+async function main(fileArg, APPLY = false) {
+  const app = initializeApp({
+    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+    databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
+    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  })
+  const db = getDatabase(app)
+
+  async function readVal(path) {
+    const snap = await get(ref(db, path))
+    return snap.exists() ? snap.val() : {}
+  }
+
   try {
     await signInWithEmailAndPassword(getAuth(app), ADMIN_EMAIL, ADMIN_PASSWORD)
     console.log('✓ Signed in as:', ADMIN_EMAIL)
@@ -186,7 +201,17 @@ async function main() {
   process.exit(0)
 }
 
-main().catch((err) => {
-  console.error('✗ Failed:', err.message || err)
-  process.exit(1)
-})
+const isMain = process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]
+
+if (isMain) {
+  const fileArg = process.argv.slice(2).find((a) => !a.startsWith('--'))
+  if (!fileArg) {
+    console.error('Usage: node scripts/restore-students-from-backup.mjs <backup.json[.gz]> [--apply]')
+    process.exit(1)
+  }
+  const APPLY = process.argv.slice(2).includes('--apply')
+  main(fileArg, APPLY).catch((err) => {
+    console.error('✗ Failed:', err.message || err)
+    process.exit(1)
+  })
+}
