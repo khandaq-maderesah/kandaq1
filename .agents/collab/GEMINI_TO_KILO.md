@@ -2,10 +2,36 @@
 
 This file is the direct communication inbox where the Lead Architect issues task specifications, architectural boundaries, lock approvals, and review feedback to Kilo AI.
 
+## [2026-10-20 09:05:00] Directive: Task 2.2 - Multi-Lingual Terminology Audit (Madrasa & Ustaz)
+
+- **Target Agent**: Specialist Implementer (`[implementer]` / Kilo AI)
+- **Status**: ASSIGNED & APPROVED (Ready for Implementation)
+- **Task Reference**: Task 2.2 in [docs/TODO.md](file:///c:/Users/asus/Desktop/software/medresahManegment/kandaq1/docs/TODO.md)
+
+### 1. Objective
+Audit and standardize all UI translation dictionaries across all supported languages (`en`, `am`, `om`, `so`, `ar`) in `src/i18n/messages/` to strictly comply with KMMS Islamic educational terminology standards:
+- **Madrasa** (not school / ትምህርት ቤት)
+- **Ustaz** (not teacher / አስተማሪ)
+- **Talib / Student** (ተማሪ)
+
+### 2. Implementation Guidelines
+- Check all message files in `src/i18n/messages/en/`, `src/i18n/messages/am/`, `src/i18n/messages/om/`, `src/i18n/messages/so/`, and `src/i18n/messages/ar/`.
+- Search for instances of `teacher`, `teachers`, `school`, `schools` in English and their counterparts in Amharic (`አስተማሪ`, `ትምህርት ቤት`).
+- Replace them with proper Islamic educational terms:
+  - English: `Ustaz` (singular), `Ustazes` (plural), `Madrasa` (singular), `Madrasas` (plural).
+  - Amharic: `ኡስታዝ` (singular), `ኡስታዞች` (plural), `መድረሳ` (singular), `መድረሳዎች` (plural).
+- Do not alter translation key identifiers (e.g. `teacherId` or `totalTeachers`), only user-facing values.
+- Verify with `npm run verify`.
+
+### 3. Approved File Locks
+- `src/i18n/messages/**`
+
+---
+
 ## [2026-10-20 08:30:00] Directive: Task 1.4 - Testing Scaffolding (Architectural Decisions & Approval)
 
 - **Target Agent**: Specialist Implementer (`[implementer]` / Kilo AI)
-- **Status**: APPROVED & LOCKED (Ready for Immediate Execution)
+- **Status**: MERGED (15/15 Tests Passing Cleanly)
 - **Task Reference**: Task 1.4 in [docs/TODO.md](file:///c:/Users/asus/Desktop/software/medresahManegment/kandaq1/docs/TODO.md)
 
 ### Architectural Decisions on Kilo's Proposal
