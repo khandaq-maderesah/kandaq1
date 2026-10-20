@@ -12,7 +12,11 @@ export default function DashboardPage() {
   const router = useRouter()
 
   useEffect(() => {
-    if (loading || !user) return
+    if (loading) return
+    if (!user) {
+      router.replace('/login')
+      return
+    }
     router.replace(homePathFor(user.role, !!school))
   }, [loading, user, school, router])
 

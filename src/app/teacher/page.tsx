@@ -17,6 +17,7 @@ import { badgeVariants } from '@/components/ui/badge'
 import { EmptyState, PageHeader, StatCard, TableContainer } from '@/components/ui/page'
 import { RequestStatusBadge } from '@/components/requests/RequestStatusBadge'
 import { cn } from '@/lib/utils'
+import { withTimeout } from '@/lib/asyncUtils'
 import type { Student, Class, Attendance } from '@/types'
 
 const todayIso = () => new Date().toISOString().slice(0, 10)
@@ -40,23 +41,72 @@ export default function TeacherPage() {
   useEffect(() => {
     const load = async () => {
       if (!user) return
+
+      // If offline, load classes and students from localStorage cache immediately
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        try {
+          const cachedClassesStr = localStorage.getItem(`kmms_teacher_classes_${user.uid}`)
+          if (cachedClassesStr) {
+            const myClasses = JSON.parse(cachedClassesStr) as Class[]
+            setClasses(myClasses)
+            setSelectedClass((current) => current || (myClasses.length > 0 ? myClasses[0].id : ''))
+            const studentLists = myClasses.map((c) => {
+              const str = localStorage.getItem(`kmms_class_students_${c.id}`)
+              return str ? (JSON.parse(str) as Student[]) : []
+            })
+            setStudents(studentLists.flat())
+          }
+        } catch {
+          /* ignore */
+        }
+        setLoading(false)
+        return
+      }
+
       setLoading(true)
       try {
-        const classList = await rtdb.getAllClasses()
+        const classList = await withTimeout(rtdb.getAllClasses(), 2500)
         const myClasses = classList.filter((c) => c.teacherId === user.uid && c.isActive !== false)
 
-        // Only download what belongs to this teacher: their attendance plus the
-        // students of their own classes (queried server-side, in parallel).
-        const [attList, myStudents] = await Promise.all([
-          rtdb.getAttendanceByTeacher(user.uid),
-          Promise.all(myClasses.map((c) => rtdb.getStudentsByClass(c.id))).then((lists) => lists.flat()),
-        ])
+        const [attList, myStudents] = await withTimeout(
+          Promise.all([
+            rtdb.getAttendanceByTeacher(user.uid),
+            Promise.all(myClasses.map((c) => rtdb.getStudentsByClass(c.id))).then((lists) => lists.flat()),
+          ]),
+          2500
+        )
 
         setClasses(myClasses)
         setStudents(myStudents)
         setAttendance(attList)
         setSelectedClass((current) => current || (myClasses.length > 0 ? myClasses[0].id : ''))
+
+        try {
+          localStorage.setItem(`kmms_teacher_classes_${user.uid}`, JSON.stringify(myClasses))
+          myClasses.forEach((c) => {
+            const clsStudents = myStudents.filter((s) => s.classId === c.id)
+            localStorage.setItem(`kmms_class_students_${c.id}`, JSON.stringify(clsStudents))
+          })
+        } catch {
+          /* ignore */
+        }
       } catch {
+        // Fallback to cached data if network times out
+        try {
+          const cachedClassesStr = localStorage.getItem(`kmms_teacher_classes_${user.uid}`)
+          if (cachedClassesStr) {
+            const myClasses = JSON.parse(cachedClassesStr) as Class[]
+            setClasses(myClasses)
+            setSelectedClass((current) => current || (myClasses.length > 0 ? myClasses[0].id : ''))
+            const studentLists = myClasses.map((c) => {
+              const str = localStorage.getItem(`kmms_class_students_${c.id}`)
+              return str ? (JSON.parse(str) as Student[]) : []
+            })
+            setStudents(studentLists.flat())
+          }
+        } catch {
+          /* ignore */
+        }
         toast.error(t('toast.loadFailed'))
       } finally {
         setLoading(false)

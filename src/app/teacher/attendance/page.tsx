@@ -24,6 +24,7 @@ import { useOfflineAttendanceSync } from '@/hooks/useOfflineAttendanceSync'
 import {
   enqueueOfflineAttendance,
   isBrowserOnline,
+  withTimeout,
   type QueuedAttendanceRecord,
 } from '@/lib/offlineAttendance'
 import { Button } from '@/components/ui/button'
@@ -91,8 +92,25 @@ export default function TeacherAttendancePage() {
   useEffect(() => {
     const load = async () => {
       if (!user) return
+
+      // If offline, immediately load from local cache without blocking on network!
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        const cached = localStorage.getItem(`kmms_teacher_classes_${user.uid}`)
+        if (cached) {
+          try {
+            const parsed = JSON.parse(cached) as Class[]
+            setClasses(parsed)
+            if (parsed.length > 0) setClassId(parsed[0].id)
+          } catch {
+            /* ignore */
+          }
+        }
+        setLoading(false)
+        return
+      }
+
       try {
-        const classList = await rtdb.getAllClasses()
+        const classList = await withTimeout(rtdb.getAllClasses(), 2500)
         const myClasses = classList.filter((c) => c.teacherId === user.uid && c.isActive !== false)
         setClasses(myClasses)
         try {
@@ -130,11 +148,30 @@ export default function TeacherAttendancePage() {
     const loadClassData = async () => {
       if (!classId) return
       setLoadingStudents(true)
+
+      // If offline, immediately load students from local cache without network call
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        const cached = localStorage.getItem(`kmms_class_students_${classId}`)
+        if (cached) {
+          try {
+            const parsed = JSON.parse(cached) as Student[]
+            setStudents(parsed)
+          } catch {
+            /* ignore */
+          }
+        }
+        setLoadingStudents(false)
+        return
+      }
+
       try {
-        const [studentList, existing] = await Promise.all([
-          rtdb.getStudentsByClass(classId),
-          rtdb.getAttendanceByClassAndDate(classId, date),
-        ])
+        const [studentList, existing] = await withTimeout(
+          Promise.all([
+            rtdb.getStudentsByClass(classId),
+            rtdb.getAttendanceByClassAndDate(classId, date),
+          ]),
+          2500
+        )
         // Archived (deleted) students never appear in attendance taking.
         const activeStudents = studentList
           .filter((s) => s.isActive !== false)

@@ -16,6 +16,7 @@ import { rememberBrandSlug } from '@/lib/brandMemory'
 import type { School, User } from '@/types'
 import { useLocaleSettings } from '@/i18n/I18nProvider'
 import { isLocale } from '@/i18n/config'
+import { withTimeout } from '@/lib/asyncUtils'
 
 interface LoginResult {
   credential: UserCredential
@@ -83,16 +84,32 @@ async function resolveSchool(profile: User): Promise<School | null> {
 
   if (profile.role === 'superadmin') {
     const selected = readSelectedSchool()
-    return selected ? await getSchool(selected) : null
+    return selected ? await withTimeout(getSchool(selected), 2000).catch(() => null) : null
   }
 
   if (!profile.schoolId) throw accessError('app/no-school')
+
+  // If offline, retrieve cached school immediately without network hang
+  if (typeof navigator !== 'undefined' && !navigator.onLine) {
+    const cached =
+      localStorage.getItem('kmms_cached_school_' + profile.schoolId) ||
+      localStorage.getItem('kmms_last_active_school')
+    if (cached) {
+      try {
+        return JSON.parse(cached) as School
+      } catch {
+        /* ignore */
+      }
+    }
+  }
+
   try {
-    const school = await getSchool(profile.schoolId)
+    const school = await withTimeout(getSchool(profile.schoolId), 2500)
     if (!school) throw accessError('app/no-school')
     if (school.status === 'suspended') throw accessError('app/school-suspended')
     try {
       localStorage.setItem('kmms_cached_school_' + profile.schoolId, JSON.stringify(school))
+      localStorage.setItem('kmms_last_active_school', JSON.stringify(school))
     } catch {
       /* ignore */
     }
@@ -101,9 +118,11 @@ async function resolveSchool(profile: User): Promise<School | null> {
     if (err && typeof err === 'object' && 'code' in err) {
       throw err // accessError
     }
-    // Try cached school if network failed
+    // Try cached school if network failed or timed out
     if (typeof window !== 'undefined') {
-      const cached = localStorage.getItem('kmms_cached_school_' + profile.schoolId)
+      const cached =
+        localStorage.getItem('kmms_cached_school_' + profile.schoolId) ||
+        localStorage.getItem('kmms_last_active_school')
       if (cached) {
         try {
           return JSON.parse(cached) as School
@@ -123,10 +142,45 @@ function writeSessionCookie() {
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
+  // Synchronous offline-first hydration from localStorage so the app never hangs on startup
+  const [user, setUser] = useState<User | null>(() => {
+    if (typeof window === 'undefined') return null
+    try {
+      const cached = localStorage.getItem('kmms_last_active_user')
+      if (cached) return JSON.parse(cached) as User
+    } catch {
+      /* ignore */
+    }
+    return null
+  })
+
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null)
-  const [school, setSchool] = useState<School | null>(null)
-  const [loading, setLoading] = useState(true)
+
+  const [school, setSchool] = useState<School | null>(() => {
+    if (typeof window === 'undefined') return null
+    try {
+      const cached = localStorage.getItem('kmms_last_active_school')
+      if (cached) return JSON.parse(cached) as School
+    } catch {
+      /* ignore */
+    }
+    return null
+  })
+
+  // If the browser is offline and we already have a cached profile, never show the full-screen spinner
+  const [loading, setLoading] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return true
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      try {
+        const cached = localStorage.getItem('kmms_last_active_user')
+        if (cached) return false
+      } catch {
+        /* ignore */
+      }
+    }
+    return true
+  })
+
   const [branding, setBranding] = useState<PublicBranding | null>(null)
   const [brandingTick, setBrandingTick] = useState(0)
   const { setLocale } = useLocaleSettings()
@@ -142,10 +196,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const applySchool = useCallback((next: School | null) => {
     setCurrentSchoolId(next?.id ?? null)
     setSchool(next)
+    if (typeof window !== 'undefined') {
+      try {
+        if (next) localStorage.setItem('kmms_last_active_school', JSON.stringify(next))
+        else localStorage.removeItem('kmms_last_active_school')
+      } catch {
+        /* ignore */
+      }
+    }
   }, [])
 
   const clearSession = useCallback(async () => {
     document.cookie = 'khandaq_session=; path=/; Max-Age=0'
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem('kmms_last_active_user')
+        localStorage.removeItem('kmms_last_active_school')
+      } catch {
+        /* ignore */
+      }
+    }
     writeSelectedSchool(null)
     applySchool(null)
     setUser(null)
@@ -158,34 +228,100 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [applySchool])
 
   useEffect(() => {
+    let settled = false
+
+    // Safety timeout: Ensure loading flips to false within 2s max (or 100ms if offline)
+    // so offline mobile devices NEVER hang on the rotating loader screen.
+    const isOffline = typeof navigator !== 'undefined' && !navigator.onLine
+    const safetyTimer = setTimeout(() => {
+      if (!settled) {
+        if (typeof window !== 'undefined') {
+          try {
+            const cachedUserStr = localStorage.getItem('kmms_last_active_user')
+            if (cachedUserStr) {
+              const profile = JSON.parse(cachedUserStr) as User
+              setUser(profile)
+              applyProfileLocale(profile)
+              const cachedSchoolStr = localStorage.getItem('kmms_last_active_school')
+              if (cachedSchoolStr) {
+                applySchool(JSON.parse(cachedSchoolStr) as School)
+              }
+            }
+          } catch {
+            /* ignore */
+          }
+        }
+        setLoading(false)
+      }
+    }, isOffline ? 100 : 2000)
+
     const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
       setFirebaseUser(fbUser)
 
       if (fbUser) {
-        // Keep session alive for 1 year (31,536,000s) across app reopens
         writeSessionCookie()
-        // Fetch user data from Realtime Database
+
+        // If currently offline, restore profile and school from local cache immediately
+        // and do NOT attempt network RTDB requests that will hang indefinitely.
+        if (typeof navigator !== 'undefined' && !navigator.onLine) {
+          const cached =
+            localStorage.getItem('kmms_cached_user_' + fbUser.uid) ||
+            localStorage.getItem('kmms_last_active_user')
+          if (cached) {
+            try {
+              const profile = JSON.parse(cached) as User
+              setUser(profile)
+              const cachedSchoolStr = profile.schoolId
+                ? localStorage.getItem('kmms_cached_school_' + profile.schoolId) ||
+                  localStorage.getItem('kmms_last_active_school')
+                : null
+              if (cachedSchoolStr) {
+                applySchool(JSON.parse(cachedSchoolStr) as School)
+              }
+              applyProfileLocale(profile)
+            } catch {
+              /* ignore */
+            }
+          }
+          settled = true
+          clearTimeout(safetyTimer)
+          setLoading(false)
+          return
+        }
+
+        // Online: fetch user data with a strict timeout so it never hangs
         try {
-          const snapshot = await get(ref(db, 'users/' + fbUser.uid))
+          const snapshot = await withTimeout(get(ref(db, 'users/' + fbUser.uid)), 2500)
           if (snapshot.exists()) {
             const profile = { ...(snapshot.val() as Omit<User, 'uid'>), uid: fbUser.uid } as User
             try {
               localStorage.setItem('kmms_cached_user_' + fbUser.uid, JSON.stringify(profile))
+              localStorage.setItem('kmms_last_active_user', JSON.stringify(profile))
             } catch {
               /* ignore */
             }
-            applySchool(await resolveSchool(profile))
+            const resolvedSchool = await withTimeout(resolveSchool(profile), 2500).catch(() => null)
+            if (resolvedSchool) {
+              applySchool(resolvedSchool)
+            }
             applyProfileLocale(profile)
             setUser(profile)
           }
         } catch (error) {
           // If network / offline error, restore from local cache rather than signing out
-          const cached = typeof window !== 'undefined' ? localStorage.getItem('kmms_cached_user_' + fbUser.uid) : null
+          const cached =
+            typeof window !== 'undefined'
+              ? localStorage.getItem('kmms_cached_user_' + fbUser.uid) ||
+                localStorage.getItem('kmms_last_active_user')
+              : null
           if (cached) {
             try {
               const profile = JSON.parse(cached) as User
               setUser(profile)
-              const cachedSchoolStr = profile.schoolId ? localStorage.getItem('kmms_cached_school_' + profile.schoolId) : null
+              const cachedSchoolStr = profile.schoolId
+                ? localStorage.getItem('kmms_cached_school_' + profile.schoolId) ||
+                  localStorage.getItem('kmms_last_active_school')
+                : null
               if (cachedSchoolStr) {
                 applySchool(JSON.parse(cachedSchoolStr) as School)
               }
@@ -199,15 +335,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
         }
       } else {
-        document.cookie = 'khandaq_session=; path=/; Max-Age=0'
-        applySchool(null)
-        setUser(null)
+        // Only clear session if we are actually online
+        if (typeof navigator === 'undefined' || navigator.onLine) {
+          document.cookie = 'khandaq_session=; path=/; Max-Age=0'
+          if (typeof window !== 'undefined') {
+            try {
+              localStorage.removeItem('kmms_last_active_user')
+              localStorage.removeItem('kmms_last_active_school')
+            } catch {
+              /* ignore */
+            }
+          }
+          applySchool(null)
+          setUser(null)
+        }
       }
 
+      settled = true
+      clearTimeout(safetyTimer)
       setLoading(false)
     })
 
-    return () => unsubscribe()
+    return () => {
+      settled = true
+      clearTimeout(safetyTimer)
+      unsubscribe()
+    }
   }, [applySchool, applyProfileLocale, clearSession])
 
   // Load the public branding whenever the current school changes.
@@ -243,12 +396,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Load the profile immediately so the caller can redirect straight to the
     // right dashboard without an intermediate /dashboard hop.
     const userRef = ref(db, 'users/' + result.user.uid)
-    const snapshot = await get(userRef)
+    const snapshot = await withTimeout(get(userRef), 4000)
     let profile: User | null = null
     if (snapshot.exists()) {
       profile = { ...(snapshot.val() as Omit<User, 'uid'>), uid: result.user.uid } as User
       try {
         localStorage.setItem('kmms_cached_user_' + result.user.uid, JSON.stringify(profile))
+        localStorage.setItem('kmms_last_active_user', JSON.stringify(profile))
       } catch {
         /* ignore */
       }
@@ -263,7 +417,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         await clearSession()
         throw err
       }
-      await update(userRef, { lastLogin: new Date().toISOString() })
+      await update(userRef, { lastLogin: new Date().toISOString() }).catch(() => {
+        /* ignore background lastLogin error */
+      })
       applyProfileLocale(profile)
       setUser(profile)
     }

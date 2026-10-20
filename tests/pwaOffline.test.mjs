@@ -9,6 +9,7 @@ const {
   clearOfflineAttendanceQueue,
   syncOfflineAttendance,
   isBrowserOnline,
+  withTimeout,
 } = await import('../src/lib/offlineAttendance.ts')
 
 const { DEFAULT_APP_FULL_NAME, DEFAULT_APP_NAME, BRAND_COOKIE } = await import(
@@ -397,5 +398,48 @@ describe('Ustaz offline sync edge cases', () => {
     const catchIndex = page.indexOf('catch {')
     const enqueueIndex = page.indexOf('enqueueOfflineAttendance(recordsToEnqueue)', catchIndex)
     assert.ok(catchIndex > -1 && enqueueIndex > catchIndex, 'Network failure must fall back to the offline queue')
+  })
+})
+
+// ==================== Async timeout & anti-hang guarantees ====================
+
+describe('Async timeout & anti-hang offline guarantees', () => {
+  test('withTimeout resolves immediately when the operation succeeds', async () => {
+    const res = await withTimeout(Promise.resolve('ok'), 1000)
+    assert.equal(res, 'ok')
+  })
+
+  test('withTimeout rejects when operation exceeds timeoutMs', async () => {
+    const hanging = new Promise((resolve) => setTimeout(resolve, 500))
+    await assert.rejects(
+      () => withTimeout(hanging, 50),
+      /Operation timed out after 50ms/
+    )
+  })
+
+  test('withTimeout returns fallback value if provided when timed out', async () => {
+    const hanging = new Promise((resolve) => setTimeout(resolve, 500))
+    const res = await withTimeout(hanging, 50, 'fallback_val')
+    assert.equal(res, 'fallback_val')
+  })
+
+  test('AuthContext contains synchronous localStorage hydration and safetyTimer', () => {
+    const auth = read(path.join('src', 'context', 'AuthContext.tsx'))
+    assert.ok(auth.includes('kmms_last_active_user'), 'Must hydrate last active user')
+    assert.ok(auth.includes('kmms_last_active_school'), 'Must hydrate last active school')
+    assert.ok(auth.includes('safetyTimer'), 'Must declare anti-hang safety timer')
+    assert.ok(auth.includes('withTimeout'), 'Must wrap RTDB calls with withTimeout')
+  })
+
+  test('DashboardPage redirects unauthenticated users without hanging on the spinner', () => {
+    const dashboard = read(path.join('src', 'app', 'dashboard', 'page.tsx'))
+    assert.ok(dashboard.includes("router.replace('/login')"), 'Must redirect to login if !loading && !user')
+  })
+
+  test('service worker serves _next/static assets cache-first', () => {
+    const sw = read(path.join('public', 'sw.js'))
+    assert.ok(sw.includes("url.pathname.startsWith('/_next/static/')"), 'Must handle static assets')
+    assert.ok(sw.includes('PRECACHE_SHELL'), 'Must precache shell')
+    assert.ok(sw.includes("'/teacher'"), 'Must precache /teacher in shell')
   })
 })

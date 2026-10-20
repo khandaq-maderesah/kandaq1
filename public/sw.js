@@ -2,11 +2,12 @@
 // Strategy: network-first for same-origin GET requests (excluding /api),
 // falling back to a cached copy only when offline. Cross-origin (Firebase)
 // and API requests are left untouched to avoid serving stale data.
-const CACHE = 'khendeq-medresah-v2'
+const CACHE = 'khendeq-medresah-v3'
 const PRECACHE_SHELL = [
   '/',
   '/login',
   '/dashboard',
+  '/teacher',
   '/teacher/attendance',
   '/teacher/classes',
   '/icons/icon-192.png',
@@ -72,6 +73,26 @@ self.addEventListener('fetch', (event) => {
   if (url.origin !== location.origin) return
   if (url.pathname.startsWith('/api/')) return
 
+  // Cache-first for Next.js immutable content-hashed static assets (_next/static/...)
+  if (url.pathname.startsWith('/_next/static/')) {
+    event.respondWith(
+      caches.open(CACHE).then(async (cache) => {
+        const cached = await cache.match(request)
+        if (cached) return cached
+        try {
+          const response = await fetch(request)
+          if (response && response.ok) {
+            cache.put(request, response.clone())
+          }
+          return response
+        } catch {
+          return new Response('', { status: 404 })
+        }
+      })
+    )
+    return
+  }
+
   event.respondWith(
     (async () => {
       const cache = await caches.open(CACHE)
@@ -85,11 +106,25 @@ self.addEventListener('fetch', (event) => {
         const cached = await cache.match(request)
         if (cached) return cached
         if (request.mode === 'navigate') {
+          // Direct matching cached page
+          const directMatch = await cache.match(url.pathname)
+          if (directMatch) return directMatch
+
+          // Teacher routes fallback to cached /teacher/attendance or /teacher
+          if (url.pathname.startsWith('/teacher')) {
+            const att = await cache.match('/teacher/attendance')
+            if (att) return att
+            const teach = await cache.match('/teacher')
+            if (teach) return teach
+          }
+
           const shell = await cache.match('/dashboard')
           if (shell) return shell
+          const root = await cache.match('/')
+          if (root) return root
         }
         return new Response('You are offline.', { status: 503, headers: { 'Content-Type': 'text/plain' } })
       }
     })()
   )
-})
+})
