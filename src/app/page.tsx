@@ -18,6 +18,11 @@ import { buttonVariants } from '@/components/ui/button'
 import { LanguageSwitcher } from '@/components/shell/LanguageSwitcher'
 import { ThemeToggle } from '@/components/theme/ThemeToggle'
 
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { useAuth } from '@/context/AuthContext'
+import { homePathFor } from '@/components/ProtectedRoute'
+
 const FEATURES: { key: 'attendance' | 'students' | 'exams' | 'parents' | 'reports' | 'languages'; icon: LucideIcon }[] = [
   { key: 'attendance', icon: ClipboardCheck },
   { key: 'students', icon: Users },
@@ -30,6 +35,14 @@ const FEATURES: { key: 'attendance' | 'students' | 'exams' | 'parents' | 'report
 export default function Home() {
   const t = useTranslations('landing')
   const tc = useTranslations('common')
+  const { user, loading, school } = useAuth()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!loading && user) {
+      router.replace(homePathFor(user.role, !!school))
+    }
+  }, [loading, user, school, router])
 
   return (
     <div className="flex min-h-screen flex-col bg-background">

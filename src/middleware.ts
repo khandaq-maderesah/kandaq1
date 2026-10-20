@@ -21,8 +21,8 @@ export function middleware(req: NextRequest) {
     return NextResponse.redirect(loginUrl)
   }
 
-  // Already signed in users shouldn't see the login page
-  if (pathname === '/login' && hasSession) {
+  // Already signed in users shouldn't see the login page or landing page
+  if ((pathname === '/login' || pathname === '/') && hasSession) {
     return NextResponse.redirect(new URL('/dashboard', req.url))
   }
 
@@ -30,5 +30,5 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/teacher/:path*', '/dashboard/:path*', '/profile/:path*', '/superadmin/:path*', '/login'],
+  matcher: ['/', '/admin/:path*', '/teacher/:path*', '/dashboard/:path*', '/profile/:path*', '/superadmin/:path*', '/login'],
 }

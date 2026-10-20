@@ -116,6 +116,12 @@ async function resolveSchool(profile: User): Promise<School | null> {
   }
 }
 
+function writeSessionCookie() {
+  if (typeof document === 'undefined') return
+  const isSecure = typeof window !== 'undefined' && window.location.protocol === 'https:' ? '; Secure' : ''
+  document.cookie = `khandaq_session=true; path=/; SameSite=Lax; Max-Age=31536000${isSecure}`
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null)
@@ -157,7 +163,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (fbUser) {
         // Keep session alive for 1 year (31,536,000s) across app reopens
-        document.cookie = 'khandaq_session=true; path=/; SameSite=Lax; Max-Age=31536000'
+        writeSessionCookie()
         // Fetch user data from Realtime Database
         try {
           const snapshot = await get(ref(db, 'users/' + fbUser.uid))
@@ -231,7 +237,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // based on this cookie, and it is NOT guaranteed to be written yet when
     // `onAuthStateChanged` fires. Setting it here prevents a logged-in user from
     // being bounced straight back to /login right after signing in.
-    document.cookie = 'khandaq_session=true; path=/; SameSite=Lax; Max-Age=31536000'
+    writeSessionCookie()
     setFirebaseUser(result.user)
 
     // Load the profile immediately so the caller can redirect straight to the

@@ -10,6 +10,7 @@ import { ArrowLeft, Eye, EyeOff, KeyRound, Loader2, Lock, Mail } from 'lucide-re
 import { auth } from '@/lib/firebase/config'
 import { getAuthErrorKey, type AuthErrorInfo } from '@/lib/firebase/authErrors'
 import { useLogin } from '@/hooks/useAuth'
+import { useAuth } from '@/context/AuthContext'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
@@ -19,6 +20,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { LanguageSwitcher } from '@/components/shell/LanguageSwitcher'
 import { ThemeToggle } from '@/components/theme/ThemeToggle'
 import { homePathFor } from '@/components/ProtectedRoute'
+import { useEffect } from 'react'
 
 /** A madrasa's public branding, for the branded sign-in page at /m/{slug}. */
 export interface SignInBrand {
@@ -36,6 +38,7 @@ export interface SignInBrand {
 export function SignInView({ brand }: { brand?: SignInBrand }) {
   const t = useTranslations('auth')
   const tc = useTranslations('common')
+  const { user, loading: authLoading, school } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -48,6 +51,12 @@ export function SignInView({ brand }: { brand?: SignInBrand }) {
 
   const loginUser = useLogin()
   const router = useRouter()
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      router.replace(homePathFor(user.role, !!school))
+    }
+  }, [authLoading, user, school, router])
 
   const errorText = (info: AuthErrorInfo) => t(`errors.${info.key}`, { code: info.code })
 
