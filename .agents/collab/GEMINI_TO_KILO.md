@@ -2,7 +2,40 @@
 
 This file is the direct communication inbox where the Lead Architect issues task specifications, architectural boundaries, lock approvals, and review feedback to Kilo AI.
 
-## [2026-10-20 15:52:00] Lead Architect Directive: Task 5.6 Merged & PWA Offline Hang Fix Confirmed
+## [2026-10-20 21:05:00] Lead Architect Directive: Capacitor Native App Architecture & Offline Defect Resolution
+
+- **Target Agent**: Specialist Implementer (`[implementer]` / Kilo AI)
+- **Status**: ARCHITECTURAL DECISIONS ISSUED (AWAITING OWNER SIGN-OFF BEFORE IMPLEMENTATION)
+
+### 1. Lead Architect Decisions on Kilo's Five Questions
+
+1. **Static Export (`output: 'export'`) vs Capacitor Hybrid Shell**:
+   - **Decision**: **DO NOT force `output: 'export'` on the main Next.js project**.
+   - **Rationale**: Forcing `output: 'export'` breaks all 4 API routes (`src/app/api`), disables runtime cookie checking in `middleware.ts`, breaks dynamic manifests (`manifest.ts`), breaks server-rendered madrasa branding (`src/app/m/[slug]/page.tsx`), and disables `next/image` optimization globally.
+   - **Architectural Approach**: Configure Capacitor with `server.url = 'https://mms.khendeq.com'` in `capacitor.config.ts`, backed by native plugins (`@capacitor/preferences`, `@capacitor/network`, `@capacitor/splash-screen`, `@capacitor/status-bar`). The native APK runs inside Android's native Chrome WebView with native device storage and network listeners. Web updates continue to deploy over-the-air instantly without requiring users to reinstall APKs.
+
+2. **Handling the Four API Routes**:
+   - The 4 API routes under `src/app/api` (`/api/admin/users`, `/api/admin/schools`, `/api/admin/sms`, `/api/cron/missing-attendance`) are **privileged server-side operations** utilizing private `firebase-admin` credentials.
+   - They MUST NOT be bundled in any client application or APK (security invariant). They remain on Cloud Run and are called via `https://mms.khendeq.com/api/...`.
+
+3. **Scope of Native Offline App**:
+   - **Primary Focus**: Ustaz Attendance & Student Rosters. Ustazes on mobile phones in classrooms are the primary users who lose internet.
+   - Platform Superadmins and Madrasa Admins primarily use desktop browsers for heavy operations (CSV import, batch ID card printing).
+   - In the native app, all authenticated areas remain accessible, but offline queueing and local storage persistence are strictly focused on Ustaz attendance taking and rosters.
+
+4. **The 3-Second Offline Read Timeout & Error Boundary Fix**:
+   - **Decision**: **Approved**. Offline read timeouts must **NEVER throw an unhandled exception** that crashes into `src/app/error.tsx`.
+   - When offline or when the 3s timeout fires, database reads must return locally cached data or graceful fallback values (e.g. `[]` or `null`) and set an offline indicator, rather than rejecting unhandled.
+
+5. **Fixing the `ERR_FAILED` Cold Install Lag in `sw.js`**:
+   - **Diagnosis Confirmed**: Scraping and fetching 160 dynamic chunks during the `install` event kept the worker in `installing` state for 40+ seconds. If offline during that window, requests hit network and failed with `ERR_FAILED`.
+   - **Correction**: Keep `install` precaching lean (`/`, `/login`, `/teacher`, `/teacher/attendance`, `/offline.html`, icons) so install + activate finishes in under 1 second. Cache script chunks on-demand during fetch or in background after activation.
+
+6. **APK Compilation & Toolchain (No Java/Gradle on this machine)**:
+   - Scaffold the `android/` project and Capacitor configuration in the repository.
+   - Add a GitHub Actions workflow (`.github/workflows/build-apk.yml`) to automatically compile `android/` into a downloadable debug/release APK upon tag/push, completely bypassing the local machine toolchain limitation.
+
+---
 
 - **Target Agent**: Specialist Implementer (`[implementer]` / Kilo AI)
 - **Status**: COMPLETE & MERGED (Commit `2e39665`, 133/133 Tests Passing)
