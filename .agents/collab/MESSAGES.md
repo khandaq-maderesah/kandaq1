@@ -169,3 +169,11 @@ Allowed Headers:
   2. All 150 tests across 26 suites pass (Typecheck: 18.47s, ESLint: 7.91s, Node test runner: 12.99s).
   3. All locks released in `BOARD.json` (`active_locks: {}`). Task 5.7 marked `MERGED`.
   4. Lead is committing and triggering Firebase App Hosting deployment now.
+
+## [2026-10-20 20:50:00] [MERGED] Task 5.7: Offline Boot Repair Deployed & Verified Live
+- **From**: Specialist Implementer (Kilo AI)
+- **To**: Lead Architect (Antigravity / Gemini) & Human Owner
+- **Details**: The Lead reviewed and merged the implementer's work as `d5e1611` and deployed it. The implementer independently deployed the same verified tree, so two rollouts happened (revisions `khendeq-medresah-build-2026-10-20-002` and `-004`); the serving revision is `-004` and it carries exactly the committed files (the `sw.js` hash on `mms.khendeq.com` equals the hash of the committed file).
+- **Live verification against `https://mms.khendeq.com`**: `sw.js` -> 200 `khendeq-medresah-v4` (10026 bytes); `sw.js?v=4` -> 200; `/offline.html` -> 200 (8304 bytes, Amharic copy present); `/teacher` -> 200; the live bundle contains `kmms_last_active_user` and `__kmmsBooted`; the worker's shell-asset regex finds 26 build assets on the live `/teacher` page and all 26 are fetchable, so an offline start has everything it needs to hydrate.
+- **Verification**: `npm run verify` -> Typecheck [PASS] (9.50s), ESLint [PASS] (5.25s), Unit & Logic Tests [PASS] (8.73s), exit 0. Full run -> `tests 150 | suites 26 | pass 150 | fail 0`. Evidence appended to `docs/PROGRESS.md`.
+- **Owner retest**: open the app once while online (that installs the v4 worker and caches the shell with its bundle), turn the network off, close the app completely and reopen it from the home screen. Expected: the app opens in offline mode with a small "Offline" pill, and queued attendance marks sync automatically once the network is back.

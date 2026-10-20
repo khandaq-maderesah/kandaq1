@@ -616,3 +616,57 @@ STATUS: ALL VERIFICATION CHECKS PASSED
 ========================================
 Exit Code: 0
 ```
+
+---
+
+## [2026-10-20 20:50:00] Task 5.7 - Offline Boot Repair (Deployed & Verified Live)
+
+- **Lead Architect**: Antigravity (Gemini) & Specialist Implementer (Kilo AI)
+- **Status**: MERGED, DEPLOYED & VERIFIED ON THE LIVE SITE (commit `d5e1611`, App Hosting revision `khendeq-medresah-build-2026-10-20-004`)
+- **Owner report**: the installed PWA got stuck on the loading spinner when it was opened again without a network.
+
+### Root Cause (measured on the live site, not guessed)
+1. **The offline fix was never deployed.** `https://mms.khendeq.com/sw.js` still served `khendeq-medresah-v2` (2954 bytes) while the repository held the new worker, and the live bundle `/_next/static/chunks/1255-*.js` contained neither `withTimeout` nor `kmms_last_active_user`. `firebase apphosting:backends:list` showed the backend last updated at 14:42:20, and the Lead's own log recorded revision `khendeq-medresah-build-2026-10-20-001` cut at 09:37:39 UTC - before the fix commit (12:36 UTC). The phone therefore ran the pre-fix code, where `onAuthStateChanged` awaited a Realtime Database `get()` that never settles while offline, so `loading` stayed `true` and the full-screen spinner of `ProtectedRoute` / `DashboardPage` never ended.
+2. **Worker updates could not reach devices.** `/sw.js` is served through Cloudflare with `Cache-Control: public, max-age=14400`, so a newly deployed worker stays invisible on devices for hours.
+3. **The shell was cached without its bundle.** The worker precached HTML pages but not the `/_next/static` chunks they reference, so a cold offline start could never hydrate and the server-rendered spinner stayed on screen forever.
+4. **The worker was registered too late.** Registration lived in `InstallAppPrompt`, which returns early when nobody is signed in, so the first visits were never offline-capable.
+5. **No timeout, no offline document.** Navigations had no network timeout, and a failed navigation answered with a bare `You are offline.` text page.
+
+### What changed
+- `public/sw.js` v4: caches every shell together with the build assets it references, cache-first for `/_next/static`, 3.5 s navigation and 8 s asset timeouts, explicit 504 for a missing build asset (never an empty body that breaks hydration unnoticed), RSC payload handling, and a branded `/offline.html` as the last resort.
+- `public/offline.html`: themed, localized in en/am/ar/om/so, retry button and automatic retry the moment the connection returns.
+- `src/components/ServiceWorkerRegistrar.tsx`: registered from the root layout on every page as `/sw.js?v=4` with `updateViaCache: 'none'`, so a version bump installs at once despite the 4 hour CDN cache.
+- `src/components/OfflineScreen.tsx` + `src/components/NetworkStatus.tsx`: a real offline screen (retry plus auto-retry) instead of an endless spinner, and a quiet offline pill on every screen.
+- `src/context/AuthContext.tsx`: reports `offline` and `stalled`; the boot watchdog always resolves `loading`.
+- `src/app/layout.tsx`: inline boot guard sends a failed offline boot to `/offline.html`.
+- `src/lib/database/index.ts`: every one-shot Realtime Database read is bounded (3 s offline, 20 s online, so a slow connection is never a false failure).
+- `src/i18n/messages/*/common.json`: the offline copy in all five languages.
+
+### Verification Evidence
+```text
+> npm run verify
+Checking TypeScript Typecheck... [PASS] (9.50s)
+Checking ESLint Static Analysis... [PASS] (5.25s)
+Checking Unit & Logic Tests (Node Test Runner)... [PASS] (8.73s)
+STATUS: ALL VERIFICATION CHECKS PASSED
+
+$ npx tsx --test tests/*.test.mjs
+tests 150 | suites 26 | pass 150 | fail 0
+
+$ firebase deploy --only apphosting --project khendeq-8e17f
++ apphosting: Rollout for backend khendeq-medresah complete!
+
+Live checks against https://mms.khendeq.com
+  sw.js            -> 200, khendeq-medresah-v4, 10026 bytes
+  sw.js?v=4        -> 200, khendeq-medresah-v4
+  offline.html     -> 200, 8304 bytes, Amharic copy present
+  /teacher         -> 200
+  live bundle      -> contains kmms_last_active_user and __kmmsBooted
+  shell assets     -> 26 build assets discovered by the worker regex, 26 fetchable
+  sw.js hash       -> identical to the committed file
+```
+
+### How to retest on the phone
+1. Open the app once while online (this installs the v4 worker and caches the shell with its bundle).
+2. Turn the network off, close the app completely, reopen it from the home screen.
+3. Expected: the app opens on your dashboard in offline mode with a small "Offline" pill; queued attendance marks sync automatically once the network returns.
