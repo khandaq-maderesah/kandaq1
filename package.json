@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint .",
+    "lint": "eslint . --cache",
     "verify": "node scripts/verify.mjs",
     "test": "node scripts/verify.mjs",
     "prebuild": "node scripts/backup-db.mjs",

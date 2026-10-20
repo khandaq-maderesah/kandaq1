@@ -68,3 +68,6 @@ Desktop.ini
 *.pem
 *.key
 *.cert
+
+# Tool caches
+.eslintcache

@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useMemo } from 'react'
-import { GraduationCap, Phone, Printer, QrCode } from 'lucide-react'
+import { GraduationCap, Phone, Printer } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { generateBarcodeSvg, generateStudentVerificationCode } from '@/lib/idCardBarcode'
 import type { Student, Class } from '@/types'

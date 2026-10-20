@@ -25,11 +25,12 @@ const checks = [
   {
     name: 'ESLint Static Analysis',
     command: 'npm run lint',
-    timeout: 60000
+    timeout: 60000,
+    retry: true
   },
   {
     name: 'Unit & Logic Tests (Node Test Runner)',
-    command: 'npx tsx --test tests/attendanceReminder.test.mjs tests/ethiopianDate.test.mjs tests/pushNotification.test.mjs tests/authRoleGuard.test.mjs tests/i18nTerminology.test.mjs tests/backupRestore.test.mjs tests/photoStorage.test.mjs tests/attendanceAggregation.test.mjs tests/superadminAnalytics.test.mjs tests/smsAdapter.test.mjs tests/idCardBarcode.test.mjs tests/offlineAttendance.test.mjs tests/offlineAttendancePayload.test.mjs tests/pwaOffline.test.mjs',
+    command: 'npx tsx --test tests/attendanceReminder.test.mjs tests/ethiopianDate.test.mjs tests/pushNotification.test.mjs tests/authRoleGuard.test.mjs tests/i18nTerminology.test.mjs tests/backupRestore.test.mjs tests/photoStorage.test.mjs tests/attendanceAggregation.test.mjs tests/superadminAnalytics.test.mjs tests/smsAdapter.test.mjs tests/idCardBarcode.test.mjs tests/offlineAttendance.test.mjs tests/offlineAttendancePayload.test.mjs tests/pwaOffline.test.mjs tests/offlineSyncResilience.test.mjs tests/authSessionRouting.test.mjs',
     timeout: 60000
   }
 ];
@@ -43,19 +44,35 @@ let hasFailure = false;
 for (const check of checks) {
   process.stdout.write(`Checking ${check.name}... `);
   const start = Date.now();
-  try {
-    execSync(check.command, {
-      stdio: 'pipe',
-      timeout: check.timeout,
-      encoding: 'utf-8'
-    });
-    const duration = ((Date.now() - start) / 1000).toFixed(2);
-    console.log(`${colors.green}[PASS]${colors.reset} (${duration}s)`);
-  } catch (error) {
-    const duration = ((Date.now() - start) / 1000).toFixed(2);
-    console.log(`${colors.red}[FAIL]${colors.reset} (${duration}s)`);
-    if (error.stdout) console.log(error.stdout.toString());
-    if (error.stderr) console.error(error.stderr.toString());
+  let lastError = null;
+  // A single bounded retry: a machine under load can push a single pass past the
+  // 60s thermal budget, and the second pass (warm ESLint cache) finishes fast.
+  const attempts = check.retry ? 2 : 1;
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    try {
+      execSync(check.command, {
+        stdio: 'pipe',
+        timeout: check.timeout,
+        encoding: 'utf-8'
+      });
+      const duration = ((Date.now() - start) / 1000).toFixed(2);
+      console.log(`${colors.green}[PASS]${colors.reset} (${duration}s${attempt > 1 ? ', retry' : ''})`);
+      lastError = null;
+      break;
+    } catch (error) {
+      lastError = error;
+      const timedOut = error.signal === 'SIGTERM' || error.code === 'ETIMEDOUT';
+      if (attempt < attempts && timedOut) {
+        console.log(`${colors.yellow}[TIMEOUT]${colors.reset} retrying once... `);
+        continue;
+      }
+      const duration = ((Date.now() - start) / 1000).toFixed(2);
+      console.log(`${colors.red}[FAIL]${colors.reset} (${duration}s)`);
+      if (error.stdout) console.log(error.stdout.toString());
+      if (error.stderr) console.error(error.stderr.toString());
+    }
+  }
+  if (lastError) {
     hasFailure = true;
     break;
   }

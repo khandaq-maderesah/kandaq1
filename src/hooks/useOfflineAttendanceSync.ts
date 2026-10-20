@@ -26,10 +26,33 @@ export function useOfflineAttendanceSync() {
     const queue = getOfflineAttendanceQueue()
     if (queue.length === 0) return
 
+    // One existence lookup per class/day instead of one per student, so a full
+    // roster syncs quickly even on a weak connection.
+    const groups = new Map<string, { classId: string; date: string }>()
+    for (const record of queue) {
+      const key = `${record.classId}|${record.date}`
+      if (!groups.has(key)) {
+        groups.set(key, { classId: record.classId, date: record.date })
+      }
+    }
+
+    const knownIds = new Set<string>()
+    const failedLookups = new Set<string>()
+    await Promise.all(
+      Array.from(groups.entries()).map(async ([key, group]) => {
+        try {
+          const existing = await rtdb.getAttendanceByClassAndDate(group.classId, group.date)
+          existing.forEach((row) => knownIds.add(row.id))
+        } catch {
+          failedLookups.add(key)
+        }
+      })
+    )
+
     setSyncing(true)
     try {
       const result = await syncOfflineAttendance(async (record: QueuedAttendanceRecord) => {
-        await rtdb.createAttendance(record.id, {
+        const payload = {
           id: record.id,
           studentId: record.studentId,
           classId: record.classId,
@@ -40,7 +63,17 @@ export function useOfflineAttendanceSync() {
           teacherId: record.teacherId,
           markedBy: record.markedBy,
           markedAt: new Date(record.timestamp).toISOString(),
-        })
+        }
+        // Update instead of overwrite when the record already exists in the cloud,
+        // so notes / excuse notes that were added in the app are preserved.
+        const alreadyExists = failedLookups.has(`${record.classId}|${record.date}`)
+          ? Boolean(await rtdb.getAttendance(record.id))
+          : knownIds.has(record.id)
+        if (alreadyExists) {
+          await rtdb.updateAttendance(record.id, payload)
+        } else {
+          await rtdb.createAttendance(record.id, payload)
+        }
       })
 
       if (result.synced > 0) {

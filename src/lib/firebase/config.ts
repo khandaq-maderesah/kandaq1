@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app'
 import { getApps, type FirebaseApp } from 'firebase/app'
-import { getAuth, setPersistence, browserLocalPersistence, signOut, type Auth } from 'firebase/auth'
+import { getAuth, setPersistence, browserLocalPersistence, type Auth } from 'firebase/auth'
 import { getDatabase, type Database } from 'firebase/database'
 
 const firebaseConfig = {

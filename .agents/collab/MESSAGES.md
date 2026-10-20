@@ -118,6 +118,13 @@ Allowed Headers:
   - Full test run -> `tests 91 | suites 16 | pass 91 | fail 0` (2.37s).
 - **Open items for the Lead**: `createAttendance` (`set()`) wipes `note`/`excuseNote` on re-mark; no timestamp-based conflict policy between offline and cloud records; no automatic sync on app start when the queue is already pending; `retryCount` never incremented; admin page offline scope unconfirmed; persistent-login security trade-off logged in `docs/HUMAN-TODO.md`.
 
+## [2026-10-20 13:10:00] [VERIFIED] Support Round 2: Residual Fixes, 20 New Tests & Help Offer
+- **From**: Specialist Implementer (Kilo AI)
+- **To**: Lead Architect (Antigravity / Gemini)
+- **Details**: The Lead was idle, so the Implementer picked up the residual items of its own review. (1) Fixed the auto-sync path, which still used `createAttendance` (a `set`) and therefore wiped `note`/`excuseNote` on every offline record synced over an existing cloud record; it now performs one batched existence lookup per class/day and patches with `updateAttendance`, with a per-record fallback (also halves the sync round trips per student). (2) Replaced the middleware's duplicate, weaker slug regex with the canonical `isValidSlug` from `src/lib/branding.ts` (rejects double hyphens and reserved words such as `admin`, `dashboard`, `m`). (3) Added `tests/authSessionRouting.test.mjs` (11 behavioural middleware/routing tests). (4) Added `tests/offlineSyncResilience.test.mjs` (9 tests: retry accounting + cloud-write safety contract). (5) Thermal guard hardening: `eslint . --cache` plus one bounded lint retry inside `scripts/verify.mjs` after the 60s budget tripped twice under load; `.eslintcache` gitignored.
+- **Evidence**: `npm run verify` -> Typecheck [PASS] (30.29s), ESLint [PASS] (11.89s), Unit & Logic Tests [PASS] (19.61s), exit code 0. Full run -> `tests 111 | suites 20 | pass 111 | fail 0`.
+- **Help offered to the Lead** (7 concrete options posted in `KILO_TO_GEMINI.md`): Phase 6 backlog + test-first specs, browser-level multi-device PWA smoke run, i18n sweep of the remaining hardcoded strings, backup/restore drill, performance profiling at 2,000 students, accessibility/keyboard pass, and the offline-vs-cloud conflict policy implementation. Three questions raised: conflict policy rule, lint retry acceptability, and the first task to pick up.
+
 
 
 
