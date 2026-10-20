@@ -17,6 +17,7 @@ import {
   Phone,
   PlayCircle,
   Plus,
+  Search,
   Upload,
   UserPlus,
   Users,
@@ -99,6 +100,8 @@ export default function SuperAdminPage() {
   const [suspendTarget, setSuspendTarget] = useState<School | null>(null)
   const [busyId, setBusyId] = useState<string | null>(null)
   const [openingId, setOpeningId] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'suspended'>('all')
 
   const schools = useMemo(
     () => [...(schoolsData.data ?? [])].sort((a, b) => a.name.localeCompare(b.name)),
@@ -118,9 +121,24 @@ export default function SuperAdminPage() {
 
   const stats = useMemo(() => {
     const suspended = schools.filter((s) => s.status === 'suspended').length
+    const active = schools.length - suspended
     const users = (usersData.data ?? []).filter((u) => u.schoolId).length
-    return { total: schools.length, active: schools.length - suspended, suspended, users }
+    const ustazes = (usersData.data ?? []).filter((u) => u.schoolId && u.role === 'teacher').length
+    return { total: schools.length, active, suspended, users, ustazes }
   }, [schools, usersData.data])
+
+  const filteredSchools = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase()
+    return schools.filter((s) => {
+      if (statusFilter !== 'all' && s.status !== statusFilter) return false
+      if (!q) return true
+      return (
+        (s.name && s.name.toLowerCase().includes(q)) ||
+        (s.address && s.address.toLowerCase().includes(q)) ||
+        (s.id && s.id.toLowerCase().includes(q))
+      )
+    })
+  }, [schools, searchQuery, statusFilter])
 
   const adminSchool = adminFor ? schools.find((s) => s.id === adminFor) : undefined
 
@@ -324,6 +342,44 @@ export default function SuperAdminPage() {
         />
       </div>
 
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="relative max-w-sm flex-1">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Search madrasas by name or city..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+        <div className="flex items-center gap-1.5">
+          <Button
+            type="button"
+            size="sm"
+            variant={statusFilter === 'all' ? 'default' : 'outline'}
+            onClick={() => setStatusFilter('all')}
+          >
+            All ({schools.length})
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant={statusFilter === 'active' ? 'default' : 'outline'}
+            onClick={() => setStatusFilter('active')}
+          >
+            Active ({stats.active})
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant={statusFilter === 'suspended' ? 'default' : 'outline'}
+            onClick={() => setStatusFilter('suspended')}
+          >
+            Suspended ({stats.suspended})
+          </Button>
+        </div>
+      </div>
+
       {loading ? (
         <div className="grid gap-4 md:grid-cols-2">
           {[0, 1, 2, 3].map((i) => (
@@ -342,9 +398,13 @@ export default function SuperAdminPage() {
             </Button>
           }
         />
+      ) : filteredSchools.length === 0 ? (
+        <div className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">
+          No madrasas match your search query or filter.
+        </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
-          {schools.map((school) => {
+          {filteredSchools.map((school) => {
             const members = usersBySchool.get(school.id) ?? []
             const admins = members.filter((u) => u.role === 'admin')
             const teacherCount = members.filter((u) => u.role === 'teacher').length
