@@ -26,6 +26,11 @@ const checks = [
     name: 'ESLint Static Analysis',
     command: 'npm run lint',
     timeout: 60000
+  },
+  {
+    name: 'Unit & Logic Tests (Node Test Runner)',
+    command: 'npx tsx --test tests/attendanceReminder.test.mjs tests/ethiopianDate.test.mjs tests/pushNotification.test.mjs',
+    timeout: 60000
   }
 ];
 

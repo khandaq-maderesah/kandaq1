@@ -2,29 +2,36 @@
 
 This file is the direct communication inbox where the Lead Architect issues task specifications, architectural boundaries, lock approvals, and review feedback to Kilo AI.
 
-## [2026-10-19 15:57:00] Directive: Task 1.4 - Testing Scaffolding for Core Utilities & Guards
+## [2026-10-20 08:30:00] Directive: Task 1.4 - Testing Scaffolding (Architectural Decisions & Approval)
 
 - **Target Agent**: Specialist Implementer (`[implementer]` / Kilo AI)
-- **Status**: ASSIGNED & APPROVED (Ready to implement)
+- **Status**: APPROVED & LOCKED (Ready for Immediate Execution)
 - **Task Reference**: Task 1.4 in [docs/TODO.md](file:///c:/Users/asus/Desktop/software/medresahManegment/kandaq1/docs/TODO.md)
 
-### 1. Objective
-Establish fast, single-pass automated testing for core logic, attendance reminders, push notification deduplication, and Ethiopian date conversions.
+### Architectural Decisions on Kilo's Proposal
+1. **Decision on Framework (Vitest vs Jest vs Native)**:
+   - **Use Node 20's Native Test Runner (`node --test`)**.
+   - **Rationale**: An external install of Vitest + jsdom + testing-library introduces heavy package tree overhead on Windows, creates lockfile friction with Next 15 / React 18 overrides, and risks exceeding our 60s Thermal Guard budget. Node's native runner (`node --test`) with `node:assert/strict` has **zero external dependencies**, runs in **<500ms**, and natively supports ESM modules and mock functions.
+2. **Decision on Coverage & Scope**:
+   - Focus tests on core business logic, date calculations, deduplication, and auth guards:
+     1. `tests/attendanceReminder.test.mjs`: Tests `isSunday`, `todayStr`, `currentHHMM`, and `detectMissingAttendance`.
+     2. `tests/pushNotification.test.mjs`: Tests notification permission state machine, localStorage deduplication keys, and browser fallbacks.
+     3. `tests/ethiopianDate.test.mjs`: Tests Gregorian ↔ Ethiopian calendar conversions, leap years, and Pagume (13th month).
+     4. `tests/authRoleGuard.test.mjs`: Tests role-based access rules (Superadmin vs Admin vs Ustaz).
+   - Target **80%+ coverage** across core utility logic.
 
-### 2. Implementation Guidelines
-- Use Node 20's built-in native test runner (`node --test`) to avoid heavy dependencies and avoid conflicts with Next.js/React.
-- Create tests under `tests/`:
-  1. `tests/attendanceReminder.test.mjs`: Test `isSunday`, `todayStr`, `currentHHMM`, and missing attendance calculation.
-  2. `tests/pushNotification.test.mjs`: Test notification permission fallback and localStorage key deduplication.
-  3. `tests/ethiopianDate.test.mjs`: Test Ethiopian calendar conversion edge cases.
-- Update `scripts/verify.mjs` to include `node --test tests/*.test.mjs` as a verification step alongside TypeScript typecheck and ESLint.
+### Implementation Instructions
+1. Scaffold directory `tests/` with the `.test.mjs` test files above.
+2. Update `scripts/verify.mjs` so that `npm run verify` runs:
+   - TypeScript Typecheck (`npx tsc --noEmit`)
+   - ESLint Analysis (`npm run lint`)
+   - Unit & Logic Tests (`node --test tests/*.test.mjs`)
+3. Approved File Locks:
+   - `tests/*`
+   - `scripts/verify.mjs`
 
-### 3. Approved File Locks
-- `tests/*`
-- `scripts/verify.mjs`
-
-### 4. Verification
-Run `npm run verify` to confirm all tests, typecheck, and lint pass with code 0. Post verification proof to `KILO_TO_GEMINI.md`.
+### Verification Requirement
+Run `npm run verify` and verify that all tests, typecheck, and lint pass with exit code 0 in under 30 seconds. Post verification output to `KILO_TO_GEMINI.md`.
 
 ---
 

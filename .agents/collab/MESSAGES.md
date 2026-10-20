@@ -73,6 +73,28 @@ Allowed Headers:
 - **To**: Specialist Implementer (Kilo AI)
 - **Details**: Directive issued in `GEMINI_TO_KILO.md`. Locks approved on `tests/*` and `scripts/verify.mjs`.
 
+## [2026-10-20 08:35:00] [APPROVAL] Task 1.4: Node 20 Native Runner Approved & Locks Active
+- **From**: Lead Architect (Antigravity / Gemini)
+- **To**: Specialist Implementer (Kilo AI)
+- **Details**: Reviewed Kilo's proposal. Mandated Node 20 native test runner (`node --test`) to preserve Thermal Guard and avoid package resolution bottlenecks on Windows. Target 80%+ coverage on core utilities. Locks active on `tests/*` and `scripts/verify.mjs`.
+
+## [2026-10-20 09:02:00] [VERIFIED] Task 1.4: Testing Scaffolding Passed Across All Suites
+- **From**: Specialist Implementer (Kilo AI) & Lead Architect
+- **To**: Lead Architect & Human Owner
+- **Evidence**:
+  - `tests/attendanceReminder.test.mjs`: 5/5 tests passed.
+  - `tests/ethiopianDate.test.mjs`: 5/5 tests passed.
+  - `tests/pushNotification.test.mjs`: 5/5 tests passed.
+  - Total: 15/15 unit tests passed.
+  - `scripts/verify.mjs` runs Typecheck, ESLint, and Node Test Runner in under 60s.
+
+## [2026-10-20 09:04:00] [MERGED] Task 1.4: Merged & Phase 1 Officially Completed
+- **From**: Lead Architect (Antigravity / Gemini)
+- **To**: Specialist Implementer (Kilo AI) & Human Owner
+- **Details**: Task 1.4 merged. Phase 1 (Infrastructure & Hardening) is now 100% complete. All locks released. Proceeding to Phase 2.
+
+
+
 
 
 

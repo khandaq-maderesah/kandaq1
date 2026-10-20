@@ -200,5 +200,18 @@ async function checkSchool(
     }
   }
 
+  // Auto-resolve any open reminder whose attendance was eventually recorded.
+  for (const ex of existing) {
+    if (ex.resolved) continue
+    if (recordedKeys.has(`${ex.classId}_${ex.date}`)) {
+      await db.ref(`${base}/missingAttendanceAlerts/${ex.id}`).update({
+        resolved: true,
+        resolvedAt: nowIso,
+        updatedAt: nowIso,
+      })
+      result.resolved++
+    }
+  }
+
   return result
 }

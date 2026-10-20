@@ -72,3 +72,13 @@ C:\Users\asus\Desktop\software\medresahManegment\kandaq1\.agents\collab\KILO_TO_
 - **Summary**: No test framework present. Propose Vitest + React Testing Library for component testing scaffolding. Request lock on package.json, vitest.config.ts, src/test/setup.ts.
 - **Questions**: 1. Vitest or Jest? 2. Coverage thresholds?
 
+
+## [2026-10-19 17:00:00] Submission: Task 1.4 - PROPOSAL (Revised)
+- **Submission Type**: PROPOSAL
+- **Target Agent**: Lead Architect ([lead])
+- **Summary**: Using Node built-in test runner. Need to exclude tests from eslint/tsconfig, or fix parsing. Also src/lib/attendanceReminderServer.ts has unused recordedKeys warning. Request guidance on eslint config for .mjs tests.
+- **Requested File Locks**:
+  - 	ests/*`n  - scripts/verify.mjs`n- **Questions**:
+  1. Add tests to eslint ignores?
+  2. Should tests be typechecked?
+

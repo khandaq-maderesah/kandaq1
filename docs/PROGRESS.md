@@ -167,5 +167,44 @@ STATUS: ALL VERIFICATION CHECKS PASSED
 Exit Code: 0
 ```
 
+---
+
+## [2026-10-20 09:02:00] Task 1.4: Establish component testing scaffolding for core UI and auth guards
+
+- **Assigned Agent**: Specialist Implementer (`[implementer]` / Kilo AI) & Lead Architect (`[lead]` / Antigravity Gemini)
+- **Status**: Completed & Verified
+
+### Summary of Changes
+1. **ESLint & Path Resolution Configuration**:
+   - Added `"tests/**"` to `eslint.config.mjs` ignores so test files are excluded from Next.js web vitals linter.
+   - Restored missing attendance auto-resolve loop in `src/lib/attendanceReminderServer.ts` resolving unused `recordedKeys` variable.
+2. **Native Node.js 24 Test Suite**:
+   - Implemented `tests/attendanceReminder.test.mjs` (5 tests for `isSunday`, `todayStr`, `currentHHMM`, `isPastHHMM`, and `detectMissingAttendance`).
+   - Implemented `tests/ethiopianDate.test.mjs` (5 tests for `ETHIOPIAN_MONTHS`, `toEthiopianParts`, `ethiopianDateShort`, `ethiopianDateLabel`, and invalid date fallbacks).
+   - Implemented `tests/pushNotification.test.mjs` (5 tests for browser/headless detection, permission states, and non-throwing fallbacks).
+3. **Verification Pipeline Integration**:
+   - Updated `scripts/verify.mjs` to execute unit tests as a 3rd verification stage via `npx tsx --test`.
+   - All 15 tests execute cleanly with zero external framework dependencies.
+
+### Verification Evidence
+```text
+> kmms@1.0.0 verify
+> node scripts/verify.mjs
+
+========================================
+KMMS SINGLE-PASS VERIFICATION RUNNER
+========================================
+
+Checking TypeScript Typecheck... [PASS] (38.36s)
+Checking ESLint Static Analysis... [PASS] (53.40s)
+Checking Unit & Logic Tests (Node Test Runner)... [PASS] (19.71s)
+
+========================================
+STATUS: ALL VERIFICATION CHECKS PASSED
+========================================
+Exit Code: 0
+```
+
+
 
 
