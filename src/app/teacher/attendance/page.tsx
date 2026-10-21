@@ -218,6 +218,11 @@ export default function TeacherAttendancePage() {
       toast.error(t('toast.nothingToSave'))
       return
     }
+    // Every student must be marked: a half-filled sheet is never saved.
+    if (counts.unmarked > 0) {
+      toast.error(t('toast.incomplete', { count: counts.unmarked }))
+      return
+    }
     if (!sessionsAnswered(answers)) {
       toast.error(t('sessions.required'))
       return
@@ -574,7 +579,7 @@ export default function TeacherAttendancePage() {
                       {dirty ? t('saveBar.unsaved') : t('saveBar.allSaved')}
                     </p>
                   </div>
-                  <Button size="lg" onClick={handleSave} disabled={saving || !dirty} className="shrink-0">
+                  <Button size="lg" onClick={handleSave} disabled={saving || !dirty || counts.unmarked > 0} className="shrink-0">
                     {saving ? <Loader2 className="animate-spin" /> : <Save />}
                     {t('saveBar.save')}
                   </Button>

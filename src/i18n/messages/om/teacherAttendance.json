@@ -41,7 +41,8 @@
     "nothingToSave": "Osoo hin olkaa'in dura yoo xiqqaate barataa tokko mallatteessaa.",
     "loadClassesFailed": "Kutaalee keessan fe'uun hin danda'amne.",
     "loadStudentsFailed": "Barattoota fe'uun hin danda'amne.",
-    "saveFailed": "Argama olkaa'uun hin danda'amne. Maaloo irra deebi'aa yaalaa."
+    "saveFailed": "Argama olkaa'uun hin danda'amne. Maaloo irra deebi'aa yaalaa.",
+    "incomplete": "Dura barattoota hunda mallatteessi: {count} ammas hin mallatteeffamne."
   },
   "offline": {
     "mode": "Galaa dhalaa",

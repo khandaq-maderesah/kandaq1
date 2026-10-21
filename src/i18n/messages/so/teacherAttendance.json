@@ -41,7 +41,8 @@
     "nothingToSave": "Fadlan calaamadee ugu yaraan hal arday ka hor intaadan kaydin.",
     "loadClassesFailed": "Fasalladaada lama soo rari karin.",
     "loadStudentsFailed": "Ardayda lama soo rari karin.",
-    "saveFailed": "Xaadiriska lama kaydin karin. Fadlan isku day mar kale."
+    "saveFailed": "Xaadiriska lama kaydin karin. Fadlan isku day mar kale.",
+    "incomplete": "Marka hore calaamadee arday kasta: {count} weli lama calaamadayn."
   },
   "offline": {
     "mode": "Xaalad la'aan internet ah",

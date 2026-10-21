@@ -41,7 +41,8 @@
     "nothingToSave": "Mark at least one student before saving.",
     "loadClassesFailed": "Could not load your classes.",
     "loadStudentsFailed": "Could not load the students.",
-    "saveFailed": "Could not save attendance. Please try again."
+    "saveFailed": "Could not save attendance. Please try again.",
+    "incomplete": "Mark every student first: {count} still unmarked."
   },
   "offline": {
     "mode": "Offline Mode",
