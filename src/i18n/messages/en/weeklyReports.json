@@ -13,8 +13,8 @@
     "quran": "Qur'an",
     "kitab": "Kitab",
     "review": "Review",
-    "held": "Held",
-    "notHeld": "Not held",
+    "held": "Done",
+    "notHeld": "Not done",
     "noLog": "No attendance taken"
   },
   "fields": {
