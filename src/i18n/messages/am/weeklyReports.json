@@ -1,0 +1,64 @@
+{
+  "title": "ሳምንታዊ ሪፖርት",
+  "description": "ክፍልዎ በዚህ ሳምንት የተማረውን በየቀኑ፣ ከቅዳሜ ግምገማ ጋር።",
+  "adminTitle": "ሳምንታዊ ሪፖርቶች",
+  "adminDescription": "የእያንዳንዱ ክፍል ሳምንታዊ ሪፖርት ከኡስታዙ፡ ማን አስገባ፣ ማን ገና ይቀራል።",
+  "week": "ሳምንት",
+  "weekOf": "የ{date} ሳምንት",
+  "class": "ክፍል",
+  "thisWeek": "ይህ ሳምንት",
+  "previousWeek": "ያለፈው ሳምንት",
+  "nextWeek": "ቀጣይ ሳምንት",
+  "sessions": {
+    "quran": "ቁርአን",
+    "kitab": "ኪታብ",
+    "review": "ግምገማ",
+    "held": "ተካሂዷል",
+    "notHeld": "አልተካሄደም",
+    "noLog": "ክትትል አልተወሰደም"
+  },
+  "fields": {
+    "quran": "የተሸፈነ ቁርአን",
+    "quranPlaceholder": "ለምሳሌ፡ አል-በቀራ 1-20",
+    "kitab": "ኪታብ",
+    "topic": "ርዕስ / ምዕራፍ",
+    "topicPlaceholder": "የተሸፈነው",
+    "review": "ሳምንታዊ ግምገማ",
+    "reviewPlaceholder": "ጥሩ የሄደው፣ ወደኋላ የቀረው፣ በቀጣይ ሳምንት የሚደገመው"
+  },
+  "status": {
+    "draft": "ረቂቅ",
+    "submitted": "ገብቷል",
+    "missing": "ይቀራል",
+    "locked": "{date} ገብቷል። ለማስተካከል አስተዳዳሪ እንዲከፍትልዎ ይጠይቁ።"
+  },
+  "actions": {
+    "saveDraft": "ረቂቅ አስቀምጥ",
+    "submit": "ሪፖርት አስገባ",
+    "unlock": "ለማስተካከል ክፈት",
+    "open": "ክፈት"
+  },
+  "toast": {
+    "saved": "ረቂቅ ተቀምጧል።",
+    "submitted": "ሳምንታዊ ሪፖርት ገብቷል።",
+    "unlocked": "ሪፖርቱ ተከፍቷል። ኡስታዙ እንደገና ማስተካከል ይችላል።",
+    "failed": "ሪፖርቱን ማስቀመጥ አልተቻለም። እባክዎ እንደገና ይሞክሩ።",
+    "missing": "እባክዎ ያሟሉ፡ {fields}"
+  },
+  "problems": {
+    "quran": "{day}፡ የተሸፈነ ቁርአን",
+    "kitab": "{day}፡ ኪታብ",
+    "topic": "{day}፡ ርዕስ",
+    "review": "ሳምንታዊ ግምገማ"
+  },
+  "empty": {
+    "noClasses": "እስካሁን የተመደቡልዎ ክፍሎች የሉም።",
+    "noReports": "ለዚህ ሳምንት እስካሁን ሳምንታዊ ሪፖርት የለም።",
+    "noClassesAdmin": "ንቁ ክፍሎች የሉም።"
+  },
+  "summary": {
+    "submitted": "{count} ገብቷል",
+    "missing": "{count} ይቀራል"
+  },
+  "by": "በ{name}"
+}

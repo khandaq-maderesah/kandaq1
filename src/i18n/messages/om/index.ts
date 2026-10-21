@@ -26,6 +26,7 @@ import teacherDashboard from './teacherDashboard.json'
 import teacherExams from './teacherExams.json'
 import teacherHistory from './teacherHistory.json'
 import teacherStudents from './teacherStudents.json'
+import weeklyReports from './weeklyReports.json'
 
 const messages = {
   adminAttendance: adminAttendance,
@@ -55,6 +56,7 @@ const messages = {
   teacherExams: teacherExams,
   teacherHistory: teacherHistory,
   teacherStudents: teacherStudents,
+  weeklyReports: weeklyReports,
 }
 
 export default messages

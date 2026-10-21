@@ -860,3 +860,38 @@ Live check against https://mms.khendeq.com
   /_next/static/css/b7de8d594f33a1c2.css contains the user-select / touch-callout rules
   /_next/static/chunks/app/layout-7464d7b1afd68923.js contains NativeFeel (selectstart/contextmenu)
 ```
+
+---
+
+## [2026-10-21] Task 6.4 - Daily session log + weekly report
+
+- **Implementer**: Claude (Fable 5.1), on the owner's direct request
+- **Owner decisions**: on the attendance page the Ustaz must say whether the Qur'an and the Kitab session were held (required, not optional; Saturday's second session is the Review); one weekly report per class, Monday to Saturday, kitab chosen from the admin-editable kitab list, Saturday review notes, submit locks it, admin can unlock; visible to admins, super admin and the class's own Ustaz; no admin comments.
+
+### What changed
+- `src/lib/weeklyReport.ts` (new, pure): weeks (Monday start, six days), ids, due week, required answers, submission rules (an entry is required only for sessions that were held; the review is always required).
+- `src/lib/offlineSessions.ts` (new): offline queue for the session log, synced by `useOfflineAttendanceSync` before the attendance marks.
+- `src/types/index.ts`: `SessionLog`, `WeeklyReport`, `WeeklyReportDay`. `src/lib/database/index.ts`: `setSessionLog`, `subscribeToSessions[ByTeacher]`, `saveWeeklyReport`, `updateWeeklyReport`, `subscribeToWeeklyReports[ByTeacher]`.
+- `database.rules.json`: `sessions` (members read; admin or the class's Ustaz writes) and `weeklyReports/{teacherId}` (admins read all; an Ustaz reads and writes only their own, never a submitted report).
+- `src/app/teacher/attendance/page.tsx`: "Sessions today" (Held / Not held for Qur'an and Kitab/Review), required before saving, saved online or queued offline with the marks.
+- `src/app/teacher/reports/page.tsx` (new): the weekly report (class, week navigation, six days with the session chips from the log, Qur'an covered, kitab + topic, Saturday review, Save draft / Submit, locked after submit).
+- `src/app/admin/weekly-reports/page.tsx` (new): per week, each class's status (submitted / draft / missing), open a report, unlock for correction. Nav badge with the number of missing reports for the due week.
+- `src/components/reports/WeeklyReportView.tsx` (new), `src/hooks/useWeeklyReports.ts` (new), nav items, worker precache routes, translations `weeklyReports.json` + `teacherAttendance.sessions` + nav keys in en/am/ar/om/so, `tests/weeklyReport.test.mjs` (12 tests).
+
+### Verification Evidence
+```text
+> npm run verify
+Checking TypeScript Typecheck... [PASS] (26.12s)
+Checking ESLint Static Analysis... [PASS] (7.85s)
+Checking Unit & Logic Tests (Node Test Runner)... [PASS] (6.88s)
+STATUS: ALL VERIFICATION CHECKS PASSED
+
+$ npx tsx --test tests/*.test.mjs
+tests 215 | pass 215 | fail 0
+
+$ npx next build
+✓ Compiled successfully / ✓ Generating static pages (30/30) / build exit: 0
+
+Backup before the rules change:
+$ firebase database:get / --project khendeq-8e17f -o backups/rtdb-2026-10-21-121543.json (159757 bytes)
+```

@@ -57,5 +57,15 @@
     "syncFailed": "Could not sync {count} record(s). Will retry automatically.",
     "reconnectedSyncing": "Internet reconnected. Syncing offline records...",
     "workingOffline": "No internet connection. Working in offline mode."
+  },
+  "sessions": {
+    "title": "Sessions today",
+    "hint": "Required: say whether each program was held.",
+    "quran": "Qur'an",
+    "kitab": "Kitab",
+    "review": "Review",
+    "held": "Held",
+    "notHeld": "Not held",
+    "required": "Please say whether the Qur'an and Kitab sessions were held."
   }
 }

@@ -208,6 +208,55 @@ export interface Attendance {
   excuseNote?: string
 }
 
+// ==================== Daily session log & weekly report ====================
+
+/** Whether each session of a class day was held. Saved with the attendance. */
+export interface SessionLog {
+  /** `${classId}_${date}` */
+  id: string
+  classId: string
+  date: string // YYYY-MM-DD
+  teacherId: string
+  /** The Qur'an session (first program) was held. */
+  quran: boolean
+  /** The Kitab session (second program; the weekly review on Saturday) was held. */
+  kitab: boolean
+  markedAt: string
+}
+
+export interface WeeklyReportDay {
+  /** What was covered in the Qur'an session, e.g. "Al-Baqarah 1-20". */
+  quran: string
+  /** The kitab taught (from the madrasa's kitab list). */
+  kitab: string
+  /** The chapter / topic covered in the kitab session. */
+  topic: string
+}
+
+export type WeeklyReportStatus = 'draft' | 'submitted'
+
+/** Stored at schoolData/{schoolId}/weeklyReports/{teacherId}/{classId}_{weekStart}. */
+export interface WeeklyReport {
+  /** `${classId}_${weekStart}` */
+  id: string
+  classId: string
+  className?: string
+  teacherId: string
+  teacherName?: string
+  /** Monday of the week (YYYY-MM-DD). */
+  weekStart: string
+  /** Keyed by date, Monday to Saturday. */
+  days: Record<string, WeeklyReportDay>
+  /** Saturday review notes: what went well, what is behind, what to repeat. */
+  review: string
+  status: WeeklyReportStatus
+  submittedAt?: string
+  /** Admin who unlocked a submitted report for correction. */
+  unlockedBy?: string
+  createdAt: string
+  updatedAt: string
+}
+
 // Form Types
 export interface CreateUserForm {
   email: string

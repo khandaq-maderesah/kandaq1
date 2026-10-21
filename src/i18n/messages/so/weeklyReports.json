@@ -1,0 +1,64 @@
+{
+  "title": "Warbixinta toddobaadlaha",
+  "description": "Waxa fasalkaagu bartay toddobaadkan, maalin maalin, iyo dib-u-eegista Sabtida.",
+  "adminTitle": "Warbixinnada toddobaadlaha",
+  "adminDescription": "Warbixinta toddobaadlaha ee fasal kasta oo ka timid ustaadkiisa: cidda gudbisay iyo cidda weli maqan.",
+  "week": "Toddobaad",
+  "weekOf": "Toddobaadka {date}",
+  "class": "Fasal",
+  "thisWeek": "Toddobaadkan",
+  "previousWeek": "Toddobaadkii hore",
+  "nextWeek": "Toddobaadka xiga",
+  "sessions": {
+    "quran": "Quraan",
+    "kitab": "Kitaab",
+    "review": "Dib-u-eegis",
+    "held": "Waa la qabtay",
+    "notHeld": "Lama qaban",
+    "noLog": "Xaadirin lama qaadin"
+  },
+  "fields": {
+    "quran": "Quraanka la daboolay",
+    "quranPlaceholder": "tus: Al-Baqarah 1-20",
+    "kitab": "Kitaab",
+    "topic": "Mawduuc / cutub",
+    "topicPlaceholder": "Waxa la daboolay",
+    "review": "Dib-u-eegista toddobaadka",
+    "reviewPlaceholder": "Waxa si fiican u socday, waxa dib u dhacay, waxa la soo celinayo toddobaadka xiga"
+  },
+  "status": {
+    "draft": "Qabyo",
+    "submitted": "La gudbiyay",
+    "missing": "Maqan",
+    "locked": "La gudbiyay {date}. Weydii maamulaha inuu u furo sixitaan."
+  },
+  "actions": {
+    "saveDraft": "Kaydi qabyada",
+    "submit": "Gudbi warbixinta",
+    "unlock": "U fur sixitaan",
+    "open": "Fur"
+  },
+  "toast": {
+    "saved": "Qabyada waa la kaydiyay.",
+    "submitted": "Warbixinta toddobaadlaha waa la gudbiyay.",
+    "unlocked": "Warbixinta waa la furay. Ustaadku mar kale wuu wax ka beddeli karaa.",
+    "failed": "Warbixinta lama kaydin karin. Fadlan mar kale isku day.",
+    "missing": "Fadlan dhammaystir: {fields}"
+  },
+  "problems": {
+    "quran": "{day}: Quraan",
+    "kitab": "{day}: kitaab",
+    "topic": "{day}: mawduuc",
+    "review": "dib-u-eegista toddobaadka"
+  },
+  "empty": {
+    "noClasses": "Weli fasal laguuma qoondayn.",
+    "noReports": "Toddobaadkan weli warbixin toddobaadle ma jirto.",
+    "noClassesAdmin": "Fasallo firfircoon ma jiraan."
+  },
+  "summary": {
+    "submitted": "{count} la gudbiyay",
+    "missing": "{count} maqan"
+  },
+  "by": "Waxaa qoray {name}"
+}

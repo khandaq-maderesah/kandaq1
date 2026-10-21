@@ -12,6 +12,7 @@ import {
   type CloudAttendanceMark,
   type QueuedAttendanceRecord,
 } from '@/lib/offlineAttendance'
+import { getOfflineSessionQueue, syncOfflineSessions } from '@/lib/offlineSessions'
 
 export function useOfflineAttendanceSync() {
   const t = useTranslations('teacherAttendance')
@@ -20,13 +21,15 @@ export function useOfflineAttendanceSync() {
   const [syncing, setSyncing] = useState(false)
 
   const refreshPending = useCallback(() => {
-    setPendingCount(getOfflineAttendanceQueue().length)
+    // Attendance marks plus the daily session logs saved with them.
+    setPendingCount(getOfflineAttendanceQueue().length + getOfflineSessionQueue().length)
   }, [])
 
   const triggerSync = useCallback(async () => {
     if (syncing || !isBrowserOnline()) return
     const queue = getOfflineAttendanceQueue()
-    if (queue.length === 0) return
+    const sessionQueue = getOfflineSessionQueue()
+    if (queue.length === 0 && sessionQueue.length === 0) return
 
     // One existence lookup per class/day instead of one per student, so a full
     // roster syncs quickly even on a weak connection.
@@ -55,6 +58,11 @@ export function useOfflineAttendanceSync() {
 
     setSyncing(true)
     try {
+      // The daily session logs (Qur'an / Kitab held) go first: they are tiny
+      // and the weekly report depends on them.
+      if (sessionQueue.length > 0) {
+        await syncOfflineSessions((log) => rtdb.setSessionLog(log))
+      }
       const result = await syncOfflineAttendance(async (record: QueuedAttendanceRecord) => {
         const payload = {
           id: record.id,
@@ -108,7 +116,7 @@ export function useOfflineAttendanceSync() {
 
   useEffect(() => {
     refreshPending()
-    if (isBrowserOnline() && getOfflineAttendanceQueue().length > 0) {
+    if (isBrowserOnline() && getOfflineAttendanceQueue().length + getOfflineSessionQueue().length > 0) {
       triggerSync()
     }
 

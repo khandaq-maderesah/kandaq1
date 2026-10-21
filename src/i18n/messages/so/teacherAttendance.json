@@ -57,5 +57,15 @@
     "syncFailed": "{count} diiwaangelin lama xiriirin karin. Waxaa la isku dayi doonaa.",
     "reconnectedSyncing": "Xiriirka internetku wuu soo noqday. Diiwaangelinta xaadirka ayaa isku darka jira...",
     "workingOffline": "Xiriir internet ma jiro. Waxaan ku shaqeeyaa xaalad offline ah."
+  },
+  "sessions": {
+    "title": "Kulammada maanta",
+    "hint": "Qasab: sheeg in barnaamij kasta la qabtay iyo in kale.",
+    "quran": "Quraan",
+    "kitab": "Kitaab",
+    "review": "Dib-u-eegis",
+    "held": "Waa la qabtay",
+    "notHeld": "Lama qaban",
+    "required": "Fadlan sheeg in kulammada Quraanka iyo Kitaabka la qabtay."
   }
 }

@@ -22,12 +22,23 @@ import { rtdb } from '@/lib/database'
 import { useAuth } from '@/context/AuthContext'
 import { useOfflineAttendanceSync } from '@/hooks/useOfflineAttendanceSync'
 import { useMyAttendance, useMyClasses, useStudentsOfClass } from '@/hooks/useTeacherData'
+import { useMySessionLogs } from '@/hooks/useWeeklyReports'
 import {
   enqueueOfflineAttendance,
   getOfflineAttendanceQueue,
   isBrowserOnline,
   type QueuedAttendanceRecord,
 } from '@/lib/offlineAttendance'
+import { enqueueOfflineSession, getOfflineSessionQueue } from '@/lib/offlineSessions'
+import {
+  answersFromLog,
+  EMPTY_SESSION_ANSWERS,
+  isSaturday,
+  sessionLogId,
+  sessionsAnswered,
+  type SessionAnswers,
+} from '@/lib/weeklyReport'
+import type { SessionLog } from '@/types'
 import { OfflineNotice } from '@/components/OfflineNotice'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -123,7 +134,23 @@ export default function TeacherAttendancePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [classId, date, students, liveAttendance, pendingCount])
 
-  const dirty = students.some((s) => statusMap[s.id] !== savedMap[s.id])
+  // The daily session log (was the Qur'an session held? the Kitab session?)
+  // is required with every attendance: the weekly report is built on it.
+  const liveSessions = useMySessionLogs()
+  const knownAnswers = useMemo<SessionAnswers>(() => {
+    if (!classId) return EMPTY_SESSION_ANSWERS
+    const id = sessionLogId(classId, date)
+    const log = getOfflineSessionQueue().find((l) => l.id === id) ?? (liveSessions ?? []).find((l) => l.id === id)
+    return answersFromLog(log)
+    // pendingCount changes whenever the device queue changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [classId, date, liveSessions, pendingCount])
+  const [answers, setAnswers] = useState<SessionAnswers>(EMPTY_SESSION_ANSWERS)
+
+  const dirty =
+    students.some((s) => statusMap[s.id] !== savedMap[s.id]) ||
+    answers.quran !== knownAnswers.quran ||
+    answers.kitab !== knownAnswers.kitab
   const dirtyRef = useRef(dirty)
   dirtyRef.current = dirty
   const scopeRef = useRef('')
@@ -137,7 +164,20 @@ export default function TeacherAttendancePage() {
     if (!scopeChanged && dirtyRef.current) return
     setStatusMap(knownMap)
     setSavedMap(knownMap)
-  }, [knownMap, classId, date])
+    setAnswers(knownAnswers)
+  }, [knownMap, knownAnswers, classId, date])
+
+  const secondSession = isSaturday(date) ? 'review' : 'kitab'
+
+  const sessionLog = (): SessionLog => ({
+    id: sessionLogId(classId, date),
+    classId,
+    date,
+    teacherId: user?.uid || '',
+    quran: answers.quran === true,
+    kitab: answers.kitab === true,
+    markedAt: new Date().toISOString(),
+  })
 
   const setStatus = (studentId: string, status: AttendanceStatus) => {
     setStatusMap((prev) => ({ ...prev, [studentId]: status }))
@@ -178,6 +218,10 @@ export default function TeacherAttendancePage() {
       toast.error(t('toast.nothingToSave'))
       return
     }
+    if (!sessionsAnswered(answers)) {
+      toast.error(t('sessions.required'))
+      return
+    }
     setSaving(true)
     const className = classes.find((c) => c.id === classId)?.name || ''
     const recordsToEnqueue: QueuedAttendanceRecord[] = []
@@ -202,6 +246,7 @@ export default function TeacherAttendancePage() {
         })
       })
       enqueueOfflineAttendance(recordsToEnqueue)
+      enqueueOfflineSession(sessionLog())
       setSavedMap(statusMap)
       refreshPending()
       setSaving(false)
@@ -211,6 +256,7 @@ export default function TeacherAttendancePage() {
 
     // If online, try direct cloud save with offline fallback
     try {
+      await rtdb.setSessionLog(sessionLog())
       await Promise.all(
         students.map(async (s) => {
           const status = statusMap[s.id]
@@ -258,6 +304,7 @@ export default function TeacherAttendancePage() {
         })
       })
       enqueueOfflineAttendance(recordsToEnqueue)
+      enqueueOfflineSession(sessionLog())
       setSavedMap(statusMap)
       refreshPending()
       toast.warning(t('offline.savedAfterConnectionLoss'))
@@ -371,6 +418,46 @@ export default function TeacherAttendancePage() {
               />
             </div>
           </div>
+
+          {/* Daily session log: required with every attendance */}
+          <section className="mt-4 rounded-xl border bg-card p-4 shadow-sm sm:p-5" aria-labelledby="sessions-title">
+            <h2 id="sessions-title" className="text-sm font-semibold text-foreground">
+              {t('sessions.title')}
+            </h2>
+            <p className="mt-0.5 text-xs text-muted-foreground">{t('sessions.hint')}</p>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              {(['quran', 'kitab'] as const).map((key) => {
+                const label = key === 'kitab' ? t(`sessions.${secondSession}`) : t('sessions.quran')
+                const value = answers[key]
+                return (
+                  <div key={key} role="radiogroup" aria-label={label} className="flex items-center justify-between gap-3 rounded-lg border bg-background px-3 py-2">
+                    <span className="text-sm font-medium text-foreground">{label}</span>
+                    <div className="grid grid-cols-2 gap-1">
+                      {([true, false] as const).map((held) => (
+                        <button
+                          key={String(held)}
+                          type="button"
+                          role="radio"
+                          aria-checked={value === held}
+                          onClick={() => setAnswers((a) => ({ ...a, [key]: held }))}
+                          className={cn(
+                            'min-h-9 rounded-md border px-3 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                            value === held
+                              ? held
+                                ? 'border-success bg-success text-success-foreground'
+                                : 'border-destructive bg-destructive text-destructive-foreground'
+                              : 'bg-card text-muted-foreground hover:bg-muted'
+                          )}
+                        >
+                          {held ? t('sessions.held') : t('sessions.notHeld')}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </section>
 
           {loadingStudents && offline ? (
             <OfflineNotice className="mt-6" />

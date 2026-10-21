@@ -1,0 +1,64 @@
+{
+  "title": "Weekly report",
+  "description": "What your class learned this week, day by day, with the Saturday review.",
+  "adminTitle": "Weekly reports",
+  "adminDescription": "Each class's weekly report from its Ustaz: who submitted, who is still missing.",
+  "week": "Week",
+  "weekOf": "Week of {date}",
+  "class": "Class",
+  "thisWeek": "This week",
+  "previousWeek": "Previous week",
+  "nextWeek": "Next week",
+  "sessions": {
+    "quran": "Qur'an",
+    "kitab": "Kitab",
+    "review": "Review",
+    "held": "Held",
+    "notHeld": "Not held",
+    "noLog": "No attendance taken"
+  },
+  "fields": {
+    "quran": "Qur'an covered",
+    "quranPlaceholder": "e.g. Al-Baqarah 1-20",
+    "kitab": "Kitab",
+    "topic": "Topic / chapter",
+    "topicPlaceholder": "What was covered",
+    "review": "Weekly review",
+    "reviewPlaceholder": "What went well, what is behind, what to repeat next week"
+  },
+  "status": {
+    "draft": "Draft",
+    "submitted": "Submitted",
+    "missing": "Missing",
+    "locked": "Submitted on {date}. Ask an admin to unlock it for a correction."
+  },
+  "actions": {
+    "saveDraft": "Save draft",
+    "submit": "Submit report",
+    "unlock": "Unlock for correction",
+    "open": "Open"
+  },
+  "toast": {
+    "saved": "Draft saved.",
+    "submitted": "Weekly report submitted.",
+    "unlocked": "Report unlocked. The Ustaz can edit it again.",
+    "failed": "Couldn't save the report. Please try again.",
+    "missing": "Please complete: {fields}"
+  },
+  "problems": {
+    "quran": "{day}: Qur'an covered",
+    "kitab": "{day}: kitab",
+    "topic": "{day}: topic",
+    "review": "weekly review"
+  },
+  "empty": {
+    "noClasses": "No classes assigned to you yet.",
+    "noReports": "No weekly reports for this week yet.",
+    "noClassesAdmin": "No active classes."
+  },
+  "summary": {
+    "submitted": "{count} submitted",
+    "missing": "{count} missing"
+  },
+  "by": "By {name}"
+}

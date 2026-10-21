@@ -3,8 +3,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { useLiveData } from '@/lib/dataStore'
-import { subscribeToChangeRequests, subscribeToMyChangeRequests } from '@/lib/database'
-import type { ChangeRequest } from '@/types'
+import { rtdb, subscribeToChangeRequests, subscribeToMyChangeRequests } from '@/lib/database'
+import { reportWeekFor } from '@/lib/weeklyReport'
+import { missingReportClasses, useAllWeeklyReports } from '@/hooks/useWeeklyReports'
+import type { ChangeRequest, Class } from '@/types'
 
 const SEEN_EVENT = 'khandaq:request-updates-seen'
 const seenKey = (uid: string) => `khandaq_requests_seen_${uid}`
@@ -43,11 +45,14 @@ export function useMyRequests(uid: string | undefined) {
  * Counters for the navigation badges:
  *  - pendingRequests: requests waiting for a school admin
  *  - requestUpdates:  a teacher's requests decided since they last looked
+ *  - missingReports:  classes whose weekly report for the due week is not submitted (admin)
  */
 export function useRequestBadges() {
   const { user, isAdmin, isTeacher } = useAuth()
   const schoolRequests = useSchoolRequests(isAdmin)
   const myRequests = useMyRequests(isTeacher ? user?.uid : undefined)
+  const classes = useLiveData<Class[]>(isAdmin ? 'classes' : null, (emit) => rtdb.subscribeToClasses(emit)).data
+  const weeklyReports = useAllWeeklyReports(isAdmin)
   const [seen, setSeen] = useState('')
 
   useEffect(() => {
@@ -64,7 +69,11 @@ export function useRequestBadges() {
       requestUpdates: (myRequests ?? []).filter(
         (r) => (r.status === 'approved' || r.status === 'rejected') && (r.reviewedAt ?? '') > seen
       ).length,
+      missingReports:
+        classes && weeklyReports
+          ? missingReportClasses(classes, weeklyReports, reportWeekFor(new Date().toISOString().slice(0, 10))).length
+          : 0,
     }),
-    [schoolRequests, myRequests, seen]
+    [schoolRequests, myRequests, seen, classes, weeklyReports]
   )
 }

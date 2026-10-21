@@ -2,7 +2,7 @@ import { app, db } from '@/lib/firebase/config'
 import { getStorage, ref as storageRef, uploadBytes, deleteObject } from 'firebase/storage'
 import { BRANDING_FILES, brandingStoragePath, type BrandingFile, type PublicBranding } from '@/lib/branding'
 import { ref, get as rtdbGet, set, update, remove, onValue, query, orderByChild, equalTo, startAt, type QueryConstraint, type Unsubscribe, type DataSnapshot } from 'firebase/database'
-import type { User, Class, Student, Attendance, AbsentAlert, MissingAttendanceAlert, Exam, Announcement, School, ChangeRequest, DeletionReason, StudentArchive } from '@/types'
+import type { User, Class, Student, Attendance, AbsentAlert, MissingAttendanceAlert, Exam, Announcement, School, ChangeRequest, DeletionReason, StudentArchive, SessionLog, WeeklyReport } from '@/types'
 import { withTimeout } from '@/lib/asyncUtils'
 import { normalizeRegistrationOptions, type RegistrationOptions } from '@/lib/registration'
 
@@ -746,6 +746,72 @@ export function subscribeToExams(cb: (exams: Exam[]) => void): Unsubscribe {
   })
 }
 
+// ==================== Daily session log & weekly reports ====================
+// sessions/{classId}_{date}: whether the Qur'an and Kitab sessions were held
+// (saved with the attendance). weeklyReports/{teacherId}/{classId}_{weekStart}:
+// the Ustaz's weekly report, nested by teacher so each Ustaz reads only theirs.
+
+export async function setSessionLog(log: SessionLog): Promise<void> {
+  await set(sref(`sessions/${log.id}`), defined(log))
+}
+
+export function subscribeToSessionsByTeacher(teacherId: string, cb: (logs: SessionLog[]) => void): Unsubscribe {
+  const q = query(sref('sessions'), orderByChild('teacherId'), equalTo(teacherId))
+  return onValue(q, (snap) => {
+    const out: SessionLog[] = []
+    snap.forEach((child) => {
+      out.push({ ...(child.val() as SessionLog), id: child.key as string })
+    })
+    cb(out)
+  })
+}
+
+/** Admin: every session log of the school. */
+export function subscribeToSessions(cb: (logs: SessionLog[]) => void): Unsubscribe {
+  return onValue(sref('sessions'), (snap) => {
+    const out: SessionLog[] = []
+    snap.forEach((child) => {
+      out.push({ ...(child.val() as SessionLog), id: child.key as string })
+    })
+    cb(out)
+  })
+}
+
+export async function saveWeeklyReport(report: WeeklyReport): Promise<void> {
+  await set(sref(`weeklyReports/${report.teacherId}/${report.id}`), defined(report))
+}
+
+export async function updateWeeklyReport(
+  teacherId: string,
+  reportId: string,
+  updates: Partial<WeeklyReport>
+): Promise<void> {
+  await update(sref(`weeklyReports/${teacherId}/${reportId}`), defined(updates))
+}
+
+export function subscribeToWeeklyReportsByTeacher(teacherId: string, cb: (reports: WeeklyReport[]) => void): Unsubscribe {
+  return onValue(sref(`weeklyReports/${teacherId}`), (snap) => {
+    const out: WeeklyReport[] = []
+    snap.forEach((child) => {
+      out.push({ ...(child.val() as WeeklyReport), id: child.key as string })
+    })
+    cb(out)
+  })
+}
+
+/** Admin: every weekly report of the school (all Ustazes). */
+export function subscribeToWeeklyReports(cb: (reports: WeeklyReport[]) => void): Unsubscribe {
+  return onValue(sref('weeklyReports'), (snap) => {
+    const out: WeeklyReport[] = []
+    snap.forEach((byTeacher) => {
+      byTeacher.forEach((child) => {
+        out.push({ ...(child.val() as WeeklyReport), id: child.key as string })
+      })
+    })
+    cb(out)
+  })
+}
+
 // ==================== Approval requests ====================
 // schoolData/{schoolId}/requests/{id}. Teachers create requests; admins
 // approve/reject. An approval applies the change, closes the request and
@@ -996,6 +1062,13 @@ export const rtdb = {
   subscribeToMissingAttendanceAlerts,
   subscribeToRegistrationOpen,
   subscribeToRegistrationOptions,
+  setSessionLog,
+  subscribeToSessionsByTeacher,
+  subscribeToSessions,
+  saveWeeklyReport,
+  updateWeeklyReport,
+  subscribeToWeeklyReportsByTeacher,
+  subscribeToWeeklyReports,
   saveRegistrationOptions,
   getSettings,
   getRegistrationOpen,

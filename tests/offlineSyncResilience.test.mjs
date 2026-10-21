@@ -177,9 +177,10 @@ describe('Cloud write safety during sync', () => {
   })
 
   test('a pending queue is synced automatically when the app opens online', () => {
+    // Attendance marks and the daily session logs queued with them.
     assert.match(
       hook,
-      /if \(isBrowserOnline\(\) && getOfflineAttendanceQueue\(\)\.length > 0\)/,
+      /if \(isBrowserOnline\(\) && getOfflineAttendanceQueue\(\)\.length \+ getOfflineSessionQueue\(\)\.length > 0\)/,
       'The hook must sync a pending queue on mount'
     )
   })

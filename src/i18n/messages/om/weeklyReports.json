@@ -1,0 +1,64 @@
+{
+  "title": "Gabaasa torbanii",
+  "description": "Kutaan kee torban kana waan barate guyyaa guyyaan, madaallii Sanbata wajjin.",
+  "adminTitle": "Gabaasota torbanii",
+  "adminDescription": "Gabaasa torbanii kutaa hundaa ustaazii isaa irraa: eenyu akka dhiyeesse, eenyu akka hafe.",
+  "week": "Torban",
+  "weekOf": "Torban {date}",
+  "class": "Kutaa",
+  "thisWeek": "Torban kana",
+  "previousWeek": "Torban darbe",
+  "nextWeek": "Torban itti aanu",
+  "sessions": {
+    "quran": "Qur'aana",
+    "kitab": "Kitaaba",
+    "review": "Madaallii",
+    "held": "Gaggeeffameera",
+    "notHeld": "Hin gaggeeffamne",
+    "noLog": "Hirmaannaan hin fudhatamne"
+  },
+  "fields": {
+    "quran": "Qur'aana baratame",
+    "quranPlaceholder": "fkn: Al-Baqarah 1-20",
+    "kitab": "Kitaaba",
+    "topic": "Mata duree / boqonnaa",
+    "topicPlaceholder": "Waan baratame",
+    "review": "Madaallii torbanii",
+    "reviewPlaceholder": "Waan gaarii ta'e, waan duubatti hafe, waan torban itti aanu irra deebi'amu"
+  },
+  "status": {
+    "draft": "Wixinee",
+    "submitted": "Dhiyaateera",
+    "missing": "Hafeera",
+    "locked": "{date} dhiyaateera. Sirreessuuf bulchaan akka banu gaafadhu."
+  },
+  "actions": {
+    "saveDraft": "Wixinee olkaa'i",
+    "submit": "Gabaasa dhiyeessi",
+    "unlock": "Sirreessuuf bani",
+    "open": "Bani"
+  },
+  "toast": {
+    "saved": "Wixineen olkaa'ameera.",
+    "submitted": "Gabaasni torbanii dhiyaateera.",
+    "unlocked": "Gabaasni banameera. Ustaaziin irra deebi'ee gulaaluu danda'a.",
+    "failed": "Gabaasa olkaa'uun hin danda'amne. Maaloo irra deebi'ii yaali.",
+    "missing": "Maaloo guutaa: {fields}"
+  },
+  "problems": {
+    "quran": "{day}: Qur'aana",
+    "kitab": "{day}: kitaaba",
+    "topic": "{day}: mata duree",
+    "review": "madaallii torbanii"
+  },
+  "empty": {
+    "noClasses": "Kutaan siif kenname hin jiru.",
+    "noReports": "Torban kanaaf gabaasni torbanii hin jiru.",
+    "noClassesAdmin": "Kutaan hojii irra jiru hin jiru."
+  },
+  "summary": {
+    "submitted": "{count} dhiyaateera",
+    "missing": "{count} hafeera"
+  },
+  "by": "{name} tiin"
+}

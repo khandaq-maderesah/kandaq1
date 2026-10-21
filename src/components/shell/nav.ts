@@ -11,6 +11,7 @@ import {
   Inbox,
   History,
   Building2,
+  CalendarCheck,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -29,6 +30,8 @@ export type NavLabel =
   | 'reports'
   | 'requests'
   | 'myRequests'
+  | 'weeklyReport'
+  | 'weeklyReports'
   | 'settings'
 
 export interface NavItem {
@@ -36,7 +39,7 @@ export interface NavItem {
   label: NavLabel
   icon: LucideIcon
   /** Which badge counter (if any) to show next to this item. */
-  badge?: 'pendingRequests' | 'requestUpdates'
+  badge?: 'pendingRequests' | 'requestUpdates' | 'missingReports'
   /** Match only the exact path (for section roots like /admin). */
   exact?: boolean
 }
@@ -64,6 +67,7 @@ export const adminNav: NavSection[] = [
       { href: '/admin/classes', label: 'classes', icon: SchoolIcon },
       { href: '/admin/attendance', label: 'attendance', icon: ClipboardCheck },
       { href: '/admin/exams', label: 'results', icon: FileText },
+      { href: '/admin/weekly-reports', label: 'weeklyReports', icon: CalendarCheck, badge: 'missingReports' },
       { href: '/admin/reports', label: 'reports', icon: BarChart3 },
     ],
   },
@@ -88,6 +92,7 @@ export const teacherNav: NavSection[] = [
       { href: '/teacher/students', label: 'students', icon: GraduationCap },
       { href: '/teacher/exams', label: 'exams', icon: FileText },
       { href: '/teacher/history', label: 'history', icon: History },
+      { href: '/teacher/reports', label: 'weeklyReport', icon: CalendarCheck },
       { href: '/teacher/requests', label: 'myRequests', icon: ClipboardList, badge: 'requestUpdates' },
     ],
   },

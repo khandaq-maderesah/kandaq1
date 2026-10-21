@@ -57,5 +57,15 @@
     "syncFailed": "{count} galmeen hin qabxii fuffamne. Ofiitti irra deebi'aa yaalaa.",
     "reconnectedSyncing": "Xiriirka interneetii deebii'ameera. Galmeen argamaa qabxii fufaa jira...",
     "workingOffline": "Xiriirka interneetii hin jiru. Galaa dhalaa keessa jirnaa jira."
+  },
+  "sessions": {
+    "title": "Kutaa yeroo har'aa",
+    "hint": "Dirqama: sagantaan hundi gaggeeffamuu isaa himi.",
+    "quran": "Qur'aana",
+    "kitab": "Kitaaba",
+    "review": "Madaallii",
+    "held": "Gaggeeffameera",
+    "notHeld": "Hin gaggeeffamne",
+    "required": "Maaloo kutaan Qur'aanaa fi Kitaabaa gaggeeffamuu isaanii himi."
   }
 }
