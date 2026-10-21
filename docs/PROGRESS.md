@@ -721,3 +721,58 @@ build exit: 0
 2. Turn the network off, close the app completely, reopen it: the Ustaz dashboard is the first thing on screen (no landing/sign-in flash).
 3. Tap Classes, Students, Exams, History, My requests and the three bells: each opens at once with the last known data and the "Offline" pill.
 4. Turn the network on: everything refreshes by itself; queued attendance syncs.
+
+---
+
+## [2026-10-21] Task 6.1 - Family Registration Form (paper sheet in the app)
+
+- **Implementer**: Claude (Fable 5.1), on the owner's direct request (photo of the paper form)
+- **Status**: IMPLEMENTED, VERIFIED, COMMITTED (`d6f7e51`); deploy evidence below
+- **Owner decisions**: required = student name/age/gender, student madrasa + Qur'an level, and for father and mother name, phone, occupation, education level, Qur'an level; everything else optional; address reduced to sub-city + kebele; father/mother phones fill the existing parent/alternative phone; declaration and signatures dropped; level fields are dropdowns the madrasa admin edits, with an "Other" choice.
+
+### What changed
+- `src/types/index.ts`: `GuardianInfo` and the new student fields (`phone`, `subCity`, `kebele`, `madrasaLevel`, `quranLevel`, `kitabs`, `lastYearLevel`, `lastYearResult`, `occupation`, `father`, `mother`).
+- `src/lib/registration.ts` (new, pure): form state, required-field rules, record mapping both ways (legacy students show their old parent phones under the parents), editable option lists (`settings/registrationOptions`) with defaults.
+- `src/components/students/FamilyInfoFields.tsx` (new): the family section used by both registration forms; `LevelSelect` dropdown with "Other…" free text; localized missing-field message.
+- `src/hooks/useRegistrationOptions.ts` (new): live, offline-cached lists. `src/lib/database/index.ts`: `subscribeToRegistrationOptions`, `saveRegistrationOptions`.
+- `src/app/teacher/classes/page.tsx`, `src/app/admin/students/page.tsx`: family fields replace the two phone inputs; age and gender required; validation before save.
+- `src/components/StudentDetailCard.tsx`: "Student details / Father / Mother" sections.
+- `src/app/admin/settings/page.tsx`: "Registration lists" card (one entry per line) for madrasa levels, Qur'an levels, education levels, results.
+- `database.rules.json`: `settings/registrationOptions` readable by every active member of the madrasa (Ustazes register students); writes stay admin-only.
+- `src/i18n/messages/*/registration.json`: new namespace in en/am/ar/om/so.
+- `tests/studentRegistration.test.mjs` (new, 14 tests) registered in `scripts/verify.mjs`.
+
+### Verification Evidence
+```text
+> npm run verify
+Checking TypeScript Typecheck... [PASS] (4.14s)
+Checking ESLint Static Analysis... [PASS] (3.24s)
+Checking Unit & Logic Tests (Node Test Runner)... [PASS] (7.56s)
+STATUS: ALL VERIFICATION CHECKS PASSED
+
+$ npx tsx --test tests/*.test.mjs
+tests 196 | pass 196 | fail 0
+
+$ node scripts/i18n-sync.mjs --check
+All translations complete.
+
+$ npx next build
+✓ Compiled successfully in 34.8s
+✓ Generating static pages (28/28)
+build exit: 0
+
+Backup before the rules change (scripts/backup-db.mjs needs SEED_ADMIN_PASSWORD, so taken with the CLI):
+$ firebase database:get / --project khendeq-8e17f -o backups/rtdb-2026-10-21-095800.json
+158273 bytes, nodes: publicBranding, schoolData (4 madrasas), schoolInfo, slugs, users
+```
+
+### Deployment Evidence
+```text
+$ firebase deploy --only database,apphosting --project khendeq-8e17f
++ database: rules for database khendeq-8e17f-default-rtdb released successfully
++ apphosting: Rollout for backend khendeq-medresah complete!
++ Deploy complete!
+
+Live check against https://mms.khendeq.com
+  live bundle /_next/static/chunks/8414-5029b26af534fcc8.js contains the registration code
+```
