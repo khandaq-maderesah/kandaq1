@@ -895,3 +895,15 @@ $ npx next build
 Backup before the rules change:
 $ firebase database:get / --project khendeq-8e17f -o backups/rtdb-2026-10-21-121543.json (159757 bytes)
 ```
+
+### Deployment Evidence
+```text
+$ firebase deploy --only database,apphosting --project khendeq-8e17f
++ database: rules for database khendeq-8e17f-default-rtdb released successfully
++ apphosting: Rollout for backend khendeq-medresah complete!
++ Deploy complete!
+
+Live check against https://mms.khendeq.com
+  /teacher/reports and /admin/weekly-reports answer 307 -> /login?from=... when signed out (routes live, protected)
+  sw.js?v=5 precache list contains /teacher/reports and /admin/weekly-reports
+```
