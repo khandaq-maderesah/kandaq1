@@ -79,11 +79,32 @@
   }
   html {
     -webkit-text-size-adjust: 100%;
+    /* App, not web page: no rubber-band bounce or pull-to-refresh of the whole page. */
+    overscroll-behavior: none;
   }
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-latin), var(--font-ethiopic), var(--font-arabic), ui-sans-serif, system-ui, sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
+    /* App, not web page: the interface (labels, buttons, lists, menus) is not
+       selectable text, a tap shows no grey flash, a long press opens no
+       callout, a double tap does not zoom. See NativeFeel.tsx for the
+       long-press menu. Typing fields opt back in below. */
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  input,
+  textarea,
+  select,
+  [contenteditable=""],
+  [contenteditable="true"],
+  .select-text {
+    -webkit-user-select: text;
+    user-select: text;
+    -webkit-touch-callout: default;
   }
   /* Script-specific fonts first so punctuation/digits match the script. */
   html[lang="am"] body {

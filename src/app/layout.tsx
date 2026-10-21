@@ -5,6 +5,7 @@ import { AuthProvider } from "@/context/AuthContext"
 import { InstallAppPrompt } from "@/components/InstallAppPrompt"
 import { NetworkStatus } from "@/components/NetworkStatus"
 import { ServiceWorkerRegistrar } from "@/components/ServiceWorkerRegistrar"
+import { NativeFeel } from "@/components/NativeFeel"
 import { I18nProvider } from "@/i18n/I18nProvider"
 import { LOCALE_STORAGE_KEY } from "@/i18n/config"
 import { ThemeProvider, THEME_STORAGE_KEY } from "@/components/theme/ThemeProvider"
@@ -100,6 +101,7 @@ export default function RootLayout({
           </I18nProvider>
         </ThemeProvider>
         <ServiceWorkerRegistrar />
+        <NativeFeel />
       </body>
     </html>
   )

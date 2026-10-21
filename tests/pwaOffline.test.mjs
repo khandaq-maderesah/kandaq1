@@ -812,3 +812,31 @@ describe('Offline boot repair: the app never shows an endless spinner', () => {
     }
   })
 })
+
+// ==================== App feel (not a web page) ====================
+
+describe('Installed app feels native, not like a web page', () => {
+  const css = read(path.join('src', 'app', 'globals.css'))
+  const layout = read(path.join('src', 'app', 'layout.tsx'))
+  const feel = read(path.join('src', 'components', 'NativeFeel.tsx'))
+
+  test('the interface is not selectable text and shows no tap highlight or callout', () => {
+    const body = css.match(/\n  body \{([\s\S]*?)\n  \}/)?.[1] ?? ''
+    assert.match(body, /user-select: none/)
+    assert.match(body, /-webkit-touch-callout: none/)
+    assert.match(body, /-webkit-tap-highlight-color: transparent/)
+    assert.match(body, /touch-action: manipulation/)
+    assert.match(css, /overscroll-behavior: none/)
+  })
+
+  test('typing fields and marked text stay selectable', () => {
+    assert.match(css, /input,\s*\n\s*textarea,\s*\n\s*select,[\s\S]*?\.select-text \{[\s\S]*?user-select: text/)
+  })
+
+  test('long presses open no browser menu outside typing fields', () => {
+    assert.match(layout, /<NativeFeel \/>/)
+    assert.match(feel, /addEventListener\('contextmenu'/)
+    assert.match(feel, /addEventListener\('selectstart'/)
+    assert.match(feel, /input, textarea, select, \[contenteditable=""\], \[contenteditable="true"\], \.select-text/)
+  })
+})

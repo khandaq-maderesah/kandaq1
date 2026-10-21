@@ -825,3 +825,23 @@ Live check against https://mms.khendeq.com
   live bundle /_next/static/chunks/8414-5c2a952159ffab01.js contains the kitabs list
   POST /api/admin/users without a body -> 400 (validation live)
 ```
+
+---
+
+## [2026-10-21] Task 6.3 - Native app feel (no text selection / long-press menus in the PWA)
+
+- **Implementer**: Claude (Fable 5.1), on the owner's direct request
+- **Owner report**: in the installed app every text was selectable; a tap or long press selected text and popped up the browser's search on it.
+- **What changed**: `src/app/globals.css` (body: `user-select: none`, no touch callout, transparent tap highlight, `touch-action: manipulation`; html: `overscroll-behavior: none`; inputs, textareas, selects, editable areas and `.select-text` stay selectable), `src/components/NativeFeel.tsx` (blocks the long-press context menu and text selection outside typing fields), mounted in `src/app/layout.tsx`; the student ID in the detail card is marked `select-text` so it can still be copied. Three tests in `tests/pwaOffline.test.mjs`.
+
+### Verification Evidence
+```text
+> npm run verify
+Checking TypeScript Typecheck... [PASS] (6.90s)
+Checking ESLint Static Analysis... [PASS] (4.79s)
+Checking Unit & Logic Tests (Node Test Runner)... [PASS] (11.79s)
+STATUS: ALL VERIFICATION CHECKS PASSED
+
+$ npx tsx --test tests/*.test.mjs
+tests 201 | pass 201 | fail 0
+```

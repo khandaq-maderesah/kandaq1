@@ -292,7 +292,7 @@ export function StudentDetailCard({ student, classes = [], users, onClose, onEdi
         <Field label={t('class')} value={className} />
         <Field label={t('section')} value={sectionLabel} />
         <Field label={t('parentLanguage')} value={languageLabel} />
-        <Field label={t('studentId')} value={<span className="font-mono text-xs">{student.id}</span>} />
+        <Field label={t('studentId')} value={<span className="select-text font-mono text-xs">{student.id}</span>} />
       </dl>
 
       <SectionHeading>{t('phoneHeading')}</SectionHeading>
