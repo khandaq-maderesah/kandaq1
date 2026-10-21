@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
+import { KitabsPicker } from '@/components/students/KitabsPicker'
 import {
   GUARDIAN_KEYS,
   REQUIRED_GUARDIAN_FIELDS,
@@ -198,12 +199,13 @@ function GuardianFields({
         required={required('quranLevel')}
       />
 
-      <LevelSelect
+      <KitabsPicker
         id={id('kitabs')}
         label={t('fields.kitabs')}
         value={value.kitabs}
         onChange={(v) => set('kitabs', v)}
         options={options.kitabs}
+        className="sm:col-span-2"
       />
 
       <label className="flex items-center gap-2 text-sm text-foreground sm:col-span-2">
@@ -269,7 +271,7 @@ export function FamilyInfoFields({
         className="sm:col-span-2"
       />
 
-      <LevelSelect
+      <KitabsPicker
         id={id('kitabs')}
         label={t('fields.kitabs')}
         value={value.kitabs}

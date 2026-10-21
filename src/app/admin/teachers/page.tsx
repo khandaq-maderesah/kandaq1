@@ -46,6 +46,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { apiErrorKey, TranslatedError } from '@/lib/apiErrors'
 import { LevelSelect } from '@/components/students/FamilyInfoFields'
+import { KitabsPicker } from '@/components/students/KitabsPicker'
 import { useRegistrationOptions } from '@/hooks/useRegistrationOptions'
 import { LOCALES, LOCALE_NAMES } from '@/i18n/config'
 
@@ -663,7 +664,7 @@ export default function TeachersPage() {
                     options={registrationOptions.quranLevels}
                     required
                   />
-                  <LevelSelect
+                  <KitabsPicker
                     id="user-kitabs"
                     label={tr('fields.kitabs')}
                     value={kitabs}
@@ -772,7 +773,7 @@ export default function TeachersPage() {
                     options={registrationOptions.quranLevels}
                     required
                   />
-                  <LevelSelect
+                  <KitabsPicker
                     id="details-kitabs"
                     label={tr('fields.kitabs')}
                     value={details.kitabs}

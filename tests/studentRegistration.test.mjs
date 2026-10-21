@@ -209,3 +209,24 @@ describe('Registration dropdown lists', () => {
     }
   })
 })
+
+describe('Kitabs: several per person, stored as one string', () => {
+  test('a stored "A, B" splits into choices and joins back cleanly', async () => {
+    const { parseKitabs, joinKitabs } = await import('../src/lib/registration.ts')
+    assert.deepEqual(parseKitabs("Qa'ida, Juz Amma ,  Safinat al-Najah"), ["Qa'ida", 'Juz Amma', 'Safinat al-Najah'])
+    assert.deepEqual(parseKitabs('A، B; a'), ['A', 'B'])
+    assert.deepEqual(parseKitabs(''), [])
+    assert.deepEqual(parseKitabs(undefined), [])
+    assert.equal(joinKitabs(['A', ' B ', 'a']), 'A, B')
+  })
+
+  test('every "kitabs studied before" field uses the multi-choice picker', () => {
+    const family = fs.readFileSync(path.resolve('src/components/students/FamilyInfoFields.tsx'), 'utf8')
+    assert.equal((family.match(/<KitabsPicker/g) || []).length, 2, 'student and guardians')
+    const teachers = fs.readFileSync(path.resolve('src/app/admin/teachers/page.tsx'), 'utf8')
+    assert.equal((teachers.match(/<KitabsPicker/g) || []).length, 2, 'ustaz create and edit')
+    const picker = fs.readFileSync(path.resolve('src/components/students/KitabsPicker.tsx'), 'utf8')
+    assert.match(picker, /role="checkbox"/)
+    assert.match(picker, /kitabsPicker\.otherPlaceholder/)
+  })
+})

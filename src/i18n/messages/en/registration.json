@@ -44,5 +44,11 @@
     "saved": "Registration lists saved.",
     "failed": "Couldn't save the lists. Please try again.",
     "kitabs": "Kitabs"
+  },
+  "kitabsPicker": {
+    "add": "Add",
+    "otherPlaceholder": "Another kitab not in the list",
+    "selected": "{count, plural, one {# kitab chosen} other {# kitabs chosen}}",
+    "none": "Tap the kitabs that apply."
   }
 }

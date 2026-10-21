@@ -44,5 +44,11 @@
     "saved": "Liisaska diiwaangelinta waa la kaydiyay.",
     "failed": "Liisaska lama kaydin karin. Fadlan mar kale isku day.",
     "kitabs": "Kutubta"
+  },
+  "kitabsPicker": {
+    "add": "Kudar",
+    "otherPlaceholder": "Kitaab kale oo aan liiska ku jirin",
+    "selected": "{count} kitaab la doortay",
+    "none": "Taabo kutubta khuseeya."
   }
 }

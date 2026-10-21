@@ -44,5 +44,11 @@
     "saved": "Tarreewwan galmee olkaa'amaniiru.",
     "failed": "Tarreewwan olkaa'uun hin danda'amne. Maaloo irra deebi'ii yaali.",
     "kitabs": "Kitaabota"
+  },
+  "kitabsPicker": {
+    "add": "Dabali",
+    "otherPlaceholder": "Kitaaba biraa tarree keessa hin jirre",
+    "selected": "Kitaaba {count} filatameera",
+    "none": "Kitaabota isaan ilaalan tuqi."
   }
 }

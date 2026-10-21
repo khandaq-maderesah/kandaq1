@@ -915,3 +915,10 @@ Live check against https://mms.khendeq.com
 - `src/app/teacher/attendance/page.tsx`: Save is disabled, and refused with "Mark every student first: {count} still unmarked" (en/am/ar/om/so), until every student of the class is marked.
 - English session answers read "Done / Not done" on the attendance page and the weekly report.
 - Verified: typecheck, lint, tests pass; deployed (`firebase deploy --only apphosting`, rollout complete) - commits `b68a66f`, `961d1e9`.
+
+---
+
+## [2026-10-21] Task 6.6 - "Kitabs studied before" allows several choices
+
+- `src/components/students/KitabsPicker.tsx` (new): tap several kitabs from the madrasa's list, add an unlisted one under "Other"; stored as one string ("A, B, C") so records, lists and exports keep working. Used for the student, the father, the mother (`FamilyInfoFields`) and the Ustaz create/edit forms (`admin/teachers`). `parseKitabs` / `joinKitabs` in `src/lib/registration.ts`; `registration.kitabsPicker.*` translations in en/am/ar/om/so; 2 new tests.
+- Verified: `npm run verify` PASS, 217 tests pass.

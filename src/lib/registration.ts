@@ -260,3 +260,24 @@ export function normalizeRegistrationOptions(raw: unknown): RegistrationOptions 
   }
   return out
 }
+
+// ==================== Kitabs (several per person) ====================
+
+/** "A, B, C" -> ['A', 'B', 'C'] (trimmed, no blanks, no duplicates). */
+export function parseKitabs(value: string | undefined): string[] {
+  if (!value) return []
+  const seen = new Set<string>()
+  const out: string[] = []
+  for (const raw of value.split(/\s*[,;،]\s*/)) {
+    const item = raw.trim()
+    if (!item || seen.has(item.toLowerCase())) continue
+    seen.add(item.toLowerCase())
+    out.push(item)
+  }
+  return out
+}
+
+/** ['A', 'B'] -> "A, B" (the stored form). */
+export function joinKitabs(list: string[]): string {
+  return parseKitabs(list.join(', ')).join(', ')
+}
