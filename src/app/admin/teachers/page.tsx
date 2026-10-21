@@ -45,6 +45,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { apiErrorKey, TranslatedError } from '@/lib/apiErrors'
+import { LevelSelect } from '@/components/students/FamilyInfoFields'
+import { useRegistrationOptions } from '@/hooks/useRegistrationOptions'
+import { LOCALES, LOCALE_NAMES } from '@/i18n/config'
 
 const PER_PAGE = 10
 
@@ -118,6 +121,16 @@ export default function TeachersPage() {
   const [password, setPassword] = useState('')
   const [role, setRole] = useState<StaffRole>('teacher')
   const [selectedClasses, setSelectedClasses] = useState<string[]>([])
+  // Ustaz details collected at creation: Qur'an level and kitabs come from
+  // the madrasa's editable registration lists; language is the app language.
+  const [quranLevel, setQuranLevel] = useState('')
+  const [kitabs, setKitabs] = useState('')
+  const [language, setLanguage] = useState('')
+  const registrationOptions = useRegistrationOptions()
+  const tr = useTranslations('registration')
+  // Edit the details (phone, Qur'an level, kitabs, language) of an existing user.
+  const [editingDetails, setEditingDetails] = useState<User | null>(null)
+  const [details, setDetails] = useState({ phone: '', quranLevel: '', kitabs: '', language: '' })
   const [saving, setSaving] = useState(false)
 
   // Assignment edit
@@ -199,6 +212,9 @@ export default function TeachersPage() {
     setPassword('')
     setRole('teacher')
     setSelectedClasses([])
+    setQuranLevel('')
+    setKitabs('')
+    setLanguage('')
     setCreateOpen(true)
   }
 
@@ -219,6 +235,9 @@ export default function TeachersPage() {
           password,
           phone: phone || undefined,
           role,
+          quranLevel: role === 'teacher' ? quranLevel || undefined : undefined,
+          kitabs: role === 'teacher' ? kitabs || undefined : undefined,
+          language: language || undefined,
           assignedClassIds: selectedClasses,
           schoolId: rtdb.getCurrentSchoolId(),
         }),
@@ -279,6 +298,37 @@ export default function TeachersPage() {
     }
   }
 
+  const startDetailsEdit = (u: User) => {
+    setEditingDetails(u)
+    setDetails({ phone: u.phone || '', quranLevel: u.quranLevel || '', kitabs: u.kitabs || '', language: u.language || '' })
+  }
+
+  const handleDetailsSave = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!editingDetails) return
+    setSaving(true)
+    try {
+      const idToken = await auth.currentUser?.getIdToken()
+      const res = await fetch(`/api/admin/users/${editingDetails.uid}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${idToken}`,
+        },
+        body: JSON.stringify({ details }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new TranslatedError(tc(`errors.api.${apiErrorKey(data)}`))
+      toast.success(t('toast.detailsSaved', { name: editingDetails.name }))
+      setEditingDetails(null)
+      await loadTeachers()
+    } catch (err) {
+      toast.error(errorText(err))
+    } finally {
+      setSaving(false)
+    }
+  }
+
   // Permanently delete a user via the admin-only server route.
   const confirmDelete = async () => {
     const u = deleting
@@ -331,6 +381,9 @@ export default function TeachersPage() {
             <Pencil /> {t('actions.editClasses')}
           </DropdownMenuItem>
         )}
+        <DropdownMenuItem onSelect={() => startDetailsEdit(u)}>
+          <Pencil /> {t('actions.editDetails')}
+        </DropdownMenuItem>
         <DropdownMenuItem onSelect={() => toggleStatus(u)}>
           <Power /> {u.status === 'active' ? t('actions.deactivate') : t('actions.activate')}
         </DropdownMenuItem>
@@ -445,6 +498,11 @@ export default function TeachersPage() {
                           {u.phone}
                         </p>
                       )}
+                      {(u.quranLevel || u.kitabs) && (
+                        <p className="truncate text-xs text-muted-foreground">
+                          {[u.quranLevel, u.kitabs].filter(Boolean).join(' · ')}
+                        </p>
+                      )}
                     </div>
                     {renderActions(u)}
                   </div>
@@ -483,6 +541,11 @@ export default function TeachersPage() {
                     <td className="font-medium text-foreground">
                       {u.name}
                       {u.uid === myUid && <span className="ms-1.5 text-xs font-normal text-muted-foreground">({t('you')})</span>}
+                      {(u.quranLevel || u.kitabs) && (
+                        <p className="text-xs font-normal text-muted-foreground">
+                          {[u.quranLevel, u.kitabs].filter(Boolean).join(' · ')}
+                        </p>
+                      )}
                     </td>
                     <td>
                       <span dir="ltr">{u.email}</span>
@@ -555,6 +618,7 @@ export default function TeachersPage() {
                   placeholder={t('form.phonePlaceholder')}
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
+                  required={role === 'teacher'}
                 />
               </div>
               <div className="space-y-2">
@@ -578,6 +642,38 @@ export default function TeachersPage() {
                 </Select>
                 <p className="text-xs text-muted-foreground">{t('form.roleHint')}</p>
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="user-language">{t('form.language')}</Label>
+                <Select id="user-language" value={language} onChange={(e) => setLanguage(e.target.value)} required={role === 'teacher'}>
+                  <option value="">{t('form.languagePlaceholder')}</option>
+                  {LOCALES.map((l) => (
+                    <option key={l} value={l}>
+                      {LOCALE_NAMES[l]}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+              {role === 'teacher' && (
+                <>
+                  <LevelSelect
+                    id="user-quranLevel"
+                    label={tr('fields.quranLevel')}
+                    value={quranLevel}
+                    onChange={setQuranLevel}
+                    options={registrationOptions.quranLevels}
+                    required
+                  />
+                  <LevelSelect
+                    id="user-kitabs"
+                    label={tr('fields.kitabs')}
+                    value={kitabs}
+                    onChange={setKitabs}
+                    options={registrationOptions.kitabs}
+                    required
+                    className="sm:col-span-2"
+                  />
+                </>
+              )}
             </div>
             {role === 'teacher' && (
               <div className="space-y-2">
@@ -627,6 +723,77 @@ export default function TeachersPage() {
               {t('assign.save')}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit details: phone, Qur'an level, kitabs, language */}
+      <Dialog open={!!editingDetails} onOpenChange={(o) => !o && setEditingDetails(null)}>
+        <DialogContent>
+          <form onSubmit={handleDetailsSave} className="grid gap-4">
+            <DialogHeader>
+              <DialogTitle>{t('details.title')}</DialogTitle>
+              <DialogDescription>{t('details.description', { name: editingDetails?.name ?? '' })}</DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="details-phone">{t('form.phone')}</Label>
+                <Input
+                  id="details-phone"
+                  type="tel"
+                  dir="ltr"
+                  placeholder={t('form.phonePlaceholder')}
+                  value={details.phone}
+                  onChange={(e) => setDetails({ ...details, phone: e.target.value })}
+                  required={editingDetails?.role === 'teacher'}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="details-language">{t('form.language')}</Label>
+                <Select
+                  id="details-language"
+                  value={details.language}
+                  onChange={(e) => setDetails({ ...details, language: e.target.value })}
+                >
+                  <option value="">{t('form.languagePlaceholder')}</option>
+                  {LOCALES.map((l) => (
+                    <option key={l} value={l}>
+                      {LOCALE_NAMES[l]}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+              {editingDetails?.role === 'teacher' && (
+                <>
+                  <LevelSelect
+                    id="details-quranLevel"
+                    label={tr('fields.quranLevel')}
+                    value={details.quranLevel}
+                    onChange={(v) => setDetails((d) => ({ ...d, quranLevel: v }))}
+                    options={registrationOptions.quranLevels}
+                    required
+                  />
+                  <LevelSelect
+                    id="details-kitabs"
+                    label={tr('fields.kitabs')}
+                    value={details.kitabs}
+                    onChange={(v) => setDetails((d) => ({ ...d, kitabs: v }))}
+                    options={registrationOptions.kitabs}
+                    required
+                    className="sm:col-span-2"
+                  />
+                </>
+              )}
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setEditingDetails(null)}>
+                {tc('actions.cancel')}
+              </Button>
+              <Button type="submit" disabled={saving}>
+                {saving && <Loader2 className="animate-spin" />}
+                {t('details.save')}
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
 

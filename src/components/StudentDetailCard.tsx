@@ -64,7 +64,6 @@ function FamilySection({ student }: { student: Student }) {
     <>
       <SectionHeading>{t('sections.student')}</SectionHeading>
       <dl className="mt-3 grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3">
-        <Field label={t('fields.madrasaLevel')} value={student.madrasaLevel} />
         <Field label={t('fields.quranLevel')} value={student.quranLevel} />
         <Field label={t('fields.kitabs')} value={student.kitabs} />
         <Field label={t('fields.lastYearLevel')} value={student.lastYearLevel} />

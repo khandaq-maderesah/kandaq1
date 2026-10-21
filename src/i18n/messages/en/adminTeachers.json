@@ -25,7 +25,8 @@
     "activate": "Activate",
     "delete": "Delete user",
     "more": "More actions for {name}",
-    "cannotDeleteSelf": "You can't delete your own account"
+    "cannotDeleteSelf": "You can't delete your own account",
+    "editDetails": "Edit details"
   },
   "form": {
     "createTitle": "Add user",
@@ -34,7 +35,7 @@
     "namePlaceholder": "For example: Ahmed Ali",
     "email": "Email",
     "emailPlaceholder": "ustaz@madrasa.com",
-    "phone": "Phone number (optional)",
+    "phone": "Phone number",
     "phonePlaceholder": "For example: 0911 223344",
     "password": "Temporary password",
     "passwordPlaceholder": "At least 6 characters",
@@ -43,7 +44,10 @@
     "classes": "Assign classes",
     "classesHint": "Choose the classes this ustaz teaches.",
     "noClassesYet": "No classes yet. Create classes first, then assign the ustaz.",
-    "create": "Create user"
+    "create": "Create user",
+    "language": "Language",
+    "languagePlaceholder": "Select language",
+    "ustazDetails": "Ustaz details"
   },
   "assign": {
     "title": "Edit assigned classes",
@@ -65,7 +69,8 @@
     "deactivated": "{name} was deactivated.",
     "deleted": "{name} was deleted.",
     "loadError": "Could not load users. Make sure the database rules are published, then refresh.",
-    "unexpectedResponse": "The server returned an unexpected response ({status}). Refresh the page and try again."
+    "unexpectedResponse": "The server returned an unexpected response ({status}). Refresh the page and try again.",
+    "detailsSaved": "Details updated for {name}."
   },
   "empty": {
     "title": "No users yet",
@@ -78,5 +83,10 @@
     "role": "Role",
     "phone": "Phone",
     "status": "Status"
+  },
+  "details": {
+    "title": "Edit details",
+    "description": "Phone, Qur'an level, kitabs and language of {name}.",
+    "save": "Save details"
   }
 }

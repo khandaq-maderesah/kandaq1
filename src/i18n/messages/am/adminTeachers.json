@@ -25,7 +25,8 @@
     "activate": "አንቃ",
     "delete": "ተጠቃሚ ሰርዝ",
     "more": "ለ{name} ተጨማሪ ተግባራት",
-    "cannotDeleteSelf": "የራስዎን መለያ መሰረዝ አይችሉም"
+    "cannotDeleteSelf": "የራስዎን መለያ መሰረዝ አይችሉም",
+    "editDetails": "መረጃ አስተካክል"
   },
   "form": {
     "createTitle": "ተጠቃሚ ጨምር",
@@ -34,7 +35,7 @@
     "namePlaceholder": "ለምሳሌ፦ አሕመድ ዓሊ",
     "email": "ኢሜይል",
     "emailPlaceholder": "teacher@school.com",
-    "phone": "ስልክ ቁጥር (አማራጭ)",
+    "phone": "ስልክ ቁጥር",
     "phonePlaceholder": "ለምሳሌ፦ 0911 223344",
     "password": "ጊዜያዊ የይለፍ ቃል",
     "passwordPlaceholder": "ቢያንስ 6 ፊደላት",
@@ -43,7 +44,10 @@
     "classes": "ክፍሎችን መድብ",
     "classesHint": "ይህ ኡስታዝ የሚያስተምራቸውን ክፍሎች ይምረጡ።",
     "noClassesYet": "እስካሁን ክፍል የለም። መጀመሪያ ክፍሎችን ይፍጠሩ፤ ከዚያ ኡስታዙን ይመድቡ።",
-    "create": "ተጠቃሚ ፍጠር"
+    "create": "ተጠቃሚ ፍጠር",
+    "language": "ቋንቋ",
+    "languagePlaceholder": "ቋንቋ ይምረጡ",
+    "ustazDetails": "የኡስታዝ መረጃ"
   },
   "assign": {
     "title": "የተመደቡ ክፍሎችን አስተካክል",
@@ -65,7 +69,8 @@
     "deactivated": "የ{name} መለያ ቦዝኗል።",
     "deleted": "የ{name} መለያ ተሰርዟል።",
     "loadError": "ተጠቃሚዎችን መጫን አልተቻለም። የዳታቤዝ ደንቦቹ መታተማቸውን (published) ያረጋግጡ፤ ከዚያ ገጹን ያድሱ።",
-    "unexpectedResponse": "አገልጋዩ ያልተጠበቀ ምላሽ ሰጥቷል ({status})። ገጹን አድሰው እንደገና ይሞክሩ።"
+    "unexpectedResponse": "አገልጋዩ ያልተጠበቀ ምላሽ ሰጥቷል ({status})። ገጹን አድሰው እንደገና ይሞክሩ።",
+    "detailsSaved": "የ{name} መረጃ ተዘምኗል።"
   },
   "empty": {
     "title": "እስካሁን ተጠቃሚ የለም",
@@ -78,5 +83,10 @@
     "role": "ሚና",
     "phone": "ስልክ",
     "status": "ሁኔታ"
+  },
+  "details": {
+    "title": "መረጃ አስተካክል",
+    "description": "የ{name} ስልክ፣ የቁርአን ደረጃ፣ ኪታብ እና ቋንቋ።",
+    "save": "መረጃውን አስቀምጥ"
   }
 }

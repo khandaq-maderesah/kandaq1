@@ -21,6 +21,10 @@ export interface User {
   assignedClassIds?: string[]
   /** Preferred UI language (en | am | ar | om | so). */
   language?: string
+  /** Ustaz: Qur'an level (from the madrasa's registration lists). */
+  quranLevel?: string
+  /** Ustaz: kitabs (books) studied before. */
+  kitabs?: string
 }
 
 // School Types

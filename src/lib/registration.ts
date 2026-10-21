@@ -30,7 +30,6 @@ export interface RegistrationDetails {
   phone: string
   subCity: string
   kebele: string
-  madrasaLevel: string
   quranLevel: string
   kitabs: string
   lastYearLevel: string
@@ -64,7 +63,6 @@ export function emptyRegistration(): RegistrationDetails {
     phone: '',
     subCity: '',
     kebele: '',
-    madrasaLevel: '',
     quranLevel: '',
     kitabs: '',
     lastYearLevel: '',
@@ -77,8 +75,8 @@ export function emptyRegistration(): RegistrationDetails {
 
 // ==================== Required fields ====================
 
-/** Student fields that must be filled (the student's academic status). */
-export const REQUIRED_STUDENT_FIELDS = ['madrasaLevel', 'quranLevel'] as const
+/** Student fields that must be filled (the student's academic status; the class says the madrasa level). */
+export const REQUIRED_STUDENT_FIELDS = ['quranLevel'] as const
 
 /** Parent fields that must be filled, for the father and the mother alike. */
 export const REQUIRED_GUARDIAN_FIELDS = ['name', 'phone', 'occupation', 'educationLevel', 'quranLevel'] as const
@@ -140,7 +138,6 @@ export function registrationToStudentFields(details: RegistrationDetails): Parti
     phone: clean(details.phone),
     subCity: clean(details.subCity),
     kebele: clean(details.kebele),
-    madrasaLevel: clean(details.madrasaLevel),
     quranLevel: clean(details.quranLevel),
     kitabs: clean(details.kitabs),
     lastYearLevel: clean(details.lastYearLevel),
@@ -187,7 +184,6 @@ export function registrationFromStudent(student: Student): RegistrationDetails {
     phone: student.phone ?? '',
     subCity: student.subCity ?? '',
     kebele: student.kebele ?? '',
-    madrasaLevel: student.madrasaLevel ?? '',
     quranLevel: student.quranLevel ?? '',
     kitabs: student.kitabs ?? '',
     lastYearLevel: student.lastYearLevel ?? '',
@@ -200,7 +196,7 @@ export function registrationFromStudent(student: Student): RegistrationDetails {
 
 // ==================== Dropdown lists ====================
 
-export const REGISTRATION_LIST_KEYS = ['madrasaLevels', 'quranLevels', 'educationLevels', 'results'] as const
+export const REGISTRATION_LIST_KEYS = ['madrasaLevels', 'quranLevels', 'kitabs', 'educationLevels', 'results'] as const
 export type RegistrationListKey = (typeof REGISTRATION_LIST_KEYS)[number]
 export type RegistrationOptions = Record<RegistrationListKey, string[]>
 
@@ -216,6 +212,16 @@ export const DEFAULT_REGISTRATION_OPTIONS: RegistrationOptions = {
     'Hifz - 15 Juz',
     'Hifz - 20 Juz',
     'Hifz - 30 Juz (Hafiz)',
+  ],
+  kitabs: [
+    "Qa'ida",
+    'Juz Amma',
+    'Safinat al-Najah',
+    "Matn Abi Shuja' (al-Ghayah wa al-Taqrib)",
+    "Al-Arba'in al-Nawawiyyah",
+    'Riyad al-Salihin',
+    'Al-Ajurrumiyyah',
+    'Alfiyyat Ibn Malik',
   ],
   educationLevels: ['None', 'Primary (1-8)', 'Secondary (9-12)', 'Certificate / Diploma', 'Degree', 'Masters or above'],
   results: ['Excellent', 'Very good', 'Good', 'Pass', 'Fail'],

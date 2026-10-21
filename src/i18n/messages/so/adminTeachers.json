@@ -25,7 +25,8 @@
     "activate": "Hawlgeli akoonka",
     "delete": "Tirtir isticmaalaha",
     "more": "Ficillo kale oo {name} ah",
-    "cannotDeleteSelf": "Ma tirtiri kartid akoonkaaga"
+    "cannotDeleteSelf": "Ma tirtiri kartid akoonkaaga",
+    "editDetails": "Wax ka beddel xogta"
   },
   "form": {
     "createTitle": "Ku dar isticmaale",
@@ -34,7 +35,7 @@
     "namePlaceholder": "Tusaale: Axmed Cali",
     "email": "Iimayl",
     "emailPlaceholder": "ustaz@madrasa.com",
-    "phone": "Lambarka taleefanka (ikhtiyaari)",
+    "phone": "Lambarka taleefanka",
     "phonePlaceholder": "Tusaale: 0911 223344",
     "password": "Furaha sirta ku meel gaarka ah",
     "passwordPlaceholder": "Ugu yaraan 6 xaraf",
@@ -43,7 +44,10 @@
     "classes": "Qoondee fasallada",
     "classesHint": "Dooro fasallada uu ustaadkani dhigo.",
     "noClassesYet": "Weli fasal ma jiro. Marka hore samee fasallo, kadibna u qoondee ustaadka.",
-    "create": "Samee isticmaale"
+    "create": "Samee isticmaale",
+    "language": "Luqadda",
+    "languagePlaceholder": "Dooro luqadda",
+    "ustazDetails": "Xogta ustaadka"
   },
   "assign": {
     "title": "Wax ka beddel fasallada loo qoondeeyay",
@@ -65,7 +69,8 @@
     "deactivated": "Akoonka {name} waa la joojiyay.",
     "deleted": "{name} waa la tirtiray.",
     "loadError": "Isticmaalayaasha lama soo rari karin. Hubi in xeerarka xogta (database rules) la daabacay, kadibna cusboonaysii bogga.",
-    "unexpectedResponse": "Server-ku wuxuu soo celiyay jawaab aan la filayn ({status}). Fadlan cusboonaysii bogga oo isku day mar kale."
+    "unexpectedResponse": "Server-ku wuxuu soo celiyay jawaab aan la filayn ({status}). Fadlan cusboonaysii bogga oo isku day mar kale.",
+    "detailsSaved": "Xogta {name} waa la cusboonaysiiyay."
   },
   "empty": {
     "title": "Weli isticmaale ma jiro",
@@ -78,5 +83,10 @@
     "role": "Doorka",
     "phone": "Taleefanka",
     "status": "Xaaladda"
+  },
+  "details": {
+    "title": "Wax ka beddel xogta",
+    "description": "Taleefanka, heerka Quraanka, kutubta iyo luqadda {name}.",
+    "save": "Kaydi xogta"
   }
 }

@@ -36,12 +36,13 @@
   "lists": {
     "title": "Tarreewwan galmee",
     "description": "Filannoowwan unka galmee barataa irratti dhiyaatan. Sarara tokko irratti tokko. Galmeessitoonni ammas \"Kan biraa\" filatanii gatii hin tarreeffamne barreessuu danda'u.",
-    "madrasaLevels": "Sadarkaalee madrasaa",
+    "madrasaLevels": "Sadarkaalee (sadarkaa bara darbeef)",
     "quranLevels": "Sadarkaalee Qur'aanaa",
     "educationLevels": "Sadarkaalee barnootaa (warra)",
     "results": "Bu'aawwan",
     "save": "Tarreewwan olkaa'i",
     "saved": "Tarreewwan galmee olkaa'amaniiru.",
-    "failed": "Tarreewwan olkaa'uun hin danda'amne. Maaloo irra deebi'ii yaali."
+    "failed": "Tarreewwan olkaa'uun hin danda'amne. Maaloo irra deebi'ii yaali.",
+    "kitabs": "Kitaabota"
   }
 }

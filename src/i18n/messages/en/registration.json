@@ -36,12 +36,13 @@
   "lists": {
     "title": "Registration lists",
     "description": "The choices offered in the student registration form. One entry per line. Registrars can still pick \"Other\" and type a value that is not listed.",
-    "madrasaLevels": "Madrasa levels",
+    "madrasaLevels": "Levels (for last year's level)",
     "quranLevels": "Qur'an levels",
     "educationLevels": "Education levels (parents)",
     "results": "Results",
     "save": "Save lists",
     "saved": "Registration lists saved.",
-    "failed": "Couldn't save the lists. Please try again."
+    "failed": "Couldn't save the lists. Please try again.",
+    "kitabs": "Kitabs"
   }
 }

@@ -24,7 +24,6 @@ const {
 
 function filledRegistration() {
   const r = emptyRegistration()
-  r.madrasaLevel = 'Level 2'
   r.quranLevel = 'Juz Amma'
   for (const who of ['father', 'mother']) {
     r[who].name = who === 'father' ? 'Ahmed Ali' : 'Fatima Hassan'
@@ -40,7 +39,6 @@ describe('Registration form: required fields', () => {
   test('an empty form is missing the student academic status and every required parent field', () => {
     const missing = missingRegistrationFields(emptyRegistration())
     assert.deepEqual(missing, [
-      'madrasaLevel',
       'quranLevel',
       'father.name',
       'father.phone',
@@ -110,11 +108,11 @@ describe('Registration form: mapping to the student record', () => {
 
   test('values are trimmed and ages become numbers', () => {
     const r = filledRegistration()
-    r.madrasaLevel = '  Level 2 '
+    r.quranLevel = '  Juz Amma '
     r.father.age = '45'
     r.mother.age = 'abc'
     const fields = registrationToStudentFields(r)
-    assert.equal(fields.madrasaLevel, 'Level 2')
+    assert.equal(fields.quranLevel, 'Juz Amma')
     assert.equal(fields.father.age, 45)
     assert.equal(fields.mother.age, undefined)
   })
@@ -129,7 +127,7 @@ describe('Registration form: mapping to the student record', () => {
     const fields = registrationToStudentFields(r)
     const student = { id: 's1', name: 'Test', classId: 'c1', isActive: true, createdAt: '', createdBy: '', updatedAt: '', ...fields }
     const back = registrationFromStudent(student)
-    assert.equal(back.madrasaLevel, 'Level 2')
+    assert.equal(back.quranLevel, 'Juz Amma')
     assert.equal(back.father.name, 'Ahmed Ali')
     assert.equal(back.father.sameAddress, true)
     assert.equal(back.mother.sameAddress, false)
@@ -159,7 +157,7 @@ describe('Registration form: mapping to the student record', () => {
 
 describe('Registration dropdown lists', () => {
   test('the lists cover the madrasa level, Qur\'an level, education level and result', () => {
-    assert.deepEqual(REGISTRATION_LIST_KEYS, ['madrasaLevels', 'quranLevels', 'educationLevels', 'results'])
+    assert.deepEqual(REGISTRATION_LIST_KEYS, ['madrasaLevels', 'quranLevels', 'kitabs', 'educationLevels', 'results'])
     for (const key of REGISTRATION_LIST_KEYS) assert.ok(DEFAULT_REGISTRATION_OPTIONS[key].length > 0)
   })
 
@@ -180,6 +178,26 @@ describe('Registration dropdown lists', () => {
     const block = rules.match(/"registrationOptions":\s*\{\s*"\.read":\s*"([^"]+)"/)
     assert.ok(block, 'settings/registrationOptions must carry its own .read rule')
     assert.doesNotMatch(block[1], /role'\)\.val\(\) === 'admin'/, 'the read rule must not be admin-only')
+  })
+
+  test('kitabs are chosen from the editable list with an "Other" entry, for students, parents and ustazes', () => {
+    const family = fs.readFileSync(path.resolve('src/components/students/FamilyInfoFields.tsx'), 'utf8')
+    assert.equal((family.match(/options=\{options\.kitabs\}/g) || []).length, 2, 'student and guardian kitabs use the list')
+    assert.match(family, /<option value=\{OTHER\}>/)
+    const teachers = fs.readFileSync(path.resolve('src/app/admin/teachers/page.tsx'), 'utf8')
+    assert.match(teachers, /options=\{registrationOptions\.kitabs\}/)
+    assert.match(teachers, /options=\{registrationOptions\.quranLevels\}/)
+  })
+
+  test('an ustaz account requires a phone and carries Qur\'an level, kitabs and language', () => {
+    const create = fs.readFileSync(path.resolve('src/app/api/admin/users/route.ts'), 'utf8')
+    assert.match(create, /role === 'teacher' && !text\(phone\)/)
+    assert.match(create, /record\.quranLevel = /)
+    assert.match(create, /record\.kitabs = /)
+    assert.match(create, /isLocale\(text\(language\)\)/)
+    const update = fs.readFileSync(path.resolve('src/app/api/admin/users/[uid]/route.ts'), 'utf8')
+    assert.match(update, /user\.role === 'teacher' && !phone/)
+    assert.match(update, /users\/\$\{uid\}\/kitabs/)
   })
 
   test('both registration forms use the shared family fields and validation', () => {

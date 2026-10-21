@@ -33,13 +33,14 @@ function RequiredMark() {
  * reveals a text box for a value that is not listed yet. The value is always
  * a plain string, so the record never depends on the list.
  */
-function LevelSelect({
+export function LevelSelect({
   id,
   label,
   value,
   onChange,
   options,
   required,
+  className,
 }: {
   id: string
   label: string
@@ -47,6 +48,7 @@ function LevelSelect({
   onChange: (value: string) => void
   options: string[]
   required?: boolean
+  className?: string
 }) {
   const t = useTranslations('registration')
   const listed = value !== '' && options.includes(value)
@@ -59,7 +61,7 @@ function LevelSelect({
   }, [value, options])
 
   return (
-    <div className="space-y-2">
+    <div className={cn('space-y-2', className)}>
       <Label htmlFor={id}>
         {label}
         {required && <RequiredMark />}
@@ -196,15 +198,13 @@ function GuardianFields({
         required={required('quranLevel')}
       />
 
-      <div className="space-y-2">
-        <Label htmlFor={id('kitabs')}>{t('fields.kitabs')}</Label>
-        <Input
-          id={id('kitabs')}
-          placeholder={t('placeholders.kitabs')}
-          value={value.kitabs}
-          onChange={(e) => set('kitabs', e.target.value)}
-        />
-      </div>
+      <LevelSelect
+        id={id('kitabs')}
+        label={t('fields.kitabs')}
+        value={value.kitabs}
+        onChange={(v) => set('kitabs', v)}
+        options={options.kitabs}
+      />
 
       <label className="flex items-center gap-2 text-sm text-foreground sm:col-span-2">
         <input
@@ -260,32 +260,23 @@ export function FamilyInfoFields({
       <SectionTitle title={t('sections.student')} hint={t('sections.studentHint')} />
 
       <LevelSelect
-        id={id('madrasaLevel')}
-        label={t('fields.madrasaLevel')}
-        value={value.madrasaLevel}
-        onChange={(v) => set('madrasaLevel', v)}
-        options={options.madrasaLevels}
-        required={required('madrasaLevel')}
-      />
-
-      <LevelSelect
         id={id('quranLevel')}
         label={t('fields.quranLevel')}
         value={value.quranLevel}
         onChange={(v) => set('quranLevel', v)}
         options={options.quranLevels}
         required={required('quranLevel')}
+        className="sm:col-span-2"
       />
 
-      <div className="space-y-2 sm:col-span-2">
-        <Label htmlFor={id('kitabs')}>{t('fields.kitabs')}</Label>
-        <Input
-          id={id('kitabs')}
-          placeholder={t('placeholders.kitabs')}
-          value={value.kitabs}
-          onChange={(e) => set('kitabs', e.target.value)}
-        />
-      </div>
+      <LevelSelect
+        id={id('kitabs')}
+        label={t('fields.kitabs')}
+        value={value.kitabs}
+        onChange={(v) => set('kitabs', v)}
+        options={options.kitabs}
+        className="sm:col-span-2"
+      />
 
       <LevelSelect
         id={id('lastYearLevel')}
@@ -352,7 +343,6 @@ export function useMissingFieldsMessage(): (keys: string[]) => string {
   const t = useTranslations('registration')
   // Only required fields can be missing, so only their labels are needed.
   const labelKey = {
-    madrasaLevel: 'fields.madrasaLevel',
     quranLevel: 'fields.quranLevel',
     name: 'fields.name',
     phone: 'fields.phone',

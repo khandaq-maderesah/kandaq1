@@ -526,11 +526,6 @@ export default function StudentsPage() {
     )
   }, [students, editingId, effectiveRoll, classId])
 
-  const sectionOptions = useMemo(
-    () => Array.from(new Set(classes.map((c) => c.section).filter((s): s is string => Boolean(s)))),
-    [classes]
-  )
-
   const handleClassChange = (nextClassId: string) => {
     setClassId(nextClassId)
     setSection(classById[nextClassId]?.section || '')
@@ -914,17 +909,6 @@ export default function StudentsPage() {
                       {c.name}
                       {c.section ? ` · ${c.section}` : ''}
                       {c.grade ? ` (${c.grade})` : ''}
-                    </option>
-                  ))}
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="st-section">{t('form.section')}</Label>
-                <Select id="st-section" value={section} onChange={(e) => setSection(e.target.value)}>
-                  <option value="">{t('form.sectionPlaceholder')}</option>
-                  {sectionOptions.map((s) => (
-                    <option key={s} value={s}>
-                      {s}
                     </option>
                   ))}
                 </Select>

@@ -8,6 +8,7 @@ import {
   HttpError,
 } from '@/lib/firebase/admin'
 import { getAuth } from 'firebase-admin/auth'
+import { isLocale } from '@/i18n/config'
 
 export const dynamic = 'force-dynamic'
 
@@ -33,7 +34,7 @@ export async function POST(request: Request) {
   } catch {
     return NextResponse.json({ ok: false, error: 'Invalid JSON body.', code: 'invalid' }, { status: 400 })
   }
-  const { name, email, password, phone, role, assignedClassIds } = body || {}
+  const { name, email, password, phone, role, assignedClassIds, quranLevel, kitabs, language } = body || {}
 
   if (!email || !password || !name || !role) {
     return NextResponse.json(
@@ -43,6 +44,14 @@ export async function POST(request: Request) {
   }
   if (!CREATABLE_ROLES.includes(role)) {
     return NextResponse.json({ ok: false, error: 'role must be admin or teacher.', code: 'invalid' }, { status: 400 })
+  }
+  const text = (value: unknown) => (typeof value === 'string' ? value.trim() : '')
+  // An ustaz must be reachable by phone (absence follow-up, reminders).
+  if (role === 'teacher' && !text(phone)) {
+    return NextResponse.json({ ok: false, error: 'phone is required for an ustaz.', code: 'invalid' }, { status: 400 })
+  }
+  if (text(language) && !isLocale(text(language))) {
+    return NextResponse.json({ ok: false, error: 'language is not supported.', code: 'invalid' }, { status: 400 })
   }
 
   try {
@@ -88,7 +97,10 @@ export async function POST(request: Request) {
       updatedAt: now,
       createdBy: caller.uid,
     }
-    if (phone) record.phone = phone
+    if (text(phone)) record.phone = text(phone)
+    if (text(quranLevel)) record.quranLevel = text(quranLevel)
+    if (text(kitabs)) record.kitabs = text(kitabs)
+    if (text(language)) record.language = text(language)
     if (classIds.length > 0) record.assignedClassIds = classIds
     await db.ref('users/' + uid).set(record)
 

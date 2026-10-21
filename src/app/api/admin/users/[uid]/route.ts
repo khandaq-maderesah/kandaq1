@@ -1,15 +1,20 @@
 import { NextResponse } from 'next/server'
 import { requireAdmin, assertCanManageSchool, errorStatus, errorCode, HttpError } from '@/lib/firebase/admin'
 import { getAuth } from 'firebase-admin/auth'
+import { isLocale } from '@/i18n/config'
 
 export const dynamic = 'force-dynamic'
 
 /**
  * PATCH /api/admin/users/[uid]
  *
- * Updates the classes assigned to an existing teacher. Class records and user
- * profiles are updated together so moving a teacher to a new grade does not
- * leave stale assignments behind. Only within the teacher's own school.
+ * Two shapes:
+ *  - { details: { phone, quranLevel, kitabs, language } } updates the profile
+ *    details an admin collects for an ustaz (phone stays required for one);
+ *  - { assignedClassIds } updates the classes assigned to an existing teacher.
+ *    Class records and user profiles are updated together so moving a teacher
+ *    to a new grade does not leave stale assignments behind.
+ * Only within the user's own school.
  */
 export async function PATCH(
   request: Request,
@@ -19,6 +24,43 @@ export async function PATCH(
   try {
     const { db, caller } = await requireAdmin(request)
     const body = await request.json()
+
+    if (body?.details && typeof body.details === 'object') {
+      const user = (await db.ref('users/' + uid).get()).val()
+      if (!user) {
+        return NextResponse.json({ ok: false, error: 'User not found.', code: 'not-found' }, { status: 404 })
+      }
+      assertCanManageSchool(caller, user.schoolId)
+      const text = (value: unknown) => (typeof value === 'string' ? value.trim() : '')
+      const details = body.details
+      const phone = text(details.phone)
+      if (user.role === 'teacher' && !phone) {
+        return NextResponse.json({ ok: false, error: 'phone is required for an ustaz.', code: 'invalid' }, { status: 400 })
+      }
+      const language = text(details.language)
+      if (language && !isLocale(language)) {
+        return NextResponse.json({ ok: false, error: 'language is not supported.', code: 'invalid' }, { status: 400 })
+      }
+      await db.ref().update({
+        [`users/${uid}/phone`]: phone || null,
+        [`users/${uid}/quranLevel`]: text(details.quranLevel) || null,
+        [`users/${uid}/kitabs`]: text(details.kitabs) || null,
+        [`users/${uid}/language`]: language || null,
+        [`users/${uid}/updatedAt`]: new Date().toISOString(),
+      })
+      await db
+        .ref(`schoolData/${user.schoolId}/audit/audit_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`)
+        .set({
+          actorId: caller.uid,
+          action: 'update',
+          entity: 'user',
+          entityId: uid,
+          details: `Updated details for ${user.name}`,
+          timestamp: new Date().toISOString(),
+        })
+      return NextResponse.json({ ok: true })
+    }
+
     const assignedClassIds = Array.isArray(body?.assignedClassIds)
       ? [...new Set<string>(body.assignedClassIds.filter((id: unknown): id is string => typeof id === 'string' && id.length > 0))]
       : null

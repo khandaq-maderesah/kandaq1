@@ -36,12 +36,13 @@
   "lists": {
     "title": "Liisaska diiwaangelinta",
     "description": "Doorashooyinka lagu soo bandhigo foomka diiwaangelinta ardayga. Hal shay sadar kasta. Diiwaangeliyayaashu weli waxay dooran karaan \"Kale\" oo qori karaan qiime aan liiska ku jirin.",
-    "madrasaLevels": "Heerarka madrasada",
+    "madrasaLevels": "Heerarka (heerka sannadkii hore)",
     "quranLevels": "Heerarka Quraanka",
     "educationLevels": "Heerarka waxbarashada (waalidka)",
     "results": "Natiijooyinka",
     "save": "Kaydi liisaska",
     "saved": "Liisaska diiwaangelinta waa la kaydiyay.",
-    "failed": "Liisaska lama kaydin karin. Fadlan mar kale isku day."
+    "failed": "Liisaska lama kaydin karin. Fadlan mar kale isku day.",
+    "kitabs": "Kutubta"
   }
 }

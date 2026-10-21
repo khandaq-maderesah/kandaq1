@@ -776,3 +776,37 @@ $ firebase deploy --only database,apphosting --project khendeq-8e17f
 Live check against https://mms.khendeq.com
   live bundle /_next/static/chunks/8414-5029b26af534fcc8.js contains the registration code
 ```
+
+---
+
+## [2026-10-21] Task 6.2 - Ustaz details on creation + registration form trims
+
+- **Implementer**: Claude (Fable 5.1), on the owner's direct request
+- **Status**: IMPLEMENTED, VERIFIED, COMMITTED; deploy evidence below
+- **Owner decisions**: creating an ustaz asks for phone (required), Qur'an level and kitabs (both from the madrasa-editable lists, with "Other…" for an unlisted value) and the ustaz's language; the kitabs list is editable by the madrasa admin and the super admin like the other lists; "Madrasa level" leaves the student form (the class says it) and the "Section" selector leaves the admin student form (it follows the class).
+
+### What changed
+- `src/lib/registration.ts`: new `kitabs` list (defaults included); `madrasaLevel` removed from the form (the list now only feeds "last year's level"); required student field is the Qur'an level.
+- `src/components/students/FamilyInfoFields.tsx`: `LevelSelect` exported and used for kitabs (student, father, mother).
+- `src/types/index.ts`: `User.quranLevel`, `User.kitabs`.
+- `src/app/api/admin/users/route.ts`: phone required for an ustaz; stores `quranLevel`, `kitabs`, `language` (validated against the app locales).
+- `src/app/api/admin/users/[uid]/route.ts`: `PATCH { details }` lets an admin edit phone, Qur'an level, kitabs and language of an existing user (phone stays required for an ustaz).
+- `src/app/admin/teachers/page.tsx`: create form (phone required for ustaz, language, Qur'an level, kitabs), "Edit details" action and dialog, details shown in the list.
+- `src/app/admin/students/page.tsx`: section selector removed (derived from the class). `src/components/StudentDetailCard.tsx`: madrasa level removed.
+- Translations (en/am/ar/om/so): `registration.lists.kitabs`, relabelled levels list, `adminTeachers.form.phone/language/...`, `adminTeachers.details.*`, `adminTeachers.actions.editDetails`, `adminTeachers.toast.detailsSaved`.
+- `tests/studentRegistration.test.mjs`: 16 tests (kitabs list, ustaz API contract).
+
+### Verification Evidence
+```text
+> npm run verify
+Checking TypeScript Typecheck... [PASS] (4.34s)
+Checking ESLint Static Analysis... [PASS] (2.73s)
+Checking Unit & Logic Tests (Node Test Runner)... [PASS] (5.14s)
+STATUS: ALL VERIFICATION CHECKS PASSED
+
+$ npx tsx --test tests/*.test.mjs
+tests 198 | pass 198 | fail 0
+
+$ node scripts/i18n-sync.mjs --check
+All translations complete.
+```
