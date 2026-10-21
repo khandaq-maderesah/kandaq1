@@ -845,3 +845,18 @@ STATUS: ALL VERIFICATION CHECKS PASSED
 $ npx tsx --test tests/*.test.mjs
 tests 201 | pass 201 | fail 0
 ```
+
+### Deployment Evidence
+```text
+$ npx next build
+✓ Compiled successfully in 49s
+✓ Generating static pages (28/28)
+
+$ firebase deploy --only apphosting --project khendeq-8e17f
++ apphosting: Rollout for backend khendeq-medresah complete!
++ Deploy complete!
+
+Live check against https://mms.khendeq.com
+  /_next/static/css/b7de8d594f33a1c2.css contains the user-select / touch-callout rules
+  /_next/static/chunks/app/layout-7464d7b1afd68923.js contains NativeFeel (selectstart/contextmenu)
+```
