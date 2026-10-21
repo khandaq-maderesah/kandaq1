@@ -907,3 +907,11 @@ Live check against https://mms.khendeq.com
   /teacher/reports and /admin/weekly-reports answer 307 -> /login?from=... when signed out (routes live, protected)
   sw.js?v=5 precache list contains /teacher/reports and /admin/weekly-reports
 ```
+
+---
+
+## [2026-10-21] Task 6.5 - Attendance must be complete; "Done / Not done" wording
+
+- `src/app/teacher/attendance/page.tsx`: Save is disabled, and refused with "Mark every student first: {count} still unmarked" (en/am/ar/om/so), until every student of the class is marked.
+- English session answers read "Done / Not done" on the attendance page and the weekly report.
+- Verified: typecheck, lint, tests pass; deployed (`firebase deploy --only apphosting`, rollout complete) - commits `b68a66f`, `961d1e9`.
