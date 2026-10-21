@@ -60,9 +60,41 @@ export interface Class {
 }
 
 // Student Types
+
+/** A parent (father/mother) as captured on the paper registration form. */
+export interface GuardianInfo {
+  name?: string
+  age?: number
+  phone?: string
+  subCity?: string
+  kebele?: string
+  /** General education level (e.g. Primary, Degree). */
+  educationLevel?: string
+  occupation?: string
+  quranLevel?: string
+  /** Kitabs (books) studied before. */
+  kitabs?: string
+}
+
 export interface Student {
   id: string
   name: string
+  // ---- Registration form (family information) ----
+  /** The student's own phone, if any. */
+  phone?: string
+  subCity?: string
+  kebele?: string
+  /** Madrasa education level at registration. */
+  madrasaLevel?: string
+  quranLevel?: string
+  /** Kitabs (books) studied before joining. */
+  kitabs?: string
+  lastYearLevel?: string
+  lastYearResult?: string
+  /** Occupation (adult students). */
+  occupation?: string
+  father?: GuardianInfo
+  mother?: GuardianInfo
   rollNumber?: string
   gender?: 'male' | 'female'
   age?: number

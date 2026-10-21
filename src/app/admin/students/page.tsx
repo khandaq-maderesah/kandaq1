@@ -58,6 +58,15 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { StudentPhotoCapture } from '@/components/StudentPhotoCapture'
+import { FamilyInfoFields, useMissingFieldsMessage } from '@/components/students/FamilyInfoFields'
+import { useRegistrationOptions } from '@/hooks/useRegistrationOptions'
+import {
+  emptyRegistration,
+  missingRegistrationFields,
+  registrationFromStudent,
+  registrationToStudentFields,
+  type RegistrationDetails,
+} from '@/lib/registration'
 import { StudentAvatar } from '@/components/StudentAvatar'
 import { StudentDetailCard } from '@/components/StudentDetailCard'
 import { AdminArchiveDialog } from '@/components/requests/StudentChangeDialogs'
@@ -456,8 +465,12 @@ export default function StudentsPage() {
   const [parentLanguage, setParentLanguage] = useState<ParentLanguage | ''>('')
   const [classId, setClassId] = useState('')
   const [section, setSection] = useState('')
-  const [parentPhone, setParentPhone] = useState('')
-  const [alternativePhone, setAlternativePhone] = useState('')
+  // Family information from the paper registration form (father, mother,
+  // address and academic status). The parents' phones fill parentPhone and
+  // alternativePhone on save.
+  const [family, setFamily] = useState<RegistrationDetails>(emptyRegistration)
+  const registrationOptions = useRegistrationOptions()
+  const missingFieldsMessage = useMissingFieldsMessage()
   const [saving, setSaving] = useState(false)
 
   const resetForm = () => {
@@ -469,8 +482,7 @@ export default function StudentsPage() {
     setParentLanguage('')
     setClassId(classFilter)
     setSection(classById[classFilter]?.section || '')
-    setParentPhone('')
-    setAlternativePhone('')
+    setFamily(emptyRegistration())
     setEditingId(null)
   }
 
@@ -487,8 +499,7 @@ export default function StudentsPage() {
     setAge(s.age ?? '')
     setParentLanguage(s.parentLanguage || '')
     setClassId(s.classId)
-    setParentPhone(s.parentPhone)
-    setAlternativePhone(s.alternativePhone || '')
+    setFamily(registrationFromStudent(s))
     setSection(s.section || '')
     setPhotoUrl(isEmbeddedPhoto(s.photoUrl) ? s.photoUrl || '' : '')
     setFormOpen(true)
@@ -528,6 +539,12 @@ export default function StudentsPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (rollTaken) return
+    // The family information the madrasa requires on every registration.
+    const missing = missingRegistrationFields(family)
+    if (missing.length > 0) {
+      toast.error(missingFieldsMessage(missing))
+      return
+    }
     setSaving(true)
     try {
       const cls = classById[classId]
@@ -540,8 +557,7 @@ export default function StudentsPage() {
         classId,
         className: cls?.name || '',
         section,
-        parentPhone,
-        alternativePhone,
+        ...registrationToStudentFields(family),
         updatedAt: new Date().toISOString(),
       }
       if (editingId) {
@@ -929,7 +945,7 @@ export default function StudentsPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="st-gender">{t('form.gender')}</Label>
-                <Select id="st-gender" value={gender} onChange={(e) => setGender(e.target.value)}>
+                <Select id="st-gender" value={gender} onChange={(e) => setGender(e.target.value)} required>
                   <option value="">{t('form.genderPlaceholder')}</option>
                   <option value="male">{tc('gender.male')}</option>
                   <option value="female">{tc('gender.female')}</option>
@@ -946,6 +962,7 @@ export default function StudentsPage() {
                   placeholder={t('form.agePlaceholder')}
                   value={age === '' ? '' : age}
                   onChange={(e) => setAge(e.target.value === '' ? '' : Number(e.target.value))}
+                  required
                 />
               </div>
               <div className="space-y-2">
@@ -963,37 +980,13 @@ export default function StudentsPage() {
                   ))}
                 </Select>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="st-phone">{t('form.parentPhone')}</Label>
-                <div className="relative">
-                  <Phone className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    id="st-phone"
-                    type="tel"
-                    dir="ltr"
-                    placeholder={t('form.parentPhonePlaceholder')}
-                    value={parentPhone}
-                    onChange={(e) => setParentPhone(e.target.value)}
-                    className="ps-9"
-                    required
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="st-alt">{t('form.altPhone')}</Label>
-                <div className="relative">
-                  <Phone className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    id="st-alt"
-                    type="tel"
-                    dir="ltr"
-                    placeholder={t('form.altPhonePlaceholder')}
-                    value={alternativePhone}
-                    onChange={(e) => setAlternativePhone(e.target.value)}
-                    className="ps-9"
-                  />
-                </div>
-              </div>
+              <FamilyInfoFields
+                key={editingId ?? 'new'}
+                idPrefix="st"
+                value={family}
+                onChange={setFamily}
+                options={registrationOptions}
+              />
             </div>
             <div className="space-y-2">
               <p className="text-sm font-medium text-foreground">{t('form.photo')}</p>

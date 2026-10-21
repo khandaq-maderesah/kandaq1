@@ -1,0 +1,47 @@
+{
+  "sections": {
+    "student": "Odeeffannoo barataa",
+    "studentHint": "Unka galmee irraa. Dirreewwan * qaban guutamuu qabu.",
+    "father": "Abbaa",
+    "mother": "Haadha",
+    "family": "Maatii"
+  },
+  "fields": {
+    "name": "Maqaa guutuu",
+    "age": "Umurii",
+    "phone": "Bilbila",
+    "subCity": "Kutaa magaalaa",
+    "kebele": "Ganda",
+    "madrasaLevel": "Sadarkaa barnoota madrasaa",
+    "quranLevel": "Sadarkaa Qur'aanaa",
+    "kitabs": "Kitaabota kanaan dura baratan",
+    "lastYearLevel": "Sadarkaa bara darbee",
+    "lastYearResult": "Bu'aa bara darbee",
+    "occupation": "Hojii",
+    "educationLevel": "Sadarkaa barnootaa"
+  },
+  "placeholders": {
+    "select": "Filadhu…",
+    "phone": "09XX XXX XXX",
+    "age": "fkn: 40",
+    "kitabs": "fkn: Qaa'idaa, Juz Amma",
+    "other": "Asitti barreessi"
+  },
+  "other": "Kan biraa…",
+  "required": "Dirqama",
+  "sameAddress": "Kutaa magaalaa fi ganda barataa wajjin wal fakkaata",
+  "errors": {
+    "missing": "Maaloo dirreewwan maatii dirqamaa guutaa: {fields}"
+  },
+  "lists": {
+    "title": "Tarreewwan galmee",
+    "description": "Filannoowwan unka galmee barataa irratti dhiyaatan. Sarara tokko irratti tokko. Galmeessitoonni ammas \"Kan biraa\" filatanii gatii hin tarreeffamne barreessuu danda'u.",
+    "madrasaLevels": "Sadarkaalee madrasaa",
+    "quranLevels": "Sadarkaalee Qur'aanaa",
+    "educationLevels": "Sadarkaalee barnootaa (warra)",
+    "results": "Bu'aawwan",
+    "save": "Tarreewwan olkaa'i",
+    "saved": "Tarreewwan galmee olkaa'amaniiru.",
+    "failed": "Tarreewwan olkaa'uun hin danda'amne. Maaloo irra deebi'ii yaali."
+  }
+}

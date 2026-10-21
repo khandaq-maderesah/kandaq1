@@ -3,9 +3,12 @@
 import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
-import { Loader2, Lock, Unlock, Save, UserPlus } from 'lucide-react'
+import { Loader2, Lock, Unlock, Save, UserPlus, ListChecks } from 'lucide-react'
 import { rtdb } from '@/lib/database'
 import { useAuth } from '@/context/AuthContext'
+import { useRegistrationOptions } from '@/hooks/useRegistrationOptions'
+import { parseListText, REGISTRATION_LIST_KEYS, type RegistrationListKey, type RegistrationOptions } from '@/lib/registration'
+import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -31,6 +34,38 @@ export default function SettingsPage() {
   const [formError, setFormError] = useState('')
   const [registrationOpen, setRegistrationOpen] = useState(true)
   const [savingRegister, setSavingRegister] = useState(false)
+
+  // The dropdown lists of the registration form, edited as "one entry per line".
+  const tr = useTranslations('registration')
+  const liveOptions = useRegistrationOptions()
+  const [listText, setListText] = useState<Record<RegistrationListKey, string> | null>(null)
+  const [savingLists, setSavingLists] = useState(false)
+  useEffect(() => {
+    // Fill the editor once from the live value; later edits are the admin's.
+    setListText((current) => {
+      if (current) return current
+      const next = {} as Record<RegistrationListKey, string>
+      for (const key of REGISTRATION_LIST_KEYS) next[key] = liveOptions[key].join('\n')
+      return next
+    })
+  }, [liveOptions])
+
+  const handleSaveLists = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!listText) return
+    setSavingLists(true)
+    try {
+      const options = {} as RegistrationOptions
+      for (const key of REGISTRATION_LIST_KEYS) options[key] = parseListText(listText[key])
+      await rtdb.saveRegistrationOptions(options)
+      toast.success(tr('lists.saved'))
+    } catch (err) {
+      console.error('Saving registration lists failed', err)
+      toast.error(tr('lists.failed'))
+    } finally {
+      setSavingLists(false)
+    }
+  }
 
   useEffect(() => {
     ;(async () => {
@@ -241,6 +276,40 @@ export default function SettingsPage() {
                 {registrationOpen ? t('registration.close') : t('registration.open')}
               </Button>
             </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <ListChecks className="h-5 w-5 text-primary" aria-hidden="true" />
+              {tr('lists.title')}
+            </CardTitle>
+            <CardDescription>{tr('lists.description')}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSaveLists} className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                {REGISTRATION_LIST_KEYS.map((key) => (
+                  <div key={key} className="space-y-2">
+                    <Label htmlFor={`list-${key}`}>{tr(`lists.${key}`)}</Label>
+                    <Textarea
+                      id={`list-${key}`}
+                      rows={6}
+                      value={listText?.[key] ?? ''}
+                      disabled={!listText}
+                      onChange={(e) => setListText((current) => (current ? { ...current, [key]: e.target.value } : current))}
+                    />
+                  </div>
+                ))}
+              </div>
+              <div className="flex justify-end">
+                <Button type="submit" disabled={savingLists || !listText}>
+                  {savingLists ? <Loader2 className="animate-spin" /> : <Save />}
+                  {savingLists ? tc('status.saving') : tr('lists.save')}
+                </Button>
+              </div>
+            </form>
           </CardContent>
         </Card>
 

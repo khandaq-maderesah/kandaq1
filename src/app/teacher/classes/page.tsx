@@ -21,6 +21,15 @@ import { rtdb } from '@/lib/database'
 import { useAuth } from '@/context/AuthContext'
 import { useMyRequests } from '@/hooks/useRequestBadges'
 import { useAllClasses, useMyClasses, useRegistrationOpen, useStudentsOfClasses } from '@/hooks/useTeacherData'
+import { useRegistrationOptions } from '@/hooks/useRegistrationOptions'
+import { FamilyInfoFields, useMissingFieldsMessage } from '@/components/students/FamilyInfoFields'
+import {
+  emptyRegistration,
+  missingRegistrationFields,
+  registrationFromStudent,
+  registrationToStudentFields,
+  type RegistrationDetails,
+} from '@/lib/registration'
 import { OfflineNotice } from '@/components/OfflineNotice'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -108,8 +117,12 @@ export default function TeacherClassesPage() {
   const [selectedClassId, setSelectedClassId] = useState('')
   const [name, setName] = useState('')
   const [gender, setGender] = useState('')
-  const [parentPhone, setParentPhone] = useState('')
-  const [alternativePhone, setAlternativePhone] = useState('')
+  // Family information from the paper registration form (father, mother,
+  // address and academic status). The parents' phones fill parentPhone and
+  // alternativePhone on save.
+  const [family, setFamily] = useState<RegistrationDetails>(emptyRegistration)
+  const registrationOptions = useRegistrationOptions()
+  const missingFieldsMessage = useMissingFieldsMessage()
   const [saving, setSaving] = useState(false)
   const [age, setAge] = useState<number | ''>('')
   const [photoUrl, setPhotoUrl] = useState('')
@@ -173,8 +186,7 @@ export default function TeacherClassesPage() {
     setAge('')
     setPhotoUrl('')
     setParentLanguage('')
-    setParentPhone('')
-    setAlternativePhone('')
+    setFamily(emptyRegistration())
     setRollNumber('')
     setEditingId(null)
     setEditingName('')
@@ -202,6 +214,12 @@ export default function TeacherClassesPage() {
       setFormError(t('toast.rollTaken', { roll: effectiveRoll }))
       return
     }
+    // The family information the madrasa requires on every registration.
+    const missing = missingRegistrationFields(family)
+    if (missing.length > 0) {
+      setFormError(missingFieldsMessage(missing))
+      return
+    }
     setSaving(true)
     setFormError('')
     try {
@@ -212,8 +230,7 @@ export default function TeacherClassesPage() {
         gender: (gender as 'male' | 'female') || undefined,
         age: age === '' ? undefined : age,
         parentLanguage: (parentLanguage as Student['parentLanguage']) || undefined,
-        parentPhone,
-        alternativePhone,
+        ...registrationToStudentFields(family),
         updatedAt: new Date().toISOString(),
       }
       if (editingId) {
@@ -267,8 +284,7 @@ export default function TeacherClassesPage() {
     setGender(s.gender || '')
     setAge(s.age ?? '')
     setParentLanguage(s.parentLanguage || '')
-    setParentPhone(s.parentPhone)
-    setAlternativePhone(s.alternativePhone || '')
+    setFamily(registrationFromStudent(s))
     setFormError('')
     // Photos live in their own node; fetch on demand for non-embedded records.
     let photo = s.photoUrl || ''
@@ -436,7 +452,7 @@ export default function TeacherClassesPage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="gender">{t('form.gender')}</Label>
-                  <Select id="gender" value={gender} onChange={(e) => setGender(e.target.value)}>
+                  <Select id="gender" value={gender} onChange={(e) => setGender(e.target.value)} required>
                     <option value="">{t('form.genderPlaceholder')}</option>
                     <option value="male">{tc('gender.male')}</option>
                     <option value="female">{tc('gender.female')}</option>
@@ -454,6 +470,7 @@ export default function TeacherClassesPage() {
                     placeholder={t('form.agePlaceholder')}
                     value={age === '' ? '' : age}
                     onChange={(e) => setAge(e.target.value === '' ? '' : Number(e.target.value))}
+                    required
                   />
                 </div>
 
@@ -487,30 +504,13 @@ export default function TeacherClassesPage() {
                   </p>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="pPhone">{t('form.parentPhone')}</Label>
-                  <Input
-                    id="pPhone"
-                    type="tel"
-                    dir="ltr"
-                    placeholder={t('form.phonePlaceholder')}
-                    value={parentPhone}
-                    onChange={(e) => setParentPhone(e.target.value)}
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="altPhone">{t('form.alternativePhone')}</Label>
-                  <Input
-                    id="altPhone"
-                    type="tel"
-                    dir="ltr"
-                    placeholder={t('form.phonePlaceholder')}
-                    value={alternativePhone}
-                    onChange={(e) => setAlternativePhone(e.target.value)}
-                  />
-                </div>
+                <FamilyInfoFields
+                  key={editingId ?? 'new'}
+                  idPrefix="tc"
+                  value={family}
+                  onChange={setFamily}
+                  options={registrationOptions}
+                />
 
                 <div className="space-y-2 sm:col-span-2">
                   <Label>{t('form.photo')}</Label>

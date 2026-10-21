@@ -1,0 +1,47 @@
+{
+  "sections": {
+    "student": "Xogta ardayga",
+    "studentHint": "Ka timid foomka diiwaangelinta. Goobaha calaamadda * leh waa qasab.",
+    "father": "Aabbe",
+    "mother": "Hooyo",
+    "family": "Qoyska"
+  },
+  "fields": {
+    "name": "Magaca oo dhammaystiran",
+    "age": "Da'da",
+    "phone": "Taleefan",
+    "subCity": "Magaalo-hoosaad",
+    "kebele": "Qebele",
+    "madrasaLevel": "Heerka madrasada",
+    "quranLevel": "Heerka Quraanka",
+    "kitabs": "Kutubta hore loo bartay",
+    "lastYearLevel": "Heerka sannadkii hore",
+    "lastYearResult": "Natiijada sannadkii hore",
+    "occupation": "Shaqada",
+    "educationLevel": "Heerka waxbarashada"
+  },
+  "placeholders": {
+    "select": "Dooro…",
+    "phone": "09XX XXX XXX",
+    "age": "tus: 40",
+    "kitabs": "tus: Qaacida, Juz Camma",
+    "other": "Halkan ku qor"
+  },
+  "other": "Kale…",
+  "required": "Qasab",
+  "sameAddress": "Isla magaalo-hoosaadka iyo qebelaha ardayga",
+  "errors": {
+    "missing": "Fadlan buuxi goobaha qoyska ee qasabka ah: {fields}"
+  },
+  "lists": {
+    "title": "Liisaska diiwaangelinta",
+    "description": "Doorashooyinka lagu soo bandhigo foomka diiwaangelinta ardayga. Hal shay sadar kasta. Diiwaangeliyayaashu weli waxay dooran karaan \"Kale\" oo qori karaan qiime aan liiska ku jirin.",
+    "madrasaLevels": "Heerarka madrasada",
+    "quranLevels": "Heerarka Quraanka",
+    "educationLevels": "Heerarka waxbarashada (waalidka)",
+    "results": "Natiijooyinka",
+    "save": "Kaydi liisaska",
+    "saved": "Liisaska diiwaangelinta waa la kaydiyay.",
+    "failed": "Liisaska lama kaydin karin. Fadlan mar kale isku day."
+  }
+}

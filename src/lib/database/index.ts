@@ -4,6 +4,7 @@ import { BRANDING_FILES, brandingStoragePath, type BrandingFile, type PublicBran
 import { ref, get as rtdbGet, set, update, remove, onValue, query, orderByChild, equalTo, startAt, type QueryConstraint, type Unsubscribe, type DataSnapshot } from 'firebase/database'
 import type { User, Class, Student, Attendance, AbsentAlert, MissingAttendanceAlert, Exam, Announcement, School, ChangeRequest, DeletionReason, StudentArchive } from '@/types'
 import { withTimeout } from '@/lib/asyncUtils'
+import { normalizeRegistrationOptions, type RegistrationOptions } from '@/lib/registration'
 
 /**
  * One-shot reads never hang.
@@ -501,6 +502,16 @@ export function subscribeToRegistrationOpen(cb: (open: boolean) => void): Unsubs
   return onValue(sref('settings/registrationOpen'), (snap) => cb(!snap.exists() || String(snap.val()) !== 'false'))
 }
 
+/** Live dropdown lists of the registration form (defaults for anything unset). */
+export function subscribeToRegistrationOptions(cb: (options: RegistrationOptions) => void): Unsubscribe {
+  return onValue(sref('settings/registrationOptions'), (snap) => cb(normalizeRegistrationOptions(snap.val())))
+}
+
+/** Admin: replaces the registration dropdown lists. */
+export async function saveRegistrationOptions(options: RegistrationOptions): Promise<void> {
+  await set(sref('settings/registrationOptions'), options)
+}
+
 export async function updateSettings(data: Record<string, string>): Promise<void> {
   await Promise.all(
     Object.entries(data).map(([k, v]) => set(sref(`settings/${k}`), v ?? ''))
@@ -984,6 +995,8 @@ export const rtdb = {
   updateMissingAttendanceAlert,
   subscribeToMissingAttendanceAlerts,
   subscribeToRegistrationOpen,
+  subscribeToRegistrationOptions,
+  saveRegistrationOptions,
   getSettings,
   getRegistrationOpen,
   updateSettings,

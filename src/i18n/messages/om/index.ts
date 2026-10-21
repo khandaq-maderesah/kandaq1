@@ -16,6 +16,7 @@ import landing from './landing.json'
 import nav from './nav.json'
 import notifications from './notifications.json'
 import profile from './profile.json'
+import registration from './registration.json'
 import requests from './requests.json'
 import students from './students.json'
 import superadmin from './superadmin.json'
@@ -44,6 +45,7 @@ const messages = {
   nav: nav,
   notifications: notifications,
   profile: profile,
+  registration: registration,
   requests: requests,
   students: students,
   superadmin: superadmin,

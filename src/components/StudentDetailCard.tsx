@@ -40,6 +40,61 @@ function Field({ label, value }: { label: string; value?: React.ReactNode }) {
   )
 }
 
+function PhoneValue({ phone }: { phone?: string }) {
+  if (!phone) return null
+  return (
+    <a href={`tel:${phone}`} dir="ltr" className="inline-flex items-center gap-1 font-medium text-primary hover:underline">
+      <Phone className="h-3.5 w-3.5" /> {phone}
+    </a>
+  )
+}
+
+/**
+ * The family information captured on the paper registration form: the
+ * student's own details, then the father and the mother.
+ */
+function FamilySection({ student }: { student: Student }) {
+  const t = useTranslations('registration')
+  const format = useFormatter()
+  const guardians = [
+    { key: 'father' as const, info: student.father },
+    { key: 'mother' as const, info: student.mother },
+  ]
+  return (
+    <>
+      <SectionHeading>{t('sections.student')}</SectionHeading>
+      <dl className="mt-3 grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3">
+        <Field label={t('fields.madrasaLevel')} value={student.madrasaLevel} />
+        <Field label={t('fields.quranLevel')} value={student.quranLevel} />
+        <Field label={t('fields.kitabs')} value={student.kitabs} />
+        <Field label={t('fields.lastYearLevel')} value={student.lastYearLevel} />
+        <Field label={t('fields.lastYearResult')} value={student.lastYearResult} />
+        <Field label={t('fields.occupation')} value={student.occupation} />
+        <Field label={t('fields.phone')} value={<PhoneValue phone={student.phone} />} />
+        <Field label={t('fields.subCity')} value={student.subCity} />
+        <Field label={t('fields.kebele')} value={student.kebele} />
+      </dl>
+
+      {guardians.map(({ key, info }) => (
+        <div key={key}>
+          <SectionHeading>{t(`sections.${key}`)}</SectionHeading>
+          <dl className="mt-3 grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3">
+            <Field label={t('fields.name')} value={info?.name} />
+            <Field label={t('fields.phone')} value={<PhoneValue phone={info?.phone} />} />
+            <Field label={t('fields.age')} value={info?.age !== undefined ? format.number(info.age) : undefined} />
+            <Field label={t('fields.occupation')} value={info?.occupation} />
+            <Field label={t('fields.educationLevel')} value={info?.educationLevel} />
+            <Field label={t('fields.quranLevel')} value={info?.quranLevel} />
+            <Field label={t('fields.kitabs')} value={info?.kitabs} />
+            <Field label={t('fields.subCity')} value={info?.subCity} />
+            <Field label={t('fields.kebele')} value={info?.kebele} />
+          </dl>
+        </div>
+      ))}
+    </>
+  )
+}
+
 /** Add (or subtract) a number of days to a Gregorian 'YYYY-MM-DD' date key. */
 function shiftGregorianDay(dateKey: string, delta: number): string {
   const d = new Date(dateKey + 'T00:00:00Z')
@@ -272,6 +327,8 @@ export function StudentDetailCard({ student, classes = [], users, onClose, onEdi
           }
         />
       </dl>
+
+      <FamilySection student={student} />
 
       <SectionHeading>{t('registrationHeading')}</SectionHeading>
       <dl className="mt-3 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-3">

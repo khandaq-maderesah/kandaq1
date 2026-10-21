@@ -1,0 +1,47 @@
+{
+  "sections": {
+    "student": "የተማሪ መረጃ",
+    "studentHint": "ከመመዝገቢያ ቅጹ። በ * የተመለከቱት መሞላት አለባቸው።",
+    "father": "አባት",
+    "mother": "እናት",
+    "family": "ቤተሰብ"
+  },
+  "fields": {
+    "name": "ሙሉ ስም",
+    "age": "እድሜ",
+    "phone": "ስልክ",
+    "subCity": "ክፍለ ከተማ",
+    "kebele": "ቀበሌ",
+    "madrasaLevel": "የመድረሳ የት/ት ደረጃ",
+    "quranLevel": "የቁርአን ደረጃ",
+    "kitabs": "ከዚህ በፊት የቀሩት ኪታብ",
+    "lastYearLevel": "ያለፈው ዓመት የት/ት ደረጃ",
+    "lastYearResult": "ያለፈው ዓመት ውጤት",
+    "occupation": "ስራ",
+    "educationLevel": "የት/ት ደረጃ"
+  },
+  "placeholders": {
+    "select": "ይምረጡ…",
+    "phone": "09XX XXX XXX",
+    "age": "ለምሳሌ፡ 40",
+    "kitabs": "ለምሳሌ፡ ቃኢዳ፣ ጁዝ አማ",
+    "other": "እዚህ ይጻፉ"
+  },
+  "other": "ሌላ…",
+  "required": "የግድ",
+  "sameAddress": "ከተማሪው ጋር ተመሳሳይ ክፍለ ከተማ እና ቀበሌ",
+  "errors": {
+    "missing": "እባክዎ የሚያስፈልጉትን የቤተሰብ መረጃዎች ይሙሉ፡ {fields}"
+  },
+  "lists": {
+    "title": "የመመዝገቢያ ዝርዝሮች",
+    "description": "በተማሪ መመዝገቢያ ቅጽ ላይ የሚቀርቡ ምርጫዎች። በየመስመሩ አንድ። መዝጋቢዎች አሁንም \"ሌላ\" መርጠው ያልተዘረዘረ እሴት መጻፍ ይችላሉ።",
+    "madrasaLevels": "የመድረሳ የት/ት ደረጃዎች",
+    "quranLevels": "የቁርአን ደረጃዎች",
+    "educationLevels": "የት/ት ደረጃዎች (ወላጆች)",
+    "results": "ውጤቶች",
+    "save": "ዝርዝሮችን አስቀምጥ",
+    "saved": "የመመዝገቢያ ዝርዝሮች ተቀምጠዋል።",
+    "failed": "ዝርዝሮቹን ማስቀመጥ አልተቻለም። እባክዎ እንደገና ይሞክሩ።"
+  }
+}

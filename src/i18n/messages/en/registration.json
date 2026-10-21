@@ -1,0 +1,47 @@
+{
+  "sections": {
+    "student": "Student details",
+    "studentHint": "From the registration form. Fields marked * are required.",
+    "father": "Father",
+    "mother": "Mother",
+    "family": "Family"
+  },
+  "fields": {
+    "name": "Full name",
+    "age": "Age",
+    "phone": "Phone",
+    "subCity": "Sub-city",
+    "kebele": "Kebele",
+    "madrasaLevel": "Madrasa level",
+    "quranLevel": "Qur'an level",
+    "kitabs": "Kitabs studied before",
+    "lastYearLevel": "Last year's level",
+    "lastYearResult": "Last year's result",
+    "occupation": "Occupation",
+    "educationLevel": "Education level"
+  },
+  "placeholders": {
+    "select": "Select…",
+    "phone": "09XX XXX XXX",
+    "age": "e.g. 40",
+    "kitabs": "e.g. Qa'ida, Juz Amma",
+    "other": "Type it here"
+  },
+  "other": "Other…",
+  "required": "Required",
+  "sameAddress": "Same sub-city and kebele as the student",
+  "errors": {
+    "missing": "Please fill in the required family fields: {fields}"
+  },
+  "lists": {
+    "title": "Registration lists",
+    "description": "The choices offered in the student registration form. One entry per line. Registrars can still pick \"Other\" and type a value that is not listed.",
+    "madrasaLevels": "Madrasa levels",
+    "quranLevels": "Qur'an levels",
+    "educationLevels": "Education levels (parents)",
+    "results": "Results",
+    "save": "Save lists",
+    "saved": "Registration lists saved.",
+    "failed": "Couldn't save the lists. Please try again."
+  }
+}
