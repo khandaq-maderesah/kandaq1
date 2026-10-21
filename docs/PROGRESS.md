@@ -810,3 +810,18 @@ tests 198 | pass 198 | fail 0
 $ node scripts/i18n-sync.mjs --check
 All translations complete.
 ```
+
+### Deployment Evidence
+```text
+$ npx next build
+✓ Compiled successfully in 22.3s
+✓ Generating static pages (28/28)
+
+$ firebase deploy --only apphosting --project khendeq-8e17f
++ apphosting: Rollout for backend khendeq-medresah complete!
++ Deploy complete!
+
+Live check against https://mms.khendeq.com
+  live bundle /_next/static/chunks/8414-5c2a952159ffab01.js contains the kitabs list
+  POST /api/admin/users without a body -> 400 (validation live)
+```
