@@ -1,11 +1,13 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useFormatter, useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { useAuth } from '@/context/AuthContext'
 import { rtdb } from '@/lib/database'
+import { useExams, useMyClasses } from '@/hooks/useTeacherData'
+import { OfflineNotice } from '@/components/OfflineNotice'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -21,7 +23,6 @@ import {
 } from '@/components/ui/dialog'
 import { FileText, Plus, Trash2, ClipboardList, Award, CheckCircle2, PencilLine, Loader2 } from 'lucide-react'
 import type { Class, Exam } from '@/types'
-import { useLiveData } from '@/lib/dataStore'
 import { examTypeKey } from '@/lib/examMath'
 import { useExamFormat } from '@/components/ExamResultsSheet'
 
@@ -37,32 +38,16 @@ export default function TeacherExamsPage() {
   const tc = useTranslations('common')
   const format = useFormatter()
   const f = useExamFormat()
-  const { user } = useAuth()
-  const [classes, setClasses] = useState<Class[]>([])
-  const [exams, setExams] = useState<Exam[]>([])
-  const [loading, setLoading] = useState(true)
+  const { user, offline } = useAuth()
+  // Live, offline-first channels shared with the other teacher screens (the
+  // classes channel is already open via the navbar).
+  const liveClasses = useMyClasses()
+  const liveExams = useExams()
+  const classes = useMemo<Class[]>(() => liveClasses ?? [], [liveClasses])
+  const exams = useMemo<Exam[]>(() => liveExams ?? [], [liveExams])
+  const loading = liveClasses === undefined || liveExams === undefined
   const [toDelete, setToDelete] = useState<Exam | null>(null)
   const [deleting, setDeleting] = useState(false)
-
-  useEffect(() => {
-    if (!user) return
-    // Classes come from the shared store (already open via the navbar), and
-    // only the exams channel is unique to this page.
-    const unsub = rtdb.subscribeToExams((l) => {
-      setExams(l)
-      setLoading(false)
-    })
-    return () => unsub()
-  }, [user])
-
-  const storeClasses = useLiveData<Class[]>(
-    user ? 'classes' : null,
-    (emit) => rtdb.subscribeToClasses(emit)
-  )
-  useEffect(() => {
-    if (!user || !storeClasses.data) return
-    setClasses(storeClasses.data.filter((c) => c.teacherId === user.uid && c.isActive !== false))
-  }, [storeClasses.data, user])
 
   const myClassIds = useMemo(() => new Set(classes.map((c) => c.id)), [classes])
   const myExams = useMemo(
@@ -149,7 +134,9 @@ export default function TeacherExamsPage() {
         }
       />
 
-      {loading ? (
+      {loading && offline ? (
+        <OfflineNotice />
+      ) : loading ? (
         <div className="space-y-2">
           {Array.from({ length: 5 }).map((_, i) => (
             <Skeleton key={i} className="h-14 w-full rounded-xl" />

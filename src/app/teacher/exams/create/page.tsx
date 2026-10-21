@@ -1,12 +1,14 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { useAuth } from '@/context/AuthContext'
 import { rtdb } from '@/lib/database'
+import { useMyClasses, useStudentsOfClasses } from '@/hooks/useTeacherData'
+import { OfflineNotice } from '@/components/OfflineNotice'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -30,39 +32,22 @@ export default function CreateExamPage() {
   const t = useTranslations('teacherExams.create')
   const tx = useTranslations('exams')
   const tc = useTranslations('common')
-  const { user } = useAuth()
+  const { user, offline } = useAuth()
   const router = useRouter()
-  const [classes, setClasses] = useState<Class[]>([])
-  const [students, setStudents] = useState<Student[]>([])
+  // Live, offline-first data shared with the other teacher screens.
+  const liveClasses = useMyClasses()
+  const liveStudents = useStudentsOfClasses(liveClasses)
+  const classes = useMemo<Class[]>(() => liveClasses ?? [], [liveClasses])
+  const students = useMemo<Student[]>(() => liveStudents ?? [], [liveStudents])
+  const loading = liveClasses === undefined || liveStudents === undefined
   const [title, setTitle] = useState('')
   const [type, setType] = useState<ExamType>('mid')
   const [classId, setClassId] = useState('')
   const [subjects, setSubjects] = useState<SubjectDef[]>([])
   const [customName, setCustomName] = useState('')
   const [customMax, setCustomMax] = useState('')
-  const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
-
-  useEffect(() => {
-    if (!user) return
-    const load = async () => {
-      try {
-        const cls = await rtdb.getAllClasses()
-        const myClasses = cls.filter((c) => c.teacherId === user.uid && c.isActive !== false)
-        setClasses(myClasses)
-        // Only the students of the teacher's own classes are fetched (server-filtered).
-        const st = (await Promise.all(myClasses.map((c) => rtdb.getStudentsByClass(c.id)))).flat()
-        setStudents(st)
-      } catch (err) {
-        console.error(err)
-        setError(t('errors.loadFailed'))
-      } finally {
-        setLoading(false)
-      }
-    }
-    load()
-  }, [user]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Archived students (isActive === false) are never added to a new exam.
   const activeClassStudents = useMemo(
@@ -177,7 +162,7 @@ export default function CreateExamPage() {
           <Skeleton className="h-8 w-48" />
           <Skeleton className="h-4 w-80 max-w-full" />
         </div>
-        <Skeleton className="h-96 w-full rounded-xl" />
+        {offline ? <OfflineNotice /> : <Skeleton className="h-96 w-full rounded-xl" />}
       </div>
     )
   }

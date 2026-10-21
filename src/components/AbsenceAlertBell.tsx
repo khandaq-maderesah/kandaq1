@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { rtdb } from '@/lib/database'
 import { useAuth } from '@/context/AuthContext'
+import { OfflineNotice } from '@/components/OfflineNotice'
 import { getConsecutiveAbsentCount } from '@/lib/absentAlert'
 import { useLiveData } from '@/lib/dataStore'
 import { daysAgoISO, ATTENDANCE_RECENT_DAYS } from '@/lib/utils'
@@ -25,7 +26,7 @@ export function AbsenceAlertBell({
 }) {
   const t = useTranslations('notifications.absence')
   const tc = useTranslations('common')
-  const { user } = useAuth()
+  const { user, offline } = useAuth()
   const [open, setOpen] = useState(false)
   const [classList, setClassList] = useState<Class[]>([])
   const [studentsAll, setStudentsAll] = useState<Student[]>([])
@@ -295,7 +296,9 @@ export function AbsenceAlertBell({
           )}
 
           <div className="min-h-0 flex-1 overflow-y-auto">
-            {loading ? (
+            {loading && offline ? (
+              <OfflineNotice compact />
+            ) : loading ? (
               <div className="space-y-3 p-4">
                 <Skeleton className="h-10 w-full" />
                 <Skeleton className="h-10 w-full" />

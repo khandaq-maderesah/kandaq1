@@ -4,9 +4,9 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { useAuth } from '@/context/AuthContext'
-import { rtdb } from '@/lib/database'
+import { useExams, useMyClasses, useStudentsOfClasses } from '@/hooks/useTeacherData'
+import { OfflineNotice } from '@/components/OfflineNotice'
 import { Button, buttonVariants } from '@/components/ui/button'
-import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -28,45 +28,22 @@ export default function OverallResultsPage() {
   const tx = useTranslations('exams')
   const tc = useTranslations('common')
   const csv = useExamCsv()
-  const { user, school } = useAuth()
-  const [classes, setClasses] = useState<Class[]>([])
-  const [exams, setExams] = useState<Exam[]>([])
-  const [students, setStudents] = useState<Student[]>([])
-  const [classId, setClassId] = useState('')
+  const { school, offline } = useAuth()
+  // Live, offline-first data shared with the other teacher screens.
+  const liveClasses = useMyClasses()
+  const liveStudents = useStudentsOfClasses(liveClasses)
+  const liveExams = useExams()
+  const classes = useMemo<Class[]>(() => liveClasses ?? [], [liveClasses])
+  const students = useMemo<Student[]>(() => liveStudents ?? [], [liveStudents])
+  const myClassIds = useMemo(() => new Set(classes.map((c) => c.id)), [classes])
+  const exams = useMemo<Exam[]>(() => (liveExams ?? []).filter((e) => myClassIds.has(e.classId)), [liveExams, myClassIds])
+  const loading = liveClasses === undefined || liveStudents === undefined || liveExams === undefined
+  // '' = not chosen yet: the first class until the Ustaz picks another.
+  const [classChoice, setClassChoice] = useState('')
+  const classId = classChoice || (classes.length > 0 ? classes[0].id : '')
   const [yearFilter, setYearFilter] = useState('') // empty = all years
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
   const [certStudent, setCertStudent] = useState<CertificateStudent | null>(null)
   const certCloseRef = useRef<HTMLButtonElement>(null)
-
-  useEffect(() => {
-    if (!user) return
-    const load = async () => {
-      try {
-        const cls = await rtdb.getAllClasses()
-        const myClasses = cls.filter((c) => c.teacherId === user.uid && c.isActive !== false)
-        setClasses(myClasses)
-        // Only the teacher's own classes' students + exams are fetched (server-filtered).
-        const [st, ex] = await Promise.all([
-          Promise.all(myClasses.map((c) => rtdb.getStudentsByClass(c.id))).then((lists) =>
-            lists.flat(),
-          ),
-          Promise.all(myClasses.map((c) => rtdb.getExamsByClass(c.id))).then((lists) =>
-            lists.flat(),
-          ),
-        ])
-        setExams(ex)
-        setStudents(st)
-        if (!classId && myClasses.length) setClassId(myClasses[0].id)
-      } catch (err) {
-        console.error(err)
-        setError(t('overall.loadError'))
-      } finally {
-        setLoading(false)
-      }
-    }
-    load()
-  }, [user]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const classExams = useMemo(
     () =>
@@ -135,8 +112,14 @@ export default function OverallResultsPage() {
           <Skeleton className="h-8 w-56" />
           <Skeleton className="h-4 w-96 max-w-full" />
         </div>
-        <Skeleton className="h-10 w-full max-w-sm" />
-        <Skeleton className="h-96 w-full rounded-xl" />
+        {offline ? (
+          <OfflineNotice />
+        ) : (
+          <>
+            <Skeleton className="h-10 w-full max-w-sm" />
+            <Skeleton className="h-96 w-full rounded-xl" />
+          </>
+        )}
       </div>
     )
   }
@@ -167,12 +150,6 @@ export default function OverallResultsPage() {
         }
       />
 
-      {error && (
-        <Alert variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-
       <div className="no-print grid gap-4 sm:grid-cols-2 lg:max-w-2xl">
         <div className="space-y-2">
           <Label htmlFor="overall-class">{t('overall.class')}</Label>
@@ -180,7 +157,7 @@ export default function OverallResultsPage() {
             id="overall-class"
             value={classId}
             onChange={(e) => {
-              setClassId(e.target.value)
+              setClassChoice(e.target.value)
               setYearFilter('')
             }}
           >

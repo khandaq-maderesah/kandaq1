@@ -7,6 +7,8 @@ import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { useAuth } from '@/context/AuthContext'
 import { rtdb } from '@/lib/database'
+import { useExams, useStudentsOfClass } from '@/hooks/useTeacherData'
+import { OfflineNotice } from '@/components/OfflineNotice'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -55,57 +57,48 @@ export default function MarkExamPage() {
   const tx = useTranslations('exams')
   const f = useExamFormat()
   const { id } = useParams<{ id: string }>()
-  const { user } = useAuth()
+  const { user, offline } = useAuth()
+  // Live, offline-first data shared with the other teacher screens: the exam
+  // and only its class's students (no full-school download).
+  const liveExams = useExams()
+  const liveExam = useMemo(() => liveExams?.find((e) => e.id === id) ?? null, [liveExams, id])
+  const liveStudents = useStudentsOfClass(liveExam?.classId ?? null)
   const [exam, setExam] = useState<Exam | null>(null)
   const [students, setStudents] = useState<SheetStudent[]>([])
   const [marks, setMarks] = useState<Record<string, Record<string, string>>>({})
-  const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [error, setError] = useState('')
+  // The sheet is set up once from the live data; later live updates never
+  // overwrite marks being typed.
+  const [ready, setReady] = useState(false)
+  const loading = liveExams === undefined || (liveExam !== null && (liveStudents === undefined || !ready))
 
   useEffect(() => {
-    if (!id) return
-    const load = async () => {
-      try {
-        const ex = await rtdb.getExam(id)
-        if (!ex) {
-          setError(t('notFound'))
-          setLoading(false)
-          return
-        }
-        // Only this exam's class needs its students — no full-school download.
-        const clsStudentsRaw = await rtdb.getStudentsByClass(ex.classId)
-        const active: SheetStudent[] = clsStudentsRaw
-          .filter((s) => s.isActive !== false)
-          .map((s) => ({ id: s.id, name: s.name, rollNumber: s.rollNumber, inactive: false }))
-        // Students already recorded on this exam who are no longer active
-        // (archived or moved) keep their recorded row.
-        const activeIds = new Set(active.map((s) => s.id))
-        const recorded: SheetStudent[] = Object.values(ex.rows || {})
-          .filter((r) => r?.studentId && !activeIds.has(r.studentId))
-          .map((r) => ({ id: r.studentId, name: r.studentName, rollNumber: r.rollNumber, inactive: true }))
-        const all = [...active, ...recorded]
-        setStudents(all)
-        setExam(ex)
+    if (ready || !liveExam || !liveStudents) return
+    const ex = liveExam
+    const active: SheetStudent[] = liveStudents
+      .filter((s) => s.isActive !== false)
+      .map((s) => ({ id: s.id, name: s.name, rollNumber: s.rollNumber, inactive: false }))
+    // Students already recorded on this exam who are no longer active
+    // (archived or moved) keep their recorded row.
+    const activeIds = new Set(active.map((s) => s.id))
+    const recorded: SheetStudent[] = Object.values(ex.rows || {})
+      .filter((r) => r?.studentId && !activeIds.has(r.studentId))
+      .map((r) => ({ id: r.studentId, name: r.studentName, rollNumber: r.rollNumber, inactive: true }))
+    const all = [...active, ...recorded]
+    setStudents(all)
+    setExam(ex)
 
-        const init: Record<string, Record<string, string>> = {}
-        all.forEach((st) => {
-          init[st.id] = {}
-          ex.subjects.forEach((sub) => {
-            const v = ex.rows?.[st.id]?.marks?.[sub]
-            init[st.id][sub] = v != null ? String(v) : ''
-          })
-        })
-        setMarks(init)
-      } catch (err) {
-        console.error(err)
-        setError(t('loadError'))
-      } finally {
-        setLoading(false)
-      }
-    }
-    load()
-  }, [id]) // eslint-disable-line react-hooks/exhaustive-deps
+    const init: Record<string, Record<string, string>> = {}
+    all.forEach((st) => {
+      init[st.id] = {}
+      ex.subjects.forEach((sub) => {
+        const v = ex.rows?.[st.id]?.marks?.[sub]
+        init[st.id][sub] = v != null ? String(v) : ''
+      })
+    })
+    setMarks(init)
+    setReady(true)
+  }, [ready, liveExam, liveStudents])
 
   const totalMax = exam ? examTotalMax(exam.subjects, exam.subjectMax) : 0
   const subjectMax = (sub: string) => exam?.subjectMax?.[sub] ?? DEFAULT_SUBJECT_MAX
@@ -174,7 +167,6 @@ export default function MarkExamPage() {
       return
     }
     setSaving(true)
-    setError('')
     try {
       const rows: Exam['rows'] = {}
       students.forEach((st) => {
@@ -226,8 +218,14 @@ export default function MarkExamPage() {
           <Skeleton className="h-8 w-64 max-w-full" />
           <Skeleton className="h-4 w-96 max-w-full" />
         </div>
-        <Skeleton className="h-12 w-full rounded-xl" />
-        <Skeleton className="h-96 w-full rounded-xl" />
+        {offline ? (
+          <OfflineNotice />
+        ) : (
+          <>
+            <Skeleton className="h-12 w-full rounded-xl" />
+            <Skeleton className="h-96 w-full rounded-xl" />
+          </>
+        )}
       </div>
     )
   }
@@ -236,7 +234,7 @@ export default function MarkExamPage() {
     return (
       <div className="space-y-4">
         <Alert variant="destructive">
-          <AlertDescription>{error || t('notFound')}</AlertDescription>
+          <AlertDescription>{t('notFound')}</AlertDescription>
         </Alert>
         {backLink}
       </div>
@@ -299,12 +297,6 @@ export default function MarkExamPage() {
           </>
         }
       />
-
-      {error && (
-        <Alert variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
 
       {students.length === 0 ? (
         <EmptyState icon={Users} title={t('noStudents')} />

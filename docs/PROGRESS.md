@@ -670,3 +670,54 @@ Live checks against https://mms.khendeq.com
 1. Open the app once while online (this installs the v4 worker and caches the shell with its bundle).
 2. Turn the network off, close the app completely, reopen it from the home screen.
 3. Expected: the app opens on your dashboard in offline mode with a small "Offline" pill; queued attendance marks sync automatically once the network returns.
+
+---
+
+## [2026-10-21] Task 5.8 - Instant Offline Open (home-screen redirect, on-device live store, SW v5)
+
+- **Implementer**: Claude (Fable 5.1), on the owner's direct request
+- **Status**: IMPLEMENTED & VERIFIED LOCALLY (not yet committed or deployed)
+- **Owner report**: with the app installed and cached, (1) every open flashed the landing/sign-in page before the dashboard, (2) Classes, Students, Exams, History and My Requests kept loading offline while Attendance opened instantly, (3) the top-bar bells stayed on their loading skeleton.
+
+### Root causes
+1. **Start URL `/`.** Offline, the worker served the cached landing page, which redirected client-side to `/dashboard` and then to `/teacher` (two extra boots). Online, the middleware did the first hop and the dashboard page the second. The session was also only trusted from the device cache when `navigator.onLine` was false, so online opens always spun first.
+2. **No device cache for most screens.** Only Attendance and the teacher dashboard kept a localStorage copy. Every other screen (and the bells) read the Realtime Database directly, which never answers offline: skeleton forever (Exams, Requests, bells) or a 3 s timeout into an error toast (Classes, Students, History).
+3. **Worker gaps.** Protected routes were precached while signed out, so the sign-in page was stored under `/teacher/...`. RSC payloads were cached under their per-request `?_rsc=` URL (and `Vary` headers), so they never matched again and each offline tap became a full reload. Offline requests still waited for the network timeout before the cache answered.
+
+### What changed
+- `src/lib/dataStore.ts` (rewritten) + `src/lib/dataStorePersistence.ts` (new): the shared live store is now offline-first. It is built on `useSyncExternalStore`, hydrates every channel from a localStorage snapshot on the first render, mirrors every snapshot back (debounced, 1.5 MB cap, attendance trimmed to the last 90 days / 6000 rows) and forgets everything on sign-out. `useLiveDataMany` subscribes to a dynamic list of channels (one per class).
+- `src/hooks/useTeacherData.ts` (new): `useMyClasses`, `useStudentsOfClasses`, `useStudentsOfClass`, `useMyAttendance`, `useExams`, `useRegistrationOpen`; one channel per dataset shared by every teacher screen.
+- Teacher screens moved to the store: dashboard, attendance (keeps the offline queue; already-saved and still-queued marks are shown when reopened offline), classes, students, exams list/create/overall/mark sheet, history, requests. Bells (absence, reminder, announcements) and all screens show a localized "Not available offline yet" notice (`src/components/OfflineNotice.tsx`, `common.offline.notCached*` in en/am/ar/om/so) instead of an endless skeleton when nothing is cached.
+- `src/context/AuthContext.tsx`: a cached profile renders the app at once online or offline (Firebase confirms in the background); the school id is set for the data layer before the first render; the session is exposed only after hydration (no hydration mismatch, no visible spinner); the home screen is announced to the worker (`src/lib/offlineHome.ts`, `src/lib/routes.ts`) and cleared on sign-out together with the store.
+- `public/sw.js` v5 (+ registrar `v5`): `SET_HOME`/`CLEAR_HOME` messages; `/`, `/login`, `/dashboard`, `/m/{slug}` are answered with a 302 to the user's home screen (never when the server bounced with `?from=`, so no loop); the whole area (pages + RSC payloads) is precached after sign-in; a sign-in redirect is never stored under a protected route; RSC payloads are cached under the page path (`ignoreVary`), prefetches never overwrite full payloads; an offline device skips the network entirely; an uncached page redirects to its nearest cached parent, then the offline document.
+- `src/lib/database/index.ts`: `subscribeToRegistrationOpen`.
+- Tests: `tests/offlineFirstStore.test.mjs` (new, 26 tests: snapshot persistence, attendance trimming, start-screen rules, worker helpers in a sandbox) and `tests/pwaOffline.test.mjs` (worker sandbox: home redirect, no-loop, area precache, offline device never touches the network, RSC cache by path, parent fallback). `tests/authSessionRouting.test.mjs` follows `homePathFor` to `src/lib/routes.ts`.
+
+### Verification Evidence
+```text
+> npm run verify
+Checking TypeScript Typecheck... [PASS] (3.21s)
+Checking ESLint Static Analysis... [PASS] (3.04s)
+Checking Unit & Logic Tests (Node Test Runner)... [PASS] (4.87s)
+STATUS: ALL VERIFICATION CHECKS PASSED
+
+$ npm run lint
+> eslint . --cache
+(0 errors, 0 warnings)
+
+$ npx tsx --test tests/*.test.mjs
+tests 182 | suites 30 | pass 182 | fail 0
+
+$ npx next build
+✓ Compiled successfully in 50s
+✓ Generating static pages (28/28)
+○ /teacher, /teacher/attendance, /teacher/classes, /teacher/students, /teacher/exams,
+  /teacher/exams/create, /teacher/exams/overall, /teacher/history, /teacher/requests  (Static)
+build exit: 0
+```
+
+### How to retest on the phone (after deploy)
+1. Open the installed app once while online and sign in (worker v5 installs, the teacher area is precached in the background; give it ~10 s).
+2. Turn the network off, close the app completely, reopen it: the Ustaz dashboard is the first thing on screen (no landing/sign-in flash).
+3. Tap Classes, Students, Exams, History, My requests and the three bells: each opens at once with the last known data and the "Offline" pill.
+4. Turn the network on: everything refreshes by itself; queued attendance syncs.

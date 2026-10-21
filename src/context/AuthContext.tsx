@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useState, useSyncExternalStore } from 'react'
 import {
   User as FirebaseUser,
   onAuthStateChanged,
@@ -17,6 +17,9 @@ import type { School, User } from '@/types'
 import { useLocaleSettings } from '@/i18n/I18nProvider'
 import { isLocale } from '@/i18n/config'
 import { withTimeout } from '@/lib/asyncUtils'
+import { clearLiveDataCache } from '@/lib/dataStore'
+import { announceOfflineHome } from '@/lib/offlineHome'
+import { offlineHomeFor } from '@/lib/routes'
 
 interface LoginResult {
   credential: UserCredential
@@ -56,6 +59,19 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
+
+// False on the server and during hydration, true right after. The cached
+// session lives in localStorage, which the server cannot see: exposing it only
+// once hydrated keeps the first client render identical to the server HTML
+// (no hydration error), and React re-renders with the session in the same
+// frame, so the user never sees the spinner.
+const subscribeToNothing = () => () => {}
+const useHydrated = () =>
+  useSyncExternalStore(
+    subscribeToNothing,
+    () => true,
+    () => false
+  )
 
 // Remembers which school a superadmin last opened (per browser tab session).
 const SELECTED_SCHOOL_KEY = 'khandaq_selected_school'
@@ -167,23 +183,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (typeof window === 'undefined') return null
     try {
       const cached = localStorage.getItem('kmms_last_active_school')
-      if (cached) return JSON.parse(cached) as School
+      if (cached) {
+        const parsed = JSON.parse(cached) as School
+        // The data layer must know the school before the first screen renders,
+        // otherwise its first subscriptions (made from the cached session) fail.
+        setCurrentSchoolId(parsed.id)
+        return parsed
+      }
     } catch {
       /* ignore */
     }
     return null
   })
 
-  // If the browser is offline and we already have a cached profile, never show the full-screen spinner
+  // A device that already holds a profile renders the app at once (online or
+  // offline) from that cached session; Firebase then confirms it in the
+  // background and signs the user out if it no longer stands. The spinner is
+  // only for a device that knows nothing yet.
   const [loading, setLoading] = useState<boolean>(() => {
     if (typeof window === 'undefined') return true
-    if (typeof navigator !== 'undefined' && !navigator.onLine) {
-      try {
-        const cached = localStorage.getItem('kmms_last_active_user')
-        if (cached) return false
-      } catch {
-        /* ignore */
-      }
+    try {
+      const cached = localStorage.getItem('kmms_last_active_user')
+      if (cached) return false
+    } catch {
+      /* ignore */
     }
     return true
   })
@@ -247,12 +270,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     applySchool(null)
     setUser(null)
     setFirebaseUser(null)
+    // Nothing of this account stays on the device or in the worker.
+    clearLiveDataCache()
+    announceOfflineHome(null)
     try {
       await signOut(auth)
     } catch {
       /* ignore */
     }
   }, [applySchool])
+
+  // The installed app opens straight on this account's home screen (the
+  // service worker redirects the start URL there and precaches that area).
+  useEffect(() => {
+    if (loading) return
+    announceOfflineHome(user ? offlineHomeFor(user.role) : null)
+  }, [user, loading])
 
   useEffect(() => {
     let settled = false
@@ -479,23 +512,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setBrandingTick((n) => n + 1)
   }
 
-  const isSuperAdmin = user?.role === 'superadmin'
-  const isAdmin = user?.role === 'admin' || (isSuperAdmin && !!school)
-  const isTeacher = user?.role === 'teacher'
+  // Until hydrated, consumers see exactly what the server rendered: no
+  // session, loading. See useHydrated.
+  const hydrated = useHydrated()
+  const exposedUser = hydrated ? user : null
+  const exposedSchool = hydrated ? school : null
+
+  const isSuperAdmin = exposedUser?.role === 'superadmin'
+  const isAdmin = exposedUser?.role === 'admin' || (isSuperAdmin && !!exposedSchool)
+  const isTeacher = exposedUser?.role === 'teacher'
 
   return (
     <AuthContext.Provider value={{
-      user,
+      user: exposedUser,
       firebaseUser,
-      loading,
-      offline,
+      loading: hydrated ? loading : true,
+      offline: hydrated ? offline : false,
       stalled,
       login,
       logout,
       isAdmin,
       isTeacher,
       isSuperAdmin,
-      school,
+      school: exposedSchool,
       selectSchool,
       refreshSchool,
       branding,

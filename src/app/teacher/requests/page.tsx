@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { EmptyState, PageHeader } from '@/components/ui/page'
 import { RequestCard } from '@/components/requests/RequestCard'
+import { OfflineNotice } from '@/components/OfflineNotice'
 import { useAuth } from '@/context/AuthContext'
 import { markRequestUpdatesSeen, useMyRequests } from '@/hooks/useRequestBadges'
 import { cancelChangeRequest } from '@/lib/database'
@@ -15,7 +16,7 @@ import { cancelChangeRequest } from '@/lib/database'
 export default function TeacherRequestsPage() {
   const t = useTranslations('requests')
   const tc = useTranslations('common')
-  const { user } = useAuth()
+  const { user, offline } = useAuth()
   const requests = useMyRequests(user?.uid)
   const [busy, setBusy] = useState<string | null>(null)
 
@@ -49,7 +50,9 @@ export default function TeacherRequestsPage() {
   return (
     <div>
       <PageHeader title={t('teacher.title')} description={t('teacher.description')} />
-      {requests === undefined ? (
+      {requests === undefined && offline ? (
+        <OfflineNotice />
+      ) : requests === undefined ? (
         <div className="grid gap-4 lg:grid-cols-2">
           {[0, 1].map((i) => (
             <Skeleton key={i} className="h-56 rounded-xl" />

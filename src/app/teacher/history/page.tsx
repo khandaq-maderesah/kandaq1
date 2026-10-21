@@ -1,11 +1,13 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useFormatter, useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { History, X } from 'lucide-react'
 import { rtdb } from '@/lib/database'
 import { useAuth } from '@/context/AuthContext'
+import { useMyAttendance, useMyClasses, useStudentsOfClasses } from '@/hooks/useTeacherData'
+import { OfflineNotice } from '@/components/OfflineNotice'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -27,44 +29,28 @@ const statusTone: Record<AttendanceStatus, string> = {
 export default function TeacherHistoryPage() {
   const t = useTranslations('teacherHistory')
   const format = useFormatter()
-  const { user } = useAuth()
-  const [records, setRecords] = useState<Attendance[]>([])
-  const [classes, setClasses] = useState<Class[]>([])
-  const [loading, setLoading] = useState(true)
+  const { offline } = useAuth()
+  // Live, offline-first data shared with the other teacher screens. Teachers
+  // only see history for the classes assigned to them; the attendance channel
+  // is server-filtered to this teacher's own records.
+  const liveClasses = useMyClasses()
+  const liveStudents = useStudentsOfClasses(liveClasses)
+  const liveAttendance = useMyAttendance()
   const [classId, setClassId] = useState('')
   const [date, setDate] = useState('')
 
-  useEffect(() => {
-    const load = async () => {
-      if (!user) return
-      setLoading(true)
-      try {
-        const classList = await rtdb.getAllClasses()
-        // Teachers only see history for the classes assigned to them.
-        const myClasses = classList.filter((c) => c.teacherId === user.uid && c.isActive !== false)
-        const myClassIds = new Set(myClasses.map((c) => c.id))
-        setClasses(myClasses)
-        // Server-side filtered: only this teacher's own attendance is downloaded.
-        const [attendanceList, myStudents] = await Promise.all([
-          rtdb.getAttendanceByTeacher(user.uid),
-          Promise.all(myClasses.map((c) => rtdb.getStudentsByClass(c.id))).then((l) => l.flat()),
-        ])
-        // Archived (deleted) students are hidden everywhere in the teacher area.
-        const archivedIds = new Set(myStudents.filter((s) => s.isActive === false).map((s) => s.id))
-        setRecords(
-          attendanceList
-            .filter((r) => myClassIds.has(r.classId) && !archivedIds.has(r.studentId))
-            .sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0))
-        )
-      } catch {
-        toast.error(t('toast.loadFailed'))
-      } finally {
-        setLoading(false)
-      }
-    }
-    load()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user])
+  const classes = useMemo<Class[]>(() => liveClasses ?? [], [liveClasses])
+  const loading = liveClasses === undefined || liveStudents === undefined || liveAttendance === undefined
+
+  const records = useMemo<Attendance[]>(() => {
+    if (!liveClasses || !liveStudents || !liveAttendance) return []
+    const myClassIds = new Set(liveClasses.map((c) => c.id))
+    // Archived (deleted) students are hidden everywhere in the teacher area.
+    const archivedIds = new Set(liveStudents.filter((s) => s.isActive === false).map((s) => s.id))
+    return liveAttendance
+      .filter((r) => myClassIds.has(r.classId) && !archivedIds.has(r.studentId))
+      .sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0))
+  }, [liveClasses, liveStudents, liveAttendance])
 
   const classById = useMemo(() => {
     const m: Record<string, Class> = {}
@@ -87,7 +73,7 @@ export default function TeacherHistoryPage() {
         status,
         markedAt: new Date().toISOString(),
       })
-      setRecords((prev) => prev.map((rec) => (rec.id === r.id ? { ...rec, status } : rec)))
+      // The live attendance channel delivers the change to the list.
       toast.success(t('toast.updated'))
     } catch {
       toast.error(t('toast.updateFailed'))
@@ -151,7 +137,9 @@ export default function TeacherHistoryPage() {
         </div>
       </div>
 
-      {loading ? (
+      {loading && offline ? (
+        <OfflineNotice />
+      ) : loading ? (
         <div className="space-y-2">
           {[0, 1, 2, 3, 4].map((i) => (
             <Skeleton key={i} className="h-14 rounded-xl" />

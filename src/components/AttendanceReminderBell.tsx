@@ -5,6 +5,7 @@ import { useFormatter, useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { rtdb } from '@/lib/database'
 import { useAuth } from '@/context/AuthContext'
+import { OfflineNotice } from '@/components/OfflineNotice'
 import { useLiveData } from '@/lib/dataStore'
 import { ATTENDANCE_RECENT_DAYS, daysAgoISO } from '@/lib/utils'
 import { ClipboardList, CheckCircle2, Loader2, X, GraduationCap } from 'lucide-react'
@@ -23,7 +24,7 @@ export function AttendanceReminderBell(
   const t = useTranslations('notifications')
   const tc = useTranslations('common')
   const format = useFormatter()
-  const { user } = useAuth()
+  const { user, offline } = useAuth()
   const [open, setOpen] = useState(false)
   const [savingId, setSavingId] = useState('')
   const containerRef = useRef<HTMLDivElement>(null)
@@ -215,7 +216,9 @@ export function AttendanceReminderBell(
           </div>
 
           <div className="min-h-0 flex-1 overflow-y-auto">
-            {loading ? (
+            {loading && offline ? (
+              <OfflineNotice compact />
+            ) : loading ? (
               <div className="space-y-3 p-4">
                 <Skeleton className="h-12 w-full" />
                 <Skeleton className="h-12 w-full" />

@@ -19,8 +19,9 @@ import {
 } from 'lucide-react'
 import { rtdb } from '@/lib/database'
 import { useAuth } from '@/context/AuthContext'
-import { useLiveData } from '@/lib/dataStore'
 import { useMyRequests } from '@/hooks/useRequestBadges'
+import { useAllClasses, useMyClasses, useRegistrationOpen, useStudentsOfClasses } from '@/hooks/useTeacherData'
+import { OfflineNotice } from '@/components/OfflineNotice'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -94,10 +95,14 @@ function StudentRequestMenu({
 export default function TeacherClassesPage() {
   const t = useTranslations('teacherClasses')
   const tc = useTranslations('common')
-  const { user } = useAuth()
-  const [classes, setClasses] = useState<Class[]>([])
-  const [students, setStudents] = useState<Student[]>([])
-  const [loading, setLoading] = useState(true)
+  const { user, offline } = useAuth()
+  // Live, offline-first data shared with the other teacher screens: on screen
+  // from the first frame (last known snapshot) and refreshed by itself.
+  const liveClasses = useMyClasses()
+  const liveStudents = useStudentsOfClasses(liveClasses)
+  const classes = useMemo<Class[]>(() => liveClasses ?? [], [liveClasses])
+  const students = useMemo<Student[]>(() => liveStudents ?? [], [liveStudents])
+  const loading = liveClasses === undefined || liveStudents === undefined
   const [formError, setFormError] = useState('')
 
   const [selectedClassId, setSelectedClassId] = useState('')
@@ -112,43 +117,21 @@ export default function TeacherClassesPage() {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editingName, setEditingName] = useState('')
   const [rollNumber, setRollNumber] = useState('')
-  const [registrationOpen, setRegistrationOpen] = useState(true)
+  const registrationOpen = useRegistrationOpen() ?? true
   const [deleteTarget, setDeleteTarget] = useState<Student | null>(null)
   const [transferTarget, setTransferTarget] = useState<Student | null>(null)
 
-  const allClasses = useLiveData<Class[]>('classes', (emit) => rtdb.subscribeToClasses(emit)).data
+  const allClasses = useAllClasses()
   const myRequests = useMyRequests(user?.uid)
   const pendingIds = useMemo(
     () => new Set((myRequests ?? []).filter((r) => r.status === 'pending').map((r) => r.studentId)),
     [myRequests]
   )
 
+  // The form registers into the first class until the Ustaz picks another.
   useEffect(() => {
-    const load = async () => {
-      if (!user) return
-      setLoading(true)
-      try {
-        const classList = await rtdb.getAllClasses()
-        const myClasses = classList.filter((c) => c.teacherId === user.uid && c.isActive !== false)
-        const regOpen = await rtdb.getRegistrationOpen()
-        // Server-side filtered: only the students of the teacher's own classes
-        // (NOT the whole school, which used to include every student photo).
-        const myStudents = (await Promise.all(myClasses.map((c) => rtdb.getStudentsByClass(c.id)))).flat()
-        setClasses(myClasses)
-        setStudents(myStudents)
-        setRegistrationOpen(regOpen)
-        if (myClasses.length > 0) {
-          setSelectedClassId((current) => current || myClasses[0].id)
-        }
-      } catch {
-        toast.error(t('toast.loadFailed'))
-      } finally {
-        setLoading(false)
-      }
-    }
-    load()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user])
+    if (!selectedClassId && classes.length > 0) setSelectedClassId(classes[0].id)
+  }, [classes, selectedClassId])
 
   // "Add student" buttons on other pages link to #student-form: open the form ready to type.
   useEffect(() => {
@@ -205,10 +188,6 @@ export default function TeacherClassesPage() {
       document.getElementById('student-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
       document.getElementById('name')?.focus({ preventScroll: true })
     })
-  }
-
-  const reloadStudents = async () => {
-    setStudents((await Promise.all(classes.map((c) => rtdb.getStudentsByClass(c.id)))).flat())
   }
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -271,7 +250,7 @@ export default function TeacherClassesPage() {
         resetRegisterForm()
         toast.success(t('toast.added', { name: studentName, roll: fields.rollNumber }))
       }
-      await reloadStudents()
+      // The live students channel delivers the new/updated row to the list.
     } catch {
       toast.error(t('toast.saveFailed'))
     } finally {
@@ -304,12 +283,18 @@ export default function TeacherClassesPage() {
     return (
       <div>
         <PageHeader title={t('title')} description={t('description')} />
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {[0, 1, 2].map((i) => (
-            <Skeleton key={i} className="h-32 rounded-xl" />
-          ))}
-        </div>
-        <Skeleton className="mt-6 h-96 rounded-xl" />
+        {offline ? (
+          <OfflineNotice />
+        ) : (
+          <>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {[0, 1, 2].map((i) => (
+                <Skeleton key={i} className="h-32 rounded-xl" />
+              ))}
+            </div>
+            <Skeleton className="mt-6 h-96 rounded-xl" />
+          </>
+        )}
       </div>
     )
   }

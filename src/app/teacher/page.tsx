@@ -1,13 +1,13 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useFormatter, useTranslations } from 'next-intl'
-import { toast } from 'sonner'
 import { ChevronRight, ClipboardList, GraduationCap, Phone, Search, UserCheck, UserPlus, Users, UserX } from 'lucide-react'
-import { rtdb } from '@/lib/database'
 import { useAuth } from '@/context/AuthContext'
 import { useMyRequests } from '@/hooks/useRequestBadges'
+import { useMyAttendance, useMyClasses, useStudentsOfClasses } from '@/hooks/useTeacherData'
+import { OfflineNotice } from '@/components/OfflineNotice'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
@@ -17,7 +17,6 @@ import { badgeVariants } from '@/components/ui/badge'
 import { EmptyState, PageHeader, StatCard, TableContainer } from '@/components/ui/page'
 import { RequestStatusBadge } from '@/components/requests/RequestStatusBadge'
 import { cn } from '@/lib/utils'
-import { withTimeout } from '@/lib/asyncUtils'
 import type { Student, Class, Attendance } from '@/types'
 
 const todayIso = () => new Date().toISOString().slice(0, 10)
@@ -27,94 +26,23 @@ export default function TeacherPage() {
   const tAdd = useTranslations('teacherClasses')
   const tr = useTranslations('requests')
   const format = useFormatter()
-  const { user } = useAuth()
-  const [classes, setClasses] = useState<Class[]>([])
-  const [students, setStudents] = useState<Student[]>([])
-  const [attendance, setAttendance] = useState<Attendance[]>([])
-  const [loading, setLoading] = useState(true)
-  const [selectedClass, setSelectedClass] = useState('')
+  const { user, offline } = useAuth()
+  // Live, offline-first data shared with every other teacher screen: it is
+  // on screen from the first frame (last known snapshot) and refreshes itself.
+  const liveClasses = useMyClasses()
+  const liveStudents = useStudentsOfClasses(liveClasses)
+  const liveAttendance = useMyAttendance()
+  const classes = useMemo<Class[]>(() => liveClasses ?? [], [liveClasses])
+  const students = useMemo<Student[]>(() => liveStudents ?? [], [liveStudents])
+  const attendance = useMemo<Attendance[]>(() => liveAttendance ?? [], [liveAttendance])
+  const loading = liveClasses === undefined || liveStudents === undefined || liveAttendance === undefined
+  // null = the first class (the default), '' = all classes.
+  const [classChoice, setClassChoice] = useState<string | null>(null)
+  const selectedClass = classChoice ?? (classes.length > 0 ? classes[0].id : '')
   const [search, setSearch] = useState('')
   const [dateFilter, setDateFilter] = useState(todayIso)
   const [showAllDates, setShowAllDates] = useState(false)
   const myRequests = useMyRequests(user?.uid)
-
-  useEffect(() => {
-    const load = async () => {
-      if (!user) return
-
-      // If offline, load classes and students from localStorage cache immediately
-      if (typeof navigator !== 'undefined' && !navigator.onLine) {
-        try {
-          const cachedClassesStr = localStorage.getItem(`kmms_teacher_classes_${user.uid}`)
-          if (cachedClassesStr) {
-            const myClasses = JSON.parse(cachedClassesStr) as Class[]
-            setClasses(myClasses)
-            setSelectedClass((current) => current || (myClasses.length > 0 ? myClasses[0].id : ''))
-            const studentLists = myClasses.map((c) => {
-              const str = localStorage.getItem(`kmms_class_students_${c.id}`)
-              return str ? (JSON.parse(str) as Student[]) : []
-            })
-            setStudents(studentLists.flat())
-          }
-        } catch {
-          /* ignore */
-        }
-        setLoading(false)
-        return
-      }
-
-      setLoading(true)
-      try {
-        const classList = await withTimeout(rtdb.getAllClasses(), 2500)
-        const myClasses = classList.filter((c) => c.teacherId === user.uid && c.isActive !== false)
-
-        const [attList, myStudents] = await withTimeout(
-          Promise.all([
-            rtdb.getAttendanceByTeacher(user.uid),
-            Promise.all(myClasses.map((c) => rtdb.getStudentsByClass(c.id))).then((lists) => lists.flat()),
-          ]),
-          2500
-        )
-
-        setClasses(myClasses)
-        setStudents(myStudents)
-        setAttendance(attList)
-        setSelectedClass((current) => current || (myClasses.length > 0 ? myClasses[0].id : ''))
-
-        try {
-          localStorage.setItem(`kmms_teacher_classes_${user.uid}`, JSON.stringify(myClasses))
-          myClasses.forEach((c) => {
-            const clsStudents = myStudents.filter((s) => s.classId === c.id)
-            localStorage.setItem(`kmms_class_students_${c.id}`, JSON.stringify(clsStudents))
-          })
-        } catch {
-          /* ignore */
-        }
-      } catch {
-        // Fallback to cached data if network times out
-        try {
-          const cachedClassesStr = localStorage.getItem(`kmms_teacher_classes_${user.uid}`)
-          if (cachedClassesStr) {
-            const myClasses = JSON.parse(cachedClassesStr) as Class[]
-            setClasses(myClasses)
-            setSelectedClass((current) => current || (myClasses.length > 0 ? myClasses[0].id : ''))
-            const studentLists = myClasses.map((c) => {
-              const str = localStorage.getItem(`kmms_class_students_${c.id}`)
-              return str ? (JSON.parse(str) as Student[]) : []
-            })
-            setStudents(studentLists.flat())
-          }
-        } catch {
-          /* ignore */
-        }
-        toast.error(t('toast.loadFailed'))
-      } finally {
-        setLoading(false)
-      }
-    }
-    load()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user])
 
   const myClassIds = useMemo(() => new Set(classes.map((c) => c.id)), [classes])
 
@@ -223,6 +151,10 @@ export default function TeacherPage() {
     return (
       <div>
         <PageHeader title={t('title')} description={t('description')} />
+        {offline ? (
+          <OfflineNotice />
+        ) : (
+        <>
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           {[0, 1, 2, 3].map((i) => (
             <Skeleton key={i} className="h-24 rounded-xl" />
@@ -232,6 +164,8 @@ export default function TeacherPage() {
           <Skeleton className="h-80 rounded-xl lg:col-span-2" />
           <Skeleton className="h-56 rounded-xl" />
         </div>
+        </>
+        )}
       </div>
     )
   }
@@ -271,7 +205,7 @@ export default function TeacherPage() {
             <div className="grid gap-3 sm:grid-cols-3">
               <div className="space-y-2">
                 <Label htmlFor="dash-class">{t('absent.class')}</Label>
-                <Select id="dash-class" value={selectedClass} onChange={(e) => setSelectedClass(e.target.value)}>
+                <Select id="dash-class" value={selectedClass} onChange={(e) => setClassChoice(e.target.value)}>
                   <option value="">{t('absent.allClasses')}</option>
                   {classes.map((c) => (
                     <option key={c.id} value={c.id}>

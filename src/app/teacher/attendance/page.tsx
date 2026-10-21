@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import {
@@ -21,12 +21,14 @@ import {
 import { rtdb } from '@/lib/database'
 import { useAuth } from '@/context/AuthContext'
 import { useOfflineAttendanceSync } from '@/hooks/useOfflineAttendanceSync'
+import { useMyAttendance, useMyClasses, useStudentsOfClass } from '@/hooks/useTeacherData'
 import {
   enqueueOfflineAttendance,
+  getOfflineAttendanceQueue,
   isBrowserOnline,
-  withTimeout,
   type QueuedAttendanceRecord,
 } from '@/lib/offlineAttendance'
+import { OfflineNotice } from '@/components/OfflineNotice'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -77,141 +79,65 @@ const STATUSES: {
 
 export default function TeacherAttendancePage() {
   const t = useTranslations('teacherAttendance')
-  const { user } = useAuth()
+  const { user, offline } = useAuth()
   const { isOnline, pendingCount, isSyncing, syncNow, refreshPending } = useOfflineAttendanceSync()
-  const [classes, setClasses] = useState<Class[]>([])
-  const [students, setStudents] = useState<Student[]>([])
-  const [classId, setClassId] = useState('')
+  // Live, offline-first data shared with the other teacher screens: on screen
+  // from the first frame (last known snapshot) and refreshed by itself.
+  const liveClasses = useMyClasses()
+  const classes = useMemo<Class[]>(() => liveClasses ?? [], [liveClasses])
+  const [classChoice, setClassChoice] = useState('')
+  const classId = classChoice || (classes.length > 0 ? classes[0].id : '')
+  const liveStudents = useStudentsOfClass(classId || null)
+  const liveAttendance = useMyAttendance()
   const [date, setDate] = useState(today())
   const [statusMap, setStatusMap] = useState<Record<string, AttendanceStatus>>({})
   const [savedMap, setSavedMap] = useState<Record<string, AttendanceStatus>>({})
-  const [loading, setLoading] = useState(true)
-  const [loadingStudents, setLoadingStudents] = useState(false)
   const [saving, setSaving] = useState(false)
+  const loading = liveClasses === undefined
+  const loadingStudents = !!classId && liveStudents === undefined
 
-  useEffect(() => {
-    const load = async () => {
-      if (!user) return
+  // Archived (deleted) students never appear in attendance taking.
+  const students = useMemo<Student[]>(
+    () =>
+      (liveStudents ?? [])
+        .filter((s) => s.isActive !== false)
+        .sort((a, b) => (a.rollNumber || '').localeCompare(b.rollNumber || '', undefined, { numeric: true })),
+    [liveStudents]
+  )
 
-      // If offline, immediately load from local cache without blocking on network!
-      if (typeof navigator !== 'undefined' && !navigator.onLine) {
-        const cached = localStorage.getItem(`kmms_teacher_classes_${user.uid}`)
-        if (cached) {
-          try {
-            const parsed = JSON.parse(cached) as Class[]
-            setClasses(parsed)
-            if (parsed.length > 0) setClassId(parsed[0].id)
-          } catch {
-            /* ignore */
-          }
-        }
-        setLoading(false)
-        return
-      }
-
-      try {
-        const classList = await withTimeout(rtdb.getAllClasses(), 2500)
-        const myClasses = classList.filter((c) => c.teacherId === user.uid && c.isActive !== false)
-        setClasses(myClasses)
-        try {
-          localStorage.setItem(`kmms_teacher_classes_${user.uid}`, JSON.stringify(myClasses))
-        } catch {
-          /* ignore */
-        }
-        if (myClasses.length > 0) {
-          setClassId(myClasses[0].id)
-        }
-      } catch {
-        // Fallback to offline cached classes for Ustaz
-        const cached = typeof window !== 'undefined' ? localStorage.getItem(`kmms_teacher_classes_${user.uid}`) : null
-        if (cached) {
-          try {
-            const parsed = JSON.parse(cached) as Class[]
-            setClasses(parsed)
-            if (parsed.length > 0) setClassId(parsed[0].id)
-          } catch {
-            toast.error(t('toast.loadClassesFailed'))
-          }
-        } else {
-          toast.error(t('toast.loadClassesFailed'))
-        }
-      } finally {
-        setLoading(false)
-      }
-    }
-    load()
+  // What is already marked for this class and day: the saved records, plus
+  // the marks still queued on this device (they win: they are newer), so the
+  // sheet always shows the truth, even reopened offline before a sync.
+  const knownMap = useMemo(() => {
+    const map: Record<string, AttendanceStatus> = {}
+    if (!classId) return map
+    const activeIds = new Set(students.map((s) => s.id))
+    ;(liveAttendance ?? []).forEach((r) => {
+      if (r.classId === classId && r.date === date && activeIds.has(r.studentId)) map[r.studentId] = r.status
+    })
+    getOfflineAttendanceQueue().forEach((q) => {
+      if (q.classId === classId && q.date === date && activeIds.has(q.studentId)) map[q.studentId] = q.status
+    })
+    return map
+    // pendingCount changes whenever the device queue changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user])
+  }, [classId, date, students, liveAttendance, pendingCount])
 
-  // Load students + existing attendance for selected class/date
+  const dirty = students.some((s) => statusMap[s.id] !== savedMap[s.id])
+  const dirtyRef = useRef(dirty)
+  dirtyRef.current = dirty
+  const scopeRef = useRef('')
+
+  // Load the known marks into the sheet. A live update never wipes marks the
+  // Ustaz is still entering; switching class or day always starts afresh.
   useEffect(() => {
-    const loadClassData = async () => {
-      if (!classId) return
-      setLoadingStudents(true)
-
-      // If offline, immediately load students from local cache without network call
-      if (typeof navigator !== 'undefined' && !navigator.onLine) {
-        const cached = localStorage.getItem(`kmms_class_students_${classId}`)
-        if (cached) {
-          try {
-            const parsed = JSON.parse(cached) as Student[]
-            setStudents(parsed)
-          } catch {
-            /* ignore */
-          }
-        }
-        setLoadingStudents(false)
-        return
-      }
-
-      try {
-        const [studentList, existing] = await withTimeout(
-          Promise.all([
-            rtdb.getStudentsByClass(classId),
-            rtdb.getAttendanceByClassAndDate(classId, date),
-          ]),
-          2500
-        )
-        // Archived (deleted) students never appear in attendance taking.
-        const activeStudents = studentList
-          .filter((s) => s.isActive !== false)
-          .sort((a, b) =>
-            (a.rollNumber || '').localeCompare(b.rollNumber || '', undefined, { numeric: true })
-          )
-        setStudents(activeStudents)
-        try {
-          localStorage.setItem(`kmms_class_students_${classId}`, JSON.stringify(activeStudents))
-        } catch {
-          /* ignore */
-        }
-
-        const activeIds = new Set(activeStudents.map((s) => s.id))
-        const map: Record<string, AttendanceStatus> = {}
-        existing.forEach((r) => {
-          if (activeIds.has(r.studentId)) map[r.studentId] = r.status
-        })
-        setStatusMap(map)
-        setSavedMap(map)
-      } catch {
-        // Fallback to offline cached students for this class
-        const cached = typeof window !== 'undefined' ? localStorage.getItem(`kmms_class_students_${classId}`) : null
-        if (cached) {
-          try {
-            const parsed = JSON.parse(cached) as Student[]
-            setStudents(parsed)
-          } catch {
-            toast.error(t('toast.loadStudentsFailed'))
-          }
-        } else {
-          toast.error(t('toast.loadStudentsFailed'))
-        }
-      } finally {
-        setLoadingStudents(false)
-      }
-    }
-    loadClassData()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [classId, date])
+    const scope = `${classId}|${date}`
+    const scopeChanged = scope !== scopeRef.current
+    scopeRef.current = scope
+    if (!scopeChanged && dirtyRef.current) return
+    setStatusMap(knownMap)
+    setSavedMap(knownMap)
+  }, [knownMap, classId, date])
 
   const setStatus = (studentId: string, status: AttendanceStatus) => {
     setStatusMap((prev) => ({ ...prev, [studentId]: status }))
@@ -245,7 +171,6 @@ export default function TeacherAttendancePage() {
   }, [students, statusMap])
 
   const marked = students.length - counts.unmarked
-  const dirty = students.some((s) => statusMap[s.id] !== savedMap[s.id])
 
   const handleSave = async () => {
     if (!classId) return
@@ -345,12 +270,18 @@ export default function TeacherAttendancePage() {
     return (
       <div>
         <PageHeader title={t('title')} description={t('description')} />
-        <Skeleton className="mb-4 h-24 rounded-xl" />
-        <div className="space-y-2">
-          {[0, 1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-28 rounded-xl" />
-          ))}
-        </div>
+        {offline ? (
+          <OfflineNotice />
+        ) : (
+          <>
+            <Skeleton className="mb-4 h-24 rounded-xl" />
+            <div className="space-y-2">
+              {[0, 1, 2, 3].map((i) => (
+                <Skeleton key={i} className="h-28 rounded-xl" />
+              ))}
+            </div>
+          </>
+        )}
       </div>
     )
   }
@@ -417,7 +348,7 @@ export default function TeacherAttendancePage() {
           <div className="grid gap-4 rounded-xl border bg-card p-4 shadow-sm sm:grid-cols-2 sm:p-5">
             <div className="space-y-2">
               <Label htmlFor="att-class">{t('filters.class')}</Label>
-              <Select id="att-class" value={classId} onChange={(e) => setClassId(e.target.value)} className="h-11">
+              <Select id="att-class" value={classId} onChange={(e) => setClassChoice(e.target.value)} className="h-11">
                 <option value="" disabled>
                   {t('filters.classPlaceholder')}
                 </option>
@@ -441,7 +372,9 @@ export default function TeacherAttendancePage() {
             </div>
           </div>
 
-          {loadingStudents ? (
+          {loadingStudents && offline ? (
+            <OfflineNotice className="mt-6" />
+          ) : loadingStudents ? (
             <div className="mt-6 space-y-2">
               {[0, 1, 2, 3].map((i) => (
                 <Skeleton key={i} className="h-28 rounded-xl" />

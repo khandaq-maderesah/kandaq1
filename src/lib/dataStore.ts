@@ -1,143 +1,217 @@
 'use client'
 
 /**
- * Shared live-data store.
+ * Shared live-data store (offline-first).
  *
  * The admin/teacher navigation bars mount several "bell" components, and each
- * page also subscribes to the same Firebase Realtime Database nodes. Before
- * this module existed EVERY one of those subscriptions was a separate realtime
- * channel, so one screen would download the whole `attendance` node 3 times,
- * `students` 2-3 times, `classes` 3 times and `users` 2 times simultaneously.
+ * page also subscribes to the same Firebase Realtime Database nodes. This store
+ * keeps ONE underlying RTDB subscription per unique key and hands the same data
+ * to every component that asks for it. The subscription is only brought down
+ * when the last component stops using it; the last received snapshot stays
+ * cached in memory so a fast remount renders instantly.
  *
- * This store keeps ONE underlying RTDB subscription per unique key and hands
- * the same data to every component that asks for it. The subscription is only
- * brought down (unsubscribe) when the last component stops using it; the last
- * received snapshot stays cached in memory so a fast remount renders instantly.
+ * Every snapshot is also mirrored to the device (see dataStorePersistence.ts).
+ * A channel's first consumer therefore renders the last known data on the very
+ * first frame, online or offline, and the live subscription replaces it the
+ * moment the server answers. Without this the Realtime Database SDK, which has
+ * no disk cache of its own, leaves every screen on a skeleton while offline.
  */
 
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useMemo, useRef, useSyncExternalStore } from 'react'
 import { getCurrentSchoolId } from '@/lib/database'
+import {
+  persistSelectorFor,
+  readSnapshot,
+  removeSnapshots,
+  writeSnapshot,
+} from '@/lib/dataStorePersistence'
 
-type Listener<T> = (data: T) => void
+export type StartProvider<T> = (emit: (data: T) => void) => () => void
+
+type Listener = () => void
 
 interface StoreEntry<T> {
+  key: string
+  rawKey: string
   data: T | undefined
   refs: number
-  listeners: Set<Listener<T>>
-  start: (() => void) | null
+  listeners: Set<Listener>
+  provider: StartProvider<T>
   unsub: (() => void) | null
+  persistTimer: ReturnType<typeof setTimeout> | null
 }
 
 const entries = new Map<string, StoreEntry<unknown>>()
 
-function getEntry<T>(
-  key: string,
-  startProvider: (emit: (data: T) => void) => () => void
-): StoreEntry<T> {
-  const entry = entries.get(key) as StoreEntry<T> | undefined
-  if (entry) return entry
+const PERSIST_DEBOUNCE_MS = 250
 
-  const newEntry: StoreEntry<T> = {
-    data: undefined,
+/** Channels are per school, so a superadmin switching schools never sees the previous school's snapshot. */
+function scopedKey(rawKey: string): string {
+  return `${getCurrentSchoolId() ?? '-'}:${rawKey}`
+}
+
+function persistLater<T>(entry: StoreEntry<T>) {
+  if (entry.persistTimer) clearTimeout(entry.persistTimer)
+  entry.persistTimer = setTimeout(() => {
+    entry.persistTimer = null
+    if (entry.data === undefined) return
+    const select = persistSelectorFor(entry.rawKey)
+    writeSnapshot(entry.key, select ? select(entry.data) : entry.data)
+  }, PERSIST_DEBOUNCE_MS)
+}
+
+function getEntry<T>(rawKey: string, provider: StartProvider<T>): StoreEntry<T> {
+  const key = scopedKey(rawKey)
+  const existing = entries.get(key) as StoreEntry<T> | undefined
+  if (existing) return existing
+
+  const entry: StoreEntry<T> = {
+    key,
+    rawKey,
+    // Last known snapshot from the device, so the first render is never empty.
+    data: readSnapshot<T>(key),
     refs: 0,
     listeners: new Set(),
-    start: null,
+    provider,
     unsub: null,
+    persistTimer: null,
   }
-
-  const emit = (data: T) => {
-    const e = entries.get(key) as StoreEntry<T> | undefined
-    if (!e) return
-    e.data = data
-    e.listeners.forEach((l) => l(data))
-  }
-
-  newEntry.start = () => {
-    if (newEntry.unsub) return
-    try {
-      newEntry.unsub = startProvider(emit) || (() => {})
-    } catch (err) {
-      console.error(`[dataStore] failed to start subscription "${key}"`, err)
-    }
-  }
-
-  entries.set(key, newEntry as StoreEntry<unknown>)
-  return newEntry
+  entries.set(key, entry as StoreEntry<unknown>)
+  return entry
 }
+
+function startEntry<T>(entry: StoreEntry<T>) {
+  if (entry.unsub) return
+  const emit = (data: T) => {
+    entry.data = data
+    persistLater(entry)
+    entry.listeners.forEach((l) => l())
+  }
+  try {
+    entry.unsub = entry.provider(emit) || (() => {})
+  } catch (err) {
+    console.error(`[dataStore] failed to start subscription "${entry.key}"`, err)
+  }
+}
+
+function stopEntry<T>(entry: StoreEntry<T>) {
+  if (entry.unsub) {
+    entry.unsub()
+    entry.unsub = null
+  }
+  // The value stays cached in memory (and on the device) for a quick remount.
+}
+
+function attach<T>(entry: StoreEntry<T>, onChange: Listener): () => void {
+  entry.listeners.add(onChange)
+  entry.refs += 1
+  if (entry.refs === 1) startEntry(entry)
+  return () => {
+    entry.listeners.delete(onChange)
+    entry.refs -= 1
+    if (entry.refs <= 0) stopEntry(entry)
+  }
+}
+
+const getServerSnapshot = () => undefined
 
 /**
  * Subscribe to a live collection/query. `key` identifies the shared channel
- * (use the same key for the same data — e.g. 'students', 'classes',
+ * (use the same key for the same data, e.g. 'students', 'classes',
  * 'attendance:since:2026-08-15'). When `key` is null no subscription is
  * created and `data` stays undefined (use this for data you only want when a
  * flag is enabled).
  *
  * `startProvider` is called once while the key's first consumer mounts, so it
  * can be an inline closure capturing the query parameters baked into `key`.
+ *
+ * `data` is undefined only when nothing is known yet: no snapshot has arrived
+ * in this session AND none was saved on the device by an earlier one.
  */
-export function useLiveData<T>(
-  rawKey: string | null,
-  startProvider: (emit: (data: T) => void) => () => void
-): { data: T | undefined } {
-  // Channels are per school, so a superadmin switching schools never sees the
-  // previous school's cached snapshot.
-  const key = rawKey ? `${getCurrentSchoolId() ?? '-'}:${rawKey}` : null
-  // `tick` is intentionally unused — it exists only to trigger re-renders when
-  // a new snapshot arrives (we read the value from a ref below).
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [tick, setTick] = useState(0)
-  const dataRef = useRef<T | undefined>(undefined)
+export function useLiveData<T>(rawKey: string | null, startProvider: StartProvider<T>): { data: T | undefined } {
+  const providerRef = useRef(startProvider)
+  providerRef.current = startProvider
 
-  useEffect(() => {
-    if (!key) {
-      dataRef.current = undefined
-      setTick((n) => n + 1)
-      return
+  const subscribe = useCallback(
+    (onChange: Listener) => {
+      if (!rawKey) return () => {}
+      return attach(getEntry<T>(rawKey, providerRef.current), onChange)
+    },
+    [rawKey]
+  )
+
+  const getSnapshot = useCallback((): T | undefined => {
+    if (!rawKey) return undefined
+    return getEntry<T>(rawKey, providerRef.current).data
+  }, [rawKey])
+
+  const data = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
+  return { data }
+}
+
+const ID_SEPARATOR = '\u0000'
+
+/**
+ * Subscribe to a dynamic list of channels of the same shape (e.g. the students
+ * of each of a teacher's classes). Returns one slot per id, in order, or
+ * undefined while `ids` is null. A slot is undefined until its channel has
+ * data (live or from the device).
+ */
+export function useLiveDataMany<T>(
+  ids: readonly string[] | null,
+  channel: { keyFor: (id: string) => string; startFor: (id: string) => StartProvider<T> }
+): (T | undefined)[] | undefined {
+  const channelRef = useRef(channel)
+  channelRef.current = channel
+
+  // A stable identity for the id list, so consumers can pass fresh arrays.
+  const idList = useMemo(() => (ids ? ids.join(ID_SEPARATOR) : null), [ids])
+  const stableIds = useMemo(
+    () => (idList === null ? null : idList === '' ? [] : idList.split(ID_SEPARATOR)),
+    [idList]
+  )
+
+  const subscribe = useCallback(
+    (onChange: Listener) => {
+      if (!stableIds) return () => {}
+      const detach = stableIds.map((id) =>
+        attach(getEntry<T>(channelRef.current.keyFor(id), channelRef.current.startFor(id)), onChange)
+      )
+      return () => detach.forEach((d) => d())
+    },
+    [stableIds]
+  )
+
+  // useSyncExternalStore needs a referentially stable snapshot while nothing
+  // changed, so the slots array is only rebuilt when one of its parts changed.
+  const lastRef = useRef<{ idList: string | null; parts: (T | undefined)[] } | null>(null)
+  const getSnapshot = useCallback((): (T | undefined)[] | undefined => {
+    if (!stableIds) return undefined
+    const parts = stableIds.map(
+      (id) => getEntry<T>(channelRef.current.keyFor(id), channelRef.current.startFor(id)).data
+    )
+    const last = lastRef.current
+    if (
+      last &&
+      last.idList === idList &&
+      last.parts.length === parts.length &&
+      last.parts.every((p, i) => p === parts[i])
+    ) {
+      return last.parts
     }
+    lastRef.current = { idList, parts }
+    return parts
+  }, [stableIds, idList])
 
-    const entry = getEntry<T>(key, startProvider)
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
+}
 
-    // Keep a local copy so `data` returned below is the freshest value even
-    // before a re-render is flushed.
-    if (entry.data !== undefined) {
-      dataRef.current = entry.data
-    }
-
-    entry.refs += 1
-    if (entry.refs === 1 && entry.start) {
-      entry.start()
-    }
-
-    const listener: Listener<T> = (data) => {
-      dataRef.current = data
-      setTick((n) => n + 1)
-    }
-
-    entry.listeners.add(listener)
-
-    // If the value already arrived while we were mounting, push it immediately
-    // so this consumer does not block on a spurious "undefined" render.
-    if (entry.data !== undefined) {
-      dataRef.current = entry.data
-      setTick((n) => n + 1)
-    }
-
-    return () => {
-      entry.listeners.delete(listener)
-      entry.refs -= 1
-      if (entry.refs <= 0) {
-        if (entry.unsub) {
-          entry.unsub()
-          entry.unsub = null
-        }
-        // Keep the value cached in memory so a quick remount is instant, but
-        // drop the live subscription.
-      }
-    }
-    // Re-run only when the key changes; the provider closure is captured by the
-    // entry that owns it.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key])
-
-  return { data: dataRef.current }
+/** Forgets everything cached in memory and on the device (sign-out). */
+export function clearLiveDataCache(): void {
+  entries.forEach((entry) => {
+    if (entry.persistTimer) clearTimeout(entry.persistTimer)
+    stopEntry(entry)
+  })
+  entries.clear()
+  removeSnapshots()
 }

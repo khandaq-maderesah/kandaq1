@@ -131,7 +131,7 @@ describe('Service worker pre-caching smoke verification', () => {
 
   test('every precached route exists in the App Router', () => {
     const routes = precacheShell().filter((entry) => entry.startsWith('/') && !entry.startsWith('/icons/'))
-    assert.ok(routes.length >= 4, 'Expected the app shell routes to be precached')
+    assert.ok(routes.length >= 3, 'Expected the public app shell routes to be precached')
 
     for (const route of routes) {
       const pageFile = routeToPageFile(route)
@@ -160,13 +160,18 @@ describe('Service worker pre-caching smoke verification', () => {
     assert.match(sw, /url\.origin !== location\.origin/)
   })
 
-  test('the offline navigation fallback targets a precached route', () => {
-    const fallback = sw.match(/request\.mode === 'navigate'[\s\S]*?cache\.match\('([^']+)'\)/)?.[1]
-    assert.ok(fallback, 'No navigation fallback route found')
-    assert.ok(
-      precacheShell().includes(fallback),
-      `Navigation fallback "${fallback}" is not part of the precache shell`
-    )
+  test('the offline navigation fallback ends on the precached offline page', () => {
+    const fallback = sw.match(/async function offlineNavigation[\s\S]*?cache\.match\((\w+)\)/)?.[1]
+    assert.equal(fallback, 'OFFLINE_URL', 'offlineNavigation must fall back to the offline document')
+    const offlineUrl = sw.match(/const OFFLINE_URL = '([^']+)'/)?.[1]
+    assert.equal(offlineUrl, '/offline.html')
+    assert.ok(fs.existsSync(path.join(PUBLIC_DIR, 'offline.html')))
+  })
+
+  test('the start URL of a signed-in user is redirected to their home screen', () => {
+    assert.match(sw, /if \(home && isEntryPath\(url\.pathname\) && !url\.searchParams\.has\('from'\)\)/)
+    assert.match(sw, /data\.type === 'SET_HOME'/)
+    assert.match(sw, /data\.type === 'CLEAR_HOME'/)
   })
 
   test('an offline request without a cached copy returns a 503 response', () => {
@@ -388,10 +393,13 @@ describe('Ustaz offline sync edge cases', () => {
     assert.match(read(path.join('src', 'lib', 'offlineAttendance.ts')), /kmms_offline_attendance_queue/)
   })
 
-  test('the Ustaz roster and class list are cached for offline marking', () => {
+  test('the Ustaz roster and class list come from the on-device live store', () => {
     const page = read(path.join('src', 'app', 'teacher', 'attendance', 'page.tsx'))
-    assert.ok(page.includes('kmms_teacher_classes_'), 'Class list must be cached for offline use')
-    assert.ok(page.includes('kmms_class_students_'), 'Student roster must be cached for offline use')
+    assert.ok(page.includes('useMyClasses()'), 'Class list must come from the shared offline-first store')
+    assert.ok(page.includes('useStudentsOfClass('), 'Student roster must come from the shared offline-first store')
+    const store = read(path.join('src', 'lib', 'dataStore.ts'))
+    assert.ok(store.includes('readSnapshot<T>(key)'), 'The store must hydrate from the device snapshot')
+    assert.ok(store.includes('writeSnapshot('), 'The store must persist every snapshot to the device')
   })
 
   test('an offline save falls back to the device queue when the cloud write fails', () => {
@@ -465,32 +473,48 @@ describe('Offline boot repair: the service worker can serve a bootable page offl
    * Runs public/sw.js in a sandbox with a fake Cache API and a fake network,
    * so the real fetch handler can be exercised.
    */
-  function runServiceWorker({ online = false, seed = {}, html } = {}) {
+  function runServiceWorker({ online = false, seed = {}, html, deviceOffline = false } = {}) {
     const listeners = {}
     const store = new Map(
       Object.entries(seed).map(([key, body]) => [key.startsWith('/') ? ORIGIN + key : key, new Response(body)])
     )
     const fetchCalls = []
 
-    const cache = {
-      async put(request, response) {
-        store.set(keyOf(request), response)
-      },
-      async match(request) {
-        return store.get(keyOf(request))
-      },
-      async add(url) {
-        store.set(keyOf(url), new Response('cached:' + url))
-      },
+    // One store per cache name (documents, RSC payloads, worker state), like
+    // the real Cache API; `store` is the documents/assets cache.
+    const stores = new Map()
+    function cacheFor(name) {
+      if (!stores.has(name)) {
+        const map = name === 'khendeq-medresah-v5' ? store : new Map()
+        stores.set(name, {
+          map,
+          async put(request, response) {
+            map.set(keyOf(request), response)
+          },
+          // Like the real Cache API: every match is a fresh, unread response.
+          async match(request) {
+            const stored = map.get(keyOf(request))
+            return stored ? stored.clone() : undefined
+          },
+          async add(url) {
+            map.set(keyOf(url), new Response('cached:' + url))
+          },
+          async delete(request) {
+            return map.delete(keyOf(request))
+          },
+        })
+      }
+      return stores.get(name)
     }
     const caches = {
-      async open() {
-        return cache
+      async open(name) {
+        return cacheFor(name)
       },
       async keys() {
         return ['khendeq-medresah-v4']
       },
-      async delete() {
+      async delete(name) {
+        stores.delete(name)
         return true
       },
     }
@@ -498,6 +522,10 @@ describe('Offline boot repair: the service worker can serve a bootable page offl
       const url = typeof request === 'string' ? request : request.url
       fetchCalls.push(url)
       if (!online) throw new TypeError('Failed to fetch')
+      const isRsc = typeof request !== 'string' && request.headers && request.headers.get('RSC') === '1'
+      if (isRsc) {
+        return new Response('flight:' + url, { status: 200, headers: { 'Content-Type': 'text/x-component' } })
+      }
       const body = html ?? 'network:' + url
       return new Response(body, { status: 200, headers: { 'Content-Type': 'text/html' } })
     }
@@ -530,6 +558,7 @@ describe('Offline boot repair: the service worker can serve a bootable page offl
       console,
       location: { origin: ORIGIN },
       clients,
+      navigator: { onLine: !deviceOffline },
     })
     vm.runInContext(swSource, context)
 
@@ -552,16 +581,101 @@ describe('Offline boot repair: the service worker can serve a bootable page offl
       return responded ? await responded : null
     }
 
-    return { store, fetchCalls, dispatch, fetchEvent }
+    return { store, cacheFor, fetchCalls, dispatch, fetchEvent }
   }
 
   const navigation = (path) => ({ method: 'GET', url: ORIGIN + path, mode: 'navigate' })
+  const rscFetch = (path, prefetch = false) => ({
+    method: 'GET',
+    url: ORIGIN + path + '?_rsc=1abcd',
+    mode: 'cors',
+    headers: new Headers(prefetch ? { RSC: '1', 'Next-Router-Prefetch': '1' } : { RSC: '1' }),
+  })
 
-  test('an offline navigation serves the cached shell of that area', async () => {
+  test('an offline navigation serves the cached page', async () => {
     const sw = runServiceWorker({ online: false, seed: { '/teacher/attendance': '<html>attendance shell</html>' } })
-    const response = await sw.fetchEvent(navigation('/teacher'))
+    const response = await sw.fetchEvent(navigation('/teacher/attendance'))
     assert.ok(response, 'The navigation must be answered')
     assert.match(await response.text(), /attendance shell/)
+  })
+
+  test('an offline navigation to a page never opened goes to its nearest cached parent', async () => {
+    const sw = runServiceWorker({ online: false, seed: { '/teacher/exams': '<html>exam list</html>' } })
+    const response = await sw.fetchEvent(navigation('/teacher/exams/never-opened'))
+    assert.equal(response.status, 302)
+    assert.equal(response.headers.get('location'), ORIGIN + '/teacher/exams')
+  })
+
+  test('a device that reports offline is answered from the cache without touching the network', async () => {
+    const sw = runServiceWorker({
+      online: true,
+      deviceOffline: true,
+      seed: { '/teacher/classes': '<html>classes shell</html>' },
+    })
+    const response = await sw.fetchEvent(navigation('/teacher/classes'))
+    assert.match(await response.text(), /classes shell/)
+    assert.equal(sw.fetchCalls.length, 0, 'An offline device must never wait for a network timeout')
+  })
+
+  test('the start URL of a signed-in user is redirected straight to their home screen', async () => {
+    const sw = runServiceWorker({ online: true })
+    await sw.dispatch('message', { data: { type: 'SET_HOME', path: '/teacher' } })
+    for (const start of ['/', '/login', '/dashboard', '/m/khendeq']) {
+      const response = await sw.fetchEvent(navigation(start))
+      assert.equal(response.status, 302, `${start} must redirect to the home screen`)
+      assert.equal(response.headers.get('location'), ORIGIN + '/teacher')
+    }
+    // A sign-in page the server bounced to is left alone: no redirect loop.
+    const bounced = await sw.fetchEvent(navigation('/login?from=%2Fteacher'))
+    assert.equal(bounced.status, 200)
+    // The whole area was precached: pages and their RSC payloads.
+    assert.ok(sw.store.has(ORIGIN + '/teacher/classes'), 'Area pages must be precached after sign-in')
+    assert.ok(sw.store.has(ORIGIN + '/teacher/requests'), 'Area pages must be precached after sign-in')
+    assert.ok(
+      sw.cacheFor('khendeq-medresah-rsc-v5').map.has(ORIGIN + '/teacher/classes'),
+      'Area RSC payloads must be precached after sign-in'
+    )
+  })
+
+  test('signing out forgets the home screen and the cached RSC payloads', async () => {
+    const sw = runServiceWorker({ online: true })
+    await sw.dispatch('message', { data: { type: 'SET_HOME', path: '/teacher' } })
+    await sw.dispatch('message', { data: { type: 'CLEAR_HOME' } })
+    const response = await sw.fetchEvent(navigation('/'))
+    assert.equal(response.status, 200, 'Without a home the landing page is served normally')
+    assert.equal(sw.cacheFor('khendeq-medresah-rsc-v5').map.size, 0)
+  })
+
+  test('a home screen outside the app areas is refused', async () => {
+    const sw = runServiceWorker({ online: true })
+    await sw.dispatch('message', { data: { type: 'SET_HOME', path: 'https://evil.example/x' } })
+    await sw.dispatch('message', { data: { type: 'SET_HOME', path: '/login' } })
+    const response = await sw.fetchEvent(navigation('/'))
+    assert.equal(response.status, 200)
+  })
+
+  test('an in-app navigation offline is answered by the RSC payload cached under the page path', async () => {
+    const sw = runServiceWorker({ online: true })
+    const online = await sw.fetchEvent(rscFetch('/teacher/classes'))
+    assert.match(await online.text(), /flight:/)
+    sw.fetchCalls.length = 0
+    // Later, offline, with a different ?_rsc marker.
+    const offline = runServiceWorker({ online: false })
+    const rsc = offline.cacheFor('khendeq-medresah-rsc-v5')
+    await rsc.put(ORIGIN + '/teacher/classes', new Response('flight:cached', { headers: { 'Content-Type': 'text/x-component' } }))
+    const served = await offline.fetchEvent({ ...rscFetch('/teacher/classes'), url: ORIGIN + '/teacher/classes?_rsc=zzzz' })
+    assert.equal(served.status, 200)
+    assert.match(await served.text(), /flight:cached/)
+    const missing = await offline.fetchEvent(rscFetch('/teacher/history'))
+    assert.equal(missing.status, 503, 'With nothing cached the router must fall back to a full navigation')
+  })
+
+  test('a prefetch never replaces a full RSC payload already cached', async () => {
+    const sw = runServiceWorker({ online: true })
+    const rsc = sw.cacheFor('khendeq-medresah-rsc-v5')
+    await rsc.put(ORIGIN + '/teacher/classes', new Response('flight:full', { headers: { 'Content-Type': 'text/x-component' } }))
+    await sw.fetchEvent(rscFetch('/teacher/classes', true))
+    assert.match(await (await rsc.match(ORIGIN + '/teacher/classes')).text(), /flight:full/)
   })
 
   test('an offline navigation without any cached page serves the offline document', async () => {

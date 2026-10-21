@@ -1,14 +1,13 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
-import { toast } from 'sonner'
 import { ArrowRightLeft, Clock, MoreVertical, Phone, Search, Trash2, UserPlus, Users } from 'lucide-react'
-import { rtdb } from '@/lib/database'
 import { useAuth } from '@/context/AuthContext'
-import { useLiveData } from '@/lib/dataStore'
 import { useMyRequests } from '@/hooks/useRequestBadges'
+import { useAllClasses, useMyClasses, useStudentsOfClasses } from '@/hooks/useTeacherData'
+import { OfflineNotice } from '@/components/OfflineNotice'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -93,44 +92,28 @@ export default function TeacherStudentsPage() {
   const t = useTranslations('teacherStudents')
   const tAdd = useTranslations('teacherClasses')
   const tc = useTranslations('common')
-  const { user } = useAuth()
-  const [classes, setClasses] = useState<Class[]>([])
-  const [students, setStudents] = useState<Student[]>([])
-  const [loading, setLoading] = useState(true)
-  const [classId, setClassId] = useState('')
+  const { user, offline } = useAuth()
+  // Live, offline-first data shared with the other teacher screens: on screen
+  // from the first frame (last known snapshot) and refreshed by itself.
+  const liveClasses = useMyClasses()
+  const liveStudents = useStudentsOfClasses(liveClasses)
+  const classes = useMemo<Class[]>(() => liveClasses ?? [], [liveClasses])
+  const students = useMemo<Student[]>(() => liveStudents ?? [], [liveStudents])
+  const loading = liveClasses === undefined || liveStudents === undefined
+  // null = the first class (the default), '' = all classes.
+  const [classChoice, setClassChoice] = useState<string | null>(null)
+  const classId = classChoice ?? (classes.length > 0 ? classes[0].id : '')
   const [search, setSearch] = useState('')
   const [viewingStudent, setViewingStudent] = useState<Student | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<Student | null>(null)
   const [transferTarget, setTransferTarget] = useState<Student | null>(null)
 
-  const allClasses = useLiveData<Class[]>('classes', (emit) => rtdb.subscribeToClasses(emit)).data
+  const allClasses = useAllClasses()
   const myRequests = useMyRequests(user?.uid)
   const pendingIds = useMemo(
     () => new Set((myRequests ?? []).filter((r) => r.status === 'pending').map((r) => r.studentId)),
     [myRequests]
   )
-
-  useEffect(() => {
-    const load = async () => {
-      if (!user) return
-      setLoading(true)
-      try {
-        const classList = await rtdb.getAllClasses()
-        const myClasses = classList.filter((c) => c.teacherId === user.uid && c.isActive !== false)
-        // Server-side filtered: only the students of the teacher's own classes.
-        const myStudents = (await Promise.all(myClasses.map((c) => rtdb.getStudentsByClass(c.id)))).flat()
-        setClasses(myClasses)
-        setStudents(myStudents)
-        setClassId((cur) => cur || (myClasses.length > 0 ? myClasses[0].id : ''))
-      } catch {
-        toast.error(t('toast.loadFailed'))
-      } finally {
-        setLoading(false)
-      }
-    }
-    load()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user])
 
   const classById = useMemo(() => {
     const m: Record<string, Class> = {}
@@ -210,7 +193,7 @@ export default function TeacherStudentsPage() {
         </div>
         <div className="space-y-2">
           <Label htmlFor="stu-class">{t('filters.class')}</Label>
-          <Select id="stu-class" value={classId} onChange={(e) => setClassId(e.target.value)}>
+          <Select id="stu-class" value={classId} onChange={(e) => setClassChoice(e.target.value)}>
             <option value="">{t('filters.allClasses')}</option>
             {classes.map((c) => (
               <option key={c.id} value={c.id}>
@@ -221,7 +204,9 @@ export default function TeacherStudentsPage() {
         </div>
       </div>
 
-      {loading ? (
+      {loading && offline ? (
+        <OfflineNotice />
+      ) : loading ? (
         <div className="space-y-2">
           {[0, 1, 2, 3, 4].map((i) => (
             <Skeleton key={i} className="h-16 rounded-xl" />

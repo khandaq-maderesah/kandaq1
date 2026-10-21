@@ -496,6 +496,11 @@ export async function getRegistrationOpen(): Promise<boolean> {
   return !snap.exists() || String(snap.val()) !== 'false'
 }
 
+/** Live value of settings/registrationOpen (defaults to open). */
+export function subscribeToRegistrationOpen(cb: (open: boolean) => void): Unsubscribe {
+  return onValue(sref('settings/registrationOpen'), (snap) => cb(!snap.exists() || String(snap.val()) !== 'false'))
+}
+
 export async function updateSettings(data: Record<string, string>): Promise<void> {
   await Promise.all(
     Object.entries(data).map(([k, v]) => set(sref(`settings/${k}`), v ?? ''))
@@ -978,6 +983,7 @@ export const rtdb = {
   setMissingAttendanceAlert,
   updateMissingAttendanceAlert,
   subscribeToMissingAttendanceAlerts,
+  subscribeToRegistrationOpen,
   getSettings,
   getRegistrationOpen,
   updateSettings,

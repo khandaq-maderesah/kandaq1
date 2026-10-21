@@ -11,7 +11,7 @@ import { useEffect } from 'react'
  * Cache-Control), and a fixed offline bug would stay broken on every device
  * that already installed the app.
  */
-const SW_VERSION = 'v4'
+const SW_VERSION = 'v5'
 const SW_URL = `/sw.js?v=${SW_VERSION}`
 
 declare global {

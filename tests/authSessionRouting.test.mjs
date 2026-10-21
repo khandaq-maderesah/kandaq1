@@ -82,16 +82,20 @@ describe('Session middleware routing', () => {
 })
 
 describe('Role home routing', () => {
+  // homePathFor lives in src/lib/routes.ts (shared with the service worker
+  // start-screen logic) and is re-exported by ProtectedRoute for its callers.
+  const routes = fs.readFileSync(path.resolve('src/lib/routes.ts'), 'utf8')
   const protectedRoute = fs.readFileSync(
     path.resolve('src/components/ProtectedRoute.tsx'),
     'utf8'
   )
 
   test('every role has a deterministic home screen', () => {
-    assert.match(protectedRoute, /if \(role === 'superadmin'\) return hasSchool \? '\/admin' : '\/superadmin'/)
-    assert.match(protectedRoute, /if \(role === 'admin'\) return '\/admin'/)
-    assert.match(protectedRoute, /if \(role === 'teacher'\) return '\/teacher'/)
-    assert.match(protectedRoute, /return '\/login'/)
+    assert.match(routes, /if \(role === 'superadmin'\) return hasSchool \? '\/admin' : '\/superadmin'/)
+    assert.match(routes, /if \(role === 'admin'\) return '\/admin'/)
+    assert.match(routes, /if \(role === 'teacher'\) return '\/teacher'/)
+    assert.match(routes, /return '\/login'/)
+    assert.match(protectedRoute, /export \{ homePathFor \}/)
   })
 
   test('the landing page and the sign-in page redirect an authenticated user home', () => {

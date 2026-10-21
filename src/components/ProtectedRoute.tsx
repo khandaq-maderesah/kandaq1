@@ -6,19 +6,15 @@ import { useEffect } from 'react'
 import { UserRole } from '@/types'
 import { signInPath } from '@/lib/brandMemory'
 import { OfflineScreen } from '@/components/OfflineScreen'
+import { homePathFor } from '@/lib/routes'
+
+// Kept here for the many screens that import it from this module.
+export { homePathFor }
 
 interface ProtectedRouteProps {
   children: React.ReactNode
   allowedRoles?: UserRole[]
   redirectTo?: string
-}
-
-/** Where a user lands after sign-in (or when they open a page they can't use). */
-export function homePathFor(role: UserRole | undefined, hasSchool: boolean): string {
-  if (role === 'superadmin') return hasSchool ? '/admin' : '/superadmin'
-  if (role === 'admin') return '/admin'
-  if (role === 'teacher') return '/teacher'
-  return '/login'
 }
 
 export function ProtectedRoute({

@@ -44,7 +44,9 @@
     "description": "KMMS ma hadda serverka ma gaari karo. Waxaad kaydisay wuxuu ku jiraa qalabkana wuxuuna isbeddelay marka xiriirku dib u soo baxo.",
     "retry": "Isku day mar kale",
     "waiting": "Xiriir la filayaa…",
-    "banner": "Ma offline ahaad — isbeddelku waxaa lagu keydiyay qalabka"
+    "banner": "Ma offline ahaad — isbeddelku waxaa lagu keydiyay qalabka",
+    "notCached": "Weli lama heli karo adigoo offline ah",
+    "notCachedHint": "Fur shaashaddan hal mar adigoo internet haysta, ka dib waxay shaqayn doontaa adigoo offline ah."
   },
   "status": {
     "loading": "Waa la soo rarayaa…",

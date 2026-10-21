@@ -5,6 +5,7 @@ import { useFormatter, useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { rtdb } from '@/lib/database'
 import { useAuth } from '@/context/AuthContext'
+import { OfflineNotice } from '@/components/OfflineNotice'
 import { useLiveData } from '@/lib/dataStore'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -60,7 +61,7 @@ export function AnnouncementBell(
   const t = useTranslations('notifications.announcements')
   const tc = useTranslations('common')
   const format = useFormatter()
-  const { user } = useAuth()
+  const { user, offline } = useAuth()
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(true)
 
@@ -286,7 +287,9 @@ export function AnnouncementBell(
           </div>
 
           <div className="min-h-0 flex-1 overflow-y-auto">
-            {loading ? (
+            {loading && offline ? (
+              <OfflineNotice compact />
+            ) : loading ? (
               <div className="space-y-3 p-4">
                 <Skeleton className="h-16 w-full" />
                 <Skeleton className="h-16 w-full" />
