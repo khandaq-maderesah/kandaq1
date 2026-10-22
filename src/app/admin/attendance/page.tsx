@@ -17,6 +17,9 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import UstazAttendanceMonitor from '@/components/admin/UstazAttendanceMonitor'
+import { SessionChips } from '@/components/reports/WeeklyReportView'
+import { useAllSessionLogs, useSessionLogMap } from '@/hooks/useWeeklyReports'
+import { sessionLogId } from '@/lib/weeklyReport'
 import { rtdb } from '@/lib/database'
 import { useAuth } from '@/context/AuthContext'
 import { cn, daysAgoISO } from '@/lib/utils'
@@ -87,6 +90,8 @@ export default function AttendancePage() {
   const [statusMap, setStatusMap] = useState<Record<string, AttendanceStatus>>({})
   const [loadingStudents, setLoadingStudents] = useState(false)
   const [saving, setSaving] = useState(false)
+  // The Ustaz's daily report (Qur'an / Kitab done) for the chosen class and day, live.
+  const sessionLogs = useSessionLogMap(useAllSessionLogs(true))
 
   const loadData = useCallback(async (showLoader = false) => {
     if (showLoader) setLoading(true)
@@ -280,6 +285,16 @@ export default function AttendancePage() {
                 {ethDate && <p className="text-xs text-muted-foreground">{t('mark.ethiopianDate', { date: ethDate })}</p>}
               </div>
             </div>
+            {classId && (
+              <div className="mt-4 flex flex-wrap items-center gap-3 rounded-lg border bg-background px-3 py-2">
+                <span className="text-sm font-medium text-foreground">{t('mark.sessionsTitle')}</span>
+                {sessionLogs[sessionLogId(classId, date)] ? (
+                  <SessionChips date={date} log={sessionLogs[sessionLogId(classId, date)]} />
+                ) : (
+                  <span className="text-xs text-muted-foreground">{t('mark.sessionsNone')}</span>
+                )}
+              </div>
+            )}
             <div className="mt-4 flex flex-wrap items-center gap-2 border-t pt-4">
               <Button type="button" size="sm" variant="success" onClick={() => markAll('present')}>
                 <Check /> {t('mark.allPresent')}

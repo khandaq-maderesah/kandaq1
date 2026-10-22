@@ -19,7 +19,9 @@
     "progress": "{total} keessaa {marked} mallatteeffame",
     "save": "Argama olkaa'i",
     "roll": "Lakk. {roll}",
-    "statusGroup": "Haala argamaa {name}"
+    "statusGroup": "Haala argamaa {name}",
+    "sessionsTitle": "Kutaa yeroo ustaaziin gabaase",
+    "sessionsNone": "Guyyaa kanaaf ammas hin gabaafamne."
   },
   "records": {
     "class": "Kutaa",

@@ -19,7 +19,9 @@
     "progress": "{marked} of {total} marked",
     "save": "Save attendance",
     "roll": "Roll {roll}",
-    "statusGroup": "Attendance status for {name}"
+    "statusGroup": "Attendance status for {name}",
+    "sessionsTitle": "Sessions reported by the Ustaz",
+    "sessionsNone": "Not reported yet for this day."
   },
   "records": {
     "class": "Class",

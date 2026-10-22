@@ -934,3 +934,12 @@ Live check against https://mms.khendeq.com
 - `src/app/admin/page.tsx`: absent list grouped by class, each class with its own "SMS all absent (n)"; per-student buttons unchanged.
 - Translations: `teacherDashboard.absent.sendSms*`, `adminDashboard.absent.sendSmsAll*`, `weeklyReports.daily.*`. `tests/smsGroup.test.mjs` (5 tests).
 - Verified: `npm run verify` PASS, 222 tests pass.
+
+---
+
+## [2026-10-22] Task 6.8 - Admins see the daily report at once
+
+- **Owner report**: the daily session answers seemed visible only to the Ustaz. Cause: the admin "Weekly reports" page opened on the week whose report was due (last week on weekdays), so this week's marks were one tap away.
+- `src/app/admin/weekly-reports/page.tsx`: opens on the current week (the badge still counts the due week).
+- `src/app/admin/attendance/page.tsx`: the "Mark attendance" tab shows "Sessions reported by the Ustaz" (Qur'an / Kitab done or not) for the chosen class and day, or "Not reported yet"; live, no submission needed. Translations in en/am/ar/om/so; 2 tests.
+- Verified: `npm run verify` PASS, 224 tests pass.

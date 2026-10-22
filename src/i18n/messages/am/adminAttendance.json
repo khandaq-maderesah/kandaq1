@@ -19,7 +19,9 @@
     "progress": "ከ{total} ውስጥ {marked} ተመዝግበዋል",
     "save": "መገኘት አስቀምጥ",
     "roll": "ተ.ቁ. {roll}",
-    "statusGroup": "የ{name} መገኘት"
+    "statusGroup": "የ{name} መገኘት",
+    "sessionsTitle": "በኡስታዙ የተዘገቡ ክፍለ ጊዜዎች",
+    "sessionsNone": "ለዚህ ቀን እስካሁን አልተዘገበም።"
   },
   "records": {
     "class": "ክፍል",

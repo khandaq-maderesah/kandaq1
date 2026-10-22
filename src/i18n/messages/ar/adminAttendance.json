@@ -19,7 +19,9 @@
     "progress": "تم تحديد {marked} من {total}",
     "save": "حفظ الحضور",
     "roll": "رقم {roll}",
-    "statusGroup": "حالة حضور {name}"
+    "statusGroup": "حالة حضور {name}",
+    "sessionsTitle": "الحصص التي أبلغ عنها الأستاذ",
+    "sessionsNone": "لم يُبلَّغ عن هذا اليوم بعد."
   },
   "records": {
     "class": "الفصل",

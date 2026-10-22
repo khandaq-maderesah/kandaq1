@@ -19,7 +19,9 @@
     "progress": "{marked} ka mid ah {total} ayaa la calaamadeeyay",
     "save": "Kaydi xaadiriska",
     "roll": "Lambar {roll}",
-    "statusGroup": "Xaaladda xaadiriska {name}"
+    "statusGroup": "Xaaladda xaadiriska {name}",
+    "sessionsTitle": "Kulammada uu ustaadku soo sheegay",
+    "sessionsNone": "Maalintan weli lama soo sheegin."
   },
   "records": {
     "class": "Fasalka",

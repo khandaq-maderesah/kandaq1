@@ -189,3 +189,22 @@ describe('Wiring', () => {
     assert.ok(fs.existsSync(path.join(ROOT, 'src/app/admin/weekly-reports/page.tsx')))
   })
 })
+
+describe('Admins see the daily report without waiting for a submission', () => {
+  const ROOT = path.resolve('.')
+  const read = (p) => fs.readFileSync(path.join(ROOT, p), 'utf8')
+
+  test('the admin weekly reports page opens on the current week and shows the daily sessions grid', () => {
+    const page = read('src/app/admin/weekly-reports/page.tsx')
+    assert.match(page, /useState\(currentWeek\)/)
+    assert.match(page, /daily\.title/)
+    assert.match(page, /useAllSessionLogs\(true\)/)
+  })
+
+  test('the admin attendance page shows the Ustaz session answers for the chosen class and day', () => {
+    const page = read('src/app/admin/attendance/page.tsx')
+    assert.match(page, /useAllSessionLogs\(true\)/)
+    assert.match(page, /mark\.sessionsTitle/)
+    assert.match(page, /mark\.sessionsNone/)
+  })
+})

@@ -8,7 +8,7 @@ import { rtdb } from '@/lib/database'
 import { useAuth } from '@/context/AuthContext'
 import { useLiveData } from '@/lib/dataStore'
 import { useAllSessionLogs, useAllWeeklyReports, useSessionLogMap } from '@/hooks/useWeeklyReports'
-import { addDays, isSaturday, reportWeekFor, sessionLogId, weekDays, weekStartOf, weeklyReportId } from '@/lib/weeklyReport'
+import { addDays, isSaturday, sessionLogId, weekDays, weekStartOf, weeklyReportId } from '@/lib/weeklyReport'
 import { cn } from '@/lib/utils'
 import { WeeklyReportView } from '@/components/reports/WeeklyReportView'
 import { OfflineNotice } from '@/components/OfflineNotice'
@@ -32,7 +32,9 @@ export default function AdminWeeklyReportsPage() {
   const logs = useSessionLogMap(useAllSessionLogs(true))
 
   const currentWeek = weekStartOf(todayIso())
-  const [weekStart, setWeekStart] = useState(reportWeekFor(todayIso()))
+  // Opens on the current week, so today's daily sessions are visible at once
+  // (the nav badge still counts the week whose report is due).
+  const [weekStart, setWeekStart] = useState(currentWeek)
   const [open, setOpen] = useState<WeeklyReport | null>(null)
   const [unlocking, setUnlocking] = useState(false)
 
