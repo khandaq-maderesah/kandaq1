@@ -29,14 +29,20 @@
     "emptyAll": "Hanga ammaatti kutaalee keessan keessatti hafuun galmaa'e hin jiru.",
     "emptyDate": "Guyyaa {date} hafuun galmaa'e hin jiru.",
     "noClasses": "Hanga ammaatti kutaan isinitti kenname hin jiru.",
-    "callNumber": "{phone} bilbili"
+    "callNumber": "{phone} bilbili",
+    "sendSms": "SMS ergi",
+    "sendSmsHint": "Appii SMS kee ergaa hafuu wajjin bani",
+    "sendSmsAll": "Hafan hundaaf SMS ({count})",
+    "sendSmsAllHint": "Ergaa garee tokko maatii tarree kana keessa jiran hundaaf, appii SMS kee irraa",
+    "noNumbers": "Tarree kana keessa lakkoofsi bilbilaa maatii hin jiru."
   },
   "table": {
     "date": "Guyyaa",
     "student": "Barataa",
     "class": "Kutaa",
     "parentPhone": "Bilbila maatii",
-    "alternativePhone": "Bilbila biraa"
+    "alternativePhone": "Bilbila biraa",
+    "action": "Gocha"
   },
   "toast": {
     "loadFailed": "Odeeffannoo fuula jalqabaa fe'uun hin danda'amne. Walqunnamtii keessan mirkaneeffadhaa."

@@ -29,14 +29,20 @@
     "emptyAll": "No absences recorded yet in your classes.",
     "emptyDate": "No absences recorded for {date}.",
     "noClasses": "No classes have been assigned to you yet.",
-    "callNumber": "Call {phone}"
+    "callNumber": "Call {phone}",
+    "sendSms": "Send SMS",
+    "sendSmsHint": "Open your SMS app with the absence message filled in",
+    "sendSmsAll": "SMS all absent ({count})",
+    "sendSmsAllHint": "One group text to every parent in this list, from your SMS app",
+    "noNumbers": "No parent phone numbers in this list."
   },
   "table": {
     "date": "Date",
     "student": "Student",
     "class": "Class",
     "parentPhone": "Parent phone",
-    "alternativePhone": "Alternative phone"
+    "alternativePhone": "Alternative phone",
+    "action": "Action"
   },
   "toast": {
     "loadFailed": "Could not load dashboard data. Check your connection."

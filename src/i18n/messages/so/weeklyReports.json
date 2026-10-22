@@ -60,5 +60,12 @@
     "submitted": "{count} la gudbiyay",
     "missing": "{count} maqan"
   },
-  "by": "Waxaa qoray {name}"
+  "by": "Waxaa qoray {name}",
+  "daily": {
+    "title": "Kulammada maalinlaha",
+    "description": "Kulammada fasal kastaa qabtay toddobaadkan, xaadirinta uu ustaadku qaaday.",
+    "quranShort": "Q",
+    "kitabShort": "K",
+    "reviewShort": "D"
+  }
 }

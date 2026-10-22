@@ -60,5 +60,12 @@
     "submitted": "{count} تم التسليم",
     "missing": "{count} ناقص"
   },
-  "by": "بواسطة {name}"
+  "by": "بواسطة {name}",
+  "daily": {
+    "title": "الحصص اليومية",
+    "description": "الحصص التي أقامها كل فصل هذا الأسبوع، من الحضور الذي سجّله الأستاذ.",
+    "quranShort": "ق",
+    "kitabShort": "ك",
+    "reviewShort": "م"
+  }
 }

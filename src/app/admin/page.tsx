@@ -48,7 +48,8 @@ import {
 } from '@/components/ui/dialog'
 import { StudentAvatar } from '@/components/StudentAvatar'
 import { StudentDetailCard } from '@/components/StudentDetailCard'
-import { generateSmsMessage } from '@/lib/smsMessage'
+import { generateGroupSmsMessage, generateSmsMessage } from '@/lib/smsMessage'
+import { detectSmsPlatform, dominantLanguage, groupSmsHref, uniquePhones } from '@/lib/smsLink'
 import { useAuth } from '@/context/AuthContext'
 import { useEthiopianDate } from '@/hooks/useEthiopianDate'
 import { LOCALE_DIR } from '@/i18n/config'
@@ -514,6 +515,27 @@ export default function AdminPage() {
       generateSmsMessage(r.studentName, r.gender, r.parentLanguage, school)
     )}`
 
+  // The absent list is shown class by class, each with its own group text.
+  // (Plain computation: this runs after the loading return, so no hook here.)
+  const absentGroups = (() => {
+    const groups = new Map<string, { label: string; rows: AbsentStudent[] }>()
+    for (const r of filteredAbsent) {
+      const label = r.section ? `${r.className} · ${r.section}` : r.className
+      const key = `${r.className}|${r.section}`
+      if (!groups.has(key)) groups.set(key, { label, rows: [] })
+      groups.get(key)!.rows.push(r)
+    }
+    return Array.from(groups.values()).sort((a, b) => a.label.localeCompare(b.label))
+  })()
+  const platform = detectSmsPlatform(typeof navigator === 'undefined' ? '' : navigator.userAgent)
+  const groupHref = (rows: AbsentStudent[]) =>
+    groupSmsHref(
+      rows.map((r) => (r.parentPhone === '—' ? '' : r.parentPhone)),
+      generateGroupSmsMessage(dominantLanguage(rows.map((r) => r.parentLanguage)), school),
+      platform
+    )
+  const groupCount = (rows: AbsentStudent[]) => uniquePhones(rows.map((r) => (r.parentPhone === '—' ? '' : r.parentPhone))).length
+
   const studentListTitle =
     studentGenderFilter === 'male'
       ? t('students.titleMale')
@@ -861,10 +883,26 @@ export default function AdminPage() {
         {filteredAbsent.length === 0 ? (
           <EmptyState icon={UserX} title={absentEmpty} />
         ) : (
-          <>
+          absentGroups.map((group) => (
+          <div key={group.label} className="space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h3 className="flex items-center gap-2 text-base font-semibold text-foreground">
+                {group.label}
+                <Badge variant="destructive">{group.rows.length}</Badge>
+              </h3>
+              {groupHref(group.rows) && (
+                <a
+                  href={groupHref(group.rows) as string}
+                  title={t('absent.sendSmsAllHint')}
+                  className={buttonVariants({ size: 'sm', variant: 'success' })}
+                >
+                  <MessageSquare /> {t('absent.sendSmsAll', { count: groupCount(group.rows) })}
+                </a>
+              )}
+            </div>
             {/* Mobile: stacked cards */}
             <ul className="space-y-3 md:hidden">
-              {filteredAbsent.map((r) => (
+              {group.rows.map((r) => (
                 <li key={r.id} className="rounded-xl border bg-card p-4 shadow-sm">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
@@ -907,7 +945,7 @@ export default function AdminPage() {
                 </tr>
               </thead>
               <tbody>
-                {filteredAbsent.map((r) => {
+                {group.rows.map((r) => {
                   const ethDate = eth.format(r.date)
                   return (
                     <tr key={r.id}>
@@ -943,7 +981,8 @@ export default function AdminPage() {
                 })}
               </tbody>
             </TableContainer>
-          </>
+          </div>
+          ))
         )}
       </section>
 

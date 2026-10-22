@@ -92,3 +92,26 @@ export function generateSmsMessage(
     }
   }
 }
+
+/**
+ * The absence message for a group text to several parents at once (no
+ * student name, since one text goes to everyone).
+ */
+export function generateGroupSmsMessage(
+  language?: string,
+  school?: { name: string; nameAm?: string } | null
+): string {
+  const schoolName = school?.name ?? 'Khendeq'
+  switch (language as ParentLanguage) {
+    case 'Afaan Oromoo':
+      return `${school ? `${school.name} irraa` : 'Madarasaa Khendeq irraa'}\n\nKabajamtoota maatii, guyyaa har'aa mucaan keessan madarasaa akka hin dhufne isin beeksifna.`
+    case 'Somali':
+      return `Ka socota ${schoolName}\n\nWaalidka sharafta leh, waxaan idin ogeysiinaynaa in ilmahiinu maanta madrasada iman.`
+    case 'Arabic':
+      return `من ${schoolName}\n\nحضرة وليّ الأمر المحترم،\nنودّ إعلامكم بأنّ ابنكم/ابنتكم تغيّب عن المدرسة اليوم.`
+    case 'English':
+      return `From ${schoolName}\n\nDear parent or guardian, we would like to let you know that your child was absent from the madrasa today.`
+    default:
+      return `${school ? `ከ ${school.nameAm || school.name}` : 'ከ ኸንደቅ መድረሳ'}\n\nየተከበራችሁ ወላጆች፣ ዛሬ ልጃችሁ መድረሳ አለመምጣቱን/አለመምጣቷን እናሳውቃለን።`
+  }
+}

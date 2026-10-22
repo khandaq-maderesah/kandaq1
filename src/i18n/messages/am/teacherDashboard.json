@@ -29,14 +29,20 @@
     "emptyAll": "በክፍሎችዎ እስካሁን የተመዘገበ ቀሪ የለም።",
     "emptyDate": "ለ{date} የተመዘገበ ቀሪ የለም።",
     "noClasses": "እስካሁን ምንም ክፍል አልተመደበልዎትም።",
-    "callNumber": "{phone} ደውል"
+    "callNumber": "{phone} ደውል",
+    "sendSms": "ኤስኤምኤስ ላክ",
+    "sendSmsHint": "የኤስኤምኤስ መተግበሪያዎን ከመልእክቱ ጋር ይክፈቱ",
+    "sendSmsAll": "ለሁሉም የቀሩ ኤስኤምኤስ ({count})",
+    "sendSmsAllHint": "በዚህ ዝርዝር ላሉ ወላጆች ሁሉ አንድ የቡድን መልእክት፣ ከኤስኤምኤስ መተግበሪያዎ",
+    "noNumbers": "በዚህ ዝርዝር የወላጅ ስልክ ቁጥር የለም።"
   },
   "table": {
     "date": "ቀን",
     "student": "ተማሪ",
     "class": "ክፍል",
     "parentPhone": "የወላጅ ስልክ",
-    "alternativePhone": "ተጨማሪ ስልክ"
+    "alternativePhone": "ተጨማሪ ስልክ",
+    "action": "እርምጃ"
   },
   "toast": {
     "loadFailed": "የዳሽቦርድ መረጃ መጫን አልተቻለም። የኢንተርኔት ግንኙነትዎን ያረጋግጡ።"

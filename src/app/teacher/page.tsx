@@ -3,8 +3,10 @@
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useFormatter, useTranslations } from 'next-intl'
-import { ChevronRight, ClipboardList, GraduationCap, Phone, Search, UserCheck, UserPlus, Users, UserX } from 'lucide-react'
+import { ChevronRight, ClipboardList, GraduationCap, MessageSquare, Phone, Search, UserCheck, UserPlus, Users, UserX } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
+import { generateGroupSmsMessage, generateSmsMessage } from '@/lib/smsMessage'
+import { detectSmsPlatform, dominantLanguage, groupSmsHref, smsHref } from '@/lib/smsLink'
 import { useMyRequests } from '@/hooks/useRequestBadges'
 import { useMyAttendance, useMyClasses, useStudentsOfClasses } from '@/hooks/useTeacherData'
 import { OfflineNotice } from '@/components/OfflineNotice'
@@ -26,7 +28,7 @@ export default function TeacherPage() {
   const tAdd = useTranslations('teacherClasses')
   const tr = useTranslations('requests')
   const format = useFormatter()
-  const { user, offline } = useAuth()
+  const { user, offline, school } = useAuth()
   // Live, offline-first data shared with every other teacher screen: it is
   // on screen from the first frame (last known snapshot) and refreshes itself.
   const liveClasses = useMyClasses()
@@ -88,6 +90,8 @@ export default function TeacherPage() {
           section: cls?.section || '',
           parentPhone: stu?.parentPhone || '',
           alternativePhone: stu?.alternativePhone || '',
+          gender: stu?.gender,
+          parentLanguage: stu?.parentLanguage,
         }
       })
       .sort((a, b) => (a.date < b.date ? 1 : -1))
@@ -132,6 +136,17 @@ export default function TeacherPage() {
   const todayAtt = myAttendance.filter((r) => r.date === today)
   const absentToday = todayAtt.filter((r) => r.status === 'absent').length
   const presentToday = todayAtt.filter((r) => r.status === 'present').length
+
+  // SMS from the Ustaz's own phone: one per parent, or one group text to
+  // every parent of the absent students shown.
+  const rowSmsHref = (r: (typeof filteredAbsent)[number]) =>
+    smsHref(r.parentPhone, generateSmsMessage(r.studentName, r.gender, r.parentLanguage, school))
+  const groupHref = groupSmsHref(
+    filteredAbsent.map((r) => r.parentPhone),
+    generateGroupSmsMessage(dominantLanguage(filteredAbsent.map((r) => r.parentLanguage)), school),
+    detectSmsPlatform(typeof navigator === 'undefined' ? '' : navigator.userAgent)
+  )
+  const groupCount = new Set(filteredAbsent.map((r) => r.parentPhone).filter(Boolean)).size
 
   const phoneLink = (phone: string) =>
     phone ? (
@@ -198,9 +213,18 @@ export default function TeacherPage() {
                 <h2 className="text-lg font-semibold text-foreground">{t('absent.title')}</h2>
                 <p className="text-sm text-muted-foreground">{t('absent.description')}</p>
               </div>
-              <span className={badgeVariants({ variant: 'destructive' })}>
-                {t('absent.count', { count: filteredAbsent.length })}
-              </span>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className={badgeVariants({ variant: 'destructive' })}>
+                  {t('absent.count', { count: filteredAbsent.length })}
+                </span>
+                {groupHref ? (
+                  <a href={groupHref} title={t('absent.sendSmsAllHint')} className={buttonVariants({ size: 'sm', variant: 'success' })}>
+                    <MessageSquare /> {t('absent.sendSmsAll', { count: groupCount })}
+                  </a>
+                ) : (
+                  filteredAbsent.length > 0 && <span className="text-xs text-muted-foreground">{t('absent.noNumbers')}</span>
+                )}
+              </div>
             </div>
             <div className="grid gap-3 sm:grid-cols-3">
               <div className="space-y-2">
@@ -280,9 +304,18 @@ export default function TeacherPage() {
                         {formatDay(r.date)} · {r.section ? `${r.className} · ${r.section}` : r.className}
                       </p>
                       {(r.parentPhone || r.alternativePhone) && (
-                        <div className="mt-2 flex flex-wrap gap-2">
+                        <div className="mt-2 flex flex-wrap items-center gap-2">
                           {r.parentPhone && phoneLink(r.parentPhone)}
                           {r.alternativePhone && phoneLink(r.alternativePhone)}
+                          {r.parentPhone && (
+                            <a
+                              href={rowSmsHref(r)}
+                              title={t('absent.sendSmsHint')}
+                              className={cn(buttonVariants({ size: 'sm', variant: 'outline' }), 'ms-auto')}
+                            >
+                              <MessageSquare /> {t('absent.sendSms')}
+                            </a>
+                          )}
                         </div>
                       )}
                     </li>
@@ -298,6 +331,7 @@ export default function TeacherPage() {
                       <th>{t('table.class')}</th>
                       <th>{t('table.parentPhone')}</th>
                       <th>{t('table.alternativePhone')}</th>
+                      <th>{t('table.action')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -310,6 +344,15 @@ export default function TeacherPage() {
                         </td>
                         <td>{phoneLink(r.parentPhone)}</td>
                         <td>{phoneLink(r.alternativePhone)}</td>
+                        <td>
+                          {r.parentPhone ? (
+                            <a href={rowSmsHref(r)} title={t('absent.sendSmsHint')} className={buttonVariants({ size: 'sm', variant: 'outline' })}>
+                              <MessageSquare /> {t('absent.sendSms')}
+                            </a>
+                          ) : (
+                            <span className="text-muted-foreground">–</span>
+                          )}
+                        </td>
                       </tr>
                     ))}
                   </tbody>

@@ -29,14 +29,20 @@
     "emptyAll": "Weli maqnaansho lagama diiwaangelin fasalladaada.",
     "emptyDate": "Wax maqnaansho ah lama diiwaangelin {date}.",
     "noClasses": "Weli laguuma qoondayn wax fasal ah.",
-    "callNumber": "Wac {phone}"
+    "callNumber": "Wac {phone}",
+    "sendSms": "Dir SMS",
+    "sendSmsHint": "Fur abka SMS-kaaga fariinta maqnaanshaha oo diyaar ah",
+    "sendSmsAll": "SMS dhammaan maqan ({count})",
+    "sendSmsAllHint": "Hal fariin kooxeed oo loo diro dhammaan waalidka liiskan, abka SMS-kaaga",
+    "noNumbers": "Liiskan lambarro taleefan waalid kuma jiraan."
   },
   "table": {
     "date": "Taariikhda",
     "student": "Ardayga",
     "class": "Fasalka",
     "parentPhone": "Taleefanka waalidka",
-    "alternativePhone": "Taleefan kale"
+    "alternativePhone": "Taleefan kale",
+    "action": "Ficil"
   },
   "toast": {
     "loadFailed": "Xogta bogga guud lama soo rari karin. Fadlan hubi xiriirkaaga."

@@ -8,7 +8,8 @@ import { rtdb } from '@/lib/database'
 import { useAuth } from '@/context/AuthContext'
 import { useLiveData } from '@/lib/dataStore'
 import { useAllSessionLogs, useAllWeeklyReports, useSessionLogMap } from '@/hooks/useWeeklyReports'
-import { addDays, reportWeekFor, weekStartOf, weeklyReportId } from '@/lib/weeklyReport'
+import { addDays, isSaturday, reportWeekFor, sessionLogId, weekDays, weekStartOf, weeklyReportId } from '@/lib/weeklyReport'
+import { cn } from '@/lib/utils'
 import { WeeklyReportView } from '@/components/reports/WeeklyReportView'
 import { OfflineNotice } from '@/components/OfflineNotice'
 import { Button } from '@/components/ui/button'
@@ -111,6 +112,75 @@ export default function AdminWeeklyReportsPage() {
           </div>
         )}
       </div>
+
+      {/* Daily sessions: the Ustaz's Qur'an / Kitab answers from the attendance, per class and day */}
+      {!loading && rows.length > 0 && (
+        <section className="mb-6 rounded-xl border bg-card shadow-sm">
+          <div className="border-b p-4 sm:p-5">
+            <h2 className="text-base font-semibold text-foreground">{t('daily.title')}</h2>
+            <p className="mt-0.5 text-sm text-muted-foreground">{t('daily.description')}</p>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-muted/50 text-xs uppercase tracking-wide text-muted-foreground">
+                  <th className="px-4 py-2.5 text-start font-medium">{t('class')}</th>
+                  {weekDays(weekStart).map((date) => (
+                    <th key={date} className="px-2 py-2.5 text-center font-medium">
+                      {format.dateTime(new Date(`${date}T00:00:00`), { weekday: 'short', day: 'numeric' })}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map(({ cls }) => (
+                  <tr key={cls.id} className="border-t">
+                    <td className="whitespace-nowrap px-4 py-2 font-medium text-foreground">
+                      {cls.section ? `${cls.name} · ${cls.section}` : cls.name}
+                    </td>
+                    {weekDays(weekStart).map((date) => {
+                      const log = logs[sessionLogId(cls.id, date)]
+                      if (!log) {
+                        return (
+                          <td key={date} className="px-2 py-2 text-center text-muted-foreground">
+                            —
+                          </td>
+                        )
+                      }
+                      const chips = [
+                        { code: t('daily.quranShort'), label: t('sessions.quran'), done: log.quran },
+                        {
+                          code: isSaturday(date) ? t('daily.reviewShort') : t('daily.kitabShort'),
+                          label: isSaturday(date) ? t('sessions.review') : t('sessions.kitab'),
+                          done: log.kitab,
+                        },
+                      ]
+                      return (
+                        <td key={date} className="px-2 py-2">
+                          <div className="flex justify-center gap-1">
+                            {chips.map((chip) => (
+                              <span
+                                key={chip.label}
+                                title={`${chip.label}: ${chip.done ? t('sessions.held') : t('sessions.notHeld')}`}
+                                className={cn(
+                                  'inline-flex h-6 min-w-6 items-center justify-center rounded px-1 text-xs font-semibold',
+                                  chip.done ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive line-through'
+                                )}
+                              >
+                                {chip.code}
+                              </span>
+                            ))}
+                          </div>
+                        </td>
+                      )
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
 
       {loading && offline ? (
         <OfflineNotice />

@@ -922,3 +922,15 @@ Live check against https://mms.khendeq.com
 
 - `src/components/students/KitabsPicker.tsx` (new): tap several kitabs from the madrasa's list, add an unlisted one under "Other"; stored as one string ("A, B, C") so records, lists and exports keep working. Used for the student, the father, the mother (`FamilyInfoFields`) and the Ustaz create/edit forms (`admin/teachers`). `parseKitabs` / `joinKitabs` in `src/lib/registration.ts`; `registration.kitabsPicker.*` translations in en/am/ar/om/so; 2 new tests.
 - Verified: `npm run verify` PASS, 217 tests pass.
+
+---
+
+## [2026-10-22] Task 6.7 - Daily sessions for admins; group SMS to absent students' parents
+
+- **Owner report**: admins could not see the daily session answers; the Ustaz had no SMS button; the admin absent list showed every class at once.
+- `src/app/admin/weekly-reports/page.tsx`: "Daily sessions" grid (class × Mon-Sat, Qur'an / Kitab / Review done or not) from the attendance session logs, above the weekly report list.
+- `src/lib/smsLink.ts` (new, pure): `smsHref`, `groupSmsHref` (Android `sms:a,b?body=`, iPhone `sms:/open?addresses=a,b&body=`), `uniquePhones`, `dominantLanguage`; `generateGroupSmsMessage` in `src/lib/smsMessage.ts` (en/am/ar/om/so).
+- `src/app/teacher/page.tsx`: "SMS all absent (n)" group text from the Ustaz's own phone plus a "Send SMS" per student (same message as the admin's).
+- `src/app/admin/page.tsx`: absent list grouped by class, each class with its own "SMS all absent (n)"; per-student buttons unchanged.
+- Translations: `teacherDashboard.absent.sendSms*`, `adminDashboard.absent.sendSmsAll*`, `weeklyReports.daily.*`. `tests/smsGroup.test.mjs` (5 tests).
+- Verified: `npm run verify` PASS, 222 tests pass.

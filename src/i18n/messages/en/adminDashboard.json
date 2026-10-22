@@ -111,7 +111,9 @@
       "title": "Clear deleted students' absences?",
       "description": "{count, plural, one {# absence record belongs to a student who no longer exists. It will be deleted. This cannot be undone.} other {# absence records belong to students who no longer exist. They will be deleted. This cannot be undone.}}",
       "action": "Delete records"
-    }
+    },
+    "sendSmsAll": "SMS all absent ({count})",
+    "sendSmsAllHint": "One group text to every parent in this list, from your SMS app"
   },
   "charts": {
     "byClassTitle": "Students by class",

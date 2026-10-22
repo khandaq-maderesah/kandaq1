@@ -60,5 +60,12 @@
     "submitted": "{count} submitted",
     "missing": "{count} missing"
   },
-  "by": "By {name}"
+  "by": "By {name}",
+  "daily": {
+    "title": "Daily sessions",
+    "description": "Which sessions each class held this week, from the attendance taken by the Ustaz.",
+    "quranShort": "Q",
+    "kitabShort": "K",
+    "reviewShort": "R"
+  }
 }

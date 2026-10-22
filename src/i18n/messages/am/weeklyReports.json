@@ -60,5 +60,12 @@
     "submitted": "{count} ገብቷል",
     "missing": "{count} ይቀራል"
   },
-  "by": "በ{name}"
+  "by": "በ{name}",
+  "daily": {
+    "title": "የዕለት ክፍለ ጊዜዎች",
+    "description": "ኡስታዙ ከወሰደው ክትትል፣ እያንዳንዱ ክፍል በዚህ ሳምንት ያካሄዳቸው ክፍለ ጊዜዎች።",
+    "quranShort": "ቁ",
+    "kitabShort": "ኪ",
+    "reviewShort": "ግ"
+  }
 }

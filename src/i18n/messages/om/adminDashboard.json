@@ -111,7 +111,9 @@
       "title": "Hafuu barattoota haqamanii qulqulleessituu?",
       "description": "{count, plural, one {Galmeen hafuu # kan barataa amma hin jirree ti. Ni haqama. Kana booda deebisuun hin danda'amu.} other {Galmeewwan hafuu # kan barattoota amma hin jirree ti. Ni haqamu. Kana booda deebisuun hin danda'amu.}}",
       "action": "Galmeewwan haqi"
-    }
+    },
+    "sendSmsAll": "Hafan hundaaf SMS ({count})",
+    "sendSmsAllHint": "Ergaa garee tokko maatii tarree kana keessa jiran hundaaf, appii SMS kee irraa"
   },
   "charts": {
     "byClassTitle": "Barattoota akka kutaatti",

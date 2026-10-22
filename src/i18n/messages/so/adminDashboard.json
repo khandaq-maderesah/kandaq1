@@ -111,7 +111,9 @@
       "title": "Ma nadiifinaysaa maqnaanshaha ardayda la tirtiray?",
       "description": "{count, plural, one {# diiwaan maqnaansho wuxuu ka tirsan yahay arday aan hadda jirin. Waa la tirtiri doonaa. Dib looma soo celin karo.} other {# diiwaan maqnaansho waxay ka tirsan yihiin arday aan hadda jirin. Waa la tirtiri doonaa. Dib looma soo celin karo.}}",
       "action": "Tirtir diiwaannada"
-    }
+    },
+    "sendSmsAll": "SMS dhammaan maqan ({count})",
+    "sendSmsAllHint": "Hal fariin kooxeed oo loo diro dhammaan waalidka liiskan, abka SMS-kaaga"
   },
   "charts": {
     "byClassTitle": "Ardayda fasal kasta",

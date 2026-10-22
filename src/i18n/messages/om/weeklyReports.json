@@ -60,5 +60,12 @@
     "submitted": "{count} dhiyaateera",
     "missing": "{count} hafeera"
   },
-  "by": "{name} tiin"
+  "by": "{name} tiin",
+  "daily": {
+    "title": "Kutaa yeroo guyyaa",
+    "description": "Kutaa yeroo kutaan hundi torban kana gaggeesse, hirmaannaa ustaaziin fudhate irraa.",
+    "quranShort": "Q",
+    "kitabShort": "K",
+    "reviewShort": "M"
+  }
 }
