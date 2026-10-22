@@ -943,3 +943,10 @@ Live check against https://mms.khendeq.com
 - `src/app/admin/weekly-reports/page.tsx`: opens on the current week (the badge still counts the due week).
 - `src/app/admin/attendance/page.tsx`: the "Mark attendance" tab shows "Sessions reported by the Ustaz" (Qur'an / Kitab done or not) for the chosen class and day, or "Not reported yet"; live, no submission needed. Translations in en/am/ar/om/so; 2 tests.
 - Verified: `npm run verify` PASS, 224 tests pass.
+
+---
+
+## [2026-10-22] Task 6.9 - Refresh button in the app bar
+
+- `src/components/shell/RefreshButton.tsx` (new), mounted in `AppShell` next to the language switch on every signed-in screen: asks the service worker for a newer version (bounded to 1.5 s, online only) then reloads; spinner while busy; `nav.refresh` in en/am/ar/om/so; 1 test.
+- Verified: `npm run verify` PASS, 225 tests pass.

@@ -840,3 +840,14 @@ describe('Installed app feels native, not like a web page', () => {
     assert.match(feel, /input, textarea, select, \[contenteditable=""\], \[contenteditable="true"\], \.select-text/)
   })
 })
+
+describe('Refresh button in the app bar', () => {
+  test('every signed-in screen has a refresh control that checks for an update, then reloads', () => {
+    const shell = read(path.join('src', 'components', 'shell', 'AppShell.tsx'))
+    assert.match(shell, /<RefreshButton \/>/)
+    const button = read(path.join('src', 'components', 'shell', 'RefreshButton.tsx'))
+    assert.match(button, /registration\?\.update\(\)/)
+    assert.match(button, /window\.location\.reload\(\)/)
+    assert.match(button, /setTimeout\(resolve, 1500\)/)
+  })
+})

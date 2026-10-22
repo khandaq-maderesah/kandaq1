@@ -23,6 +23,7 @@ import { cn } from '@/lib/utils'
 import { signInPath } from '@/lib/brandMemory'
 import { brandingAssetUrl } from '@/lib/branding'
 import { LanguageSwitcher } from './LanguageSwitcher'
+import { RefreshButton } from './RefreshButton'
 import { ThemeToggle } from '@/components/theme/ThemeToggle'
 import type { NavItem, NavSection } from './nav'
 
@@ -223,6 +224,7 @@ export function AppShell({
           </div>
           <div className="flex items-center gap-1">
             {actions}
+            <RefreshButton />
             <LanguageSwitcher />
             <ThemeToggle />
             <UserMenu />
