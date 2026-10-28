@@ -14,6 +14,7 @@ import { useMemo } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { rtdb } from '@/lib/database'
 import { useLiveData, useLiveDataMany } from '@/lib/dataStore'
+import { isClassTeacher } from '@/lib/classTeachers'
 import type { Attendance, Class, Exam, Student } from '@/types'
 
 /** Every class of the current school (live). */
@@ -27,7 +28,7 @@ export function useMyClasses(): Class[] | undefined {
   const { user } = useAuth()
   const all = useAllClasses()
   const uid = user?.uid
-  return useMemo(() => all?.filter((c) => c.teacherId === uid && c.isActive !== false), [all, uid])
+  return useMemo(() => all?.filter((c) => isClassTeacher(c, uid) && c.isActive !== false), [all, uid])
 }
 
 const studentsChannel = {

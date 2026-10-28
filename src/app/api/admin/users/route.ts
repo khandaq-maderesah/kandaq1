@@ -9,6 +9,7 @@ import {
 } from '@/lib/firebase/admin'
 import { getAuth } from 'firebase-admin/auth'
 import { isLocale } from '@/i18n/config'
+import { teacherFieldsFor, teachersAfterChange } from '@/lib/classTeachers'
 
 export const dynamic = 'force-dynamic'
 
@@ -105,11 +106,21 @@ export async function POST(request: Request) {
     await db.ref('users/' + uid).set(record)
 
     // 3) Assign classes (teachers).
+    // A class can have several Ustaz: the new one joins whoever is already there.
     if (classIds.length > 0) {
+      const usersSnap = await db.ref('users').orderByChild('schoolId').equalTo(schoolId).get()
+      const nameByUid = new Map<string, string>()
+      usersSnap.forEach((child) => {
+        const value = child.val()
+        if (value && typeof value.name === 'string') nameByUid.set(child.key as string, value.name)
+      })
+      const classesSnap = await db.ref(`schoolData/${schoolId}/classes`).get()
       const updates: Record<string, any> = {}
       for (const cid of classIds) {
-        updates[`schoolData/${schoolId}/classes/${cid}/teacherId`] = uid
-        updates[`schoolData/${schoolId}/classes/${cid}/teacherName`] = name
+        const fields = teacherFieldsFor(teachersAfterChange(classesSnap.child(cid).val() ?? {}, uid, true, (id) => nameByUid.get(id)))
+        updates[`schoolData/${schoolId}/classes/${cid}/teacherId`] = fields.teacherId
+        updates[`schoolData/${schoolId}/classes/${cid}/teacherName`] = fields.teacherName
+        updates[`schoolData/${schoolId}/classes/${cid}/teacherIds`] = fields.teacherIds
       }
       await db.ref().update(updates)
     }

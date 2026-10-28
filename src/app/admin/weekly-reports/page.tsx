@@ -7,6 +7,7 @@ import { CalendarCheck, ChevronLeft, ChevronRight, Loader2, Unlock } from 'lucid
 import { rtdb } from '@/lib/database'
 import { useAuth } from '@/context/AuthContext'
 import { useLiveData } from '@/lib/dataStore'
+import { hasTeacher } from '@/lib/classTeachers'
 import { useAllSessionLogs, useAllWeeklyReports, useSessionLogMap } from '@/hooks/useWeeklyReports'
 import { addDays, isSaturday, sessionLogId, weekDays, weekStartOf, weeklyReportId } from '@/lib/weeklyReport'
 import { cn } from '@/lib/utils'
@@ -39,12 +40,14 @@ export default function AdminWeeklyReportsPage() {
   const [unlocking, setUnlocking] = useState(false)
 
   const classes = useMemo(
-    () => (liveClasses ?? []).filter((c) => c.isActive !== false && c.teacherId).sort((a, b) => a.name.localeCompare(b.name)),
+    () => (liveClasses ?? []).filter((c) => c.isActive !== false && hasTeacher(c)).sort((a, b) => a.name.localeCompare(b.name)),
     [liveClasses]
   )
   const byId = useMemo(() => {
     const m: Record<string, WeeklyReport | undefined> = {}
-    for (const r of reports ?? []) m[r.id] = r
+    // Each Ustaz of a class files their own report under the same id; a
+    // submitted one counts for the class, so it is not hidden by a draft.
+    for (const r of reports ?? []) if (!m[r.id] || m[r.id]?.status !== 'submitted') m[r.id] = r
     return m
   }, [reports])
 

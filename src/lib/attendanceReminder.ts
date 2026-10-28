@@ -1,4 +1,5 @@
 import { rtdb } from '@/lib/database'
+import { classTeacherIds } from '@/lib/classTeachers'
 import type { Class, Attendance, User, MissingAttendanceAlert } from '@/types'
 import { showBrowserNotification } from './pushNotification'
 import { ADMIN_NOTIFY_TIME, TEACHER_NOTIFY_TIME, CHECK_INTERVAL_MS } from './reminderConstants'
@@ -50,6 +51,7 @@ export interface MissingClassInput {
   className: string
   section: string
   teacherId: string
+  teacherIds: string[]
   teacherName: string
 }
 
@@ -72,16 +74,18 @@ export function detectMissingAttendance(
   const missing: MissingClassInput[] = []
   for (const c of classes) {
     if (c.isActive === false) continue
-    if (!c.teacherId) continue
+    const teacherIds = classTeacherIds(c)
+    if (teacherIds.length === 0) continue
     if (attendedClassIds.has(c.id)) continue
-    const teacher = userById.get(c.teacherId)
+    const teacher = userById.get(teacherIds[0])
     missing.push({
       id: `${date}_${c.id}`,
       date,
       classId: c.id,
       className: c.name,
       section: c.section || '',
-      teacherId: c.teacherId,
+      teacherId: teacherIds[0],
+      teacherIds,
       teacherName: c.teacherName || teacher?.name || 'Unknown ustaz',
     })
   }
@@ -130,6 +134,7 @@ export async function runMissingAttendanceCheck(
       className: m.className,
       section: m.section,
       teacherId: m.teacherId,
+      teacherIds: m.teacherIds,
       teacherName: m.teacherName,
       adminNotified,
       adminNotifiedAt: adminNotified ? prev?.adminNotifiedAt || nowIso : '',

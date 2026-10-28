@@ -1,4 +1,5 @@
 import type { Attendance, Class, Student, User } from '@/types'
+import { classTeacherIds } from '@/lib/classTeachers'
 
 export interface ClassDailyStatus {
   date: string
@@ -66,7 +67,7 @@ export function aggregateAttendanceOverview(params: {
   const classMap = new Map<string, { name: string; section?: string; teacherName: string }>()
   for (let i = 0; i < classes.length; i++) {
     const c = classes[i]
-    const teacher = c.teacherId ? userMap.get(c.teacherId) : undefined
+    const teacher = userMap.get(classTeacherIds(c)[0])
     classMap.set(c.id, {
       name: c.name,
       section: c.section,

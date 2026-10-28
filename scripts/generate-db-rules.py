@@ -27,8 +27,11 @@ def can_admin(sid):
 S = "$schoolId"
 READ, ADMIN, MEMBER = can_read(S), can_admin(S), member(S)
 def class_teacher(class_expr):
-    return f"root.child('schoolData/' + $schoolId + '/classes/' + {class_expr} + '/teacherId').val() === auth.uid"
+    # A class has a lead ustaz (teacherId) and may have more (teacherIds/{uid} === true).
+    cls = f"root.child('schoolData/' + $schoolId + '/classes/' + {class_expr}"
+    return f"({cls} + '/teacherId').val() === auth.uid || {cls} + '/teacherIds/' + auth.uid).val() === true)"
 NEW_CLASS_TEACHER = class_teacher("newData.child('classId').val()")
+EXISTING_CLASS_TEACHER = class_teacher("data.child('classId').val()")
 PHOTO_CLASS_TEACHER = class_teacher("root.child('schoolData/' + $schoolId + '/students/' + $studentId + '/classId').val()")
 REQ_STUDENT = "root.child('schoolData/' + $schoolId + '/students/' + newData.child('studentId').val())"
 REQ_STUDENT_TEACHER = class_teacher(f"{REQ_STUDENT}.child('classId').val()")
@@ -137,7 +140,7 @@ rules = {
       "adminPushTokens": {".read": ADMIN, "$tokenId": {".write": ADMIN}},
       "exams": {
         ".read": READ, ".indexOn": ["classId", "teacherId"],
-        "$examId": {".write": f"{ADMIN} || ({MEMBER} && ((data.exists() && data.child('teacherId').val() === auth.uid) || (!data.exists() && newData.child('classId').exists() && {NEW_CLASS_TEACHER})))"}
+        "$examId": {".write": f"{ADMIN} || ({MEMBER} && ((data.exists() && (data.child('teacherId').val() === auth.uid || {EXISTING_CLASS_TEACHER})) || (!data.exists() && newData.child('classId').exists() && {NEW_CLASS_TEACHER})))"}
       },
       "announcements": {".read": READ, "$announcementId": {".write": ADMIN}},
       "audit": {".read": ADMIN, "$id": {".write": f"{READ} && !data.exists()"}},

@@ -135,7 +135,7 @@ export function AttendanceReminderBell(
     return alerts
       .filter((a) => !a.resolved)
       .filter((a) =>
-        isAdmin ? a.adminNotified : a.teacherId === user.uid && a.teacherNotified
+        isAdmin ? a.adminNotified : (a.teacherId === user.uid || !!a.teacherIds?.includes(user.uid)) && a.teacherNotified
       )
       .sort((a, b) => (a.date < b.date ? 1 : -1))
   }, [alerts, user, isAdmin])

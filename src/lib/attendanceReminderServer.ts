@@ -1,6 +1,7 @@
 import { getAdminApp } from '@/lib/firebase/admin'
 import { getDatabase, type Database } from 'firebase-admin/database'
 import { ADMIN_NOTIFY_TIME, TEACHER_NOTIFY_TIME } from '@/lib/reminderConstants'
+import { classTeacherIds } from '@/lib/classTeachers'
 import type { Class, Attendance, User, MissingAttendanceAlert } from '@/types'
 
 const DEFAULT_TIMEZONE = 'Africa/Addis_Ababa'
@@ -136,12 +137,13 @@ async function checkSchool(
 
   for (const c of classes) {
     if (c.isActive === false) continue
-    if (!c.teacherId) continue
+    const teacherIds = classTeacherIds(c)
+    if (teacherIds.length === 0) continue
     if (attendedToday.has(c.id)) continue
 
     const id = `${date}_${c.id}`
     const prev = existingById.get(id)
-    const teacher = userById.get(c.teacherId)
+    const teacher = userById.get(teacherIds[0])
     const adminNotified = prev?.adminNotified === true || adminDue
     const teacherNotified = prev?.teacherNotified === true || teacherDue
 
@@ -151,7 +153,8 @@ async function checkSchool(
       classId: c.id,
       className: c.name,
       section: c.section || '',
-      teacherId: c.teacherId,
+      teacherId: teacherIds[0],
+      teacherIds,
       teacherName: c.teacherName || teacher?.name || 'Unknown ustaz',
       adminNotified,
       adminNotifiedAt: adminNotified ? prev?.adminNotifiedAt || nowIso : '',

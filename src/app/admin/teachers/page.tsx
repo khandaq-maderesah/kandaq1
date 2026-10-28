@@ -20,6 +20,7 @@ import {
 import { auth } from '@/lib/firebase/config'
 import { rtdb } from '@/lib/database'
 import { useLiveData } from '@/lib/dataStore'
+import { classTeacherIds, isClassTeacher } from '@/lib/classTeachers'
 import { exportToCsv, dateStamp } from '@/lib/exportCsv'
 import type { User, Class } from '@/types'
 import { Button } from '@/components/ui/button'
@@ -78,7 +79,8 @@ function ClassChecklist({
     <div className="max-h-64 divide-y overflow-y-auto rounded-lg border">
       {classes.map((c) => {
         const checked = selected.includes(c.id)
-        const otherTeacher = c.teacherId && c.teacherId !== currentUid
+        // Other Ustaz already on the class: shown as information, they stay.
+        const others = classTeacherIds(c).filter((uid) => uid !== currentUid)
         const id = `cls-${currentUid ?? 'new'}-${c.id}`
         return (
           <label key={c.id} htmlFor={id} className="flex min-h-11 cursor-pointer items-center gap-3 px-3 py-2 text-sm hover:bg-muted/50">
@@ -90,10 +92,10 @@ function ClassChecklist({
               className="h-4 w-4 shrink-0 rounded border-input accent-[hsl(var(--primary))]"
             />
             <span className="min-w-0 flex-1 truncate text-foreground">{classLabel(c)}</span>
-            {otherTeacher && (
+            {others.length > 0 && (
               <span className="shrink-0 text-xs text-muted-foreground">
-                {c.teacherId && teacherNames[c.teacherId]
-                  ? t('assign.currentlyAssigned', { name: teacherNames[c.teacherId] })
+                {others.every((uid) => teacherNames[uid])
+                  ? t('assign.currentlyAssigned', { name: others.map((uid) => teacherNames[uid]).join(', ') })
                   : t('assign.currentlyAssignedOther')}
               </span>
             )}
@@ -177,7 +179,7 @@ export default function TeachersPage() {
   const classesByTeacher = useMemo(() => {
     const m: Record<string, Class[]> = {}
     classes.forEach((c) => {
-      if (c.teacherId) (m[c.teacherId] ||= []).push(c)
+      classTeacherIds(c).forEach((uid) => (m[uid] ||= []).push(c))
     })
     return m
   }, [classes])
@@ -271,7 +273,7 @@ export default function TeachersPage() {
 
   const startAssignmentEdit = (u: User) => {
     setEditingTeacher(u)
-    setEditingClassIds(classes.filter((c) => c.teacherId === u.uid).map((c) => c.id))
+    setEditingClassIds(classes.filter((c) => isClassTeacher(c, u.uid)).map((c) => c.id))
   }
 
   const handleAssignmentSave = async () => {

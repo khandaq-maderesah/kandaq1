@@ -42,7 +42,7 @@
     "role": "Role",
     "roleHint": "Madrasa admins have full access and can manage other users.",
     "classes": "Assign classes",
-    "classesHint": "Choose the classes this ustaz teaches.",
+    "classesHint": "Choose the classes this ustaz teaches. A class can have more than one ustaz.",
     "noClassesYet": "No classes yet. Create classes first, then assign the ustaz.",
     "create": "Create user",
     "language": "Language",
@@ -52,8 +52,8 @@
   "assign": {
     "title": "Edit assigned classes",
     "description": "Choose the classes {name} teaches. Students stay in their classes.",
-    "currentlyAssigned": "Assigned to {name}",
-    "currentlyAssignedOther": "Assigned to another ustaz",
+    "currentlyAssigned": "Also taught by {name}",
+    "currentlyAssignedOther": "Also taught by another ustaz",
     "save": "Save assignments"
   },
   "delete": {

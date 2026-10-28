@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useFormatter, useTranslations } from 'next-intl'
 import { CalendarDays, Filter, Maximize2, Pencil, Phone } from 'lucide-react'
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts'
+import { classTeacherIds } from '@/lib/classTeachers'
 import { EthDateTime, type MonthEth } from 'ethiopian-calendar-date-converter'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Badge, type BadgeProps } from '@/components/ui/badge'
@@ -149,9 +150,10 @@ export function StudentDetailCard({ student, classes = [], users, onClose, onEdi
 
   const creatorLabel = () => {
     // Primary: the Ustaz who is assigned to this student's class.
-    const teacherId = cls?.teacherId
+    const teacherId = cls ? classTeacherIds(cls)[0] : undefined
     const teacherNameRaw = cls?.teacherName
-    if (teacherId) {
+    // Several Ustaz: the stored name already lists them all.
+    if (teacherId && !(cls && classTeacherIds(cls).length > 1)) {
       const u = users?.find((x) => x.uid === teacherId)
       if (u && u.name && String(u.name).trim()) {
         return u.role === 'teacher' ? t('ustaz', { name: u.name }) : u.name

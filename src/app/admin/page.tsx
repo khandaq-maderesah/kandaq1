@@ -28,6 +28,7 @@ import {
   Legend,
 } from 'recharts'
 import { rtdb } from '@/lib/database'
+import { classTeacherIds, isClassTeacher } from '@/lib/classTeachers'
 import { useLiveData } from '@/lib/dataStore'
 import { cn, daysAgoISO, ATTENDANCE_RECENT_DAYS } from '@/lib/utils'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
@@ -174,7 +175,7 @@ export default function AdminPage() {
     const userById = new Map(users.map((u: any) => [u.uid, u]))
     const classInfo: Record<string, { name: string; section?: string; teacherName?: string }> = {}
     classes.forEach((c) => {
-      const teacher = userById.get(c.teacherId)
+      const teacher = userById.get(classTeacherIds(c)[0])
       classInfo[c.id] = {
         name: c.name,
         section: c.section,
@@ -726,7 +727,7 @@ export default function AdminPage() {
                     </td>
                     <td>
                       {classesAll
-                        .filter((c: any) => c.teacherId === u.uid)
+                        .filter((c: any) => isClassTeacher(c, u.uid))
                         .map((c: any) => c.name)
                         .join(', ') || '—'}
                     </td>
@@ -774,7 +775,7 @@ export default function AdminPage() {
               </thead>
               <tbody>
                 {filteredClasses.map((c: any) => {
-                  const teacher = usersAll.find((u: any) => u.uid === c.teacherId)
+                  const teacher = usersAll.find((u: any) => u.uid === classTeacherIds(c)[0])
                   const count = studentsAll.filter((s: any) => s.classId === c.id && isActiveStudent(s)).length
                   return (
                     <tr key={c.id}>

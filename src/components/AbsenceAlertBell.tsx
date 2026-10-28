@@ -8,6 +8,7 @@ import { useAuth } from '@/context/AuthContext'
 import { OfflineNotice } from '@/components/OfflineNotice'
 import { getConsecutiveAbsentCount } from '@/lib/absentAlert'
 import { useLiveData } from '@/lib/dataStore'
+import { isClassTeacher } from '@/lib/classTeachers'
 import { daysAgoISO, ATTENDANCE_RECENT_DAYS } from '@/lib/utils'
 import { Bell, CheckCircle2, Loader2, Phone, X, GraduationCap } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -70,7 +71,7 @@ export function AbsenceAlertBell({
     const classSubs: Record<string, () => void> = {}
     const byClass: Record<string, Student[]> = {}
     const myClassIds = storeClasses.data
-      .filter((c) => c.teacherId === user?.uid)
+      .filter((c) => isClassTeacher(c, user?.uid))
       .map((c) => c.id)
     myClassIds.forEach((cid) => {
       classSubs[cid] = rtdb.subscribeToStudentsByClass(cid, (students) => {
@@ -166,7 +167,7 @@ export function AbsenceAlertBell({
 
   const myClassIds = useMemo(() => {
     if (!user) return new Set<string>()
-    return new Set(classList.filter((c) => c.teacherId === user.uid).map((c) => c.id))
+    return new Set(classList.filter((c) => isClassTeacher(c, user.uid)).map((c) => c.id))
   }, [classList, user])
 
   const displayAlerts = useMemo(() => {

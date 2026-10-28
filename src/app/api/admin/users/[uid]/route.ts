@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { requireAdmin, assertCanManageSchool, errorStatus, errorCode, HttpError } from '@/lib/firebase/admin'
 import { getAuth } from 'firebase-admin/auth'
 import { isLocale } from '@/i18n/config'
+import { isClassTeacher, teacherFieldsFor, teachersAfterChange } from '@/lib/classTeachers'
 
 export const dynamic = 'force-dynamic'
 
@@ -89,37 +90,28 @@ export async function PATCH(
       [`users/${uid}/assignedClassIds`]: [...selected],
       [`users/${uid}/updatedAt`]: new Date().toISOString(),
     }
-    const assignedByUser = new Map<string, string[]>()
 
+    const nameByUid = new Map<string, string>()
     usersSnap.forEach((child) => {
       const value = child.val()
-      if (value?.role === 'teacher' && Array.isArray(value.assignedClassIds)) {
-        assignedByUser.set(child.key as string, value.assignedClassIds)
-      }
+      if (value?.role === 'teacher' && typeof value.name === 'string') nameByUid.set(child.key as string, value.name)
     })
+    nameByUid.set(uid, user.name)
 
+    // A class can have several Ustaz: adding this one keeps the others, and
+    // removing it only takes this Ustaz off.
     classesSnap.forEach((child) => {
       const classId = child.key as string
       const value = child.val()
       if (!value) return
+      const wasAssigned = isClassTeacher(value, uid)
+      const assigned = selected.has(classId)
+      if (assigned === wasAssigned) return
       const classPath = `schoolData/${schoolId}/classes/${classId}`
-
-      if (selected.has(classId)) {
-        updates[`${classPath}/teacherId`] = uid
-        updates[`${classPath}/teacherName`] = user.name
-      } else if (value.teacherId === uid) {
-        updates[`${classPath}/teacherId`] = null
-        updates[`${classPath}/teacherName`] = null
-      }
-
-      if (selected.has(classId)) {
-        assignedByUser.forEach((ids, otherUid) => {
-          if (otherUid !== uid && ids.includes(classId)) {
-            updates[`users/${otherUid}/assignedClassIds`] = ids.filter((id) => id !== classId)
-            updates[`users/${otherUid}/updatedAt`] = new Date().toISOString()
-          }
-        })
-      }
+      const fields = teacherFieldsFor(teachersAfterChange(value, uid, assigned, (id) => nameByUid.get(id)))
+      updates[`${classPath}/teacherId`] = fields.teacherId
+      updates[`${classPath}/teacherName`] = fields.teacherName
+      updates[`${classPath}/teacherIds`] = fields.teacherIds
     })
 
     await db.ref().update(updates)
@@ -174,14 +166,25 @@ export async function DELETE(
     if (user.role === 'superadmin') throw new HttpError(403, 'A superadmin cannot be deleted here.')
     assertCanManageSchool(caller, user.schoolId)
 
-    // Unassign classes taught by the user being deleted.
-    const classesSnap = await db.ref(`schoolData/${user.schoolId}/classes`).get()
-    const classUpdates: Record<string, null> = {}
+    // Take the user off every class they taught (other Ustaz of the class stay).
+    const [classesSnap, schoolUsersSnap] = await Promise.all([
+      db.ref(`schoolData/${user.schoolId}/classes`).get(),
+      db.ref('users').orderByChild('schoolId').equalTo(user.schoolId).get(),
+    ])
+    const nameByUid = new Map<string, string>()
+    schoolUsersSnap.forEach((child) => {
+      const value = child.val()
+      if (value && typeof value.name === 'string') nameByUid.set(child.key as string, value.name)
+    })
+    const classUpdates: Record<string, unknown> = {}
     classesSnap.forEach((child) => {
       const val = child.val()
-      if (val && val.teacherId === uid) {
-        classUpdates[`schoolData/${user.schoolId}/classes/${child.key}/teacherId`] = null
-        classUpdates[`schoolData/${user.schoolId}/classes/${child.key}/teacherName`] = null
+      if (val && isClassTeacher(val, uid)) {
+        const fields = teacherFieldsFor(teachersAfterChange(val, uid, false, (id) => nameByUid.get(id)))
+        const path = `schoolData/${user.schoolId}/classes/${child.key}`
+        classUpdates[`${path}/teacherId`] = fields.teacherId
+        classUpdates[`${path}/teacherName`] = fields.teacherName
+        classUpdates[`${path}/teacherIds`] = fields.teacherIds
       }
     })
     if (Object.keys(classUpdates).length > 0) {

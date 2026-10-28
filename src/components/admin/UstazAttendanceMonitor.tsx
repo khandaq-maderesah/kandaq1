@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Phone, MessageSquare, Copy, Bell, CheckCircle2, AlertTriangle } from 'lucide-react'
 import { isNotificationSupported, getNotificationPermission, requestNotificationPermission, showBrowserNotification } from '@/lib/pushNotification'
+import { classTeacherIds, hasTeacher } from '@/lib/classTeachers'
 import type { Class, User, Attendance } from '@/types'
 
 interface Props {
@@ -28,15 +29,16 @@ export default function UstazAttendanceMonitor({ classes, users, attendance }: P
   const rows = useMemo(() => {
     const userById = new Map(users.map((u) => [u.uid, u]))
     return classes
-      .filter((c) => c.isActive !== false && c.teacherId)
+      .filter((c) => c.isActive !== false && hasTeacher(c))
       .map((c) => {
-        const teacher = userById.get(c.teacherId as string)
+        const leadId = classTeacherIds(c)[0]
+        const teacher = userById.get(leadId)
         const submitted = attendedClassIds.has(c.id)
         return {
           classId: c.id,
           className: c.name,
           section: c.section || '',
-          teacherId: c.teacherId as string,
+          teacherId: leadId,
           teacherName: c.teacherName || teacher?.name || 'Unknown ustaz',
           phone: teacher?.phone || '',
           submitted,

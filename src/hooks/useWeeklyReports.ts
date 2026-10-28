@@ -8,6 +8,7 @@ import { useAuth } from '@/context/AuthContext'
 import { rtdb } from '@/lib/database'
 import { useLiveData } from '@/lib/dataStore'
 import { weeklyReportId } from '@/lib/weeklyReport'
+import { hasTeacher } from '@/lib/classTeachers'
 import type { Class, SessionLog, WeeklyReport } from '@/types'
 
 /** The signed-in Ustaz's session logs (every class day they took attendance for). */
@@ -51,5 +52,5 @@ export function useSessionLogMap(logs: SessionLog[] | undefined): Record<string,
 /** Active classes with an Ustaz whose report for the week is not submitted. */
 export function missingReportClasses(classes: Class[], reports: WeeklyReport[], weekStart: string): Class[] {
   const submitted = new Set(reports.filter((r) => r.status === 'submitted').map((r) => r.id))
-  return classes.filter((c) => c.isActive !== false && c.teacherId && !submitted.has(weeklyReportId(c.id, weekStart)))
+  return classes.filter((c) => c.isActive !== false && hasTeacher(c) && !submitted.has(weeklyReportId(c.id, weekStart)))
 }

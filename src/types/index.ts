@@ -53,7 +53,11 @@ export interface Class {
   description?: string
   grade?: string
   section?: string
+  /** Lead Ustaz (the first assigned). See lib/classTeachers.ts for the full list. */
   teacherId: string
+  /** Every assigned Ustaz, { [uid]: true }. */
+  teacherIds?: Record<string, boolean>
+  /** Names of every assigned Ustaz, comma separated. */
   teacherName?: string
   academicYear: string
   isActive: boolean
@@ -301,6 +305,8 @@ export interface MissingAttendanceAlert {
   className: string
   section?: string
   teacherId: string
+  /** Every Ustaz of the class when it was flagged (the lead is `teacherId`). */
+  teacherIds?: string[]
   teacherName: string
   adminNotified: boolean
   adminNotifiedAt?: string

@@ -950,3 +950,15 @@ Live check against https://mms.khendeq.com
 
 - `src/components/shell/RefreshButton.tsx` (new), mounted in `AppShell` next to the language switch on every signed-in screen: asks the service worker for a newer version (bounded to 1.5 s, online only) then reloads; spinner while busy; `nav.refresh` in en/am/ar/om/so; 1 test.
 - Verified: `npm run verify` PASS, 225 tests pass.
+
+---
+
+## [2026-10-28] Task 6.10 - Several Ustaz per class
+
+- **Owner request**: allow more than one Ustaz (email account) to be assigned to the same class.
+- Data: class keeps `teacherId` (lead Ustaz, first assigned) and gains `teacherIds` (`{uid: true}` for everyone); `teacherName` lists all names, comma separated. Old classes with only `teacherId` keep working with no backfill (no `backup:db` needed - nothing existing is rewritten). Helpers in `src/lib/classTeachers.ts`.
+- API: `POST /api/admin/users` and `PATCH/DELETE /api/admin/users/[uid]` now add/remove only that Ustaz on a class instead of replacing whoever was there.
+- Screens: Ustaz assignment checklist shows "Also taught by ..." (no longer steals the class); teacher classes/bells/students, reminders (client + server cron), missing-attendance bell, admin dashboard, analytics, weekly-report list, attendance monitor all use the full list. Each Ustaz files their own weekly report; a submitted one counts for the class.
+- Rules: `database.rules.json` class-teacher checks (attendance, students, requests, photos, exams) accept `teacherIds/{uid} === true`; a co-Ustaz can edit an existing exam of the class. NOTE: `scripts/generate-db-rules.py` is out of date vs the committed rules (lacks sessions / weeklyReports / registrationOptions) - the JSON was patched directly; do NOT regenerate from the script until it is brought up to date. Rules need `firebase deploy --only database`.
+- Tests: `tests/classTeachers.test.mjs` (9). Found and fixed: the database sorts map keys, so the lead is explicitly put first.
+- Verified: `npm test` -> TypeScript PASS (11.78s), ESLint PASS (52.62s), unit tests PASS (8.30s); `node scripts/i18n-sync.mjs --check` -> All translations complete.
