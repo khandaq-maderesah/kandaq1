@@ -8,11 +8,13 @@
  *  - how the form maps onto the student record (and back),
  *  - the editable option lists behind the level dropdowns.
  */
-import type { GuardianInfo, Student } from '@/types'
+import type { CaregiverInfo, GuardianInfo, ParentStatus, Student, StudentSupport, SupportLevel } from '@/types'
 
 // ==================== Form state ====================
 
 export interface GuardianDetails {
+  /** Alive / unable to work / deceased / absent. Only the first two have contact details. */
+  status: ParentStatus
   name: string
   age: string
   phone: string
@@ -26,6 +28,20 @@ export interface GuardianDetails {
   sameAddress: boolean
 }
 
+/** Who looks after the child; needed when neither parent can be contacted. */
+export interface CaregiverDetails {
+  relation: string
+  name: string
+  phone: string
+}
+
+/** The private help assessment as edited in the form. 'none' means no record is kept. */
+export interface SupportDetails {
+  level: 'none' | SupportLevel
+  kinds: string[]
+  note: string
+}
+
 export interface RegistrationDetails {
   phone: string
   subCity: string
@@ -37,6 +53,12 @@ export interface RegistrationDetails {
   occupation: string
   father: GuardianDetails
   mother: GuardianDetails
+  caregiver: CaregiverDetails
+  /**
+   * The help assessment. null while an existing student's record is still being
+   * loaded (or could not be): it is then left untouched on save.
+   */
+  support: SupportDetails | null
 }
 
 export type GuardianKey = 'father' | 'mother'
@@ -45,6 +67,7 @@ export const GUARDIAN_KEYS: GuardianKey[] = ['father', 'mother']
 
 export function emptyGuardian(): GuardianDetails {
   return {
+    status: 'alive',
     name: '',
     age: '',
     phone: '',
@@ -70,7 +93,41 @@ export function emptyRegistration(): RegistrationDetails {
     occupation: '',
     father: emptyGuardian(),
     mother: emptyGuardian(),
+    caregiver: { relation: '', name: '', phone: '' },
+    support: emptySupport(),
   }
+}
+
+export function emptySupport(): SupportDetails {
+  return { level: 'none', kinds: [], note: '' }
+}
+
+// ==================== Parent status ====================
+
+/** The choices for a parent's status (fixed list). */
+export const PARENT_STATUSES: ParentStatus[] = ['alive', 'unable', 'deceased', 'absent']
+
+/** Who can look after the child when a parent cannot be contacted (fixed list). */
+export const CAREGIVER_RELATIONS = ['grandparent', 'uncleAunt', 'sibling', 'otherRelative', 'other'] as const
+
+/** Kinds of help a family may need (fixed list). */
+export const SUPPORT_KINDS = ['financial', 'food', 'clothing', 'health', 'housing', 'guidance', 'other'] as const
+
+/** A parent who can be contacted: alive, or unable to work but present. */
+export function isReachable(status: ParentStatus | undefined): boolean {
+  return (status ?? 'alive') === 'alive' || status === 'unable'
+}
+
+export type OrphanKind = 'both' | 'father' | 'mother'
+
+/** Orphan by the parents' recorded status (only a deceased parent counts, not an absent one). */
+export function orphanKind(student: Pick<Student, 'father' | 'mother'>): OrphanKind | null {
+  const father = student.father?.status === 'deceased'
+  const mother = student.mother?.status === 'deceased'
+  if (father && mother) return 'both'
+  if (father) return 'father'
+  if (mother) return 'mother'
+  return null
 }
 
 // ==================== Required fields ====================
@@ -85,6 +142,27 @@ export type RequiredStudentField = (typeof REQUIRED_STUDENT_FIELDS)[number]
 export type RequiredGuardianField = (typeof REQUIRED_GUARDIAN_FIELDS)[number]
 
 /**
+ * The fields a parent must have filled, by status: everything for a living
+ * parent, everything but the occupation for one unable to work, and nothing
+ * for a parent who has died or is absent.
+ */
+export function requiredGuardianFields(status: ParentStatus): readonly RequiredGuardianField[] {
+  if (status === 'deceased' || status === 'absent') return []
+  if (status === 'unable') return REQUIRED_GUARDIAN_FIELDS.filter((f) => f !== 'occupation')
+  return REQUIRED_GUARDIAN_FIELDS
+}
+
+/** The caregiver is mandatory when neither parent can be contacted (someone must be called). */
+export function caregiverRequired(details: Pick<RegistrationDetails, 'father' | 'mother'>): boolean {
+  return !isReachable(details.father.status) && !isReachable(details.mother.status)
+}
+
+/** The caregiver block is offered as soon as one parent cannot be contacted. */
+export function caregiverShown(details: Pick<RegistrationDetails, 'father' | 'mother'>): boolean {
+  return !isReachable(details.father.status) || !isReachable(details.mother.status)
+}
+
+/**
  * Keys of the required fields that are still empty, e.g. 'madrasaLevel',
  * 'father.phone'. Empty means the form may not be saved.
  */
@@ -94,8 +172,13 @@ export function missingRegistrationFields(details: RegistrationDetails): string[
     if (!details[field].trim()) missing.push(field)
   }
   for (const who of GUARDIAN_KEYS) {
-    for (const field of REQUIRED_GUARDIAN_FIELDS) {
+    for (const field of requiredGuardianFields(details[who].status)) {
       if (!details[who][field].trim()) missing.push(`${who}.${field}`)
+    }
+  }
+  if (caregiverRequired(details)) {
+    for (const field of ['relation', 'name', 'phone'] as const) {
+      if (!details.caregiver[field].trim()) missing.push(`caregiver.${field}`)
     }
   }
   return missing
@@ -111,7 +194,10 @@ function parseAge(value: string): number | undefined {
 }
 
 function toGuardianInfo(g: GuardianDetails, student: RegistrationDetails): GuardianInfo {
+  // A parent who has died or is absent keeps only the status and (optionally) the name.
+  if (!isReachable(g.status)) return { status: g.status, name: clean(g.name) }
   return {
+    status: g.status,
     name: clean(g.name),
     age: parseAge(g.age),
     phone: clean(g.phone),
@@ -132,8 +218,19 @@ function toGuardianInfo(g: GuardianDetails, student: RegistrationDetails): Guard
 export function registrationToStudentFields(details: RegistrationDetails): Partial<Student> {
   const father = toGuardianInfo(details.father, details)
   const mother = toGuardianInfo(details.mother, details)
-  const parentPhone = father.phone || mother.phone || ''
-  const alternativePhone = father.phone ? mother.phone || '' : ''
+  const caregiver: CaregiverInfo | null = caregiverShown(details)
+    ? { relation: clean(details.caregiver.relation), name: clean(details.caregiver.name), phone: clean(details.caregiver.phone) }
+    : null
+  // Who is called: the reachable parents first, then the caregiver.
+  const contacts = [
+    isReachable(details.father.status) ? father : undefined,
+    isReachable(details.mother.status) ? mother : undefined,
+    caregiver ?? undefined,
+  ]
+  const phones = contacts.map((c) => c?.phone ?? '').filter(Boolean)
+  const parentPhone = phones[0] ?? ''
+  const alternativePhone = phones[1] ?? ''
+  const parentName = contacts.map((c) => c?.name ?? '').find(Boolean) ?? ''
   return {
     phone: clean(details.phone),
     subCity: clean(details.subCity),
@@ -145,7 +242,8 @@ export function registrationToStudentFields(details: RegistrationDetails): Parti
     occupation: clean(details.occupation),
     father,
     mother,
-    parentName: father.name || mother.name || '',
+    caregiver,
+    parentName,
     parentPhone,
     alternativePhone,
   }
@@ -156,6 +254,7 @@ function fromGuardianInfo(g: GuardianInfo | undefined, student: Student): Guardi
   const kebele = g?.kebele ?? ''
   const hasAddress = Boolean(subCity || kebele)
   return {
+    status: g?.status ?? 'alive',
     name: g?.name ?? '',
     age: g?.age !== undefined ? String(g.age) : '',
     phone: g?.phone ?? '',
@@ -191,7 +290,56 @@ export function registrationFromStudent(student: Student): RegistrationDetails {
     occupation: student.occupation ?? '',
     father,
     mother,
+    caregiver: {
+      relation: student.caregiver?.relation ?? '',
+      name: student.caregiver?.name ?? '',
+      phone: student.caregiver?.phone ?? '',
+    },
+    // The help assessment lives in its own record; the page loads it.
+    support: null,
   }
+}
+
+// ==================== Help assessment (private record) ====================
+
+/** The form state for a saved assessment (no record = no help needed). */
+export function supportFromRecord(record: StudentSupport | null): SupportDetails {
+  if (!record) return emptySupport()
+  return {
+    level: record.level,
+    kinds: SUPPORT_KINDS.filter((k) => record.kinds?.[k]),
+    note: record.note ?? '',
+  }
+}
+
+/** The record to save, or null when the student needs no help (the record is removed). */
+export function supportToRecord(
+  details: SupportDetails,
+  by: { uid: string; name?: string },
+  now: Date = new Date()
+): Omit<StudentSupport, 'studentId'> | null {
+  if (details.level === 'none') return null
+  const kinds = SUPPORT_KINDS.filter((k) => details.kinds.includes(k))
+  const note = details.note.trim()
+  return {
+    level: details.level,
+    kinds: kinds.length > 0 ? Object.fromEntries(kinds.map((k) => [k, true])) : undefined,
+    note: note || undefined,
+    updatedAt: now.toISOString(),
+    updatedBy: by.uid,
+    updatedByName: by.name || undefined,
+  }
+}
+
+/** An assessment not looked at for this many months is flagged for review. */
+export const SUPPORT_REVIEW_MONTHS = 6
+
+export function supportNeedsReview(record: Pick<StudentSupport, 'updatedAt'>, now: Date = new Date()): boolean {
+  const saved = new Date(record.updatedAt)
+  if (Number.isNaN(saved.getTime())) return true
+  const limit = new Date(now)
+  limit.setMonth(limit.getMonth() - SUPPORT_REVIEW_MONTHS)
+  return saved < limit
 }
 
 // ==================== Dropdown lists ====================

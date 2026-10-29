@@ -79,6 +79,7 @@ function FamilySection({ student }: { student: Student }) {
         <div key={key}>
           <SectionHeading>{t(`sections.${key}`)}</SectionHeading>
           <dl className="mt-3 grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3">
+            {info?.status && info.status !== 'alive' && <Field label={t('fields.status')} value={t(`status.${info.status}`)} />}
             <Field label={t('fields.name')} value={info?.name} />
             <Field label={t('fields.phone')} value={<PhoneValue phone={info?.phone} />} />
             <Field label={t('fields.age')} value={info?.age !== undefined ? format.number(info.age) : undefined} />
@@ -91,6 +92,20 @@ function FamilySection({ student }: { student: Student }) {
           </dl>
         </div>
       ))}
+
+      {student.caregiver && (student.caregiver.name || student.caregiver.phone) && (
+        <div>
+          <SectionHeading>{t('sections.caregiver')}</SectionHeading>
+          <dl className="mt-3 grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3">
+            <Field
+              label={t('fields.relation')}
+              value={student.caregiver.relation ? t(`relations.${student.caregiver.relation as 'other'}`) : undefined}
+            />
+            <Field label={t('fields.name')} value={student.caregiver.name} />
+            <Field label={t('fields.phone')} value={<PhoneValue phone={student.caregiver.phone} />} />
+          </dl>
+        </div>
+      )}
     </>
   )
 }

@@ -1,0 +1,52 @@
+{
+  "title": "Taageerada qoyska",
+  "description": "Ardayda agoonta ah ama qoysaskoodu caawimaad u baahan yihiin. Bogga kan keliya maamulayaashu way arkaan.",
+  "stats": {
+    "orphans": "Agoon",
+    "needs": "U baahan taageero",
+    "urgent": "Degdeg",
+    "review": "Dib-u-eegis ah u baahan"
+  },
+  "searchLabel": "Raadi liiska",
+  "searchPlaceholder": "Ku raadi arday, fasal ama waalid",
+  "filterLabel": "Muuji",
+  "filters": {
+    "all": "Dhammaan liiska ku jira",
+    "orphans": "Agoon",
+    "needs": "U baahan taageero",
+    "urgent": "Degdeg",
+    "review": "Dib-u-eegis ah u baahan"
+  },
+  "kindLabel": "Nooca caawimaadda",
+  "anyKind": "Nooc kasta oo caawimaad ah",
+  "summary": "Waxaa la muujinayaa {shown} ka mid ah {total}",
+  "notAssessed": "Wali lama qiimayn",
+  "reviewDue": "Waa waqtigii dib-u-eegis",
+  "reviewed": "La eegay {date}",
+  "edit": "Cusboonaysii qiimaynta {name}",
+  "dialog": {
+    "title": "Taageerada qoyska: {name}",
+    "description": "Sheeg haddii qoysku caawimaad u baahan yahay iyo nooca. Dooran \"Maya\" waxay ardayga ka saartaa liiska taageerada (agoonta liiska way ku sii jiraan).",
+    "save": "Kaydi"
+  },
+  "toast": {
+    "saved": "Waa la keydiyay {name}.",
+    "failed": "Lama keydin karin. Fadlan mar kale isku day."
+  },
+  "empty": {
+    "title": "Wali arday liiska kuma jiro",
+    "description": "Ardaydu halkan ayay ka muuqdaan marka waalid la diiwaangeliyo inuu dhintay, ama marka ustaad ama maamule calaamadeeyo in qoysku caawimaad u baahan yahay.",
+    "filtered": "Arday kuma jiro kuwan shaandhaynta ah"
+  },
+  "csv": {
+    "name": "Arday",
+    "class": "Fasal",
+    "orphan": "Agoon",
+    "level": "Baahi",
+    "kinds": "Noocyada caawimaadda",
+    "contact": "Qofka la xiriirayo",
+    "phone": "Taleefan",
+    "note": "Xusuus",
+    "reviewed": "Dib-u-eegistii ugu dambaysay"
+  }
+}

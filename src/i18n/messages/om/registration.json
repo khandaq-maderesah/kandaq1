@@ -4,7 +4,12 @@
     "studentHint": "Unka galmee irraa. Dirreewwan * qaban guutamuu qabu.",
     "father": "Abbaa",
     "mother": "Haadha",
-    "family": "Maatii"
+    "family": "Maatii",
+    "caregiver": "Eenyutu daa'ima kunuunsa",
+    "caregiverHint": "Filannoo. Yoo maatii isaa keessaa tokko du'e ykn hin jirre, nama biraatu daa'ima kunuunsa taanaan guutaa.",
+    "caregiverRequiredHint": "Barbaachisaa. Maatii lamaanuu argachuun hin danda'amu, kanaaf barataa kana irratti eenyu bilbilla nutti himaa.",
+    "support": "Deeggarsa maatii (icciitii)",
+    "supportHint": "Bulchaa fi ustaaza kutaa kanaa qofatu argata. Barattoota maatiin isaanii gargaarsa barbaadan argachuuf tajaajila."
   },
   "fields": {
     "name": "Maqaa guutuu",
@@ -18,14 +23,20 @@
     "lastYearLevel": "Sadarkaa bara darbee",
     "lastYearResult": "Bu'aa bara darbee",
     "occupation": "Hojii",
-    "educationLevel": "Sadarkaa barnootaa"
+    "educationLevel": "Sadarkaa barnootaa",
+    "status": "Haala",
+    "relation": "Daa'ima waliin wal-qabsiisa",
+    "supportLevel": "Maatiin gargaarsa barbaadaa?",
+    "supportKinds": "Gargaarsa akkamii?",
+    "supportNote": "Yaadannoo icciitii"
   },
   "placeholders": {
     "select": "Filadhu…",
     "phone": "09XX XXX XXX",
     "age": "fkn: 40",
     "kitabs": "fkn: Qaa'idaa, Juz Amma",
-    "other": "Asitti barreessi"
+    "other": "Asitti barreessi",
+    "supportNote": "Fakkeenyaaf: Abbaan dhukkubsataa, haati gabaa irratti shayii gurgurti"
   },
   "other": "Kan biraa…",
   "required": "Dirqama",
@@ -50,5 +61,40 @@
     "otherPlaceholder": "Kitaaba biraa tarree keessa hin jirre",
     "selected": "Kitaaba {count} filatameera",
     "none": "Kitaabota isaan ilaalan tuqi."
-  }
+  },
+  "status": {
+    "alive": "Jiraata",
+    "unable": "Jiraata, hojjechuu hin danda'u (dhukkubsataa ykn lamsa'aa)",
+    "deceased": "Du'e",
+    "absent": "Hin jiru ykn quunnamtii hin qabu"
+  },
+  "relations": {
+    "grandparent": "Akaakayyuu",
+    "uncleAunt": "Eessuma ykn adaadaa",
+    "sibling": "Obboleessa ykn obboleettii hangafa",
+    "otherRelative": "Firoottan biraa",
+    "other": "Nama biraa (ollaa, tiksaa…)"
+  },
+  "supportLevels": {
+    "none": "Lakki, maatiin of danda'a",
+    "needs": "Deeggarsa barbaada",
+    "urgent": "Deeggarsa battalaa barbaada"
+  },
+  "supportKinds": {
+    "financial": "Maallaqa (kaffaltii, fedhii guyyaa)",
+    "food": "Nyaata",
+    "clothing": "Uffata fi meeshaalee barnoota",
+    "health": "Eegumsa fayyaa",
+    "housing": "Mana jireenyaa",
+    "guidance": "Gorsaa fi qajeelfama",
+    "other": "Kan biraa"
+  },
+  "orphan": {
+    "both": "Ommaa (maatii lamaanuu du'an)",
+    "father": "Abbaan isaa du'e",
+    "mother": "Haati isaa du'te"
+  },
+  "noDetailsNeeded": "Maatii kanaaf odeeffannoon dabalataa hin barbaachisu.",
+  "supportUnavailable": "Madaallii kuufame fe'uun hin danda'amne, kanaaf hin jijjiiramu. Interneetii yeroo qabdu irra deebi'ii yaali.",
+  "supportSaveFailed": "Barataan kuufameera, garuu odeeffannoon deeggarsa maatii hin kuufamne. Maaloo barataa banuun irra deebi'ii kuusaa."
 }

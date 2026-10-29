@@ -4,7 +4,12 @@
     "studentHint": "From the registration form. Fields marked * are required.",
     "father": "Father",
     "mother": "Mother",
-    "family": "Family"
+    "family": "Family",
+    "caregiver": "Who looks after the child",
+    "caregiverHint": "Optional. Fill this in if a parent has died or is away and someone else looks after the child.",
+    "caregiverRequiredHint": "Required. Neither parent can be contacted, so tell us who to call about this student.",
+    "support": "Family support (private)",
+    "supportHint": "Only the admin and the Ustaz of this class can see this. It is used to find students whose families need help."
   },
   "fields": {
     "name": "Full name",
@@ -18,14 +23,20 @@
     "lastYearLevel": "Last year's level",
     "lastYearResult": "Last year's result",
     "occupation": "Occupation",
-    "educationLevel": "Education level"
+    "educationLevel": "Education level",
+    "status": "Status",
+    "relation": "Relationship to the child",
+    "supportLevel": "Does the family need help?",
+    "supportKinds": "What kind of help?",
+    "supportNote": "Private note"
   },
   "placeholders": {
     "select": "Select…",
     "phone": "09XX XXX XXX",
     "age": "e.g. 40",
     "kitabs": "e.g. Qa'ida, Juz Amma",
-    "other": "Type it here"
+    "other": "Type it here",
+    "supportNote": "e.g. Father is sick, mother sells tea at the market"
   },
   "other": "Other…",
   "required": "Required",
@@ -50,5 +61,40 @@
     "otherPlaceholder": "Another kitab not in the list",
     "selected": "{count, plural, one {# kitab chosen} other {# kitabs chosen}}",
     "none": "Tap the kitabs that apply."
-  }
+  },
+  "status": {
+    "alive": "Alive",
+    "unable": "Alive, unable to work (ill or disabled)",
+    "deceased": "Deceased (passed away)",
+    "absent": "Absent or not in contact"
+  },
+  "relations": {
+    "grandparent": "Grandparent",
+    "uncleAunt": "Uncle or aunt",
+    "sibling": "Older brother or sister",
+    "otherRelative": "Other relative",
+    "other": "Someone else (neighbour, guardian…)"
+  },
+  "supportLevels": {
+    "none": "No, the family manages",
+    "needs": "Needs support",
+    "urgent": "Needs urgent support"
+  },
+  "supportKinds": {
+    "financial": "Money (fees, daily needs)",
+    "food": "Food",
+    "clothing": "Clothes and study materials",
+    "health": "Health care",
+    "housing": "Housing",
+    "guidance": "Guidance and counselling",
+    "other": "Other"
+  },
+  "orphan": {
+    "both": "Orphan (both parents deceased)",
+    "father": "Orphan (father deceased)",
+    "mother": "Orphan (mother deceased)"
+  },
+  "noDetailsNeeded": "No further details are needed for this parent.",
+  "supportUnavailable": "The saved assessment could not be loaded, so it will not be changed. Try again when you are online.",
+  "supportSaveFailed": "The student was saved, but the family support details could not be saved. Please open the student and save again."
 }

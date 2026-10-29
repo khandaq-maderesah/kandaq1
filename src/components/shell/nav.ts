@@ -12,6 +12,7 @@ import {
   History,
   Building2,
   CalendarCheck,
+  HeartHandshake,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -32,6 +33,7 @@ export type NavLabel =
   | 'myRequests'
   | 'weeklyReport'
   | 'weeklyReports'
+  | 'support'
   | 'settings'
 
 export interface NavItem {
@@ -58,6 +60,7 @@ export const adminNav: NavSection[] = [
     items: [
       { href: '/admin/students', label: 'students', icon: GraduationCap },
       { href: '/admin/teachers', label: 'users', icon: Users },
+      { href: '/admin/support', label: 'support', icon: HeartHandshake },
       { href: '/admin/requests', label: 'requests', icon: Inbox, badge: 'pendingRequests' },
     ],
   },

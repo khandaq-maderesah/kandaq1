@@ -4,7 +4,12 @@
     "studentHint": "Ka timid foomka diiwaangelinta. Goobaha calaamadda * leh waa qasab.",
     "father": "Aabbe",
     "mother": "Hooyo",
-    "family": "Qoyska"
+    "family": "Qoyska",
+    "caregiver": "Cidda ilmaha daryeesha",
+    "caregiverHint": "Ikhtiyaari. Buuxi haddii waalid dhintay ama maqan yahay oo qof kale ilmaha daryeelayo.",
+    "caregiverRequiredHint": "Waa loo baahan yahay. Midkoodna lama xiriiri karo, haddaba noo sheeg yaan ku wacno arrinta ardaygan.",
+    "support": "Taageerada qoyska (sir)",
+    "supportHint": "Maamulaha iyo ustaadka fasalkan keliya ayaa arki kara. Waxaa loo isticmaalaa helidda ardayda qoysaskoodu caawimaad u baahan yihiin."
   },
   "fields": {
     "name": "Magaca oo dhammaystiran",
@@ -18,14 +23,20 @@
     "lastYearLevel": "Heerka sannadkii hore",
     "lastYearResult": "Natiijada sannadkii hore",
     "occupation": "Shaqada",
-    "educationLevel": "Heerka waxbarashada"
+    "educationLevel": "Heerka waxbarashada",
+    "status": "Xaalad",
+    "relation": "Xiriirka uu la leeyahay ilmaha",
+    "supportLevel": "Qoysku ma u baahan yahay caawimaad?",
+    "supportKinds": "Caawimaad noocee ah?",
+    "supportNote": "Xusuus sir ah"
   },
   "placeholders": {
     "select": "Dooro…",
     "phone": "09XX XXX XXX",
     "age": "tus: 40",
     "kitabs": "tus: Qaacida, Juz Camma",
-    "other": "Halkan ku qor"
+    "other": "Halkan ku qor",
+    "supportNote": "Tusaale: Aabaha waa buka, hooyaduna suuqa ayay shaah ka iibisaa"
   },
   "other": "Kale…",
   "required": "Qasab",
@@ -50,5 +61,40 @@
     "otherPlaceholder": "Kitaab kale oo aan liiska ku jirin",
     "selected": "{count} kitaab la doortay",
     "none": "Taabo kutubta khuseeya."
-  }
+  },
+  "status": {
+    "alive": "Nool",
+    "unable": "Nool, shaqayn karin (buka ama naafo)",
+    "deceased": "Dhintay",
+    "absent": "Maqan ama xiriir la'aan"
+  },
+  "relations": {
+    "grandparent": "Awoowe ama ayeeyo",
+    "uncleAunt": "Adeer, abti, eedo ama habaryar",
+    "sibling": "Walaal weyn",
+    "otherRelative": "Qaraabo kale",
+    "other": "Qof kale (deris, masuul…)"
+  },
+  "supportLevels": {
+    "none": "Maya, qoysku wuu is-dabiraa",
+    "needs": "U baahan taageero",
+    "urgent": "U baahan taageero degdeg ah"
+  },
+  "supportKinds": {
+    "financial": "Lacag (khidmad, baahiyaha maalinlaha ah)",
+    "food": "Cunto",
+    "clothing": "Dharka iyo qalabka dugsiga",
+    "health": "Daryeel caafimaad",
+    "housing": "Guri",
+    "guidance": "Tilmaam iyo la-talin",
+    "other": "Kale"
+  },
+  "orphan": {
+    "both": "Agoon (labada waalid dhintay)",
+    "father": "Agoon (aabaha dhintay)",
+    "mother": "Agoon (hooyada dhimatay)"
+  },
+  "noDetailsNeeded": "Faahfaahin dheeraad ah looma baahna waalidkan.",
+  "supportUnavailable": "Qiimaynta la keydiyay lama soo rari karin, sidaas darteed lama beddeli doono. Isku day mar kale markaad onlayn tahay.",
+  "supportSaveFailed": "Ardayga waa la keydiyay, laakiin faahfaahinta taageerada qoyska lama keydin. Fadlan fur ardayga oo mar kale kaydi."
 }

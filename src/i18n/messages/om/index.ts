@@ -6,6 +6,7 @@ import adminExams from './adminExams.json'
 import adminReports from './adminReports.json'
 import adminSettings from './adminSettings.json'
 import adminStudents from './adminStudents.json'
+import adminSupport from './adminSupport.json'
 import adminTeachers from './adminTeachers.json'
 import auth from './auth.json'
 import branding from './branding.json'
@@ -36,6 +37,7 @@ const messages = {
   adminReports: adminReports,
   adminSettings: adminSettings,
   adminStudents: adminStudents,
+  adminSupport: adminSupport,
   adminTeachers: adminTeachers,
   auth: auth,
   branding: branding,

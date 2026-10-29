@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
@@ -25,11 +25,15 @@ import { useRegistrationOptions } from '@/hooks/useRegistrationOptions'
 import { FamilyInfoFields, useMissingFieldsMessage } from '@/components/students/FamilyInfoFields'
 import {
   emptyRegistration,
+  emptySupport,
   missingRegistrationFields,
   registrationFromStudent,
   registrationToStudentFields,
+  supportFromRecord,
   type RegistrationDetails,
+  type SupportDetails,
 } from '@/lib/registration'
+import { saveSupportIfChanged } from '@/lib/studentSupport'
 import { OfflineNotice } from '@/components/OfflineNotice'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -124,6 +128,10 @@ export default function TeacherClassesPage() {
   const registrationOptions = useRegistrationOptions()
   const missingFieldsMessage = useMissingFieldsMessage()
   const [saving, setSaving] = useState(false)
+  const tReg = useTranslations('registration')
+  // The help assessment as loaded for the student being edited (to save only real changes).
+  const loadedSupport = useRef<SupportDetails | null>(emptySupport())
+  const editToken = useRef(0)
   const [age, setAge] = useState<number | ''>('')
   const [photoUrl, setPhotoUrl] = useState('')
   const [parentLanguage, setParentLanguage] = useState('')
@@ -181,6 +189,8 @@ export default function TeacherClassesPage() {
   )
 
   const resetRegisterForm = () => {
+    editToken.current++
+    loadedSupport.current = emptySupport()
     setName('')
     setGender('')
     setAge('')
@@ -246,6 +256,9 @@ export default function TeacherClassesPage() {
           entityId: editingId,
           details: studentName,
         })
+        if (!(await saveSupportIfChanged(editingId, family.support, loadedSupport.current, { uid: user.uid, name: user.name }))) {
+          toast.warning(tReg('supportSaveFailed'))
+        }
         resetRegisterForm()
         toast.success(t('toast.updated', { name: studentName }))
       } else {
@@ -264,6 +277,9 @@ export default function TeacherClassesPage() {
         // Write the photo AFTER the student exists so the RTDB rules can resolve
         // class ownership for the teacher's write on /studentPhotos.
         await rtdb.setStudentPhoto(studentId, photoUrl)
+        if (!(await saveSupportIfChanged(studentId, family.support, loadedSupport.current, { uid: user.uid, name: user.name }))) {
+          toast.warning(tReg('supportSaveFailed'))
+        }
         resetRegisterForm()
         toast.success(t('toast.added', { name: studentName, roll: fields.rollNumber }))
       }
@@ -285,6 +301,17 @@ export default function TeacherClassesPage() {
     setAge(s.age ?? '')
     setParentLanguage(s.parentLanguage || '')
     setFamily(registrationFromStudent(s))
+    loadedSupport.current = null
+    const token = ++editToken.current
+    rtdb
+      .getStudentSupport(s.id)
+      .then((record) => {
+        if (token !== editToken.current) return
+        const support = supportFromRecord(record)
+        loadedSupport.current = support
+        setFamily((f) => ({ ...f, support }))
+      })
+      .catch(() => {})
     setFormError('')
     // Photos live in their own node; fetch on demand for non-embedded records.
     let photo = s.photoUrl || ''

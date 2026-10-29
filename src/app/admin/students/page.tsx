@@ -62,11 +62,15 @@ import { FamilyInfoFields, useMissingFieldsMessage } from '@/components/students
 import { useRegistrationOptions } from '@/hooks/useRegistrationOptions'
 import {
   emptyRegistration,
+  emptySupport,
   missingRegistrationFields,
   registrationFromStudent,
   registrationToStudentFields,
+  supportFromRecord,
   type RegistrationDetails,
+  type SupportDetails,
 } from '@/lib/registration'
+import { saveSupportIfChanged } from '@/lib/studentSupport'
 import { StudentAvatar } from '@/components/StudentAvatar'
 import { StudentDetailCard } from '@/components/StudentDetailCard'
 import { AdminArchiveDialog } from '@/components/requests/StudentChangeDialogs'
@@ -472,8 +476,14 @@ export default function StudentsPage() {
   const registrationOptions = useRegistrationOptions()
   const missingFieldsMessage = useMissingFieldsMessage()
   const [saving, setSaving] = useState(false)
+  const tReg = useTranslations('registration')
+  // The help assessment as loaded for the student being edited (to save only real changes).
+  const loadedSupport = useRef<SupportDetails | null>(emptySupport())
+  const editToken = useRef(0)
 
   const resetForm = () => {
+    editToken.current++
+    loadedSupport.current = emptySupport()
     setName('')
     setRollNumber('')
     setGender('')
@@ -500,6 +510,17 @@ export default function StudentsPage() {
     setParentLanguage(s.parentLanguage || '')
     setClassId(s.classId)
     setFamily(registrationFromStudent(s))
+    loadedSupport.current = null
+    const token = ++editToken.current
+    rtdb
+      .getStudentSupport(s.id)
+      .then((record) => {
+        if (token !== editToken.current) return
+        const support = supportFromRecord(record)
+        loadedSupport.current = support
+        setFamily((f) => ({ ...f, support }))
+      })
+      .catch(() => {})
     setSection(s.section || '')
     setPhotoUrl(isEmbeddedPhoto(s.photoUrl) ? s.photoUrl || '' : '')
     setFormOpen(true)
@@ -567,6 +588,9 @@ export default function StudentsPage() {
           entityId: editingId,
           details: name,
         })
+        if (!(await saveSupportIfChanged(editingId, family.support, loadedSupport.current, { uid: user?.uid || '', name: user?.name }))) {
+          toast.warning(tReg('supportSaveFailed'))
+        }
         toast.success(t('toast.updated', { name }))
       } else {
         const studentId = `student_${Date.now()}`
@@ -588,6 +612,9 @@ export default function StudentsPage() {
           entityId: studentId,
           details: name,
         })
+        if (!(await saveSupportIfChanged(studentId, family.support, loadedSupport.current, { uid: user?.uid || '', name: user?.name }))) {
+          toast.warning(tReg('supportSaveFailed'))
+        }
         toast.success(t('toast.created', { name, roll: effectiveRoll }))
       }
       setFormOpen(false)

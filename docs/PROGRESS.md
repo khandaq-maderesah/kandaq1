@@ -962,3 +962,17 @@ Live check against https://mms.khendeq.com
 - Rules: `database.rules.json` class-teacher checks (attendance, students, requests, photos, exams) accept `teacherIds/{uid} === true`; a co-Ustaz can edit an existing exam of the class. NOTE: `scripts/generate-db-rules.py` is out of date vs the committed rules (lacks sessions / weeklyReports / registrationOptions) - the JSON was patched directly; do NOT regenerate from the script until it is brought up to date. Rules need `firebase deploy --only database`.
 - Tests: `tests/classTeachers.test.mjs` (9). Found and fixed: the database sorts map keys, so the lead is explicitly put first.
 - Verified: `npm test` -> TypeScript PASS (11.78s), ESLint PASS (52.62s), unit tests PASS (8.30s); `node scripts/i18n-sync.mjs --check` -> All translations complete.
+
+---
+
+## [2026-10-28] Task 6.11 - Parent status, caregiver and private family-support assessment
+
+- **Owner request**: group orphans AND any student whose family needs help (money, food, health, ...), recorded by the Ustaz at registration, editable later by Ustaz and admin, with a separate admin-only list. Fixed dropdown lists.
+- Parent status (father and mother): Alive / Alive but unable to work / Deceased / Absent. Deceased and Absent need no other details; "unable to work" needs everything except occupation. Older students without a status count as Alive.
+- Caregiver (relation, name, phone): offered when a parent is deceased/absent; required when neither parent can be contacted. The contact for SMS/absence calls (`parentPhone`/`parentName`/`alternativePhone`) now comes from reachable parents first, then the caregiver.
+- Help assessment: new private node `schoolData/{id}/studentSupport/{studentId}` {level needs|urgent, kinds, note, updatedAt/By}; "No" removes the record. Rules: whole list admin-only; a single record readable/writable by the admin and the Ustaz of that student's class only; fields validated. Saved from both student forms only when changed (keeps "last reviewed" honest); if the saved record cannot be loaded it is left untouched.
+- Admin page `/admin/support` (nav "Family support"): counts, filters (orphans / needs / urgent / due for review after 6 months / kind of help), search, edit dialog, CSV. Orphan status is derived from the parents' status, never stored.
+- Student detail card shows parent status and caregiver (no help/orphan label for Ustaz).
+- Files: `src/lib/registration.ts`, `src/lib/supportList.ts`, `src/lib/studentSupport.ts`, `src/components/students/FamilyInfoFields.tsx`, `src/app/admin/support/page.tsx`, both student form pages, `database.rules.json`, translations en/am/ar/om/so (`registration`, `nav`, new `adminSupport`).
+- Tests: `tests/familySupport.test.mjs` (14). The terminology check caught "school" in an English label; reworded.
+- Verified: `npm test` -> TypeScript PASS, ESLint PASS, unit tests PASS; `node scripts/i18n-sync.mjs --check` -> All translations complete. Rules deployed (`firebase deploy --only database`).

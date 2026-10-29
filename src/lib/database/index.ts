@@ -2,7 +2,7 @@ import { app, db } from '@/lib/firebase/config'
 import { getStorage, ref as storageRef, uploadBytes, deleteObject } from 'firebase/storage'
 import { BRANDING_FILES, brandingStoragePath, type BrandingFile, type PublicBranding } from '@/lib/branding'
 import { ref, get as rtdbGet, set, update, remove, onValue, query, orderByChild, equalTo, startAt, type QueryConstraint, type Unsubscribe, type DataSnapshot } from 'firebase/database'
-import type { User, Class, Student, Attendance, AbsentAlert, MissingAttendanceAlert, Exam, Announcement, School, ChangeRequest, DeletionReason, StudentArchive, SessionLog, WeeklyReport } from '@/types'
+import type { User, Class, Student, Attendance, AbsentAlert, MissingAttendanceAlert, Exam, Announcement, School, ChangeRequest, DeletionReason, StudentArchive, SessionLog, WeeklyReport, StudentSupport } from '@/types'
 import { withTimeout } from '@/lib/asyncUtils'
 import { normalizeRegistrationOptions, type RegistrationOptions } from '@/lib/registration'
 
@@ -292,6 +292,45 @@ export async function deleteStudent(studentId: string): Promise<void> {
   } catch {
     /* ignore */
   }
+  // ...and the private help assessment (best effort).
+  try {
+    await remove(sref(`studentSupport/${studentId}`))
+  } catch {
+    /* ignore */
+  }
+}
+
+// ==================== Student help assessment (private) ====================
+// studentSupport/{studentId}: whether the family needs help and what kind. Not
+// part of the student record, so only the admin and the Ustaz of the student's
+// class can read it (database rules). No record = no help needed.
+
+export async function getStudentSupport(studentId: string): Promise<StudentSupport | null> {
+  const snap = await get(sref(`studentSupport/${studentId}`))
+  return snap.exists() ? { studentId, ...(snap.val() as StudentSupport) } : null
+}
+
+/** Saves the assessment, or removes it when `record` is null (no help needed). */
+export async function setStudentSupport(
+  studentId: string,
+  record: Omit<StudentSupport, 'studentId'> | null
+): Promise<void> {
+  if (!record) {
+    await remove(sref(`studentSupport/${studentId}`))
+    return
+  }
+  await set(sref(`studentSupport/${studentId}`), defined(record))
+}
+
+/** Admin: every assessment of the madrasa, live. */
+export function subscribeToStudentSupport(cb: (records: StudentSupport[]) => void): Unsubscribe {
+  return onValue(sref('studentSupport'), (snap) => {
+    const records: StudentSupport[] = []
+    snap.forEach((child) => {
+      records.push({ ...(child.val() as StudentSupport), studentId: child.key as string })
+    })
+    cb(records)
+  })
 }
 
 // ==================== Student photos (on-demand) ====================
@@ -1036,6 +1075,9 @@ export const rtdb = {
   getStudentsByClass,
   setStudentPhoto,
   getStudentPhoto,
+  getStudentSupport,
+  setStudentSupport,
+  subscribeToStudentSupport,
   getExam,
   createExam,
   updateExam,

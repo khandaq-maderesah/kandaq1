@@ -1,0 +1,52 @@
+{
+  "title": "Family support",
+  "description": "Students who are orphans or whose families need help. Only admins can see this page.",
+  "stats": {
+    "orphans": "Orphans",
+    "needs": "Need support",
+    "urgent": "Urgent",
+    "review": "Due for review"
+  },
+  "searchLabel": "Search the list",
+  "searchPlaceholder": "Search by student, class or parent",
+  "filterLabel": "Show",
+  "filters": {
+    "all": "Everyone on the list",
+    "orphans": "Orphans",
+    "needs": "Needs support",
+    "urgent": "Urgent",
+    "review": "Due for review"
+  },
+  "kindLabel": "Kind of help",
+  "anyKind": "Any kind of help",
+  "summary": "Showing {shown} of {total}",
+  "notAssessed": "Not assessed yet",
+  "reviewDue": "Review due",
+  "reviewed": "Reviewed {date}",
+  "edit": "Update the assessment of {name}",
+  "dialog": {
+    "title": "Family support: {name}",
+    "description": "Say whether the family needs help and what kind. Choosing \"No\" removes the student from the support list (orphans stay listed).",
+    "save": "Save"
+  },
+  "toast": {
+    "saved": "Saved for {name}.",
+    "failed": "Couldn't save. Please try again."
+  },
+  "empty": {
+    "title": "No students on the list yet",
+    "description": "Students appear here when a parent is recorded as deceased, or when an Ustaz or admin marks that the family needs help.",
+    "filtered": "No students match these filters"
+  },
+  "csv": {
+    "name": "Student",
+    "class": "Class",
+    "orphan": "Orphan",
+    "level": "Need",
+    "kinds": "Kinds of help",
+    "contact": "Contact person",
+    "phone": "Phone",
+    "note": "Note",
+    "reviewed": "Last reviewed"
+  }
+}

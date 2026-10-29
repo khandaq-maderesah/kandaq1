@@ -211,6 +211,36 @@
           "registrationOptions": {
             ".read": "auth != null && (root.child('users/' + auth.uid).child('role').val() === 'superadmin' || (root.child('users/' + auth.uid).child('schoolId').val() === $schoolId && root.child('users/' + auth.uid).child('status').val() !== 'inactive' && root.child('schoolInfo/' + $schoolId + '/status').val() === 'active'))"
           }
+        },
+        "studentSupport": {
+          ".read": "auth != null && (root.child('users/' + auth.uid).child('role').val() === 'superadmin' || ((root.child('users/' + auth.uid).child('schoolId').val() === $schoolId && root.child('users/' + auth.uid).child('status').val() !== 'inactive' && root.child('schoolInfo/' + $schoolId + '/status').val() === 'active') && root.child('users/' + auth.uid).child('role').val() === 'admin'))",
+          "$studentId": {
+            ".read": "auth != null && (root.child('users/' + auth.uid).child('role').val() === 'superadmin' || ((root.child('users/' + auth.uid).child('schoolId').val() === $schoolId && root.child('users/' + auth.uid).child('status').val() !== 'inactive' && root.child('schoolInfo/' + $schoolId + '/status').val() === 'active') && root.child('users/' + auth.uid).child('role').val() === 'admin')) || ((root.child('users/' + auth.uid).child('schoolId').val() === $schoolId && root.child('users/' + auth.uid).child('status').val() !== 'inactive' && root.child('schoolInfo/' + $schoolId + '/status').val() === 'active') && (root.child('schoolData/' + $schoolId + '/classes/' + root.child('schoolData/' + $schoolId + '/students/' + $studentId + '/classId').val() + '/teacherId').val() === auth.uid || root.child('schoolData/' + $schoolId + '/classes/' + root.child('schoolData/' + $schoolId + '/students/' + $studentId + '/classId').val() + '/teacherIds/' + auth.uid).val() === true))",
+            ".write": "auth != null && (root.child('users/' + auth.uid).child('role').val() === 'superadmin' || ((root.child('users/' + auth.uid).child('schoolId').val() === $schoolId && root.child('users/' + auth.uid).child('status').val() !== 'inactive' && root.child('schoolInfo/' + $schoolId + '/status').val() === 'active') && root.child('users/' + auth.uid).child('role').val() === 'admin')) || ((root.child('users/' + auth.uid).child('schoolId').val() === $schoolId && root.child('users/' + auth.uid).child('status').val() !== 'inactive' && root.child('schoolInfo/' + $schoolId + '/status').val() === 'active') && (root.child('schoolData/' + $schoolId + '/classes/' + root.child('schoolData/' + $schoolId + '/students/' + $studentId + '/classId').val() + '/teacherId').val() === auth.uid || root.child('schoolData/' + $schoolId + '/classes/' + root.child('schoolData/' + $schoolId + '/students/' + $studentId + '/classId').val() + '/teacherIds/' + auth.uid).val() === true))",
+            "level": {
+              ".validate": "newData.val() === 'needs' || newData.val() === 'urgent'"
+            },
+            "kinds": {
+              "$kind": {
+                ".validate": "newData.val() === true && ($kind === 'financial' || $kind === 'food' || $kind === 'clothing' || $kind === 'health' || $kind === 'housing' || $kind === 'guidance' || $kind === 'other')"
+              }
+            },
+            "note": {
+              ".validate": "newData.isString() && newData.val().length <= 1000"
+            },
+            "updatedAt": {
+              ".validate": "newData.isString()"
+            },
+            "updatedBy": {
+              ".validate": "newData.val() === auth.uid"
+            },
+            "updatedByName": {
+              ".validate": "newData.isString() && newData.val().length <= 200"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
         }
       }
     }

@@ -4,7 +4,12 @@
     "studentHint": "ከመመዝገቢያ ቅጹ። በ * የተመለከቱት መሞላት አለባቸው።",
     "father": "አባት",
     "mother": "እናት",
-    "family": "ቤተሰብ"
+    "family": "ቤተሰብ",
+    "caregiver": "ልጁን የሚንከባከበው ማን ነው",
+    "caregiverHint": "አማራጭ። ወላጅ ከሞተ ወይም ከሌለ እና ሌላ ሰው ልጁን የሚንከባከብ ከሆነ ይሙሉ።",
+    "caregiverRequiredHint": "አስፈላጊ። ሁለቱም ወላጆች ሊገኙ ስለማይችሉ ስለዚህ ተማሪ ማን እንደሚደወል ይንገሩን።",
+    "support": "የቤተሰብ ድጋፍ (ሚስጥራዊ)",
+    "supportHint": "ይህንን አስተዳዳሪው እና የዚህ ክፍል ኡስታዝ ብቻ ያያሉ። ቤተሰባቸው ድጋፍ የሚያስፈልጋቸውን ተማሪዎች ለማግኘት ያገለግላል።"
   },
   "fields": {
     "name": "ሙሉ ስም",
@@ -18,14 +23,20 @@
     "lastYearLevel": "ያለፈው ዓመት የት/ት ደረጃ",
     "lastYearResult": "ያለፈው ዓመት ውጤት",
     "occupation": "ስራ",
-    "educationLevel": "የት/ት ደረጃ"
+    "educationLevel": "የት/ት ደረጃ",
+    "status": "ሁኔታ",
+    "relation": "ከልጁ ጋር ያለው ግንኙነት",
+    "supportLevel": "ቤተሰቡ እርዳታ ይፈልጋል?",
+    "supportKinds": "ምን ዓይነት እርዳታ?",
+    "supportNote": "ሚስጥራዊ ማስታወሻ"
   },
   "placeholders": {
     "select": "ይምረጡ…",
     "phone": "09XX XXX XXX",
     "age": "ለምሳሌ፡ 40",
     "kitabs": "ለምሳሌ፡ ቃኢዳ፣ ጁዝ አማ",
-    "other": "እዚህ ይጻፉ"
+    "other": "እዚህ ይጻፉ",
+    "supportNote": "ለምሳሌ፦ አባት ታሟል፣ እናት ገበያ ላይ ሻይ ትሸጣለች"
   },
   "other": "ሌላ…",
   "required": "የግድ",
@@ -50,5 +61,40 @@
     "otherPlaceholder": "በዝርዝሩ ውስጥ የሌለ ሌላ ኪታብ",
     "selected": "{count} ኪታብ ተመርጧል",
     "none": "የሚመለከቱትን ኪታቦች ይንኩ።"
-  }
+  },
+  "status": {
+    "alive": "በሕይወት አለ",
+    "unable": "በሕይወት አለ፣ መሥራት አይችልም (ታሟል ወይም አካል ጉዳተኛ)",
+    "deceased": "በሞት ተለይቷል",
+    "absent": "የለም ወይም ግንኙነት የለም"
+  },
+  "relations": {
+    "grandparent": "አያት",
+    "uncleAunt": "አጎት ወይም አክስት",
+    "sibling": "ታላቅ ወንድም ወይም እህት",
+    "otherRelative": "ሌላ ዘመድ",
+    "other": "ሌላ ሰው (ጎረቤት፣ አሳዳጊ…)"
+  },
+  "supportLevels": {
+    "none": "አይ፣ ቤተሰቡ ራሱን ይችላል",
+    "needs": "ድጋፍ ይፈልጋል",
+    "urgent": "አስቸኳይ ድጋፍ ይፈልጋል"
+  },
+  "supportKinds": {
+    "financial": "ገንዘብ (ክፍያ፣ የዕለት ተዕለት ፍላጎት)",
+    "food": "ምግብ",
+    "clothing": "ልብስና የትምህርት ቁሳቁስ",
+    "health": "የጤና እንክብካቤ",
+    "housing": "መኖሪያ ቤት",
+    "guidance": "ምክርና መመሪያ",
+    "other": "ሌላ"
+  },
+  "orphan": {
+    "both": "ወላጅ አልባ (ሁለቱም ወላጆች ሞተዋል)",
+    "father": "አባቱ የሞተ",
+    "mother": "እናቱ የሞተች"
+  },
+  "noDetailsNeeded": "ለዚህ ወላጅ ተጨማሪ ዝርዝር አያስፈልግም።",
+  "supportUnavailable": "የተቀመጠው ግምገማ መጫን አልተቻለም፣ ስለዚህ አይቀየርም። በመስመር ላይ ሲሆኑ እንደገና ይሞክሩ።",
+  "supportSaveFailed": "ተማሪው ተቀምጧል፣ ነገር ግን የቤተሰብ ድጋፍ ዝርዝር አልተቀመጠም። እባክዎ ተማሪውን ከፍተው እንደገና ያስቀምጡ።"
 }

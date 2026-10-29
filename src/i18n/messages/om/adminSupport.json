@@ -1,0 +1,52 @@
+{
+  "title": "Deeggarsa maatii",
+  "description": "Barattoota ommaa ykn maatiin isaanii gargaarsa barbaadan. Fuulli kun bulchaaf qofa mul'ata.",
+  "stats": {
+    "orphans": "Ommaa",
+    "needs": "Deeggarsa barbaadan",
+    "urgent": "Battalaa",
+    "review": "Deebi'ee ilaalamuu qaban"
+  },
+  "searchLabel": "Tarreeffama barbaadi",
+  "searchPlaceholder": "Barataan, kutaan ykn maatiin barbaadi",
+  "filterLabel": "Agarsiisi",
+  "filters": {
+    "all": "Hunda tarreeffama keessa jiran",
+    "orphans": "Ommaa",
+    "needs": "Deeggarsa barbaadan",
+    "urgent": "Battalaa",
+    "review": "Deebi'ee ilaalamuu qaban"
+  },
+  "kindLabel": "Gosa gargaarsaa",
+  "anyKind": "Gosa gargaarsaa kamiyyuu",
+  "summary": "{total} keessaa {shown} agarsiisaa jira",
+  "notAssessed": "Hanga ammaatti hin madaalamne",
+  "reviewDue": "Deebi'ee ilaaluun yeroon ga'eera",
+  "reviewed": "Yeroo dhumaa ilaalame {date}",
+  "edit": "Madaallii {name} haaromsi",
+  "dialog": {
+    "title": "Deeggarsa maatii: {name}",
+    "description": "Maatiin gargaarsa barbaadu moo hin barbaadu, akkasumas gosa isaa ibsi. «Lakki» filachuun barataa tarree deeggarsaa irraa balleessa (ommaan tarree irra turti).",
+    "save": "Kuusi"
+  },
+  "toast": {
+    "saved": "{name}f kuufameera.",
+    "failed": "Kuusuun hin danda'amne. Irra deebi'ii yaali."
+  },
+  "empty": {
+    "title": "Hanga ammaatti barataan tarree irra hin jiru",
+    "description": "Yeroo maatiin tokko du'uu galmaa'u, ykn ustaazni ykn bulchaan maatiin gargaarsa akka barbaadu mallatteessan barattoonni as mul'atu.",
+    "filtered": "Barataan calaqqisiistota kanaan walsimu hin jiru"
+  },
+  "csv": {
+    "name": "Barataa",
+    "class": "Kutaa",
+    "orphan": "Ommaa",
+    "level": "Fedhii",
+    "kinds": "Gosa gargaarsaa",
+    "contact": "Nama quunnamtii",
+    "phone": "Bilbila",
+    "note": "Yaadannoo",
+    "reviewed": "Yeroo dhumaa ilaalame"
+  }
+}

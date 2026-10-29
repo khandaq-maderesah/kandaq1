@@ -69,8 +69,38 @@ export interface Class {
 
 // Student Types
 
+/** Whether a parent is alive and reachable. A missing value means 'alive' (older records). */
+export type ParentStatus = 'alive' | 'deceased' | 'absent' | 'unable'
+
+/** Who looks after the child when a parent has died or is away. */
+export interface CaregiverInfo {
+  relation?: string
+  name?: string
+  phone?: string
+}
+
+export type SupportLevel = 'needs' | 'urgent'
+
+/**
+ * Private help assessment, stored at schoolData/{schoolId}/studentSupport/{studentId}.
+ * Only the admin and the Ustaz of the student's class can read or write it.
+ * No record means the student needs no help.
+ */
+export interface StudentSupport {
+  studentId?: string
+  level: SupportLevel
+  /** Kinds of help needed, { [kind]: true }. */
+  kinds?: Record<string, boolean>
+  note?: string
+  /** Last time the assessment was saved (ISO). */
+  updatedAt: string
+  updatedBy: string
+  updatedByName?: string
+}
+
 /** A parent (father/mother) as captured on the paper registration form. */
 export interface GuardianInfo {
+  status?: ParentStatus
   name?: string
   age?: number
   phone?: string
@@ -103,6 +133,8 @@ export interface Student {
   occupation?: string
   father?: GuardianInfo
   mother?: GuardianInfo
+  /** Who to contact when neither parent can be reached. */
+  caregiver?: CaregiverInfo | null
   rollNumber?: string
   gender?: 'male' | 'female'
   age?: number

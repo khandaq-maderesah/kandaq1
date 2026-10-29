@@ -5,17 +5,28 @@ import { useTranslations } from 'next-intl'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
 import { KitabsPicker } from '@/components/students/KitabsPicker'
 import {
+  CAREGIVER_RELATIONS,
   GUARDIAN_KEYS,
-  REQUIRED_GUARDIAN_FIELDS,
+  PARENT_STATUSES,
   REQUIRED_STUDENT_FIELDS,
+  SUPPORT_KINDS,
+  caregiverRequired,
+  caregiverShown,
+  isReachable,
+  requiredGuardianFields,
+  type CaregiverDetails,
   type GuardianDetails,
   type GuardianKey,
   type RegistrationDetails,
   type RegistrationOptions,
+  type RequiredGuardianField,
+  type SupportDetails,
 } from '@/lib/registration'
+import type { ParentStatus } from '@/types'
 
 const OTHER = '__other__'
 
@@ -129,24 +140,41 @@ function GuardianFields({
   const t = useTranslations('registration')
   const id = (field: string) => `${idPrefix}-${who}-${field}`
   const set = <K extends keyof GuardianDetails>(field: K, v: GuardianDetails[K]) => onChange({ ...value, [field]: v })
-  const required = (field: (typeof REQUIRED_GUARDIAN_FIELDS)[number]) => REQUIRED_GUARDIAN_FIELDS.includes(field)
+  const mandatory = requiredGuardianFields(value.status)
+  const required = (field: RequiredGuardianField) => mandatory.includes(field)
+  const reachable = isReachable(value.status)
 
   return (
     <>
       <SectionTitle title={t(`sections.${who}`)} />
 
       <div className="space-y-2 sm:col-span-2">
-        <Label htmlFor={id('name')}>
-          {t('fields.name')}
-          <RequiredMark />
-        </Label>
-        <Input id={id('name')} value={value.name} onChange={(e) => set('name', e.target.value)} required />
+        <Label htmlFor={id('status')}>{t('fields.status')}</Label>
+        <Select id={id('status')} value={value.status} onChange={(e) => set('status', e.target.value as ParentStatus)}>
+          {PARENT_STATUSES.map((s) => (
+            <option key={s} value={s}>
+              {t(`status.${s}`)}
+            </option>
+          ))}
+        </Select>
       </div>
 
+      <div className="space-y-2 sm:col-span-2">
+        <Label htmlFor={id('name')}>
+          {t('fields.name')}
+          {required('name') && <RequiredMark />}
+        </Label>
+        <Input id={id('name')} value={value.name} onChange={(e) => set('name', e.target.value)} required={required('name')} />
+      </div>
+
+      {!reachable && <p className="text-xs text-muted-foreground sm:col-span-2">{t('noDetailsNeeded')}</p>}
+
+      {reachable && (
+        <>
       <div className="space-y-2">
         <Label htmlFor={id('phone')}>
           {t('fields.phone')}
-          <RequiredMark />
+          {required('phone') && <RequiredMark />}
         </Label>
         <Input
           id={id('phone')}
@@ -155,7 +183,7 @@ function GuardianFields({
           placeholder={t('placeholders.phone')}
           value={value.phone}
           onChange={(e) => set('phone', e.target.value)}
-          required
+          required={required('phone')}
         />
       </div>
 
@@ -176,9 +204,14 @@ function GuardianFields({
       <div className="space-y-2">
         <Label htmlFor={id('occupation')}>
           {t('fields.occupation')}
-          <RequiredMark />
+          {required('occupation') && <RequiredMark />}
         </Label>
-        <Input id={id('occupation')} value={value.occupation} onChange={(e) => set('occupation', e.target.value)} required />
+        <Input
+          id={id('occupation')}
+          value={value.occupation}
+          onChange={(e) => set('occupation', e.target.value)}
+          required={required('occupation')}
+        />
       </div>
 
       <LevelSelect
@@ -227,6 +260,137 @@ function GuardianFields({
           <div className="space-y-2">
             <Label htmlFor={id('kebele')}>{t('fields.kebele')}</Label>
             <Input id={id('kebele')} value={value.kebele} onChange={(e) => set('kebele', e.target.value)} />
+          </div>
+        </>
+      )}
+        </>
+      )}
+    </>
+  )
+}
+
+/** Who looks after the child; shown when a parent has died or is absent. */
+function CaregiverFields({
+  idPrefix,
+  value,
+  onChange,
+  required,
+}: {
+  idPrefix: string
+  value: CaregiverDetails
+  onChange: (next: CaregiverDetails) => void
+  required: boolean
+}) {
+  const t = useTranslations('registration')
+  const id = (field: string) => `${idPrefix}-caregiver-${field}`
+  const set = (field: keyof CaregiverDetails, v: string) => onChange({ ...value, [field]: v })
+  return (
+    <>
+      <SectionTitle title={t('sections.caregiver')} hint={required ? t('sections.caregiverRequiredHint') : t('sections.caregiverHint')} />
+
+      <div className="space-y-2 sm:col-span-2">
+        <Label htmlFor={id('relation')}>
+          {t('fields.relation')}
+          {required && <RequiredMark />}
+        </Label>
+        <Select id={id('relation')} value={value.relation} onChange={(e) => set('relation', e.target.value)} required={required}>
+          <option value="">{t('placeholders.select')}</option>
+          {CAREGIVER_RELATIONS.map((r) => (
+            <option key={r} value={r}>
+              {t(`relations.${r}`)}
+            </option>
+          ))}
+        </Select>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor={id('name')}>
+          {t('fields.name')}
+          {required && <RequiredMark />}
+        </Label>
+        <Input id={id('name')} value={value.name} onChange={(e) => set('name', e.target.value)} required={required} />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor={id('phone')}>
+          {t('fields.phone')}
+          {required && <RequiredMark />}
+        </Label>
+        <Input
+          id={id('phone')}
+          type="tel"
+          dir="ltr"
+          placeholder={t('placeholders.phone')}
+          value={value.phone}
+          onChange={(e) => set('phone', e.target.value)}
+          required={required}
+        />
+      </div>
+    </>
+  )
+}
+
+/**
+ * The private help assessment: does the family need help, and what kind.
+ * Used in the registration form and in the admin's Support page.
+ */
+export function SupportFields({
+  idPrefix = 'reg',
+  value,
+  onChange,
+}: {
+  idPrefix?: string
+  value: SupportDetails
+  onChange: (next: SupportDetails) => void
+}) {
+  const t = useTranslations('registration')
+  const id = (field: string) => `${idPrefix}-support-${field}`
+  const levels: SupportDetails['level'][] = ['none', 'needs', 'urgent']
+  const toggle = (kind: string) =>
+    onChange({ ...value, kinds: value.kinds.includes(kind) ? value.kinds.filter((k) => k !== kind) : [...value.kinds, kind] })
+  return (
+    <>
+      <div className="space-y-2 sm:col-span-2">
+        <Label htmlFor={id('level')}>{t('fields.supportLevel')}</Label>
+        <Select id={id('level')} value={value.level} onChange={(e) => onChange({ ...value, level: e.target.value as SupportDetails['level'] })}>
+          {levels.map((l) => (
+            <option key={l} value={l}>
+              {t(`supportLevels.${l}`)}
+            </option>
+          ))}
+        </Select>
+      </div>
+
+      {value.level !== 'none' && (
+        <>
+          <fieldset className="space-y-2 sm:col-span-2">
+            <legend className="text-sm font-medium text-foreground">{t('fields.supportKinds')}</legend>
+            <div className="grid gap-1 sm:grid-cols-2">
+              {SUPPORT_KINDS.map((kind) => (
+                <label key={kind} htmlFor={id(`kind-${kind}`)} className="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg px-2 text-sm hover:bg-muted/50">
+                  <input
+                    id={id(`kind-${kind}`)}
+                    type="checkbox"
+                    checked={value.kinds.includes(kind)}
+                    onChange={() => toggle(kind)}
+                    className="h-4 w-4 shrink-0 rounded border-input accent-[hsl(var(--primary))]"
+                  />
+                  {t(`supportKinds.${kind}`)}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+
+          <div className="space-y-2 sm:col-span-2">
+            <Label htmlFor={id('note')}>{t('fields.supportNote')}</Label>
+            <Textarea
+              id={id('note')}
+              rows={3}
+              maxLength={1000}
+              placeholder={t('placeholders.supportNote')}
+              value={value.note}
+              onChange={(e) => onChange({ ...value, note: e.target.value })}
+            />
           </div>
         </>
       )}
@@ -333,6 +497,22 @@ export function FamilyInfoFields({
           options={options}
         />
       ))}
+
+      {caregiverShown(value) && (
+        <CaregiverFields
+          idPrefix={idPrefix}
+          value={value.caregiver}
+          onChange={(next) => set('caregiver', next)}
+          required={caregiverRequired(value)}
+        />
+      )}
+
+      <SectionTitle title={t('sections.support')} hint={t('sections.supportHint')} />
+      {value.support ? (
+        <SupportFields idPrefix={idPrefix} value={value.support} onChange={(next) => set('support', next)} />
+      ) : (
+        <p className="text-xs text-muted-foreground sm:col-span-2">{t('supportUnavailable')}</p>
+      )}
     </div>
   )
 }
@@ -350,6 +530,7 @@ export function useMissingFieldsMessage(): (keys: string[]) => string {
     phone: 'fields.phone',
     occupation: 'fields.occupation',
     educationLevel: 'fields.educationLevel',
+    relation: 'fields.relation',
   } as const
   const fieldLabel = (field: string) => {
     const key = labelKey[field as keyof typeof labelKey]
@@ -358,6 +539,7 @@ export function useMissingFieldsMessage(): (keys: string[]) => string {
   return (keys) => {
     const labels = keys.map((key) => {
       const [first, second] = key.split('.')
+      if (first === 'caregiver') return `${t('sections.caregiver')}: ${fieldLabel(second)}`
       if (second) return `${t(`sections.${first as GuardianKey}`)}: ${fieldLabel(second)}`
       return `${t('sections.student')}: ${fieldLabel(first)}`
     })
