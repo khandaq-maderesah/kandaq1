@@ -1,6 +1,6 @@
 {
   "title": "Reports",
-  "description": "Attendance overview for your madrasa",
+  "description": "Attendance overview for your medreseh",
   "actions": {
     "studentCsv": "Student CSV",
     "summaryCsv": "Summary CSV"

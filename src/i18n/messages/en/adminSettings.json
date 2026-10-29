@@ -1,12 +1,12 @@
 {
   "title": "Settings",
-  "description": "Manage your madrasa's information.",
+  "description": "Manage your medreseh's information.",
   "school": {
-    "title": "Madrasa information",
+    "title": "Medreseh information",
     "description": "These details are shown across the system and on printed reports.",
-    "name": "Madrasa name",
+    "name": "Medreseh name",
     "namePlaceholder": "e.g. Khendeq Medresah",
-    "nameAm": "Madrasa name in Amharic (used in SMS)",
+    "nameAm": "Medreseh name in Amharic (used in SMS)",
     "address": "Address",
     "addressPlaceholder": "Street, city",
     "phone": "Contact phone",
@@ -14,8 +14,8 @@
     "academicYearPlaceholder": "e.g. 2026-2027",
     "save": "Save settings",
     "saved": "Settings saved.",
-    "nameRequired": "Madrasa name is required.",
-    "noSchool": "No madrasa is selected.",
+    "nameRequired": "Medreseh name is required.",
+    "noSchool": "No medreseh is selected.",
     "failed": "Couldn't save the settings. Please try again.",
     "loadFailed": "Couldn't load the settings. Please refresh the page."
   },

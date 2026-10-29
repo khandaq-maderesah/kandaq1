@@ -40,6 +40,8 @@ export interface School {
   phone?: string
   /** IANA timezone for attendance reminders. Defaults to Africa/Addis_Ababa. */
   timezone?: string
+  /** Dropdown lists: 'platform' (the super admin's, default) or 'own' (this medreseh edits its own). */
+  listsMode?: 'platform' | 'own'
   status: SchoolStatus
   createdAt: string
   createdBy: string
@@ -105,6 +107,7 @@ export interface GuardianInfo {
   age?: number
   phone?: string
   subCity?: string
+  wereda?: string
   kebele?: string
   /** General education level (e.g. Primary, Degree). */
   educationLevel?: string
@@ -121,6 +124,7 @@ export interface Student {
   /** The student's own phone, if any. */
   phone?: string
   subCity?: string
+  wereda?: string
   kebele?: string
   /** Madrasa education level at registration. */
   madrasaLevel?: string
@@ -135,6 +139,8 @@ export interface Student {
   mother?: GuardianInfo
   /** Who to contact when neither parent can be reached. */
   caregiver?: CaregiverInfo | null
+  /** Whose number the absence SMS goes to; unset means automatic (father, then mother, then caregiver). */
+  smsTo?: 'father' | 'mother' | 'caregiver' | null
   rollNumber?: string
   gender?: 'male' | 'female'
   age?: number

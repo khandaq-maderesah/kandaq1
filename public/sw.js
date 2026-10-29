@@ -74,7 +74,7 @@ const AREA_ROUTES = {
     '/admin/settings',
     '/profile',
   ],
-  '/superadmin': ['/superadmin', '/profile'],
+  '/superadmin': ['/superadmin', '/superadmin/reports', '/superadmin/lists', '/profile'],
 }
 
 // Where the installed app starts, or where the server sends a signed-out user.

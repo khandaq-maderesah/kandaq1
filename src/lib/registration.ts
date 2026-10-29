@@ -19,12 +19,13 @@ export interface GuardianDetails {
   age: string
   phone: string
   subCity: string
+  wereda: string
   kebele: string
   educationLevel: string
   occupation: string
   quranLevel: string
   kitabs: string
-  /** Form only: copy the student's sub-city and kebele on save. */
+  /** Form only: copy the student's sub-city, wereda and kebele on save. */
   sameAddress: boolean
 }
 
@@ -42,9 +43,13 @@ export interface SupportDetails {
   note: string
 }
 
+/** Whose number the absence SMS goes to; '' means automatic (father, then mother, then caregiver). */
+export type SmsTarget = '' | GuardianKey | 'caregiver'
+
 export interface RegistrationDetails {
   phone: string
   subCity: string
+  wereda: string
   kebele: string
   quranLevel: string
   kitabs: string
@@ -54,6 +59,7 @@ export interface RegistrationDetails {
   father: GuardianDetails
   mother: GuardianDetails
   caregiver: CaregiverDetails
+  smsTo: SmsTarget
   /**
    * The help assessment. null while an existing student's record is still being
    * loaded (or could not be): it is then left untouched on save.
@@ -72,6 +78,7 @@ export function emptyGuardian(): GuardianDetails {
     age: '',
     phone: '',
     subCity: '',
+    wereda: '',
     kebele: '',
     educationLevel: '',
     occupation: '',
@@ -85,6 +92,7 @@ export function emptyRegistration(): RegistrationDetails {
   return {
     phone: '',
     subCity: '',
+    wereda: '',
     kebele: '',
     quranLevel: '',
     kitabs: '',
@@ -94,6 +102,7 @@ export function emptyRegistration(): RegistrationDetails {
     father: emptyGuardian(),
     mother: emptyGuardian(),
     caregiver: { relation: '', name: '', phone: '' },
+    smsTo: '',
     support: emptySupport(),
   }
 }
@@ -136,7 +145,7 @@ export function orphanKind(student: Pick<Student, 'father' | 'mother'>): OrphanK
 export const REQUIRED_STUDENT_FIELDS = ['quranLevel'] as const
 
 /** Parent fields that must be filled, for the father and the mother alike. */
-export const REQUIRED_GUARDIAN_FIELDS = ['name', 'phone', 'occupation', 'educationLevel', 'quranLevel'] as const
+export const REQUIRED_GUARDIAN_FIELDS = ['name', 'phone', 'occupation'] as const
 
 export type RequiredStudentField = (typeof REQUIRED_STUDENT_FIELDS)[number]
 export type RequiredGuardianField = (typeof REQUIRED_GUARDIAN_FIELDS)[number]
@@ -202,6 +211,7 @@ function toGuardianInfo(g: GuardianDetails, student: RegistrationDetails): Guard
     age: parseAge(g.age),
     phone: clean(g.phone),
     subCity: g.sameAddress ? clean(student.subCity) : clean(g.subCity),
+    wereda: g.sameAddress ? clean(student.wereda) : clean(g.wereda),
     kebele: g.sameAddress ? clean(student.kebele) : clean(g.kebele),
     educationLevel: clean(g.educationLevel),
     occupation: clean(g.occupation),
@@ -221,12 +231,16 @@ export function registrationToStudentFields(details: RegistrationDetails): Parti
   const caregiver: CaregiverInfo | null = caregiverShown(details)
     ? { relation: clean(details.caregiver.relation), name: clean(details.caregiver.name), phone: clean(details.caregiver.phone) }
     : null
-  // Who is called: the reachable parents first, then the caregiver.
-  const contacts = [
-    isReachable(details.father.status) ? father : undefined,
-    isReachable(details.mother.status) ? mother : undefined,
-    caregiver ?? undefined,
+  // Who is called: the reachable parents first, then the caregiver. The
+  // person chosen in "SMS goes to" (if they have a number) goes first.
+  const candidates: { key: SmsTarget; info?: { name?: string; phone?: string } }[] = [
+    { key: 'father', info: isReachable(details.father.status) ? father : undefined },
+    { key: 'mother', info: isReachable(details.mother.status) ? mother : undefined },
+    { key: 'caregiver', info: caregiver ?? undefined },
   ]
+  const chosen = candidates.find((c) => c.key === details.smsTo && c.info?.phone)
+  const ordered = chosen ? [chosen, ...candidates.filter((c) => c !== chosen)] : candidates
+  const contacts = ordered.map((c) => c.info)
   const phones = contacts.map((c) => c?.phone ?? '').filter(Boolean)
   const parentPhone = phones[0] ?? ''
   const alternativePhone = phones[1] ?? ''
@@ -234,6 +248,7 @@ export function registrationToStudentFields(details: RegistrationDetails): Parti
   return {
     phone: clean(details.phone),
     subCity: clean(details.subCity),
+    wereda: clean(details.wereda),
     kebele: clean(details.kebele),
     quranLevel: clean(details.quranLevel),
     kitabs: clean(details.kitabs),
@@ -243,6 +258,7 @@ export function registrationToStudentFields(details: RegistrationDetails): Parti
     father,
     mother,
     caregiver,
+    smsTo: chosen && chosen.key !== '' ? chosen.key : null,
     parentName,
     parentPhone,
     alternativePhone,
@@ -251,21 +267,23 @@ export function registrationToStudentFields(details: RegistrationDetails): Parti
 
 function fromGuardianInfo(g: GuardianInfo | undefined, student: Student): GuardianDetails {
   const subCity = g?.subCity ?? ''
+  const wereda = g?.wereda ?? ''
   const kebele = g?.kebele ?? ''
-  const hasAddress = Boolean(subCity || kebele)
+  const hasAddress = Boolean(subCity || wereda || kebele)
   return {
     status: g?.status ?? 'alive',
     name: g?.name ?? '',
     age: g?.age !== undefined ? String(g.age) : '',
     phone: g?.phone ?? '',
     subCity,
+    wereda,
     kebele,
     educationLevel: g?.educationLevel ?? '',
     occupation: g?.occupation ?? '',
     quranLevel: g?.quranLevel ?? '',
     kitabs: g?.kitabs ?? '',
     // Same address when it matches the student's (or none was recorded yet).
-    sameAddress: !hasAddress || (subCity === (student.subCity ?? '') && kebele === (student.kebele ?? '')),
+    sameAddress: !hasAddress || (subCity === (student.subCity ?? '') && wereda === (student.wereda ?? '') && kebele === (student.kebele ?? '')),
   }
 }
 
@@ -282,6 +300,7 @@ export function registrationFromStudent(student: Student): RegistrationDetails {
   return {
     phone: student.phone ?? '',
     subCity: student.subCity ?? '',
+    wereda: student.wereda ?? '',
     kebele: student.kebele ?? '',
     quranLevel: student.quranLevel ?? '',
     kitabs: student.kitabs ?? '',
@@ -295,6 +314,7 @@ export function registrationFromStudent(student: Student): RegistrationDetails {
       name: student.caregiver?.name ?? '',
       phone: student.caregiver?.phone ?? '',
     },
+    smsTo: student.smsTo ?? '',
     // The help assessment lives in its own record; the page loads it.
     support: null,
   }
@@ -344,7 +364,7 @@ export function supportNeedsReview(record: Pick<StudentSupport, 'updatedAt'>, no
 
 // ==================== Dropdown lists ====================
 
-export const REGISTRATION_LIST_KEYS = ['madrasaLevels', 'quranLevels', 'kitabs', 'educationLevels', 'results'] as const
+export const REGISTRATION_LIST_KEYS = ['madrasaLevels', 'quranLevels', 'kitabs', 'parentKitabs', 'educationLevels', 'results'] as const
 export type RegistrationListKey = (typeof REGISTRATION_LIST_KEYS)[number]
 export type RegistrationOptions = Record<RegistrationListKey, string[]>
 
@@ -362,6 +382,17 @@ export const DEFAULT_REGISTRATION_OPTIONS: RegistrationOptions = {
     'Hifz - 30 Juz (Hafiz)',
   ],
   kitabs: [
+    "Qa'ida",
+    'Juz Amma',
+    'Safinat al-Najah',
+    "Matn Abi Shuja' (al-Ghayah wa al-Taqrib)",
+    "Al-Arba'in al-Nawawiyyah",
+    'Riyad al-Salihin',
+    'Al-Ajurrumiyyah',
+    'Alfiyyat Ibn Malik',
+  ],
+  // The parents' own list; starts like the students' and is edited separately.
+  parentKitabs: [
     "Qa'ida",
     'Juz Amma',
     'Safinat al-Najah',
@@ -399,14 +430,39 @@ function toList(value: unknown): string[] | null {
  * The lists as stored in the database, completed with the defaults for any
  * list the madrasa has not set (an empty saved list stays empty on purpose).
  */
-export function normalizeRegistrationOptions(raw: unknown): RegistrationOptions {
+export function normalizeRegistrationOptions(raw: unknown, base: RegistrationOptions = DEFAULT_REGISTRATION_OPTIONS): RegistrationOptions {
   const source = raw && typeof raw === 'object' ? (raw as Record<string, unknown>) : {}
-  const out = { ...DEFAULT_REGISTRATION_OPTIONS }
+  const out = { ...base }
   for (const key of REGISTRATION_LIST_KEYS) {
     const list = toList(source[key])
     if (list !== null) out[key] = list
   }
   return out
+}
+
+// ==================== Platform lists vs a medreseh's own lists ====================
+
+/**
+ * 'platform': the medreseh uses the lists set by the super admin (the default,
+ * also for new medresehs). 'own': its admin edits its own lists in Settings.
+ */
+export type ListsMode = 'platform' | 'own'
+
+/**
+ * The mode in force. Nothing chosen yet means the platform lists, except for a
+ * medreseh that already saved its own lists before this existed: it keeps them
+ * until the super admin decides.
+ */
+export function effectiveListsMode(mode: unknown, hasOwn: boolean): ListsMode {
+  if (mode === 'platform' || mode === 'own') return mode
+  return hasOwn ? 'own' : 'platform'
+}
+
+/** The lists a medreseh's forms use. Anything a list leaves unset falls back to the platform's, then the built-in starter. */
+export function resolveRegistrationOptions(input: { platform: unknown; own: unknown; mode: unknown }): RegistrationOptions {
+  const platform = normalizeRegistrationOptions(input.platform)
+  const hasOwn = input.own !== null && input.own !== undefined
+  return effectiveListsMode(input.mode, hasOwn) === 'own' ? normalizeRegistrationOptions(input.own, platform) : platform
 }
 
 // ==================== Kitabs (several per person) ====================

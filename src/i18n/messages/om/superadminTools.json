@@ -1,0 +1,109 @@
+{
+  "stats": {
+    "students": "Barattoota",
+    "ustazes": "Ustaazota",
+    "classes": "Kutaalee"
+  },
+  "reports": {
+    "title": "Gabaasota",
+    "description": "Kaardii gabaasaa barbaaddan filadhaa, achiis madrasoota hundaaf gabaasa maddisiisaa.",
+    "pick": "Kaardii gabaasaa",
+    "selectAll": "Hunda filadhu",
+    "clear": "Haqi",
+    "generate": "Gabaasa maddisiisi",
+    "selectOne": "Yoo xiqqaate kaardii gabaasaa tokko filadhu.",
+    "refresh": "Odeeffannoo haaromsi",
+    "loading": "Lakkoofsa haaraa fe'aa jira…",
+    "generatedAt": "Kan maddise {time}",
+    "attendancePeriod": "Argama guyyoota {days} darban.",
+    "total": "Waliigala",
+    "notLoaded": "Hin fe'amne",
+    "status": {
+      "active": "Hojiirra",
+      "suspended": "Dhaabbate"
+    },
+    "empty": {
+      "title": "Gabaasni ammaaf hin jiru",
+      "description": "Kaardii gabaasaa barbaaddan olitti mallattoo godhaa, achiis Gabaasa maddisiisi cuqaasaa."
+    },
+    "cards": {
+      "overview": {
+        "title": "Ilaalcha waliigalaa",
+        "description": "Barattoota, ustaazota, bulchitoota fi kutaalee madrasa tokkoon tokkoo."
+      },
+      "students": {
+        "title": "Barattoota",
+        "description": "Barattoota madrasa tokkoon tokkoo, dhiiraa fi durboota."
+      },
+      "staff": {
+        "title": "Ustaazotaa fi bulchitoota",
+        "description": "Lakkoofsa ustaazotaa fi bulchitoota madrasa tokkoon tokkoo."
+      },
+      "classes": {
+        "title": "Kutaalee",
+        "description": "Kutaalee madrasa tokkoon tokkoo fi kutaalee ustaaz hin qabne."
+      },
+      "orphans": {
+        "title": "Ijoollee abbaa/haadha dhabanii",
+        "description": "Barattoota maatiin isaanii du'e, madrasa tokkoon tokkoo."
+      },
+      "attendance": {
+        "title": "Argama",
+        "description": "Barattoota guyyoota {days} darban dhufan."
+      }
+    },
+    "columns": {
+      "medreseh": "Madrasa",
+      "status": "Haala",
+      "students": "Barattoota",
+      "ustazes": "Ustaazota",
+      "admins": "Bulchitoota",
+      "classes": "Kutaalee",
+      "male": "Dhiiraa",
+      "female": "Durboota",
+      "withoutUstaz": "Ustaaz malee",
+      "orphans": "Ijoollee abbaa/haadha dhabanii",
+      "share": "Qooda barattootaa",
+      "came": "Dhufan",
+      "absent": "Hafan",
+      "rate": "Sadarkaa argamaa"
+    }
+  },
+  "lists": {
+    "title": "Tarreewwan filannoo",
+    "description": "Filannoowwan unka galmee barataa keessa jiran. Asitti altokko madrasoota hundaaf kaa'ama, madrasni tokko kan ofii isaa akka sirreessu isaaf hayyamuu dandeessu.",
+    "platformTitle": "Tarree madrasoota hundaa",
+    "platformDescription": "Sarara tokkotti galmee tokko. Madrasni hundi kan haaraa dabalatee, kan ofii akka qabaatu hanga hayyamtanitti tarree kana fayyadama.",
+    "save": "Tarree kuusi",
+    "saved": "Tarreewwan madrasoota hundaaf kuufaman.",
+    "failed": "Tarree kuusuun hin danda'amne. Maaloo irra deebi'ii yaali.",
+    "schoolsTitle": "Madrasa tokkoon tokkoo",
+    "schoolsDescription": "Madrasni tarree kana fayyadamu moo kan ofii isaa sirreessu filadhu. Madrasni tarree ofii dursee sirreesse gaditti mallattaa'eera.",
+    "noSchools": "Ammaaf madrasni hin jiru.",
+    "usePlatform": "Tarree waliinii fayyadami",
+    "allowOwn": "Tarree ofii hayyami",
+    "toast": {
+      "platform": "{name} amma tarree waliinii fayyadama.",
+      "own": "{name} amma tarree ofii sirreessuu danda'a.",
+      "failed": "Kana jijjiiruun hin danda'amne. Maaloo irra deebi'ii yaali."
+    },
+    "state": {
+      "platform": {
+        "label": "Tarree waliinii",
+        "hint": "Tarree olii hordofa."
+      },
+      "platformKept": {
+        "label": "Tarree waliinii",
+        "hint": "Tarree ofii kuufame qaba, cinaatti kaa'ame. Tarree ofii hayyamuun deebisa."
+      },
+      "ownEdited": {
+        "label": "Tarree ofii (sirreeffame)",
+        "hint": "Bulchaan isaa tarree jijjiire. Tarree waliinii bakka bu'ee ni fayyadama."
+      },
+      "ownAllowed": {
+        "label": "Tarree ofii hayyameera",
+        "hint": "Bulchaan isaa tarree sirreessuu danda'a. Hanga sanaatti tarree waliinii fayyadama."
+      }
+    }
+  }
+}

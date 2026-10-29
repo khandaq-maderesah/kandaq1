@@ -51,6 +51,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { RequestDeleteDialog, RequestTransferDialog } from '@/components/requests/StudentChangeDialogs'
 import { StudentPhotoCapture } from '@/components/StudentPhotoCapture'
+import { mergeLoadedParentPhotos, saveParentPhotos, type ParentPhotos } from '@/lib/parentPhotos'
 import { StudentAvatar } from '@/components/StudentAvatar'
 import { isEmbeddedPhoto } from '@/hooks/useStudentPhoto'
 import { getNextRollNumber } from '@/lib/rollNumber'
@@ -134,6 +135,7 @@ export default function TeacherClassesPage() {
   const editToken = useRef(0)
   const [age, setAge] = useState<number | ''>('')
   const [photoUrl, setPhotoUrl] = useState('')
+  const [parentPhotos, setParentPhotos] = useState<ParentPhotos>({})
   const [parentLanguage, setParentLanguage] = useState('')
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editingName, setEditingName] = useState('')
@@ -195,6 +197,7 @@ export default function TeacherClassesPage() {
     setGender('')
     setAge('')
     setPhotoUrl('')
+    setParentPhotos({})
     setParentLanguage('')
     setFamily(emptyRegistration())
     setRollNumber('')
@@ -259,6 +262,7 @@ export default function TeacherClassesPage() {
         if (!(await saveSupportIfChanged(editingId, family.support, loadedSupport.current, { uid: user.uid, name: user.name }))) {
           toast.warning(tReg('supportSaveFailed'))
         }
+        if (!(await saveParentPhotos(editingId, parentPhotos, family))) toast.warning(tReg('parentPhotoSaveFailed'))
         resetRegisterForm()
         toast.success(t('toast.updated', { name: studentName }))
       } else {
@@ -280,6 +284,7 @@ export default function TeacherClassesPage() {
         if (!(await saveSupportIfChanged(studentId, family.support, loadedSupport.current, { uid: user.uid, name: user.name }))) {
           toast.warning(tReg('supportSaveFailed'))
         }
+        if (!(await saveParentPhotos(studentId, parentPhotos, family))) toast.warning(tReg('parentPhotoSaveFailed'))
         resetRegisterForm()
         toast.success(t('toast.added', { name: studentName, roll: fields.rollNumber }))
       }
@@ -312,6 +317,10 @@ export default function TeacherClassesPage() {
         setFamily((f) => ({ ...f, support }))
       })
       .catch(() => {})
+    rtdb.getParentPhotos(s.id).then((loaded) => {
+      if (token !== editToken.current || !loaded) return
+      setParentPhotos((cur) => mergeLoadedParentPhotos(cur, loaded))
+    })
     setFormError('')
     // Photos live in their own node; fetch on demand for non-embedded records.
     let photo = s.photoUrl || ''
@@ -537,6 +546,8 @@ export default function TeacherClassesPage() {
                   value={family}
                   onChange={setFamily}
                   options={registrationOptions}
+                  parentPhotos={parentPhotos}
+                  onParentPhotoChange={(who, url) => setParentPhotos((cur) => ({ ...cur, [who]: url }))}
                 />
 
                 <div className="space-y-2 sm:col-span-2">

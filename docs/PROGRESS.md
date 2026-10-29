@@ -976,3 +976,19 @@ Live check against https://mms.khendeq.com
 - Files: `src/lib/registration.ts`, `src/lib/supportList.ts`, `src/lib/studentSupport.ts`, `src/components/students/FamilyInfoFields.tsx`, `src/app/admin/support/page.tsx`, both student form pages, `database.rules.json`, translations en/am/ar/om/so (`registration`, `nav`, new `adminSupport`).
 - Tests: `tests/familySupport.test.mjs` (14). The terminology check caught "school" in an English label; reworded.
 - Verified: `npm test` -> TypeScript PASS, ESLint PASS, unit tests PASS; `node scripts/i18n-sync.mjs --check` -> All translations complete. Rules deployed (`firebase deploy --only database`).
+
+---
+
+## [2026-10-29] Task 6.12 - Registration form additions, Ustaz SMS number, super admin tools, emails
+
+- **Wereda**: new field before Kebele for the student and for each parent (record, form, detail card, "same address" copy; 5 languages).
+- **Parent photo** (optional) per living parent in both student forms; stored in `studentPhotos/{studentId}/fatherPhoto|motherPhoto` (rules validate size); shown on the detail card. Saving the student photo no longer removes the parents' photos; an unreadable saved parent photo is left untouched.
+- **Parents' lists**: parent kitabs have their own editable list `parentKitabs`; parent education level and Qur'an level are now optional (name, phone, occupation stay required for a living parent).
+- **Absence SMS number**: the SMS/call contact is still father, then mother, then caregiver; the Ustaz/admin can now choose "SMS goes to" (father / mother / caregiver) on the student (`smsTo`). The student's own phone is never used.
+- **Wording**: "madrasa" is now "medreseh" in all English texts and default names (terminology test updated; test also forbids "madrasa" in English). Other languages keep their own word.
+- **Ustaz menu**: "Weekly report" removed from the Ustaz side menu (page still exists).
+- **Super admin**: dashboard cards for students / Ustazes / classes (`usePlatformFigures`, read once, refreshable); new `/superadmin/reports` (pick report cards -> generate; overview, students, Ustazes & admins, classes, orphans, attendance of the last 30 days; CSV per card); new `/superadmin/lists` (platform-wide dropdown lists for every medreseh incl. new ones; per medreseh "use platform lists" or "allow own lists"; medresehs that already saved lists of their own are marked and keep them until the super admin decides). Rules: new `platformSettings` (read: signed in, write: super admin only), `schoolInfo/{id}/listsMode` (super admin only). The admin Settings lists editor is read-only while the platform lists apply (UI only; not enforced in rules).
+- **Email change**: `PATCH /api/admin/users/[uid]` `{ email }` - an admin changes an Ustaz's email, only the super admin changes an admin's (Users page menu and super admin school card). Updates Firebase Auth and the profile, audited.
+- Dropped by the owner: one email in several medresehs with different roles.
+- Tests: `tests/platformAdmin.test.mjs` (12) plus additions in `studentRegistration` and `familySupport` tests.
+- Verified: `npm test` -> TypeScript PASS (5.23s), ESLint PASS (3.56s), unit tests PASS (7.51s); `node scripts/i18n-sync.mjs --check` -> All translations complete.

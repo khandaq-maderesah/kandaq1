@@ -17,6 +17,7 @@ import { useEthiopianDate } from '@/hooks/useEthiopianDate'
 import { PARENT_LANGUAGES } from '@/lib/smsMessage'
 import { StudentAvatar } from '@/components/StudentAvatar'
 import { useStudentPhoto } from '@/hooks/useStudentPhoto'
+import { useParentPhotos } from '@/hooks/useParentPhotos'
 import { cn } from '@/lib/utils'
 
 interface StudentDetailCardProps {
@@ -57,6 +58,7 @@ function PhoneValue({ phone }: { phone?: string }) {
 function FamilySection({ student }: { student: Student }) {
   const t = useTranslations('registration')
   const format = useFormatter()
+  const parentPhotos = useParentPhotos(student.id)
   const guardians = [
     { key: 'father' as const, info: student.father },
     { key: 'mother' as const, info: student.mother },
@@ -72,12 +74,17 @@ function FamilySection({ student }: { student: Student }) {
         <Field label={t('fields.occupation')} value={student.occupation} />
         <Field label={t('fields.phone')} value={<PhoneValue phone={student.phone} />} />
         <Field label={t('fields.subCity')} value={student.subCity} />
+        <Field label={t('fields.wereda')} value={student.wereda} />
         <Field label={t('fields.kebele')} value={student.kebele} />
       </dl>
 
       {guardians.map(({ key, info }) => (
         <div key={key}>
           <SectionHeading>{t(`sections.${key}`)}</SectionHeading>
+          {parentPhotos[key] && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={parentPhotos[key]} alt={t(`sections.${key}`)} className="mt-3 h-20 w-20 rounded-full object-cover" />
+          )}
           <dl className="mt-3 grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3">
             {info?.status && info.status !== 'alive' && <Field label={t('fields.status')} value={t(`status.${info.status}`)} />}
             <Field label={t('fields.name')} value={info?.name} />
@@ -88,6 +95,7 @@ function FamilySection({ student }: { student: Student }) {
             <Field label={t('fields.quranLevel')} value={info?.quranLevel} />
             <Field label={t('fields.kitabs')} value={info?.kitabs} />
             <Field label={t('fields.subCity')} value={info?.subCity} />
+            <Field label={t('fields.wereda')} value={info?.wereda} />
             <Field label={t('fields.kebele')} value={info?.kebele} />
           </dl>
         </div>

@@ -80,7 +80,7 @@ export function generateSmsMessage(
 
     case 'English': {
       const name = latin(studentName)
-      return `From ${schoolName}\n\nDear parent or guardian of ${name}, we would like to let you know that ${name} was absent from the madrasa today.`
+      return `From ${schoolName}\n\nDear parent or guardian of ${name}, we would like to let you know that ${name} was absent from the medreseh today.`
     }
 
     default: {
@@ -110,7 +110,7 @@ export function generateGroupSmsMessage(
     case 'Arabic':
       return `من ${schoolName}\n\nحضرة وليّ الأمر المحترم،\nنودّ إعلامكم بأنّ ابنكم/ابنتكم تغيّب عن المدرسة اليوم.`
     case 'English':
-      return `From ${schoolName}\n\nDear parent or guardian, we would like to let you know that your child was absent from the madrasa today.`
+      return `From ${schoolName}\n\nDear parent or guardian, we would like to let you know that your child was absent from the medreseh today.`
     default:
       return `${school ? `ከ ${school.nameAm || school.name}` : 'ከ ኸንደቅ መድረሳ'}\n\nየተከበራችሁ ወላጆች፣ ዛሬ ልጃችሁ መድረሳ አለመምጣቱን/አለመምጣቷን እናሳውቃለን።`
   }

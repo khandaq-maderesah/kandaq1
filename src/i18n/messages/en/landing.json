@@ -3,14 +3,14 @@
     "signIn": "Sign in"
   },
   "hero": {
-    "eyebrow": "Madrasa management platform",
-    "title": "Run your whole madrasa from one place",
-    "subtitle": "MMS helps madrasas take attendance, manage students and ustazes, run exams and keep parents informed, in the language you prefer.",
+    "eyebrow": "Medreseh management platform",
+    "title": "Run your whole medreseh from one place",
+    "subtitle": "MMS helps medresehs take attendance, manage students and ustazes, run exams and keep parents informed, in the language you prefer.",
     "cta": "Sign in",
     "secondary": "See what's included"
   },
   "features": {
-    "title": "Everything a madrasa needs",
+    "title": "Everything a medreseh needs",
     "subtitle": "Simple tools for administrators and ustazes, built to work well on any phone.",
     "attendance": {
       "title": "Daily attendance",
@@ -33,12 +33,12 @@
       "description": "Charts for attendance trends, grades and class sizes help you spot problems early."
     },
     "languages": {
-      "title": "Many madrasas, many languages",
-      "description": "Each madrasa has its own private space, and every user can choose their own language."
+      "title": "Many medresehs, many languages",
+      "description": "Each medreseh has its own private space, and every user can choose their own language."
     }
   },
   "footer": {
-    "copyright": "© {year} MMS — Madrasa Management System. All rights reserved."
+    "copyright": "© {year} MMS — Medreseh Management System. All rights reserved."
   },
   "errorPage": {
     "title": "Something went wrong",

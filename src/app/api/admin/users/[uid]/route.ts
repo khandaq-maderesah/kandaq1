@@ -9,9 +9,11 @@ export const dynamic = 'force-dynamic'
 /**
  * PATCH /api/admin/users/[uid]
  *
- * Two shapes:
+ * Shapes:
  *  - { details: { phone, quranLevel, kitabs, language } } updates the profile
  *    details an admin collects for an ustaz (phone stays required for one);
+ *  - { email } changes a user's sign-in email (an admin for an Ustaz, the
+ *    super admin for an admin);
  *  - { assignedClassIds } updates the classes assigned to an existing teacher.
  *    Class records and user profiles are updated together so moving a teacher
  *    to a new grade does not leave stale assignments behind.
@@ -25,6 +27,44 @@ export async function PATCH(
   try {
     const { db, caller } = await requireAdmin(request)
     const body = await request.json()
+
+    if (typeof body?.email === 'string') {
+      const email = body.email.trim().toLowerCase()
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return NextResponse.json({ ok: false, error: 'email is not valid.', code: 'auth/invalid-email' }, { status: 400 })
+      }
+      const user = (await db.ref('users/' + uid).get()).val()
+      if (!user) {
+        return NextResponse.json({ ok: false, error: 'User not found.', code: 'not-found' }, { status: 404 })
+      }
+      assertCanManageSchool(caller, user.schoolId)
+      // A medreseh admin changes the email of an Ustaz; only the super admin
+      // changes an admin's email. Nobody changes a super admin's here.
+      const allowed = caller.role === 'superadmin' ? user.role !== 'superadmin' : user.role === 'teacher'
+      if (!allowed) {
+        return NextResponse.json({ ok: false, error: 'You cannot change this email.', code: 'forbidden' }, { status: 403 })
+      }
+      if (email !== String(user.email ?? '').toLowerCase()) {
+        await getAuth().updateUser(uid, { email })
+        await db.ref().update({
+          [`users/${uid}/email`]: email,
+          [`users/${uid}/updatedAt`]: new Date().toISOString(),
+        })
+        if (user.schoolId) {
+          await db
+            .ref(`schoolData/${user.schoolId}/audit/audit_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`)
+            .set({
+              actorId: caller.uid,
+              action: 'update',
+              entity: 'user',
+              entityId: uid,
+              details: `Changed the email of ${user.name}`,
+              timestamp: new Date().toISOString(),
+            })
+        }
+      }
+      return NextResponse.json({ ok: true, email })
+    }
 
     if (body?.details && typeof body.details === 'object') {
       const user = (await db.ref('users/' + uid).get()).val()

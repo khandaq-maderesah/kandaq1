@@ -7,6 +7,7 @@ import { Loader2, Lock, Unlock, Save, UserPlus, ListChecks } from 'lucide-react'
 import { rtdb } from '@/lib/database'
 import { useAuth } from '@/context/AuthContext'
 import { useRegistrationOptions } from '@/hooks/useRegistrationOptions'
+import { useListsPolicy } from '@/hooks/useListsPolicy'
 import { parseListText, REGISTRATION_LIST_KEYS, type RegistrationListKey, type RegistrationOptions } from '@/lib/registration'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
@@ -38,21 +39,24 @@ export default function SettingsPage() {
   // The dropdown lists of the registration form, edited as "one entry per line".
   const tr = useTranslations('registration')
   const liveOptions = useRegistrationOptions()
+  const listsPolicy = useListsPolicy()
+  const listsLocked = listsPolicy.mode !== 'own'
   const [listText, setListText] = useState<Record<RegistrationListKey, string> | null>(null)
   const [savingLists, setSavingLists] = useState(false)
   useEffect(() => {
-    // Fill the editor once from the live value; later edits are the admin's.
+    // Fill the editor from the live value. While the platform's lists apply they
+    // are shown as they change; once the medreseh edits its own, edits are the admin's.
     setListText((current) => {
-      if (current) return current
+      if (current && !listsLocked) return current
       const next = {} as Record<RegistrationListKey, string>
       for (const key of REGISTRATION_LIST_KEYS) next[key] = liveOptions[key].join('\n')
       return next
     })
-  }, [liveOptions])
+  }, [liveOptions, listsLocked])
 
   const handleSaveLists = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!listText) return
+    if (!listText || listsLocked) return
     setSavingLists(true)
     try {
       const options = {} as RegistrationOptions
@@ -285,7 +289,7 @@ export default function SettingsPage() {
               <ListChecks className="h-5 w-5 text-primary" aria-hidden="true" />
               {tr('lists.title')}
             </CardTitle>
-            <CardDescription>{tr('lists.description')}</CardDescription>
+            <CardDescription>{listsLocked ? tr('lists.platformNote') : tr('lists.description')}</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSaveLists} className="space-y-4">
@@ -297,14 +301,14 @@ export default function SettingsPage() {
                       id={`list-${key}`}
                       rows={6}
                       value={listText?.[key] ?? ''}
-                      disabled={!listText}
+                      disabled={!listText || listsLocked}
                       onChange={(e) => setListText((current) => (current ? { ...current, [key]: e.target.value } : current))}
                     />
                   </div>
                 ))}
               </div>
               <div className="flex justify-end">
-                <Button type="submit" disabled={savingLists || !listText}>
+                <Button type="submit" disabled={savingLists || !listText || listsLocked}>
                   {savingLists ? <Loader2 className="animate-spin" /> : <Save />}
                   {savingLists ? tc('status.saving') : tr('lists.save')}
                 </Button>

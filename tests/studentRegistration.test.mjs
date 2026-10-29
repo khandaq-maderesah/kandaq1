@@ -36,20 +36,16 @@ function filledRegistration() {
 }
 
 describe('Registration form: required fields', () => {
-  test('an empty form is missing the student academic status and every required parent field', () => {
+  test('an empty form is missing the student academic status and the required parent fields (not the parent levels)', () => {
     const missing = missingRegistrationFields(emptyRegistration())
     assert.deepEqual(missing, [
       'quranLevel',
       'father.name',
       'father.phone',
       'father.occupation',
-      'father.educationLevel',
-      'father.quranLevel',
       'mother.name',
       'mother.phone',
       'mother.occupation',
-      'mother.educationLevel',
-      'mother.quranLevel',
     ])
   })
 
@@ -63,8 +59,13 @@ describe('Registration form: required fields', () => {
   test('address, kitabs, ages, last year and the student phone are optional', () => {
     const r = filledRegistration()
     r.subCity = ''
+    r.wereda = ''
     r.kebele = ''
     r.kitabs = ''
+    r.father.educationLevel = ''
+    r.father.quranLevel = ''
+    r.mother.educationLevel = ''
+    r.mother.quranLevel = ''
     r.lastYearLevel = ''
     r.lastYearResult = ''
     r.phone = ''
@@ -94,15 +95,19 @@ describe('Registration form: mapping to the student record', () => {
   test('parents marked "same address" copy the student sub-city and kebele', () => {
     const r = filledRegistration()
     r.subCity = 'Bole'
+    r.wereda = '3'
     r.kebele = '05'
     r.father.sameAddress = true
     r.mother.sameAddress = false
     r.mother.subCity = 'Yeka'
+    r.mother.wereda = '7'
     r.mother.kebele = '12'
     const fields = registrationToStudentFields(r)
     assert.equal(fields.father.subCity, 'Bole')
+    assert.equal(fields.father.wereda, '3')
     assert.equal(fields.father.kebele, '05')
     assert.equal(fields.mother.subCity, 'Yeka')
+    assert.equal(fields.mother.wereda, '7')
     assert.equal(fields.mother.kebele, '12')
   })
 
@@ -123,6 +128,7 @@ describe('Registration form: mapping to the student record', () => {
     r.kebele = '05'
     r.mother.sameAddress = false
     r.mother.subCity = 'Yeka'
+    r.mother.wereda = '7'
     r.mother.kebele = '12'
     const fields = registrationToStudentFields(r)
     const student = { id: 's1', name: 'Test', classId: 'c1', isActive: true, createdAt: '', createdBy: '', updatedAt: '', ...fields }
@@ -132,6 +138,7 @@ describe('Registration form: mapping to the student record', () => {
     assert.equal(back.father.sameAddress, true)
     assert.equal(back.mother.sameAddress, false)
     assert.equal(back.mother.subCity, 'Yeka')
+    assert.equal(back.mother.wereda, '7')
     assert.deepEqual(missingRegistrationFields(back), [])
   })
 
@@ -157,7 +164,7 @@ describe('Registration form: mapping to the student record', () => {
 
 describe('Registration dropdown lists', () => {
   test('the lists cover the madrasa level, Qur\'an level, education level and result', () => {
-    assert.deepEqual(REGISTRATION_LIST_KEYS, ['madrasaLevels', 'quranLevels', 'kitabs', 'educationLevels', 'results'])
+    assert.deepEqual(REGISTRATION_LIST_KEYS, ['madrasaLevels', 'quranLevels', 'kitabs', 'parentKitabs', 'educationLevels', 'results'])
     for (const key of REGISTRATION_LIST_KEYS) assert.ok(DEFAULT_REGISTRATION_OPTIONS[key].length > 0)
   })
 
@@ -182,7 +189,8 @@ describe('Registration dropdown lists', () => {
 
   test('kitabs are chosen from the editable list with an "Other" entry, for students, parents and ustazes', () => {
     const family = fs.readFileSync(path.resolve('src/components/students/FamilyInfoFields.tsx'), 'utf8')
-    assert.equal((family.match(/options=\{options\.kitabs\}/g) || []).length, 2, 'student and guardian kitabs use the list')
+    assert.equal((family.match(/options=\{options\.kitabs\}/g) || []).length, 1, 'student kitabs use the students list')
+    assert.equal((family.match(/options=\{options\.parentKitabs\}/g) || []).length, 1, 'parents use their own kitab list')
     assert.match(family, /<option value=\{OTHER\}>/)
     const teachers = fs.readFileSync(path.resolve('src/app/admin/teachers/page.tsx'), 'utf8')
     assert.match(teachers, /options=\{registrationOptions\.kitabs\}/)

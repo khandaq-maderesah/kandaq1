@@ -185,3 +185,46 @@ describe('database rules for the private assessment', () => {
     assert.match(node.$studentId.updatedBy['.validate'], /auth\.uid/)
   })
 })
+
+describe('Absence SMS number', () => {
+  test('automatic: father first, then mother', () => {
+    const f = registrationToStudentFields(livingRegistration())
+    assert.equal(f.parentPhone, '0911000001')
+    assert.equal(f.smsTo, null)
+  })
+
+  test('the Ustaz can choose the mother; she is called first, the father second', () => {
+    const r = livingRegistration()
+    r.smsTo = 'mother'
+    const f = registrationToStudentFields(r)
+    assert.equal(f.parentPhone, '0911000002')
+    assert.equal(f.alternativePhone, '0911000001')
+    assert.equal(f.parentName, 'Fatima Hassan')
+    assert.equal(f.smsTo, 'mother')
+    assert.equal(registrationFromStudent({ ...f, id: 's', name: 'x', classId: 'c', isActive: true, createdAt: '', createdBy: '', updatedAt: '' }).smsTo, 'mother')
+  })
+
+  test('a choice with no usable number falls back to automatic', () => {
+    const r = livingRegistration()
+    r.mother.status = 'deceased'
+    r.smsTo = 'mother'
+    const f = registrationToStudentFields(r)
+    assert.equal(f.parentPhone, '0911000001')
+    assert.equal(f.smsTo, null)
+  })
+})
+
+describe('Parents: optional levels and own kitab list', () => {
+  test('parent education and Qur\'an level are optional', () => {
+    const r = livingRegistration()
+    r.father.educationLevel = ''
+    r.father.quranLevel = ''
+    assert.deepEqual(missingRegistrationFields(r), [])
+  })
+
+  test('the parents have their own kitab list and photos use the studentPhotos node', () => {
+    const rules = JSON.parse(fs.readFileSync(new URL('../database.rules.json', import.meta.url), 'utf8'))
+    const photos = rules.rules.schoolData.$schoolId.studentPhotos.$studentId
+    assert.ok(photos.fatherPhoto['.validate'] && photos.motherPhoto['.validate'])
+  })
+})

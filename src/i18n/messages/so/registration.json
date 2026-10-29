@@ -16,6 +16,7 @@
     "age": "Da'da",
     "phone": "Taleefan",
     "subCity": "Magaalo-hoosaad",
+    "wereda": "Degmo",
     "kebele": "Qebele",
     "madrasaLevel": "Heerka madrasada",
     "quranLevel": "Heerka Quraanka",
@@ -24,6 +25,8 @@
     "lastYearResult": "Natiijada sannadkii hore",
     "occupation": "Shaqada",
     "educationLevel": "Heerka waxbarashada",
+    "smsTo": "Fariinta maqnaanshaha waxaa loo diraa",
+    "photo": "Sawir (ikhtiyaari)",
     "status": "Xaalad",
     "relation": "Xiriirka uu la leeyahay ilmaha",
     "supportLevel": "Qoysku ma u baahan yahay caawimaad?",
@@ -40,7 +43,7 @@
   },
   "other": "Kale…",
   "required": "Qasab",
-  "sameAddress": "Isla magaalo-hoosaadka iyo qebelaha ardayga",
+  "sameAddress": "Isla magaalo-hoosaadka, degmada iyo qebelaha ardayga",
   "errors": {
     "missing": "Fadlan buuxi goobaha qoyska ee qasabka ah: {fields}"
   },
@@ -54,7 +57,9 @@
     "save": "Kaydi liisaska",
     "saved": "Liisaska diiwaangelinta waa la kaydiyay.",
     "failed": "Liisaska lama kaydin karin. Fadlan mar kale isku day.",
-    "kitabs": "Kutubta"
+    "kitabs": "Kutubta",
+    "parentKitabs": "Kutubta (waalidiinta)",
+    "platformNote": "Liisaskan waxaa dejiya maamulaha guud, wuuna isku mid yihiin madrasad kasta. Halkan laguma beddeli karo."
   },
   "kitabsPicker": {
     "add": "Kudar",
@@ -96,5 +101,10 @@
   },
   "noDetailsNeeded": "Faahfaahin dheeraad ah looma baahna waalidkan.",
   "supportUnavailable": "Qiimaynta la keydiyay lama soo rari karin, sidaas darteed lama beddeli doono. Isku day mar kale markaad onlayn tahay.",
-  "supportSaveFailed": "Ardayga waa la keydiyay, laakiin faahfaahinta taageerada qoyska lama keydin. Fadlan fur ardayga oo mar kale kaydi."
+  "supportSaveFailed": "Ardayga waa la keydiyay, laakiin faahfaahinta taageerada qoyska lama keydin. Fadlan fur ardayga oo mar kale kaydi.",
+  "parentPhotoSaveFailed": "Ardayga waa la keydiyay, laakiin sawirka waalidka lama keydin. Fadlan fur ardayga oo sawirka mar kale ku dar.",
+  "smsTo": {
+    "auto": "Si toos ah (aabbe, kadibna hooyo)",
+    "hint": "Ustaaska ayaa wakhti kasta bedeli kara. Wicitaanadu waxay muujinayaan lambar kasta."
+  }
 }

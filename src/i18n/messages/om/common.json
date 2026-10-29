@@ -119,5 +119,15 @@
     "light": "Ifaa",
     "dark": "Dukkana",
     "system": "Akka qindaa'ina meeshaa"
+  },
+  "changeEmail": {
+    "title": "Imeelii jijjiiri",
+    "description": "Imeelii haaraan {name} jedhee seenuuf ooluu. Jecha iccitii hin jijjiiramu.",
+    "label": "Imeelii haaraa",
+    "hint": "Nama sanaaf imeelii haaraa isaa itti himaa. Imeelii durii isaa irra deebi'ee hin hojjetu.",
+    "save": "Imeelii kuusi",
+    "saved": "Imeeliin {name} jijjiirameera.",
+    "failed": "Imeelii jijjiiruun hin danda'amne.",
+    "action": "Imeelii jijjiiri"
   }
 }

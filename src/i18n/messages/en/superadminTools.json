@@ -1,0 +1,109 @@
+{
+  "stats": {
+    "students": "Students",
+    "ustazes": "Ustazes",
+    "classes": "Classes"
+  },
+  "reports": {
+    "title": "Reports",
+    "description": "Choose the report cards you want, then generate the report for all medresehs.",
+    "pick": "Report cards",
+    "selectAll": "Select all",
+    "clear": "Clear",
+    "generate": "Generate report",
+    "selectOne": "Choose at least one report card.",
+    "refresh": "Refresh data",
+    "loading": "Loading the latest numbers…",
+    "generatedAt": "Generated {time}",
+    "attendancePeriod": "Attendance of the last {days} days.",
+    "total": "Total",
+    "notLoaded": "Not loaded",
+    "status": {
+      "active": "Active",
+      "suspended": "Suspended"
+    },
+    "empty": {
+      "title": "No report yet",
+      "description": "Tick the report cards you want above and press Generate report."
+    },
+    "cards": {
+      "overview": {
+        "title": "Overview",
+        "description": "Students, Ustazes, admins and classes of each medreseh."
+      },
+      "students": {
+        "title": "Students",
+        "description": "Students per medreseh, boys and girls."
+      },
+      "staff": {
+        "title": "Ustazes and admins",
+        "description": "How many Ustazes and admins each medreseh has."
+      },
+      "classes": {
+        "title": "Classes",
+        "description": "Classes per medreseh and classes with no Ustaz."
+      },
+      "orphans": {
+        "title": "Orphans",
+        "description": "Students with a deceased parent, per medreseh."
+      },
+      "attendance": {
+        "title": "Attendance",
+        "description": "How many students came in the last {days} days."
+      }
+    },
+    "columns": {
+      "medreseh": "Medreseh",
+      "status": "Status",
+      "students": "Students",
+      "ustazes": "Ustazes",
+      "admins": "Admins",
+      "classes": "Classes",
+      "male": "Boys",
+      "female": "Girls",
+      "withoutUstaz": "Without Ustaz",
+      "orphans": "Orphans",
+      "share": "Share of students",
+      "came": "Came",
+      "absent": "Absent",
+      "rate": "Attendance rate"
+    }
+  },
+  "lists": {
+    "title": "Dropdown lists",
+    "description": "The choices in the student registration form. They are set here once for every medreseh, and you can let a medreseh edit its own.",
+    "platformTitle": "Lists for all medresehs",
+    "platformDescription": "One entry per line. Every medreseh uses these lists, including new ones, unless you allow it to have its own.",
+    "save": "Save lists",
+    "saved": "Lists saved for all medresehs.",
+    "failed": "Couldn't save the lists. Please try again.",
+    "schoolsTitle": "Each medreseh",
+    "schoolsDescription": "Choose whether a medreseh uses these lists or edits its own. A medreseh that already edited its own lists is marked below.",
+    "noSchools": "No medresehs yet.",
+    "usePlatform": "Use platform lists",
+    "allowOwn": "Allow own lists",
+    "toast": {
+      "platform": "{name} now uses the platform lists.",
+      "own": "{name} can now edit its own lists.",
+      "failed": "Couldn't change this. Please try again."
+    },
+    "state": {
+      "platform": {
+        "label": "Platform lists",
+        "hint": "Follows the lists above."
+      },
+      "platformKept": {
+        "label": "Platform lists",
+        "hint": "Has its own saved lists, kept aside. Allow own lists to bring them back."
+      },
+      "ownEdited": {
+        "label": "Own lists (edited)",
+        "hint": "Its admin changed the lists. They are used instead of the platform lists."
+      },
+      "ownAllowed": {
+        "label": "Own lists allowed",
+        "hint": "Its admin can edit the lists. Until then it uses the platform lists."
+      }
+    }
+  }
+}

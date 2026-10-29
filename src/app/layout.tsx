@@ -32,13 +32,13 @@ const arabic = Noto_Sans_Arabic({
 
 export const metadata: Metadata = {
   title: {
-    default: "MMS — Madrasa Management System",
+    default: "MMS — Medreseh Management System",
     template: "%s | MMS",
   },
   // No description on purpose: it is what link previews (Telegram, WhatsApp)
   // show under the title when sharing the URL.
   applicationName: "MMS",
-  keywords: ["madrasa", "medresah", "ustaz", "attendance", "students", "management"],
+  keywords: ["medreseh", "madrasa", "medresah", "ustaz", "attendance", "students", "management"],
   manifest: "/manifest.webmanifest",
   icons: {
     icon: "/icons/favicon-64.png",
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
   // No openGraph.description on purpose: link previews (Telegram, WhatsApp,
   // etc.) would otherwise show this text when sharing the URL.
   openGraph: {
-    title: "MMS — Madrasa Management System",
+    title: "MMS — Medreseh Management System",
     type: "website",
   },
 }

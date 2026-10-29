@@ -60,8 +60,15 @@
         ".write": "auth != null && (root.child('users/' + auth.uid).child('role').val() === 'superadmin' || (((root.child('users/' + auth.uid).child('schoolId').val() === $schoolId && root.child('users/' + auth.uid).child('status').val() !== 'inactive' && root.child('schoolInfo/' + $schoolId + '/status').val() === 'active') && root.child('users/' + auth.uid).child('role').val() === 'admin') && data.exists() && newData.exists()))",
         "status": {
           ".validate": "newData.val() === data.val() || root.child('users/' + auth.uid).child('role').val() === 'superadmin'"
+        },
+        "listsMode": {
+          ".validate": "(newData.val() === 'platform' || newData.val() === 'own') && (newData.val() === data.val() || root.child('users/' + auth.uid).child('role').val() === 'superadmin')"
         }
       }
+    },
+    "platformSettings": {
+      ".read": "auth != null",
+      ".write": "auth != null && root.child('users/' + auth.uid).child('role').val() === 'superadmin'"
     },
     "schoolData": {
       ".read": "auth != null && root.child('users/' + auth.uid).child('role').val() === 'superadmin'",
@@ -122,6 +129,12 @@
           "$studentId": {
             ".write": "auth != null && (root.child('users/' + auth.uid).child('role').val() === 'superadmin' || ((root.child('users/' + auth.uid).child('schoolId').val() === $schoolId && root.child('users/' + auth.uid).child('status').val() !== 'inactive' && root.child('schoolInfo/' + $schoolId + '/status').val() === 'active') && root.child('users/' + auth.uid).child('role').val() === 'admin')) || ((root.child('users/' + auth.uid).child('schoolId').val() === $schoolId && root.child('users/' + auth.uid).child('status').val() !== 'inactive' && root.child('schoolInfo/' + $schoolId + '/status').val() === 'active') && (root.child('schoolData/' + $schoolId + '/classes/' + root.child('schoolData/' + $schoolId + '/students/' + $studentId + '/classId').val() + '/teacherId').val() === auth.uid || root.child('schoolData/' + $schoolId + '/classes/' + root.child('schoolData/' + $schoolId + '/students/' + $studentId + '/classId').val() + '/teacherIds/' + auth.uid).val() === true))",
             "photo": {
+              ".validate": "!newData.exists() || (newData.isString() && newData.val().length < 150000)"
+            },
+            "fatherPhoto": {
+              ".validate": "!newData.exists() || (newData.isString() && newData.val().length < 150000)"
+            },
+            "motherPhoto": {
               ".validate": "!newData.exists() || (newData.isString() && newData.val().length < 150000)"
             }
           }

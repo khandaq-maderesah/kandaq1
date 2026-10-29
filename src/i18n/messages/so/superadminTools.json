@@ -1,0 +1,109 @@
+{
+  "stats": {
+    "students": "Ardayda",
+    "ustazes": "Ustaasyada",
+    "classes": "Fasallada"
+  },
+  "reports": {
+    "title": "Warbixinno",
+    "description": "Dooro kaararka warbixinta ee aad rabto, kadibna u samee warbixinta dhammaan madrasadaha.",
+    "pick": "Kaararka warbixinta",
+    "selectAll": "Dooro dhammaan",
+    "clear": "Tirtir",
+    "generate": "Samee warbixinta",
+    "selectOne": "Dooro ugu yaraan hal kaaro warbixin ah.",
+    "refresh": "Cusboonaysii xogta",
+    "loading": "Lambarrada ugu dambeeya ayaa la soo rarayaa…",
+    "generatedAt": "La sameeyay {time}",
+    "attendancePeriod": "Imaanshaha {days} maalmood ee u dambeeyay.",
+    "total": "Wadarta",
+    "notLoaded": "Lama soo rarin",
+    "status": {
+      "active": "Shaqaynaya",
+      "suspended": "La hakiyay"
+    },
+    "empty": {
+      "title": "Weli warbixin ma jirto",
+      "description": "Kor ka calaamadee kaararka warbixinta ee aad rabto, kadibna taabo Samee warbixinta."
+    },
+    "cards": {
+      "overview": {
+        "title": "Guud ahaan",
+        "description": "Ardayda, ustaasyada, maamulayaasha iyo fasallada madrasad kasta."
+      },
+      "students": {
+        "title": "Ardayda",
+        "description": "Ardayda madrasad kasta, wiilal iyo gabdho."
+      },
+      "staff": {
+        "title": "Ustaasyada iyo maamulayaasha",
+        "description": "Tirada ustaasyada iyo maamulayaasha madrasad kasta."
+      },
+      "classes": {
+        "title": "Fasallada",
+        "description": "Fasallada madrasad kasta iyo fasallada ustaas la'aan."
+      },
+      "orphans": {
+        "title": "Agoonta",
+        "description": "Ardayda hal waalid ka dhintay, madrasad kasta."
+      },
+      "attendance": {
+        "title": "Imaanshaha",
+        "description": "Ardayda timid {days} maalmood ee u dambeeyay."
+      }
+    },
+    "columns": {
+      "medreseh": "Madrasad",
+      "status": "Xaalad",
+      "students": "Ardayda",
+      "ustazes": "Ustaasyada",
+      "admins": "Maamulayaasha",
+      "classes": "Fasallada",
+      "male": "Wiilal",
+      "female": "Gabdho",
+      "withoutUstaz": "Ustaas la'aan",
+      "orphans": "Agoonta",
+      "share": "Qaybta ardayda",
+      "came": "Timid",
+      "absent": "Maqnaa",
+      "rate": "Heerka imaanshaha"
+    }
+  },
+  "lists": {
+    "title": "Liisaska dooran",
+    "description": "Doorashooyinka foomka diiwaangelinta ardayga. Halkan mar ayaa lagu dejiyaa dhammaan madrasadaha, waxaadna u ogolaan kartaa madrasad inay isbeddesho liistooyinkeeda.",
+    "platformTitle": "Liisaska dhammaan madrasadaha",
+    "platformDescription": "Hal gelin sadar kasta. Madrasad kasta, oo uu ku jiro kuwa cusub, waxay isticmaashaa liisaskan haddii aadan u ogolaan kuwooda gaarka ah.",
+    "save": "Keydi liisaska",
+    "saved": "Liisaska waa la keydiyay dhammaan madrasadaha.",
+    "failed": "Liisaska lama keydin karin. Fadlan mar kale isku day.",
+    "schoolsTitle": "Madrasad kasta",
+    "schoolsDescription": "Dooro in madrasaddu isticmaasho liisaskan iyo in ay wax ka beddesho kuwooda. Madrasadda horey u beddeshay liisaskeeda hoos ayaa lagu calaamadeeyay.",
+    "noSchools": "Weli madrasad ma jirto.",
+    "usePlatform": "Isticmaal liisaska guud",
+    "allowOwn": "Ogolow liisaska gaarka ah",
+    "toast": {
+      "platform": "{name} hadda waxay isticmaashaa liisaska guud.",
+      "own": "{name} hadda way wax ka beddeli kartaa liisaskeeda.",
+      "failed": "Tan lama beddeli karin. Fadlan mar kale isku day."
+    },
+    "state": {
+      "platform": {
+        "label": "Liisaska guud",
+        "hint": "Waxay raacdaa liisaska kore."
+      },
+      "platformKept": {
+        "label": "Liisaska guud",
+        "hint": "Waxay haysataa liisas gaar ah oo la keydiyay, dhinac la dhigay. Ogolow liisaska gaarka ah si loo soo celiyo."
+      },
+      "ownEdited": {
+        "label": "Liisas gaar ah (la beddelay)",
+        "hint": "Maamulaheeda ayaa beddelay liisaska. Waxaa la isticmaalaa halkii liisaska guud."
+      },
+      "ownAllowed": {
+        "label": "Liisas gaar ah waa la ogolaaday",
+        "hint": "Maamulaheeda wuu beddeli karaa liisaska. Ilaa markaas waxay isticmaashaa liisaska guud."
+      }
+    }
+  }
+}

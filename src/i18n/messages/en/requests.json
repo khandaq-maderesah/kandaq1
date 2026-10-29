@@ -4,7 +4,7 @@
     "student_transfer": "Move to another class"
   },
   "reasons": {
-    "transferred_school": "Transferred to another madrasa",
+    "transferred_school": "Transferred to another medreseh",
     "dropped_out": "Stopped attending",
     "moved_away": "Family moved away",
     "graduated": "Completed studies",
@@ -13,9 +13,9 @@
   },
   "dialog": {
     "deleteTitle": "Request to delete {name}",
-    "deleteDescription": "A madrasa admin must approve this. Until then the student stays in your class.",
+    "deleteDescription": "A medreseh admin must approve this. Until then the student stays in your class.",
     "transferTitle": "Request to move {name}",
-    "transferDescription": "A madrasa admin must approve this move. Until then the student stays in {className}.",
+    "transferDescription": "A medreseh admin must approve this move. Until then the student stays in {className}.",
     "adminDeleteTitle": "Delete {name}",
     "adminDeleteDescription": "The student will be moved to Deleted students with this reason. You can restore them later.",
     "reasonCategory": "Reason",
@@ -29,7 +29,7 @@
     "noOtherClasses": "There is no other class to move this student to.",
     "submitRequest": "Send request",
     "confirmDelete": "Delete student",
-    "sent": "Request sent. A madrasa admin will review it.",
+    "sent": "Request sent. A medreseh admin will review it.",
     "deleted": "{gender, select, female {{name} was moved to Deleted students.} other {{name} was moved to Deleted students.}}",
     "alreadyPending": "There is already a pending request for this student."
   },
@@ -62,7 +62,7 @@
   },
   "teacher": {
     "title": "My requests",
-    "description": "Requests you sent to the madrasa admin and their decisions.",
+    "description": "Requests you sent to the medreseh admin and their decisions.",
     "empty": "You haven't sent any requests.",
     "emptyHint": "To delete or move a student, open your students list and use the actions menu.",
     "cancelRequest": "Withdraw",
@@ -72,7 +72,7 @@
   },
   "deleted": {
     "title": "Deleted students",
-    "description": "Students removed from the madrasa. Their history is kept and they can be restored.",
+    "description": "Students removed from the medreseh. Their history is kept and they can be restored.",
     "link": "Deleted students",
     "empty": "No deleted students.",
     "reason": "Reason",

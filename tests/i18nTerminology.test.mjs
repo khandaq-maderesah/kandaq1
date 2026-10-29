@@ -18,7 +18,7 @@ describe('i18n Islamic Educational Terminology Invariants', () => {
     return results
   }
 
-  test('English translation dictionaries enforce Madrasa and Ustaz terminology', () => {
+  test('English translation dictionaries enforce Medreseh and Ustaz terminology', () => {
     const files = fs.readdirSync(enDir).filter(f => f.endsWith('.json'))
     assert.ok(files.length > 10, 'Expected multiple JSON dictionary files in en')
 
@@ -97,7 +97,7 @@ describe('i18n Islamic Educational Terminology Invariants', () => {
     const amNav = JSON.parse(fs.readFileSync(path.join(amDir, 'nav.json'), 'utf8'))
     const amCommon = JSON.parse(fs.readFileSync(path.join(amDir, 'common.json'), 'utf8'))
 
-    assert.equal(enNav.schools, 'Madrasas')
+    assert.equal(enNav.schools, 'Medresehs')
     assert.equal(enNav.teachers, 'Ustazes')
     assert.equal(enCommon.roles.teacher, 'Ustaz')
 

@@ -1,7 +1,7 @@
 {
   "dashboard": "Dashboard",
-  "schools": "Madrasas",
-  "allSchools": "All madrasas",
+  "schools": "Medresehs",
+  "allSchools": "All medresehs",
   "users": "Users",
   "teachers": "Ustazes",
   "classes": "Classes",
@@ -20,7 +20,7 @@
   "openMenu": "Open menu",
   "closeMenu": "Close menu",
   "notifications": "Notifications",
-  "switchSchool": "Switch madrasa",
+  "switchSchool": "Switch medreseh",
   "sections": {
     "overview": "Overview",
     "people": "People",
@@ -30,5 +30,6 @@
   "weeklyReport": "Weekly report",
   "weeklyReports": "Weekly reports",
   "refresh": "Refresh",
-  "support": "Family support"
+  "support": "Family support",
+  "lists": "Dropdown lists"
 }

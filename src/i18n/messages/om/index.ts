@@ -21,6 +21,7 @@ import registration from './registration.json'
 import requests from './requests.json'
 import students from './students.json'
 import superadmin from './superadmin.json'
+import superadminTools from './superadminTools.json'
 import teacherAttendance from './teacherAttendance.json'
 import teacherClasses from './teacherClasses.json'
 import teacherDashboard from './teacherDashboard.json'
@@ -52,6 +53,7 @@ const messages = {
   requests: requests,
   students: students,
   superadmin: superadmin,
+  superadminTools: superadminTools,
   teacherAttendance: teacherAttendance,
   teacherClasses: teacherClasses,
   teacherDashboard: teacherDashboard,

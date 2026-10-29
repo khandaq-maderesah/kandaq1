@@ -180,7 +180,7 @@ describe('Wiring', () => {
 
   test('the new screens are in the navigation and precached by the worker', () => {
     const nav = read('src/components/shell/nav.ts')
-    assert.match(nav, /href: '\/teacher\/reports', label: 'weeklyReport'/)
+    assert.doesNotMatch(nav, /label: 'weeklyReport'/, 'the Ustaz menu no longer lists the weekly report')
     assert.match(nav, /href: '\/admin\/weekly-reports', label: 'weeklyReports'.*badge: 'missingReports'/)
     const sw = read('public/sw.js')
     assert.match(sw, /'\/teacher\/reports'/)

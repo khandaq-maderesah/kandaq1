@@ -16,7 +16,7 @@ export interface StudentIdCardProps {
 export function SingleStudentIdCard({
   student,
   className = '',
-  schoolName = 'Khendeq Madrasa',
+  schoolName = 'Khendeq Medreseh',
   academicYear = '2017 E.C. / 2024-2025',
 }: StudentIdCardProps) {
   const verificationCode = useMemo(
@@ -108,7 +108,7 @@ export interface BatchStudentIdCardPrinterProps {
 
 export function BatchStudentIdCardPrinter({
   students,
-  schoolName = 'Khendeq Madrasa',
+  schoolName = 'Khendeq Medreseh',
   academicYear = '2017 E.C.',
 }: BatchStudentIdCardPrinterProps) {
   const handlePrint = () => {

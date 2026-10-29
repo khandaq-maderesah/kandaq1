@@ -8,6 +8,8 @@ import { Select } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
 import { KitabsPicker } from '@/components/students/KitabsPicker'
+import { StudentPhotoCapture } from '@/components/StudentPhotoCapture'
+import type { ParentPhotos } from '@/lib/parentPhotos'
 import {
   CAREGIVER_RELATIONS,
   GUARDIAN_KEYS,
@@ -24,6 +26,7 @@ import {
   type RegistrationDetails,
   type RegistrationOptions,
   type RequiredGuardianField,
+  type SmsTarget,
   type SupportDetails,
 } from '@/lib/registration'
 import type { ParentStatus } from '@/types'
@@ -130,12 +133,16 @@ function GuardianFields({
   value,
   onChange,
   options,
+  photo,
+  onPhotoChange,
 }: {
   who: GuardianKey
   idPrefix: string
   value: GuardianDetails
   onChange: (next: GuardianDetails) => void
   options: RegistrationOptions
+  photo?: string
+  onPhotoChange?: (dataUrl: string) => void
 }) {
   const t = useTranslations('registration')
   const id = (field: string) => `${idPrefix}-${who}-${field}`
@@ -171,6 +178,13 @@ function GuardianFields({
 
       {reachable && (
         <>
+      {onPhotoChange && (
+        <div className="space-y-2 sm:col-span-2">
+          <p className="text-sm font-medium text-foreground">{t('fields.photo')}</p>
+          <StudentPhotoCapture value={photo ?? ''} onChange={onPhotoChange} />
+        </div>
+      )}
+
       <div className="space-y-2">
         <Label htmlFor={id('phone')}>
           {t('fields.phone')}
@@ -220,7 +234,6 @@ function GuardianFields({
         value={value.educationLevel}
         onChange={(v) => set('educationLevel', v)}
         options={options.educationLevels}
-        required={required('educationLevel')}
       />
 
       <LevelSelect
@@ -229,7 +242,6 @@ function GuardianFields({
         value={value.quranLevel}
         onChange={(v) => set('quranLevel', v)}
         options={options.quranLevels}
-        required={required('quranLevel')}
       />
 
       <KitabsPicker
@@ -237,7 +249,7 @@ function GuardianFields({
         label={t('fields.kitabs')}
         value={value.kitabs}
         onChange={(v) => set('kitabs', v)}
-        options={options.kitabs}
+        options={options.parentKitabs}
         className="sm:col-span-2"
       />
 
@@ -256,6 +268,10 @@ function GuardianFields({
           <div className="space-y-2">
             <Label htmlFor={id('subCity')}>{t('fields.subCity')}</Label>
             <Input id={id('subCity')} value={value.subCity} onChange={(e) => set('subCity', e.target.value)} />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor={id('wereda')}>{t('fields.wereda')}</Label>
+            <Input id={id('wereda')} value={value.wereda} onChange={(e) => set('wereda', e.target.value)} />
           </div>
           <div className="space-y-2">
             <Label htmlFor={id('kebele')}>{t('fields.kebele')}</Label>
@@ -327,6 +343,39 @@ function CaregiverFields({
         />
       </div>
     </>
+  )
+}
+
+/** Lets the registrar choose whose number the absence SMS goes to (shown when there are two or more numbers). */
+function SmsTargetField({
+  idPrefix,
+  value,
+  onChange,
+}: {
+  idPrefix: string
+  value: RegistrationDetails
+  onChange: (next: RegistrationDetails) => void
+}) {
+  const t = useTranslations('registration')
+  const options: Exclude<SmsTarget, ''>[] = []
+  if (isReachable(value.father.status) && value.father.phone.trim()) options.push('father')
+  if (isReachable(value.mother.status) && value.mother.phone.trim()) options.push('mother')
+  if (caregiverShown(value) && value.caregiver.phone.trim()) options.push('caregiver')
+  if (options.length < 2) return null
+  const id = `${idPrefix}-smsTo`
+  return (
+    <div className="space-y-2 sm:col-span-2">
+      <Label htmlFor={id}>{t('fields.smsTo')}</Label>
+      <Select id={id} value={options.includes(value.smsTo as never) ? value.smsTo : ''} onChange={(e) => onChange({ ...value, smsTo: e.target.value as SmsTarget })}>
+        <option value="">{t('smsTo.auto')}</option>
+        {options.map((o) => (
+          <option key={o} value={o}>
+            {t(`sections.${o}`)}
+          </option>
+        ))}
+      </Select>
+      <p className="text-xs text-muted-foreground">{t('smsTo.hint')}</p>
+    </div>
   )
 }
 
@@ -409,12 +458,17 @@ export function FamilyInfoFields({
   options,
   idPrefix = 'reg',
   className,
+  parentPhotos,
+  onParentPhotoChange,
 }: {
   value: RegistrationDetails
   onChange: (next: RegistrationDetails) => void
   options: RegistrationOptions
   idPrefix?: string
   className?: string
+  /** Optional photos of the parents; the photo pickers show only when onParentPhotoChange is given. */
+  parentPhotos?: ParentPhotos
+  onParentPhotoChange?: (who: GuardianKey, dataUrl: string) => void
 }) {
   const t = useTranslations('registration')
   const id = (field: string) => `${idPrefix}-${field}`
@@ -483,6 +537,11 @@ export function FamilyInfoFields({
       </div>
 
       <div className="space-y-2">
+        <Label htmlFor={id('wereda')}>{t('fields.wereda')}</Label>
+        <Input id={id('wereda')} value={value.wereda} onChange={(e) => set('wereda', e.target.value)} />
+      </div>
+
+      <div className="space-y-2">
         <Label htmlFor={id('kebele')}>{t('fields.kebele')}</Label>
         <Input id={id('kebele')} value={value.kebele} onChange={(e) => set('kebele', e.target.value)} />
       </div>
@@ -495,6 +554,8 @@ export function FamilyInfoFields({
           value={value[who]}
           onChange={(next) => set(who, next)}
           options={options}
+          photo={parentPhotos?.[who]}
+          onPhotoChange={onParentPhotoChange ? (url) => onParentPhotoChange(who, url) : undefined}
         />
       ))}
 
@@ -506,6 +567,8 @@ export function FamilyInfoFields({
           required={caregiverRequired(value)}
         />
       )}
+
+      <SmsTargetField idPrefix={idPrefix} value={value} onChange={onChange} />
 
       <SectionTitle title={t('sections.support')} hint={t('sections.supportHint')} />
       {value.support ? (

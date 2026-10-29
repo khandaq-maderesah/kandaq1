@@ -4,7 +4,8 @@ import { BRANDING_FILES, brandingStoragePath, type BrandingFile, type PublicBran
 import { ref, get as rtdbGet, set, update, remove, onValue, query, orderByChild, equalTo, startAt, type QueryConstraint, type Unsubscribe, type DataSnapshot } from 'firebase/database'
 import type { User, Class, Student, Attendance, AbsentAlert, MissingAttendanceAlert, Exam, Announcement, School, ChangeRequest, DeletionReason, StudentArchive, SessionLog, WeeklyReport, StudentSupport } from '@/types'
 import { withTimeout } from '@/lib/asyncUtils'
-import { normalizeRegistrationOptions, type RegistrationOptions } from '@/lib/registration'
+import { effectiveListsMode, normalizeRegistrationOptions, resolveRegistrationOptions, type ListsMode, type RegistrationOptions } from '@/lib/registration'
+import type { SchoolSnapshot } from '@/lib/platformStats'
 
 /**
  * One-shot reads never hang.
@@ -342,10 +343,30 @@ export function subscribeToStudentSupport(cb: (records: StudentSupport[]) => voi
 
 export async function setStudentPhoto(studentId: string, dataUrl: string): Promise<void> {
   if (!dataUrl) {
-    await remove(sref(`studentPhotos/${studentId}`))
+    await remove(sref(`studentPhotos/${studentId}/photo`))
     return
   }
   await set(sref(`studentPhotos/${studentId}/photo`), dataUrl)
+}
+
+// Parents' optional photos live in the same node: fatherPhoto / motherPhoto.
+export async function setParentPhoto(studentId: string, who: 'father' | 'mother', dataUrl: string): Promise<void> {
+  const ref = sref(`studentPhotos/${studentId}/${who}Photo`)
+  if (!dataUrl) await remove(ref)
+  else await set(ref, dataUrl)
+}
+
+export async function getParentPhotos(studentId: string): Promise<{ father: string; mother: string } | null> {
+  try {
+    const snap = await get(sref(`studentPhotos/${studentId}`))
+    const v = snap.exists() ? (snap.val() as Record<string, unknown>) : {}
+    return {
+      father: typeof v.fatherPhoto === 'string' ? v.fatherPhoto : '',
+      mother: typeof v.motherPhoto === 'string' ? v.motherPhoto : '',
+    }
+  } catch {
+    return null
+  }
 }
 
 export async function getStudentPhoto(studentId: string): Promise<string | null> {
@@ -541,9 +562,105 @@ export function subscribeToRegistrationOpen(cb: (open: boolean) => void): Unsubs
   return onValue(sref('settings/registrationOpen'), (snap) => cb(!snap.exists() || String(snap.val()) !== 'false'))
 }
 
-/** Live dropdown lists of the registration form (defaults for anything unset). */
+/**
+ * Listens to several database paths and calls `cb` with all their values each
+ * time one changes. A path that cannot be read counts as empty.
+ */
+function onValues(refs: ReturnType<typeof ref>[], cb: (values: unknown[]) => void): Unsubscribe {
+  const values: unknown[] = refs.map(() => undefined)
+  const ready = refs.map(() => false)
+  const set_ = (i: number, v: unknown) => {
+    values[i] = v
+    ready[i] = true
+    if (ready.every(Boolean)) cb([...values])
+  }
+  const unsubs = refs.map((r, i) =>
+    onValue(
+      r,
+      (snap) => set_(i, snap.exists() ? snap.val() : null),
+      () => set_(i, null)
+    )
+  )
+  return () => unsubs.forEach((u) => u())
+}
+
+/**
+ * Live dropdown lists of the registration form: the medreseh's own lists when
+ * it is allowed its own, otherwise the platform lists set by the super admin.
+ */
 export function subscribeToRegistrationOptions(cb: (options: RegistrationOptions) => void): Unsubscribe {
-  return onValue(sref('settings/registrationOptions'), (snap) => cb(normalizeRegistrationOptions(snap.val())))
+  return onValues(
+    [ref(db, 'platformSettings/registrationOptions'), sref('settings/registrationOptions'), ref(db, `schoolInfo/${requireSchoolId()}/listsMode`)],
+    ([platform, own, mode]) => cb(resolveRegistrationOptions({ platform, own, mode }))
+  )
+}
+
+/** Live: whether this medreseh edits its own lists or uses the platform's. */
+export function subscribeToListsPolicy(cb: (policy: { mode: ListsMode; hasOwn: boolean }) => void): Unsubscribe {
+  return onValues([sref('settings/registrationOptions'), ref(db, `schoolInfo/${requireSchoolId()}/listsMode`)], ([own, mode]) => {
+    const hasOwn = own !== null && own !== undefined
+    cb({ mode: effectiveListsMode(mode, hasOwn), hasOwn })
+  })
+}
+
+/** Super admin: the platform-wide lists (defaults for anything unset). */
+export function subscribeToPlatformRegistrationOptions(cb: (options: RegistrationOptions) => void): Unsubscribe {
+  return onValue(
+    ref(db, 'platformSettings/registrationOptions'),
+    (snap) => cb(normalizeRegistrationOptions(snap.val())),
+    () => cb(normalizeRegistrationOptions(null))
+  )
+}
+
+/** Super admin: replaces the platform-wide lists. */
+export async function savePlatformRegistrationOptions(options: RegistrationOptions): Promise<void> {
+  await set(ref(db, 'platformSettings/registrationOptions'), options)
+}
+
+/** Super admin: which medresehs have saved lists of their own. */
+export async function getSchoolsWithOwnLists(schoolIds: string[]): Promise<Record<string, boolean>> {
+  const out: Record<string, boolean> = {}
+  await Promise.all(
+    schoolIds.map(async (id) => {
+      try {
+        out[id] = (await get(ref(db, `schoolData/${id}/settings/registrationOptions`))).exists()
+      } catch {
+        out[id] = false
+      }
+    })
+  )
+  return out
+}
+
+/**
+ * Super admin: each medreseh's students, classes and the last days of
+ * attendance, read once. A medreseh that cannot be read is left out.
+ */
+export async function fetchSchoolSnapshots(schoolIds: string[], attendanceSince: string): Promise<Record<string, SchoolSnapshot>> {
+  const out: Record<string, SchoolSnapshot> = {}
+  const list = <T,>(snap: DataSnapshot): T[] => {
+    const items: T[] = []
+    snap.forEach((child) => {
+      items.push({ id: child.key as string, ...child.val() } as T)
+    })
+    return items
+  }
+  await Promise.all(
+    schoolIds.map(async (id) => {
+      try {
+        const base = `schoolData/${id}`
+        const [students, classes, attendance] = await Promise.all([
+          get(ref(db, `${base}/students`)),
+          get(ref(db, `${base}/classes`)),
+          get(query(ref(db, `${base}/attendance`), orderByChild('date'), startAt(attendanceSince))),
+        ])
+        out[id] = { students: list<Student>(students), classes: list<Class>(classes), attendance: list<Attendance>(attendance) }
+      } catch {
+        // Not readable right now: this medreseh is shown as "not loaded".
+      }
+    })
+  )
+  return out
 }
 
 /** Admin: replaces the registration dropdown lists. */
@@ -1075,6 +1192,8 @@ export const rtdb = {
   getStudentsByClass,
   setStudentPhoto,
   getStudentPhoto,
+  setParentPhoto,
+  getParentPhotos,
   getStudentSupport,
   setStudentSupport,
   subscribeToStudentSupport,
@@ -1104,6 +1223,11 @@ export const rtdb = {
   subscribeToMissingAttendanceAlerts,
   subscribeToRegistrationOpen,
   subscribeToRegistrationOptions,
+  subscribeToListsPolicy,
+  subscribeToPlatformRegistrationOptions,
+  savePlatformRegistrationOptions,
+  getSchoolsWithOwnLists,
+  fetchSchoolSnapshots,
   setSessionLog,
   subscribeToSessionsByTeacher,
   subscribeToSessions,

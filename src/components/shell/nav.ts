@@ -5,6 +5,7 @@ import {
   School as SchoolIcon,
   ClipboardCheck,
   ClipboardList,
+  ListChecks,
   FileText,
   BarChart3,
   Settings,
@@ -34,6 +35,7 @@ export type NavLabel =
   | 'weeklyReport'
   | 'weeklyReports'
   | 'support'
+  | 'lists'
   | 'settings'
 
 export interface NavItem {
@@ -95,7 +97,6 @@ export const teacherNav: NavSection[] = [
       { href: '/teacher/students', label: 'students', icon: GraduationCap },
       { href: '/teacher/exams', label: 'exams', icon: FileText },
       { href: '/teacher/history', label: 'history', icon: History },
-      { href: '/teacher/reports', label: 'weeklyReport', icon: CalendarCheck },
       { href: '/teacher/requests', label: 'myRequests', icon: ClipboardList, badge: 'requestUpdates' },
     ],
   },
@@ -103,6 +104,10 @@ export const teacherNav: NavSection[] = [
 
 export const superadminNav: NavSection[] = [
   {
-    items: [{ href: '/superadmin', label: 'allSchools', icon: Building2, exact: true }],
+    items: [
+      { href: '/superadmin', label: 'allSchools', icon: Building2, exact: true },
+      { href: '/superadmin/reports', label: 'reports', icon: BarChart3 },
+      { href: '/superadmin/lists', label: 'lists', icon: ListChecks },
+    ],
   },
 ]

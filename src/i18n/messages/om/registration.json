@@ -16,6 +16,7 @@
     "age": "Umurii",
     "phone": "Bilbila",
     "subCity": "Kutaa magaalaa",
+    "wereda": "Aanaa",
     "kebele": "Ganda",
     "madrasaLevel": "Sadarkaa barnoota madrasaa",
     "quranLevel": "Sadarkaa Qur'aanaa",
@@ -24,6 +25,8 @@
     "lastYearResult": "Bu'aa bara darbee",
     "occupation": "Hojii",
     "educationLevel": "Sadarkaa barnootaa",
+    "smsTo": "Ergaan hafuu ni ergama",
+    "photo": "Suuraa (filannoo)",
     "status": "Haala",
     "relation": "Daa'ima waliin wal-qabsiisa",
     "supportLevel": "Maatiin gargaarsa barbaadaa?",
@@ -40,7 +43,7 @@
   },
   "other": "Kan biraa…",
   "required": "Dirqama",
-  "sameAddress": "Kutaa magaalaa fi ganda barataa wajjin wal fakkaata",
+  "sameAddress": "Kutaa magaalaa, aanaa fi ganda barataa wajjin wal fakkaata",
   "errors": {
     "missing": "Maaloo dirreewwan maatii dirqamaa guutaa: {fields}"
   },
@@ -54,7 +57,9 @@
     "save": "Tarreewwan olkaa'i",
     "saved": "Tarreewwan galmee olkaa'amaniiru.",
     "failed": "Tarreewwan olkaa'uun hin danda'amne. Maaloo irra deebi'ii yaali.",
-    "kitabs": "Kitaabota"
+    "kitabs": "Kitaabota",
+    "parentKitabs": "Kitaabota (Maatii)",
+    "platformNote": "Tarreewwan kunniin bulchaa waliigalaatiin kaa'amanii madrasoota hundaaf wal fakkaatu. Asitti sirreessuun hin danda'amu."
   },
   "kitabsPicker": {
     "add": "Dabali",
@@ -96,5 +101,10 @@
   },
   "noDetailsNeeded": "Maatii kanaaf odeeffannoon dabalataa hin barbaachisu.",
   "supportUnavailable": "Madaallii kuufame fe'uun hin danda'amne, kanaaf hin jijjiiramu. Interneetii yeroo qabdu irra deebi'ii yaali.",
-  "supportSaveFailed": "Barataan kuufameera, garuu odeeffannoon deeggarsa maatii hin kuufamne. Maaloo barataa banuun irra deebi'ii kuusaa."
+  "supportSaveFailed": "Barataan kuufameera, garuu odeeffannoon deeggarsa maatii hin kuufamne. Maaloo barataa banuun irra deebi'ii kuusaa.",
+  "parentPhotoSaveFailed": "Barataan kuufameera, garuu suuraan maatii hin kuufamne. Maaloo barataa banuun suuraa irra deebi'ii itti dabali.",
+  "smsTo": {
+    "auto": "Ofumaan (abbaa, achiin haadha)",
+    "hint": "Ustaazni yeroo kamiyyuu geeddaruu danda'a. Bilbilli lakkoofsa hunda agarsiisa."
+  }
 }

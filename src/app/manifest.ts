@@ -12,7 +12,7 @@ import { brandingAssetUrl, BRAND_COOKIE } from '@/lib/branding'
  * available, preventing the generic default logo from overriding madrasa branding.
  */
 export default async function manifest(): Promise<MetadataRoute.Manifest> {
-  let name = 'MMS — Madrasa Management System'
+  let name = 'MMS — Medreseh Management System'
   let short_name = 'MMS'
   let id = '/'
   let start_url = '/'

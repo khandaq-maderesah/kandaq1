@@ -1,39 +1,39 @@
 {
-  "title": "Madrasas",
-  "description": "Create madrasas, give each one an admin, and open any madrasa to manage it.",
-  "newSchool": "New madrasa",
+  "title": "Medresehs",
+  "description": "Create medresehs, give each one an admin, and open any medreseh to manage it.",
+  "newSchool": "New medreseh",
   "stats": {
-    "total": "Madrasas",
+    "total": "Medresehs",
     "active": "Active",
     "suspended": "Suspended",
     "users": "Users"
   },
   "empty": {
-    "title": "No madrasas yet",
-    "description": "Create the first madrasa to get started."
+    "title": "No medresehs yet",
+    "description": "Create the first medreseh to get started."
   },
   "card": {
     "noContact": "No contact details",
     "admins": "{count, plural, =0 {No admins} one {# admin} other {# admins}}",
     "teachers": "{count, plural, =0 {No ustazes} one {# ustaz} other {# ustazes}}",
-    "noAdminYet": "This madrasa has no admin yet.",
+    "noAdminYet": "This medreseh has no admin yet.",
     "open": "Open",
     "addAdmin": "Add admin",
     "suspend": "Suspend",
     "reactivate": "Reactivate"
   },
   "create": {
-    "title": "New madrasa",
-    "description": "The madrasa starts empty. Its admin then adds classes, ustazes and students.",
-    "name": "Madrasa name",
+    "title": "New medreseh",
+    "description": "The medreseh starts empty. Its admin then adds classes, ustazes and students.",
+    "name": "Medreseh name",
     "namePlaceholder": "e.g. Khendeq Medresah",
     "nameAm": "Name in Amharic (for SMS)",
     "address": "Address",
     "phone": "Phone number",
     "timezone": "Time zone",
-    "submit": "Create madrasa",
+    "submit": "Create medreseh",
     "created": "{name} was created. Now add its admin account.",
-    "failed": "Couldn't create the madrasa. Please try again."
+    "failed": "Couldn't create the medreseh. Please try again."
   },
   "admin": {
     "title": "New admin for {school}",
@@ -50,11 +50,11 @@
   "suspend": {
     "title": "Suspend {name}?",
     "description": "Its admins and ustazes won't be able to sign in until you reactivate it.",
-    "confirm": "Suspend madrasa"
+    "confirm": "Suspend medreseh"
   },
   "toast": {
     "suspended": "{name} was suspended.",
     "reactivated": "{name} was reactivated.",
-    "updateFailed": "Couldn't update the madrasa. Please try again."
+    "updateFailed": "Couldn't update the medreseh. Please try again."
   }
 }

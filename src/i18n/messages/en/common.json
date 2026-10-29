@@ -1,6 +1,6 @@
 {
   "appName": "MMS",
-  "appTagline": "Madrasa Management System",
+  "appTagline": "Medreseh Management System",
   "actions": {
     "save": "Save",
     "saveChanges": "Save changes",
@@ -56,7 +56,7 @@
   },
   "roles": {
     "superadmin": "Platform admin",
-    "admin": "Madrasa admin",
+    "admin": "Medreseh admin",
     "teacher": "Ustaz"
   },
   "gender": {
@@ -95,8 +95,8 @@
       "weakPassword": "The password must be at least 6 characters.",
       "sessionExpired": "Your session has expired. Please sign in again.",
       "forbidden": "You don't have permission to do this.",
-      "schoolSuspended": "This madrasa is suspended.",
-      "otherSchool": "You can only manage people in your own madrasa.",
+      "schoolSuspended": "This medreseh is suspended.",
+      "otherSchool": "You can only manage people in your own medreseh.",
       "notFound": "This account no longer exists.",
       "cannotDeleteSelf": "You can't delete your own account.",
       "invalid": "Some information is missing or not valid.",
@@ -119,5 +119,15 @@
     "light": "Light",
     "dark": "Dark",
     "system": "Device setting"
+  },
+  "changeEmail": {
+    "title": "Change email",
+    "description": "The new email is used to sign in as {name}. The password stays the same.",
+    "label": "New email",
+    "hint": "Tell the person their new email. Their old email will no longer work.",
+    "save": "Save email",
+    "saved": "The email of {name} was changed.",
+    "failed": "Couldn't change the email.",
+    "action": "Change email"
   }
 }

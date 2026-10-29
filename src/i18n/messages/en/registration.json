@@ -16,14 +16,17 @@
     "age": "Age",
     "phone": "Phone",
     "subCity": "Sub-city",
+    "wereda": "Wereda",
     "kebele": "Kebele",
-    "madrasaLevel": "Madrasa level",
+    "madrasaLevel": "Medreseh level",
     "quranLevel": "Qur'an level",
     "kitabs": "Kitabs studied before",
     "lastYearLevel": "Last year's level",
     "lastYearResult": "Last year's result",
     "occupation": "Occupation",
     "educationLevel": "Education level",
+    "smsTo": "Absence SMS goes to",
+    "photo": "Photo (optional)",
     "status": "Status",
     "relation": "Relationship to the child",
     "supportLevel": "Does the family need help?",
@@ -40,7 +43,7 @@
   },
   "other": "Other…",
   "required": "Required",
-  "sameAddress": "Same sub-city and kebele as the student",
+  "sameAddress": "Same sub-city, wereda and kebele as the student",
   "errors": {
     "missing": "Please fill in the required family fields: {fields}"
   },
@@ -54,7 +57,9 @@
     "save": "Save lists",
     "saved": "Registration lists saved.",
     "failed": "Couldn't save the lists. Please try again.",
-    "kitabs": "Kitabs"
+    "kitabs": "Kitabs",
+    "parentKitabs": "Kitabs (parents)",
+    "platformNote": "These lists are set by the platform admin and are the same for every medreseh. They can't be edited here."
   },
   "kitabsPicker": {
     "add": "Add",
@@ -96,5 +101,10 @@
   },
   "noDetailsNeeded": "No further details are needed for this parent.",
   "supportUnavailable": "The saved assessment could not be loaded, so it will not be changed. Try again when you are online.",
-  "supportSaveFailed": "The student was saved, but the family support details could not be saved. Please open the student and save again."
+  "supportSaveFailed": "The student was saved, but the family support details could not be saved. Please open the student and save again.",
+  "parentPhotoSaveFailed": "The student was saved, but a parent's photo could not be saved. Please open the student and add it again.",
+  "smsTo": {
+    "auto": "Automatic (father, then mother)",
+    "hint": "The Ustaz can change this any time. Calls still show every number."
+  }
 }

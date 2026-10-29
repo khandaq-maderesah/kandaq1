@@ -9,6 +9,7 @@ import {
   Download,
   GraduationCap,
   Loader2,
+  Mail,
   MoreHorizontal,
   Pencil,
   Plus,
@@ -18,6 +19,8 @@ import {
   UserPlus,
 } from 'lucide-react'
 import { auth } from '@/lib/firebase/config'
+import { useAuth } from '@/context/AuthContext'
+import { ChangeEmailDialog } from '@/components/ChangeEmailDialog'
 import { rtdb } from '@/lib/database'
 import { useLiveData } from '@/lib/dataStore'
 import { classTeacherIds, isClassTeacher } from '@/lib/classTeachers'
@@ -133,6 +136,7 @@ export default function TeachersPage() {
   const tr = useTranslations('registration')
   // Edit the details (phone, Qur'an level, kitabs, language) of an existing user.
   const [editingDetails, setEditingDetails] = useState<User | null>(null)
+  const [emailTarget, setEmailTarget] = useState<User | null>(null)
   const [details, setDetails] = useState({ phone: '', quranLevel: '', kitabs: '', language: '' })
   const [saving, setSaving] = useState(false)
 
@@ -204,6 +208,7 @@ export default function TeachersPage() {
   const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE))
   const paginated = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE)
   const myUid = auth.currentUser?.uid
+  const myRole = useAuth().user?.role
 
   // Only messages we translated ourselves are shown; anything else (network, SDK) gets the generic text.
   const errorText = (err: unknown) => (err instanceof TranslatedError ? err.message : tc('errors.generic'))
@@ -387,6 +392,11 @@ export default function TeachersPage() {
         <DropdownMenuItem onSelect={() => startDetailsEdit(u)}>
           <Pencil /> {t('actions.editDetails')}
         </DropdownMenuItem>
+        {(u.role === 'teacher' || (myRole === 'superadmin' && u.role === 'admin')) && (
+          <DropdownMenuItem onSelect={() => setEmailTarget(u)}>
+            <Mail /> {tc('changeEmail.action')}
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem onSelect={() => toggleStatus(u)}>
           <Power /> {u.status === 'active' ? t('actions.deactivate') : t('actions.activate')}
         </DropdownMenuItem>
@@ -728,6 +738,8 @@ export default function TeachersPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <ChangeEmailDialog user={emailTarget} onClose={() => setEmailTarget(null)} onSaved={() => void loadTeachers()} />
 
       {/* Edit details: phone, Qur'an level, kitabs, language */}
       <Dialog open={!!editingDetails} onOpenChange={(o) => !o && setEditingDetails(null)}>

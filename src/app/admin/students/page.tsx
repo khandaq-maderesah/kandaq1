@@ -58,6 +58,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { StudentPhotoCapture } from '@/components/StudentPhotoCapture'
+import { mergeLoadedParentPhotos, saveParentPhotos, type ParentPhotos } from '@/lib/parentPhotos'
 import { FamilyInfoFields, useMissingFieldsMessage } from '@/components/students/FamilyInfoFields'
 import { useRegistrationOptions } from '@/hooks/useRegistrationOptions'
 import {
@@ -466,6 +467,7 @@ export default function StudentsPage() {
   const [gender, setGender] = useState('')
   const [age, setAge] = useState<number | ''>('')
   const [photoUrl, setPhotoUrl] = useState('')
+  const [parentPhotos, setParentPhotos] = useState<ParentPhotos>({})
   const [parentLanguage, setParentLanguage] = useState<ParentLanguage | ''>('')
   const [classId, setClassId] = useState('')
   const [section, setSection] = useState('')
@@ -489,6 +491,7 @@ export default function StudentsPage() {
     setGender('')
     setAge('')
     setPhotoUrl('')
+    setParentPhotos({})
     setParentLanguage('')
     setClassId(classFilter)
     setSection(classById[classFilter]?.section || '')
@@ -521,6 +524,10 @@ export default function StudentsPage() {
         setFamily((f) => ({ ...f, support }))
       })
       .catch(() => {})
+    rtdb.getParentPhotos(s.id).then((loaded) => {
+      if (token !== editToken.current || !loaded) return
+      setParentPhotos((cur) => mergeLoadedParentPhotos(cur, loaded))
+    })
     setSection(s.section || '')
     setPhotoUrl(isEmbeddedPhoto(s.photoUrl) ? s.photoUrl || '' : '')
     setFormOpen(true)
@@ -591,6 +598,7 @@ export default function StudentsPage() {
         if (!(await saveSupportIfChanged(editingId, family.support, loadedSupport.current, { uid: user?.uid || '', name: user?.name }))) {
           toast.warning(tReg('supportSaveFailed'))
         }
+        if (!(await saveParentPhotos(editingId, parentPhotos, family))) toast.warning(tReg('parentPhotoSaveFailed'))
         toast.success(t('toast.updated', { name }))
       } else {
         const studentId = `student_${Date.now()}`
@@ -615,6 +623,7 @@ export default function StudentsPage() {
         if (!(await saveSupportIfChanged(studentId, family.support, loadedSupport.current, { uid: user?.uid || '', name: user?.name }))) {
           toast.warning(tReg('supportSaveFailed'))
         }
+        if (!(await saveParentPhotos(studentId, parentPhotos, family))) toast.warning(tReg('parentPhotoSaveFailed'))
         toast.success(t('toast.created', { name, roll: effectiveRoll }))
       }
       setFormOpen(false)
@@ -997,6 +1006,8 @@ export default function StudentsPage() {
                 value={family}
                 onChange={setFamily}
                 options={registrationOptions}
+                parentPhotos={parentPhotos}
+                onParentPhotoChange={(who, url) => setParentPhotos((cur) => ({ ...cur, [who]: url }))}
               />
             </div>
             <div className="space-y-2">

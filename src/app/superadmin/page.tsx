@@ -7,12 +7,16 @@ import { toast } from 'sonner'
 import {
   Building2,
   CheckCircle2,
+  GraduationCap,
+  School as ClassIcon,
+  UserCheck,
   Copy,
   Link2,
   Loader2,
   LogIn,
   Mail,
   MapPin,
+  Pencil,
   PauseCircle,
   Phone,
   PlayCircle,
@@ -26,6 +30,8 @@ import { auth } from '@/lib/firebase/config'
 import { rtdb } from '@/lib/database'
 import { useLiveData } from '@/lib/dataStore'
 import { useAuth } from '@/context/AuthContext'
+import { usePlatformFigures } from '@/hooks/usePlatformFigures'
+import { ChangeEmailDialog } from '@/components/ChangeEmailDialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -67,6 +73,8 @@ export default function SuperAdminPage() {
   const schoolsData = useLiveData<School[]>('schools', (emit) => rtdb.subscribeToSchools(emit))
   const brandingData = useLiveData<Record<string, PublicBranding>>('allBranding', (emit) => rtdb.subscribeToAllBranding(emit))
   const tb = useTranslations('branding')
+  const tt = useTranslations('superadminTools.stats')
+  const platform = usePlatformFigures()
   const usersData = useLiveData<User[]>('allUsers', (emit) => rtdb.subscribeToAllUsers(emit))
 
   // New school form
@@ -101,6 +109,7 @@ export default function SuperAdminPage() {
   const [busyId, setBusyId] = useState<string | null>(null)
   const [openingId, setOpeningId] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
+  const [emailTarget, setEmailTarget] = useState<User | null>(null)
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'suspended'>('all')
 
   const schools = useMemo(
@@ -342,11 +351,17 @@ export default function SuperAdminPage() {
         />
       </div>
 
+      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <StatCard label={tt('students')} value={platform.ready ? platform.totals.students : '—'} icon={GraduationCap} />
+        <StatCard label={tt('ustazes')} value={platform.ready ? platform.totals.ustazes : '—'} icon={UserCheck} tone="success" />
+        <StatCard label={tt('classes')} value={platform.ready ? platform.totals.classes : '—'} icon={ClassIcon} tone="info" />
+      </div>
+
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative max-w-sm flex-1">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Search madrasas by name or city..."
+            placeholder="Search medresehs by name or city..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9"
@@ -480,12 +495,19 @@ export default function SuperAdminPage() {
                   <Badge variant="secondary">{t('card.teachers', { count: teacherCount })}</Badge>
                 </div>
                 {admins.length > 0 ? (
-                  <p className="mt-2 flex min-w-0 items-center gap-2 text-sm text-muted-foreground">
-                    <Mail className="h-4 w-4 shrink-0" />
-                    <span className="truncate" dir="ltr">
-                      {admins.map((a) => a.email).join(', ')}
-                    </span>
-                  </p>
+                  <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
+                    {admins.map((a) => (
+                      <li key={a.uid} className="flex min-w-0 items-center gap-2">
+                        <Mail className="h-4 w-4 shrink-0" />
+                        <span className="min-w-0 flex-1 truncate" dir="ltr">
+                          {a.email}
+                        </span>
+                        <Button size="icon-sm" variant="ghost" onClick={() => setEmailTarget(a)} aria-label={`${tc('changeEmail.action')}: ${a.email}`}>
+                          <Pencil />
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
                 ) : (
                   <p className="mt-2 text-sm text-warning">{t('card.noAdminYet')}</p>
                 )}
@@ -530,6 +552,8 @@ export default function SuperAdminPage() {
       )}
 
       {/* New school */}
+      <ChangeEmailDialog user={emailTarget} onClose={() => setEmailTarget(null)} />
+
       <Dialog open={showCreate} onOpenChange={(o) => !creating && setShowCreate(o)}>
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
