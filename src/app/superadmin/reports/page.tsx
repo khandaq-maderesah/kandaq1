@@ -58,7 +58,7 @@ export default function SuperadminReportsPage() {
   const t = useTranslations('superadminTools.reports')
   const tc = useTranslations('common')
   const format = useFormatter()
-  const { figures, totals, ready, refreshing, refresh } = usePlatformFigures()
+  const { figures, totals, ready, refreshing, refresh } = usePlatformFigures({ auto: false })
 
   const [selected, setSelected] = useState<ReportCard[]>([])
   const [shown, setShown] = useState<ReportCard[] | null>(null)
@@ -67,12 +67,13 @@ export default function SuperadminReportsPage() {
   const toggle = (card: ReportCard) =>
     setSelected((cur) => (cur.includes(card) ? cur.filter((c) => c !== card) : [...cur, card]))
 
-  const generate = () => {
+  // Nothing is read until the button is pressed; the report appears once the numbers have arrived.
+  const generate = async () => {
     if (selected.length === 0) return
+    await refresh()
     // Keep the cards in their usual order, whatever order they were ticked in.
     setShown(REPORT_CARDS.filter((c) => selected.includes(c)))
     setGeneratedAt(new Date())
-    refresh()
   }
 
   const num = (v: string | number) => (typeof v === 'number' ? format.number(v) : v)
@@ -141,7 +142,7 @@ export default function SuperadminReportsPage() {
               {generatedAt && t('generatedAt', { time: format.dateTime(generatedAt, { dateStyle: 'medium', timeStyle: 'short' }) })}
               {!ready && ` · ${t('loading')}`}
             </span>
-            <Button type="button" variant="outline" size="sm" onClick={refresh} disabled={refreshing}>
+            <Button type="button" variant="outline" size="sm" onClick={() => void refresh()} disabled={refreshing}>
               {refreshing ? <Loader2 className="animate-spin" /> : <RefreshCw />}
               {t('refresh')}
             </Button>

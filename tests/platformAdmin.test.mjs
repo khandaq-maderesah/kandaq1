@@ -127,6 +127,14 @@ describe('Menus and email changes', () => {
     assert.match(superadmin, /\/superadmin\/lists/)
   })
 
+  test('the Reports page reads nothing until Generate report is pressed', () => {
+    const page = read('src/app/superadmin/reports/page.tsx')
+    assert.match(page, /usePlatformFigures\(\{ auto: false \}\)/)
+    assert.match(page, /await refresh\(\)\s+\/\/ Keep the cards/)
+    const hook = read('src/hooks/usePlatformFigures.ts')
+    assert.match(hook, /if \(auto\) void load\(\)/)
+  })
+
   test('an admin may change an Ustaz email, only the super admin an admin email', () => {
     const route = read('src/app/api/admin/users/[uid]/route.ts')
     assert.match(route, /caller\.role === 'superadmin' \? user\.role !== 'superadmin' : user\.role === 'teacher'/)

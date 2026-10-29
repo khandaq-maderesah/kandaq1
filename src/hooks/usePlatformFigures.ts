@@ -19,16 +19,19 @@ export const PLATFORM_ATTENDANCE_DAYS = 30
 /**
  * Super admin: the numbers of every medreseh (students, Ustazes, classes,
  * attendance). The medresehs and users are live; each medreseh's students,
- * classes and attendance are read once and again on `refresh`.
+ * classes and attendance are read once (and again on `refresh`). With
+ * `auto: false` nothing is read until `refresh` is called.
  */
-export function usePlatformFigures(): {
+export function usePlatformFigures(options: { auto?: boolean } = {}): {
   figures: SchoolFigures[]
   totals: PlatformTotals
   /** False until the medresehs, users and their data have been read. */
   ready: boolean
   refreshing: boolean
-  refresh: () => void
+  /** Reads the data now; resolves when it has arrived. */
+  refresh: () => Promise<void>
 } {
+  const auto = options.auto ?? true
   const schools = useLiveData<School[]>('schools', (emit) => rtdb.subscribeToSchools(emit)).data
   const users = useLiveData<User[]>('allUsers', (emit) => rtdb.subscribeToAllUsers(emit)).data
   const [snapshots, setSnapshots] = useState<Record<string, SchoolSnapshot> | null>(null)
@@ -44,7 +47,10 @@ export function usePlatformFigures(): {
   )
 
   const load = useCallback(async () => {
-    if (!idsKey) return
+    if (!idsKey) {
+      setSnapshots({})
+      return
+    }
     setRefreshing(true)
     try {
       setSnapshots(await rtdb.fetchSchoolSnapshots(idsKey.split(','), dateDaysAgo(PLATFORM_ATTENDANCE_DAYS)))
@@ -54,8 +60,8 @@ export function usePlatformFigures(): {
   }, [idsKey])
 
   useEffect(() => {
-    void load()
-  }, [load])
+    if (auto) void load()
+  }, [auto, load])
 
   const figures = useMemo(
     () =>
@@ -66,5 +72,5 @@ export function usePlatformFigures(): {
   )
   const totals = useMemo(() => computePlatformTotals(figures), [figures])
 
-  return { figures, totals, ready: schools !== undefined && users !== undefined && snapshots !== null, refreshing, refresh: () => void load() }
+  return { figures, totals, ready: schools !== undefined && users !== undefined && snapshots !== null, refreshing, refresh: load }
 }

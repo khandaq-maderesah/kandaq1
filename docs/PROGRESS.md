@@ -992,3 +992,4 @@ Live check against https://mms.khendeq.com
 - Dropped by the owner: one email in several medresehs with different roles.
 - Tests: `tests/platformAdmin.test.mjs` (12) plus additions in `studentRegistration` and `familySupport` tests.
 - Verified: `npm test` -> TypeScript PASS (5.23s), ESLint PASS (3.56s), unit tests PASS (7.51s); `node scripts/i18n-sync.mjs --check` -> All translations complete.
+- Follow-up (2026-10-29): the super admin Reports page now reads nothing until "Generate report" is pressed (`usePlatformFigures({ auto: false })`); the report appears once the numbers have arrived. Verified: `npm test` -> TypeScript PASS (5.19s), ESLint PASS (3.26s), unit tests PASS (9.69s).
