@@ -8,6 +8,7 @@ import { useAuth } from '@/context/AuthContext'
 import { rtdb } from '@/lib/database'
 import { checkInId } from '@/lib/teacherCheckIn'
 import { Button } from '@/components/ui/button'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { cn } from '@/lib/utils'
 import type { Class, TeacherCheckIn } from '@/types'
 
@@ -22,6 +23,8 @@ export function CheckInCard({ classes, checkIns }: { classes: Class[]; checkIns:
   const format = useFormatter()
   const { user, offline } = useAuth()
   const [busyClassId, setBusyClassId] = useState<string | null>(null)
+  // The tap tells the admin the Ustaz is in class and cannot be taken back, so it is confirmed first.
+  const [confirming, setConfirming] = useState<Class | null>(null)
 
   if (!user || classes.length === 0) return null
 
@@ -91,7 +94,7 @@ export function CheckInCard({ classes, checkIns }: { classes: Class[]; checkIns:
                   size="lg"
                   className="w-full sm:w-auto"
                   disabled={offline || busyClassId !== null}
-                  onClick={() => handleCheckIn(c)}
+                  onClick={() => setConfirming(c)}
                 >
                   {busyClassId === c.id ? <Loader2 className="animate-spin" /> : <DoorOpen />}
                   {busyClassId === c.id ? t('saving') : t('button')}
@@ -101,6 +104,18 @@ export function CheckInCard({ classes, checkIns }: { classes: Class[]; checkIns:
           )
         })}
       </ul>
+
+      <ConfirmDialog
+        open={confirming !== null}
+        onOpenChange={(o) => !o && setConfirming(null)}
+        title={t('confirmTitle')}
+        description={t('confirmDescription', {
+          className: confirming ? (confirming.section ? `${confirming.name} · ${confirming.section}` : confirming.name) : '',
+        })}
+        confirmLabel={t('confirmYes')}
+        cancelLabel={t('confirmNo')}
+        onConfirm={() => (confirming ? handleCheckIn(confirming) : undefined)}
+      />
 
       {offline && !allDone && (
         <p className="mt-3 inline-flex items-center gap-2 text-xs text-muted-foreground">

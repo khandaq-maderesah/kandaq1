@@ -8,7 +8,11 @@
     "offline": "You are offline. Connect to the internet to check in.",
     "failed": "Could not check in. Please try again.",
     "success": "Checked in at {time}",
-    "allDone": "You are checked in for all your classes today."
+    "allDone": "You are checked in for all your classes today.",
+    "confirmTitle": "Confirm you are in class",
+    "confirmDescription": "You are telling the admin you are in {className} now. This cannot be undone.",
+    "confirmYes": "Yes, I am in class",
+    "confirmNo": "Not yet"
   },
   "board": {
     "title": "Ustaz presence",

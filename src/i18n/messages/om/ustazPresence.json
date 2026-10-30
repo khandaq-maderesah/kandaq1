@@ -8,7 +8,11 @@
     "offline": "Interneetii hin qabdan. Galmaa'uuf interneetitti walqunnamaa.",
     "failed": "Galmaa'uun hin danda'amne. Mee irra deebi'ii yaalaa.",
     "success": "{time} irratti galmaa'tan",
-    "allDone": "Har'a kutaalee keessan hundaaf galmaa'aniirtu."
+    "allDone": "Har'a kutaalee keessan hundaaf galmaa'aniirtu.",
+    "confirmTitle": "Kutaa keessa akka jirtu mirkaneessi",
+    "confirmDescription": "Amma {className} keessa akka jirtu bulchaaf himaa jirta. Kun hin deebi'u.",
+    "confirmYes": "Eeyyee, kutaa keessa jira",
+    "confirmNo": "Ammallee miti"
   },
   "board": {
     "title": "Argamuu Ustaazotaa",

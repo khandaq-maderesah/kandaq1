@@ -35,6 +35,12 @@ describe('Confirmation dialogs', () => {
     }
   })
 
+  test('"I am in class" is confirmed before it is recorded, since it cannot be taken back', () => {
+    const src = read('src/components/teacher/CheckInCard.tsx')
+    assert.match(src, /onClick=\{\(\) => setConfirming\(c\)\}/)
+    assert.doesNotMatch(src, /onClick=\{\(\) => handleCheckIn\(c\)\}/)
+  })
+
   test('a new student form with anything typed in asks before it is closed', () => {
     const src = read('src/app/admin/students/page.tsx')
     assert.match(src, /createDirty/)

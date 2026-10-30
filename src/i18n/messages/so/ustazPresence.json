@@ -8,7 +8,11 @@
     "offline": "Internet ma haysid. Ku xidh internetka si aad isu diiwaangeliso.",
     "failed": "Lama diiwaangelin karin. Fadlan mar kale isku day.",
     "success": "Waxaad isu diiwaangelisay {time}",
-    "allDone": "Maanta waxaad isu diiwaangelisay dhammaan fasalladaada."
+    "allDone": "Maanta waxaad isu diiwaangelisay dhammaan fasalladaada.",
+    "confirmTitle": "Xaqiiji inaad fasalka ku jirto",
+    "confirmDescription": "Waxaad maamulaha ku sheegayaa inaad hadda ku jirto {className}. Tan dib looma celin karo.",
+    "confirmYes": "Haa, fasalka ayaan ku jiraa",
+    "confirmNo": "Weli maaha"
   },
   "board": {
     "title": "Joogitaanka Ustaasyada",
