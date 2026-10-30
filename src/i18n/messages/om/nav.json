@@ -21,12 +21,13 @@
   "closeMenu": "Baafata cufi",
   "notifications": "Beeksisota",
   "switchSchool": "Madarasaa jijjiiri",
-  "backToAllSchools": "Gara madarasaalee hundaatti deebi'i",
   "sections": {
     "overview": "Waliigala",
     "people": "Namoota",
     "academics": "Barnoota",
-    "administration": "Bulchiinsa"
+    "administration": "Bulchiinsa",
+    "platform": "Pilaatfoormii",
+    "currentSchool": "Madarasaa kana"
   },
   "weeklyReport": "Gabaasa torbanii",
   "weeklyReports": "Gabaasota torbanii",

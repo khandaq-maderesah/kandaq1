@@ -21,12 +21,13 @@
   "closeMenu": "Xir liiska",
   "notifications": "Ogeysiisyada",
   "switchSchool": "Beddel madrasada",
-  "backToAllSchools": "Ku laabo dhammaan madrasadaha",
   "sections": {
     "overview": "Guudmar",
     "people": "Dadka",
     "academics": "Waxbarashada",
-    "administration": "Maamulka"
+    "administration": "Maamulka",
+    "platform": "Madal",
+    "currentSchool": "Madrasadan"
   },
   "weeklyReport": "Warbixinta toddobaadlaha",
   "weeklyReports": "Warbixinnada toddobaadlaha",

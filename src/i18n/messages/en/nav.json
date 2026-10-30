@@ -21,12 +21,13 @@
   "closeMenu": "Close menu",
   "notifications": "Notifications",
   "switchSchool": "Switch medreseh",
-  "backToAllSchools": "Back to all medresehs",
   "sections": {
     "overview": "Overview",
     "people": "People",
     "academics": "Academics",
-    "administration": "Administration"
+    "administration": "Administration",
+    "platform": "Platform",
+    "currentSchool": "This medreseh"
   },
   "weeklyReport": "Weekly report",
   "weeklyReports": "Weekly reports",

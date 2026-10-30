@@ -49,7 +49,7 @@ export interface NavItem {
 }
 
 export interface NavSection {
-  title?: 'overview' | 'people' | 'academics' | 'administration'
+  title?: 'overview' | 'people' | 'academics' | 'administration' | 'platform' | 'currentSchool'
   items: NavItem[]
 }
 
@@ -81,9 +81,6 @@ export const adminNav: NavSection[] = [
     items: [{ href: '/admin/settings', label: 'settings', icon: Settings }],
   },
 ]
-
-/** Extra entry shown to a platform admin who opened a school. */
-export const superadminBackItem: NavItem = { href: '/superadmin', label: 'allSchools', icon: Building2, exact: true }
 
 export const teacherNav: NavSection[] = [
   {

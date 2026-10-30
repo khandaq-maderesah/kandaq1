@@ -21,12 +21,13 @@
   "closeMenu": "إغلاق القائمة",
   "notifications": "الإشعارات",
   "switchSchool": "تبديل المدرسة",
-  "backToAllSchools": "العودة إلى جميع المدارس",
   "sections": {
     "overview": "نظرة عامة",
     "people": "الأفراد",
     "academics": "الشؤون الأكاديمية",
-    "administration": "الإدارة"
+    "administration": "الإدارة",
+    "platform": "المنصة",
+    "currentSchool": "هذه المدرسة"
   },
   "weeklyReport": "التقرير الأسبوعي",
   "weeklyReports": "التقارير الأسبوعية",

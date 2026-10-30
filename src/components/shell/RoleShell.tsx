@@ -6,7 +6,7 @@ import { AttendanceReminderBell } from '@/components/AttendanceReminderBell'
 import { AnnouncementBell } from '@/components/AnnouncementBell'
 import { UnsentSmsNotifier } from '@/components/admin/UnsentSmsNotifier'
 import { AppShell } from './AppShell'
-import { adminNav, superadminBackItem, superadminNav, teacherNav, type NavSection } from './nav'
+import { adminNav, superadminNav, teacherNav, type NavSection } from './nav'
 
 /** AppShell with the navigation and notification bells for the user's role. */
 export function RoleShell({ children }: { children: React.ReactNode }) {
@@ -16,9 +16,14 @@ export function RoleShell({ children }: { children: React.ReactNode }) {
   let actions: React.ReactNode = null
 
   if (isAdmin) {
+    // A superadmin inside a medreseh keeps the platform menu on top; the
+    // medreseh's own pages follow under their own heading.
     sections =
       user?.role === 'superadmin'
-        ? [{ items: [superadminBackItem] }, ...adminNav]
+        ? [
+            { title: 'platform', items: superadminNav.flatMap((s) => s.items) },
+            ...adminNav.map((s, i) => (i === 0 ? { ...s, title: 'currentSchool' as const } : s)),
+          ]
         : adminNav
     actions = (
       <>
