@@ -336,6 +336,22 @@ export interface AbsentAlert {
 // Id is `${date}_${classId}`.
 export type ReminderAudience = 'admin' | 'teacher'
 
+/**
+ * An Ustaz's "I am in class" tap for one class on one day.
+ * Stored under teacherCheckIns/{date}_{classId}_{teacherId}.
+ */
+export interface TeacherCheckIn {
+  id: string
+  date: string // YYYY-MM-DD
+  classId: string
+  className: string
+  section?: string
+  teacherId: string
+  teacherName: string
+  /** Server time (ms since epoch) when the Ustaz tapped the button. */
+  checkedInAt: number
+}
+
 export interface MissingAttendanceAlert {
   id: string
   date: string // YYYY-MM-DD

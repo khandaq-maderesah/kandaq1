@@ -56,5 +56,10 @@
     "suspended": "{name} was suspended.",
     "reactivated": "{name} was reactivated.",
     "updateFailed": "Couldn't update the medreseh. Please try again."
+  },
+  "reportsLink": {
+    "title": "Student, Ustaz and class numbers",
+    "description": "These need every medreseh's records, so they are in Reports and only loaded when you ask.",
+    "action": "Open reports"
   }
 }

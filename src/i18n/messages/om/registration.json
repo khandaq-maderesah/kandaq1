@@ -33,6 +33,11 @@
     "supportKinds": "Gargaarsa akkamii?",
     "supportNote": "Yaadannoo icciitii"
   },
+  "occupations": {
+    "student": "Barataa",
+    "working": "Hojjataa",
+    "notWorking": "Hin hojjatu / mana jira"
+  },
   "placeholders": {
     "select": "Filadhu…",
     "phone": "09XX XXX XXX",

@@ -1,0 +1,56 @@
+{
+  "checkIn": {
+    "title": "Fasalka ayaan ku jiraa",
+    "description": "Riix badhanka marka aad fasalka timaado, si maamuuluhu u ogaado inaad joogto.",
+    "button": "Fasalka ayaan ku jiraa",
+    "done": "Fasalka ku jira tan iyo {time}",
+    "saving": "Waa la keydinayaa…",
+    "offline": "Internet ma haysid. Ku xidh internetka si aad isu diiwaangeliso.",
+    "failed": "Lama diiwaangelin karin. Fadlan mar kale isku day.",
+    "success": "Waxaad isu diiwaangelisay {time}",
+    "allDone": "Maanta waxaad isu diiwaangelisay dhammaan fasalladaada."
+  },
+  "board": {
+    "title": "Joogitaanka Ustaasyada",
+    "description": "Yaa maanta fasalka ku jira, iyo fasalka lagu qaaday ka-qaybgalka ardayda.",
+    "date": "Taariikh",
+    "ethiopianDate": "Taariikhda Itoobiya: {date}",
+    "today": "Maanta",
+    "stats": {
+      "total": "Ustaasyada la filayo",
+      "inClass": "Fasalka ku jira",
+      "notYet": "Weli ma timaadin"
+    },
+    "filters": {
+      "label": "Muuji",
+      "all": "Dhammaan",
+      "inClass": "Fasalka ku jira",
+      "notYet": "Weli"
+    },
+    "search": "Raadi",
+    "searchPlaceholder": "Ustaas ama fasal",
+    "badge": {
+      "inClass": "Fasalka ku jira · {time}",
+      "notYet": "Weli fasalka ma gelin"
+    },
+    "attendanceTaken": "Ka-qaybgalka waa la qaaday",
+    "attendanceMissing": "Ka-qaybgalka lama qaadin",
+    "unknownUstaz": "Ustaas aan la aqoon",
+    "empty": "Weli ma jiraan fasallo ustaas loo magacaabay.",
+    "emptyFilter": "Cidna kuma habboona shaandhadan.",
+    "allIn": "Ustaas kasta fasalka ayuu ku jiraa.",
+    "call": "U wac {name}",
+    "sms": "U dir SMS {name}",
+    "copy": "Koobi lambarka",
+    "copied": "Lambarka waa la koobiyeeyay",
+    "push": {
+      "enable": "Daar ogeysiisyada",
+      "enabled": "Ogeysiisyada waa daran yihiin",
+      "blocked": "Ogeysiisyada waa la xanibay",
+      "prompt": "Ogeysiisyada waa dansan yihiin",
+      "test": "Tijaabi ogeysiis",
+      "testTitle": "Joogitaanka Ustaasyada",
+      "testBody": "{count, plural, one {# ustaas weli fasalka ma gelin} other {# ustaas weli fasalka ma gelin}}"
+    }
+  }
+}

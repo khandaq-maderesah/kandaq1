@@ -1,9 +1,4 @@
 {
-  "stats": {
-    "students": "الطلاب",
-    "ustazes": "الأساتذة",
-    "classes": "الفصول"
-  },
   "reports": {
     "title": "التقارير",
     "description": "اختر بطاقات التقرير التي تريدها ثم أنشئ التقرير لجميع المدارس.",
@@ -67,6 +62,26 @@
       "came": "حضروا",
       "absent": "غابوا",
       "rate": "نسبة الحضور"
+    },
+    "selected": "تم اختيار {selected} من {total}",
+    "readsNothing": "يستخدم القوائم المحمّلة مسبقًا، لذا يظهر فورًا.",
+    "reads": "سيقرأ: {items}.",
+    "readItems": {
+      "students": "الطلاب",
+      "classes": "الفصول",
+      "attendance": "حضور آخر {days} يومًا"
+    },
+    "glance": "نظرة سريعة",
+    "filter": "تصفية المدارس",
+    "filterPlaceholder": "اسم المدرسة",
+    "noMatch": "لا توجد مدارس تطابق التصفية.",
+    "partial": "تعذّرت قراءة {count, plural, one {# مدرسة} other {# مدارس}}، لذا تظهر أرقامها 0. اضغط تحديث البيانات للمحاولة مرة أخرى.",
+    "hints": {
+      "gender": "{boys} بنين · {girls} بنات",
+      "admins": "{count} مشرفين",
+      "withoutUstaz": "{count} بلا أستاذ",
+      "share": "{percent} من الطلاب",
+      "attendance": "{came} حضروا · {absent} غابوا"
     }
   },
   "lists": {

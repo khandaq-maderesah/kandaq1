@@ -1,9 +1,4 @@
 {
-  "stats": {
-    "students": "ተማሪዎች",
-    "ustazes": "ኡስታዞች",
-    "classes": "ክፍሎች"
-  },
   "reports": {
     "title": "ሪፖርቶች",
     "description": "የሚፈልጓቸውን የሪፖርት ካርዶች ይምረጡ፣ ከዚያ ለሁሉም መድረሳዎች ሪፖርቱን ያመንጩ።",
@@ -67,6 +62,26 @@
       "came": "የመጡ",
       "absent": "የቀሩ",
       "rate": "የመገኘት መጠን"
+    },
+    "selected": "ከ{total} {selected} ተመርጧል",
+    "readsNothing": "ቀድሞ የተጫኑ ዝርዝሮችን ስለሚጠቀም ወዲያውኑ ነው።",
+    "reads": "የሚነበበው፦ {items}።",
+    "readItems": {
+      "students": "ተማሪዎች",
+      "classes": "ክፍሎች",
+      "attendance": "የመጨረሻዎቹ {days} ቀናት መገኘት"
+    },
+    "glance": "በአጭሩ",
+    "filter": "መድረሳዎችን አጣራ",
+    "filterPlaceholder": "የመድረሳ ስም",
+    "noMatch": "ከማጣሪያዎ ጋር የሚገጥም መድረሳ የለም።",
+    "partial": "{count, plural, one {# መድረሳ} other {# መድረሳዎች}} ማንበብ አልተቻለም፤ ቁጥራቸው 0 ይታያል። እንደገና ለመሞከር መረጃ አድስን ይጫኑ።",
+    "hints": {
+      "gender": "{boys} ወንዶች · {girls} ሴቶች",
+      "admins": "{count} አስተዳዳሪዎች",
+      "withoutUstaz": "{count} ኡስታዝ የሌላቸው",
+      "share": "{percent} የተማሪዎች",
+      "attendance": "{came} መጡ · {absent} ቀሩ"
     }
   },
   "lists": {

@@ -15,10 +15,12 @@ import {
   GUARDIAN_KEYS,
   PARENT_STATUSES,
   REQUIRED_STUDENT_FIELDS,
+  STUDENT_OCCUPATIONS,
   SUPPORT_KINDS,
   caregiverRequired,
   caregiverShown,
   isReachable,
+  isStudentOccupation,
   requiredGuardianFields,
   type CaregiverDetails,
   type GuardianDetails,
@@ -528,7 +530,18 @@ export function FamilyInfoFields({
 
       <div className="space-y-2">
         <Label htmlFor={id('occupation')}>{t('fields.occupation')}</Label>
-        <Input id={id('occupation')} value={value.occupation} onChange={(e) => set('occupation', e.target.value)} />
+        <Select id={id('occupation')} value={value.occupation} onChange={(e) => set('occupation', e.target.value)}>
+          <option value="">{t('placeholders.select')}</option>
+          {STUDENT_OCCUPATIONS.map((o) => (
+            <option key={o} value={o}>
+              {t(`occupations.${o}`)}
+            </option>
+          ))}
+          {/* An older free-text entry stays selectable so editing never loses it. */}
+          {value.occupation !== '' && !isStudentOccupation(value.occupation) && (
+            <option value={value.occupation}>{value.occupation}</option>
+          )}
+        </Select>
       </div>
 
       <div className="space-y-2">

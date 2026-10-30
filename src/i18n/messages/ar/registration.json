@@ -33,6 +33,11 @@
     "supportKinds": "أي نوع من المساعدة؟",
     "supportNote": "ملاحظة سرّية"
   },
+  "occupations": {
+    "student": "طالب",
+    "working": "يعمل",
+    "notWorking": "لا يعمل / في المنزل"
+  },
   "placeholders": {
     "select": "اختر…",
     "phone": "09XX XXX XXX",

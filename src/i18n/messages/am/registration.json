@@ -33,6 +33,11 @@
     "supportKinds": "ምን ዓይነት እርዳታ?",
     "supportNote": "ሚስጥራዊ ማስታወሻ"
   },
+  "occupations": {
+    "student": "ተማሪ",
+    "working": "የሚሰራ",
+    "notWorking": "የማይሰራ / ቤት ያለ"
+  },
   "placeholders": {
     "select": "ይምረጡ…",
     "phone": "09XX XXX XXX",

@@ -933,6 +933,10 @@ export default function StudentsPage() {
             </DialogHeader>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2 sm:col-span-2">
+                <p className="text-sm font-medium text-foreground">{t('form.photo')}</p>
+                <StudentPhotoCapture value={photoUrl} onChange={setPhotoUrl} />
+              </div>
+              <div className="space-y-2 sm:col-span-2">
                 <Label htmlFor="st-name">{t('form.name')}</Label>
                 <Input id="st-name" placeholder={t('form.namePlaceholder')} value={name} onChange={(e) => setName(e.target.value)} required />
               </div>
@@ -1009,10 +1013,6 @@ export default function StudentsPage() {
                 parentPhotos={parentPhotos}
                 onParentPhotoChange={(who, url) => setParentPhotos((cur) => ({ ...cur, [who]: url }))}
               />
-            </div>
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-foreground">{t('form.photo')}</p>
-              <StudentPhotoCapture value={photoUrl} onChange={setPhotoUrl} />
             </div>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setFormOpen(false)}>

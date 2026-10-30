@@ -33,6 +33,11 @@
     "supportKinds": "What kind of help?",
     "supportNote": "Private note"
   },
+  "occupations": {
+    "student": "Student",
+    "working": "Working",
+    "notWorking": "Not working / at home"
+  },
   "placeholders": {
     "select": "Select…",
     "phone": "09XX XXX XXX",

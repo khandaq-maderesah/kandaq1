@@ -1,0 +1,56 @@
+{
+  "checkIn": {
+    "title": "I am in class",
+    "description": "Tap the button when you arrive in your class, so the admin knows you are there.",
+    "button": "I am in class",
+    "done": "In class since {time}",
+    "saving": "Saving…",
+    "offline": "You are offline. Connect to the internet to check in.",
+    "failed": "Could not check in. Please try again.",
+    "success": "Checked in at {time}",
+    "allDone": "You are checked in for all your classes today."
+  },
+  "board": {
+    "title": "Ustaz presence",
+    "description": "Who is in class today, and whose class attendance is done.",
+    "date": "Date",
+    "ethiopianDate": "Ethiopian date: {date}",
+    "today": "Today",
+    "stats": {
+      "total": "Ustazes expected",
+      "inClass": "In class",
+      "notYet": "Not in class yet"
+    },
+    "filters": {
+      "label": "Show",
+      "all": "All",
+      "inClass": "In class",
+      "notYet": "Not yet"
+    },
+    "search": "Search",
+    "searchPlaceholder": "Ustaz or class",
+    "badge": {
+      "inClass": "In class · {time}",
+      "notYet": "Not in class yet"
+    },
+    "attendanceTaken": "Attendance taken",
+    "attendanceMissing": "Attendance not taken",
+    "unknownUstaz": "Unknown ustaz",
+    "empty": "No classes with an assigned ustaz yet.",
+    "emptyFilter": "Nobody matches this filter.",
+    "allIn": "Every ustaz is in class.",
+    "call": "Call {name}",
+    "sms": "Send SMS to {name}",
+    "copy": "Copy number",
+    "copied": "Number copied",
+    "push": {
+      "enable": "Enable alerts",
+      "enabled": "Alerts on",
+      "blocked": "Alerts blocked",
+      "prompt": "Alerts off",
+      "test": "Test alert",
+      "testTitle": "Ustaz presence",
+      "testBody": "{count, plural, one {# ustaz is} other {# ustazes are}} not in class yet"
+    }
+  }
+}

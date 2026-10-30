@@ -1,9 +1,4 @@
 {
-  "stats": {
-    "students": "Students",
-    "ustazes": "Ustazes",
-    "classes": "Classes"
-  },
   "reports": {
     "title": "Reports",
     "description": "Choose the report cards you want, then generate the report for all medresehs.",
@@ -67,6 +62,26 @@
       "came": "Came",
       "absent": "Absent",
       "rate": "Attendance rate"
+    },
+    "selected": "{selected} of {total} selected",
+    "readsNothing": "Uses the lists already loaded, so it is instant.",
+    "reads": "Will read: {items}.",
+    "readItems": {
+      "students": "students",
+      "classes": "classes",
+      "attendance": "the last {days} days of attendance"
+    },
+    "glance": "At a glance",
+    "filter": "Filter medresehs",
+    "filterPlaceholder": "Medreseh name",
+    "noMatch": "No medresehs match your filter.",
+    "partial": "{count, plural, one {# medreseh} other {# medresehs}} could not be read, so their numbers show 0. Press Refresh data to try again.",
+    "hints": {
+      "gender": "{boys} boys · {girls} girls",
+      "admins": "{count} admins",
+      "withoutUstaz": "{count} without Ustaz",
+      "share": "{percent} of students",
+      "attendance": "{came} came · {absent} absent"
     }
   },
   "lists": {

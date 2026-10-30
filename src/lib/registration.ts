@@ -122,6 +122,14 @@ export const CAREGIVER_RELATIONS = ['grandparent', 'uncleAunt', 'sibling', 'othe
 /** Kinds of help a family may need (fixed list). */
 export const SUPPORT_KINDS = ['financial', 'food', 'clothing', 'health', 'housing', 'guidance', 'other'] as const
 
+/** What the student does besides the medreseh (fixed list; the stored value is the key). */
+export const STUDENT_OCCUPATIONS = ['student', 'working', 'notWorking'] as const
+export type StudentOccupation = (typeof STUDENT_OCCUPATIONS)[number]
+
+export function isStudentOccupation(value: string | undefined): value is StudentOccupation {
+  return (STUDENT_OCCUPATIONS as readonly string[]).includes(value ?? '')
+}
+
 /** A parent who can be contacted: alive, or unable to work but present. */
 export function isReachable(status: ParentStatus | undefined): boolean {
   return (status ?? 'alive') === 'alive' || status === 'unable'

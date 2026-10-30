@@ -1,15 +1,15 @@
 'use client'
 
 import { useMemo, useRef, useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import {
+  BarChart3,
   Building2,
   CheckCircle2,
-  GraduationCap,
-  School as ClassIcon,
-  UserCheck,
+  ChevronRight,
   Copy,
   Link2,
   Loader2,
@@ -30,9 +30,8 @@ import { auth } from '@/lib/firebase/config'
 import { rtdb } from '@/lib/database'
 import { useLiveData } from '@/lib/dataStore'
 import { useAuth } from '@/context/AuthContext'
-import { usePlatformFigures } from '@/hooks/usePlatformFigures'
 import { ChangeEmailDialog } from '@/components/ChangeEmailDialog'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
@@ -73,8 +72,6 @@ export default function SuperAdminPage() {
   const schoolsData = useLiveData<School[]>('schools', (emit) => rtdb.subscribeToSchools(emit))
   const brandingData = useLiveData<Record<string, PublicBranding>>('allBranding', (emit) => rtdb.subscribeToAllBranding(emit))
   const tb = useTranslations('branding')
-  const tt = useTranslations('superadminTools.stats')
-  const platform = usePlatformFigures()
   const usersData = useLiveData<User[]>('allUsers', (emit) => rtdb.subscribeToAllUsers(emit))
 
   // New school form
@@ -351,11 +348,22 @@ export default function SuperAdminPage() {
         />
       </div>
 
-      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <StatCard label={tt('students')} value={platform.ready ? platform.totals.students : '—'} icon={GraduationCap} />
-        <StatCard label={tt('ustazes')} value={platform.ready ? platform.totals.ustazes : '—'} icon={UserCheck} tone="success" />
-        <StatCard label={tt('classes')} value={platform.ready ? platform.totals.classes : '—'} icon={ClassIcon} tone="info" />
-      </div>
+      {/* The student, Ustaz and class figures need every medreseh's records, so they live in Reports and are only read on request. */}
+      <Link
+        href="/superadmin/reports"
+        className="mb-6 flex items-center gap-3 rounded-xl border bg-card p-4 shadow-sm transition-colors hover:border-primary/40 hover:bg-accent/40"
+      >
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+          <BarChart3 className="h-5 w-5" aria-hidden="true" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="font-medium text-foreground">{t('reportsLink.title')}</p>
+          <p className="text-sm text-muted-foreground">{t('reportsLink.description')}</p>
+        </div>
+        <span className={buttonVariants({ variant: 'outline', size: 'sm' })}>
+          {t('reportsLink.action')} <ChevronRight className="rtl:rotate-180" />
+        </span>
+      </Link>
 
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative max-w-sm flex-1">

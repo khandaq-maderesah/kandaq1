@@ -1,0 +1,56 @@
+{
+  "checkIn": {
+    "title": "ክፍል ውስጥ ነኝ",
+    "description": "ክፍልዎ ሲደርሱ ቁልፉን ይጫኑ፣ አስተዳዳሪው መኖርዎን እንዲያውቅ።",
+    "button": "ክፍል ውስጥ ነኝ",
+    "done": "ከ{time} ጀምሮ ክፍል ውስጥ",
+    "saving": "በማስቀመጥ ላይ…",
+    "offline": "ከመስመር ውጭ ነዎት። ለመመዝገብ ከኢንተርኔት ጋር ይገናኙ።",
+    "failed": "መመዝገብ አልተቻለም። እባክዎ እንደገና ይሞክሩ።",
+    "success": "በ{time} ተመዝግበዋል",
+    "allDone": "ዛሬ ለሁሉም ክፍሎችዎ ተመዝግበዋል።"
+  },
+  "board": {
+    "title": "የኡስታዞች መገኘት",
+    "description": "ዛሬ ማን ክፍል ውስጥ እንዳለ እና የማን ክፍል የተማሪ መገኘት እንደተያዘ።",
+    "date": "ቀን",
+    "ethiopianDate": "የኢትዮጵያ ቀን፦ {date}",
+    "today": "ዛሬ",
+    "stats": {
+      "total": "የሚጠበቁ ኡስታዞች",
+      "inClass": "ክፍል ውስጥ",
+      "notYet": "ገና ክፍል ውስጥ ያልገቡ"
+    },
+    "filters": {
+      "label": "አሳይ",
+      "all": "ሁሉም",
+      "inClass": "ክፍል ውስጥ",
+      "notYet": "ገና"
+    },
+    "search": "ፈልግ",
+    "searchPlaceholder": "ኡስታዝ ወይም ክፍል",
+    "badge": {
+      "inClass": "ክፍል ውስጥ · {time}",
+      "notYet": "ገና ክፍል ውስጥ አልገባም"
+    },
+    "attendanceTaken": "መገኘት ተይዟል",
+    "attendanceMissing": "መገኘት አልተያዘም",
+    "unknownUstaz": "ያልታወቀ ኡስታዝ",
+    "empty": "ኡስታዝ የተመደበለት ክፍል እስካሁን የለም።",
+    "emptyFilter": "ከዚህ ማጣሪያ ጋር የሚገጥም የለም።",
+    "allIn": "ሁሉም ኡስታዞች ክፍል ውስጥ ናቸው።",
+    "call": "ለ{name} ደውል",
+    "sms": "ለ{name} መልዕክት ላክ",
+    "copy": "ቁጥሩን ቅዳ",
+    "copied": "ቁጥሩ ተቀድቷል",
+    "push": {
+      "enable": "ማሳወቂያዎችን አንቃ",
+      "enabled": "ማሳወቂያ በርቷል",
+      "blocked": "ማሳወቂያ ታግዷል",
+      "prompt": "ማሳወቂያ ጠፍቷል",
+      "test": "ማሳወቂያ ሞክር",
+      "testTitle": "የኡስታዞች መገኘት",
+      "testBody": "{count, plural, one {# ኡስታዝ} other {# ኡስታዞች}} ገና ክፍል ውስጥ አልገቡም"
+    }
+  }
+}

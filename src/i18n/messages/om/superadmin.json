@@ -56,5 +56,10 @@
     "suspended": "Madarasaan {name} dhorkameera.",
     "reactivated": "Madarasaan {name} deebi'ee hojiirra ooleera.",
     "updateFailed": "Madarasaa haaromsuun hin danda'amne. Maaloo irra deebi'aa yaalaa."
+  },
+  "reportsLink": {
+    "title": "Lakkoofsa barattootaa, ustaazotaa fi kutaalee",
+    "description": "Galmee madrasoota hundaa waan barbaadaniif Gabaasa keessa jiru; yeroo gaafattan qofa fe'amu.",
+    "action": "Gabaasa banaa"
   }
 }

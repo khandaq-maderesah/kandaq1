@@ -1,9 +1,4 @@
 {
-  "stats": {
-    "students": "Barattoota",
-    "ustazes": "Ustaazota",
-    "classes": "Kutaalee"
-  },
   "reports": {
     "title": "Gabaasota",
     "description": "Kaardii gabaasaa barbaaddan filadhaa, achiis madrasoota hundaaf gabaasa maddisiisaa.",
@@ -67,6 +62,26 @@
       "came": "Dhufan",
       "absent": "Hafan",
       "rate": "Sadarkaa argamaa"
+    },
+    "selected": "{total} keessaa {selected} filatameera",
+    "readsNothing": "Tarreewwan duraan fe'aman fayyadama, kanaaf battalumatti.",
+    "reads": "Kan dubbifamu: {items}.",
+    "readItems": {
+      "students": "barattoota",
+      "classes": "kutaalee",
+      "attendance": "argamuu guyyaa {days} darban"
+    },
+    "glance": "Gabaabaatti",
+    "filter": "Madrasoota calali",
+    "filterPlaceholder": "Maqaa madrasa",
+    "noMatch": "Madrasni calaltuu kanaan wal-simu hin jiru.",
+    "partial": "{count, plural, one {Madrasni #} other {Madrasoonni #}} dubbifamuu hin dandeenye, lakkoofsi isaanii 0 agarsiisa. Irra deebi'ee yaaluuf Odeeffannoo haaromsi tuqi.",
+    "hints": {
+      "gender": "{boys} dhiiraa · {girls} durba",
+      "admins": "bulchitoota {count}",
+      "withoutUstaz": "{count} ustaaza hin qabne",
+      "share": "{percent} barattootaa",
+      "attendance": "{came} dhufan · {absent} hafan"
     }
   },
   "lists": {

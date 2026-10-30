@@ -33,6 +33,11 @@
     "supportKinds": "Caawimaad noocee ah?",
     "supportNote": "Xusuus sir ah"
   },
+  "occupations": {
+    "student": "Arday",
+    "working": "Shaqeeya",
+    "notWorking": "Ma shaqeeyo / guriga jooga"
+  },
   "placeholders": {
     "select": "Dooro…",
     "phone": "09XX XXX XXX",

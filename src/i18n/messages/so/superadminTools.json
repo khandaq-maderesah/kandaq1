@@ -1,9 +1,4 @@
 {
-  "stats": {
-    "students": "Ardayda",
-    "ustazes": "Ustaasyada",
-    "classes": "Fasallada"
-  },
   "reports": {
     "title": "Warbixinno",
     "description": "Dooro kaararka warbixinta ee aad rabto, kadibna u samee warbixinta dhammaan madrasadaha.",
@@ -67,6 +62,26 @@
       "came": "Timid",
       "absent": "Maqnaa",
       "rate": "Heerka imaanshaha"
+    },
+    "selected": "{selected} ka mid ah {total} ayaa la doortay",
+    "readsNothing": "Wuxuu isticmaalaa liisaska hore loo soo qaaday, markaas isla markiiba.",
+    "reads": "Wuxuu akhrin doonaa: {items}.",
+    "readItems": {
+      "students": "ardayda",
+      "classes": "fasallada",
+      "attendance": "ka-qaybgalka {days} maalmood ee u dambeeyay"
+    },
+    "glance": "Dulmar kooban",
+    "filter": "Shaandhee madrasadaha",
+    "filterPlaceholder": "Magaca madrasada",
+    "noMatch": "Wax madrasad ah kuma habboona shaandhadaada.",
+    "partial": "{count, plural, one {# madrasad} other {# madrasadaha}} lama akhriyi karin, sidaa darteed tiradooda waxay muujisaa 0. Taabo Cusboonaysii xogta si aad mar kale u isku daydo.",
+    "hints": {
+      "gender": "{boys} wiilal · {girls} gabdhood",
+      "admins": "{count} maamule",
+      "withoutUstaz": "{count} ustaas la'aan",
+      "share": "{percent} ardayda",
+      "attendance": "{came} yimid · {absent} maqnaa"
     }
   },
   "lists": {

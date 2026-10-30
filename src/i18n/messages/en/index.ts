@@ -28,6 +28,7 @@ import teacherDashboard from './teacherDashboard.json'
 import teacherExams from './teacherExams.json'
 import teacherHistory from './teacherHistory.json'
 import teacherStudents from './teacherStudents.json'
+import ustazPresence from './ustazPresence.json'
 import weeklyReports from './weeklyReports.json'
 
 const messages = {
@@ -60,6 +61,7 @@ const messages = {
   teacherExams: teacherExams,
   teacherHistory: teacherHistory,
   teacherStudents: teacherStudents,
+  ustazPresence: ustazPresence,
   weeklyReports: weeklyReports,
 }
 

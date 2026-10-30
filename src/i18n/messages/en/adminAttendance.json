@@ -4,7 +4,8 @@
   "tabs": {
     "label": "Attendance views",
     "mark": "Mark attendance",
-    "records": "Records"
+    "records": "Records",
+    "ustaz": "Ustaz presence"
   },
   "mark": {
     "class": "Class",

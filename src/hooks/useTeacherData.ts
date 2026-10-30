@@ -15,7 +15,7 @@ import { useAuth } from '@/context/AuthContext'
 import { rtdb } from '@/lib/database'
 import { useLiveData, useLiveDataMany } from '@/lib/dataStore'
 import { isClassTeacher } from '@/lib/classTeachers'
-import type { Attendance, Class, Exam, Student } from '@/types'
+import type { Attendance, Class, Exam, Student, TeacherCheckIn } from '@/types'
 
 /** Every class of the current school (live). */
 export function useAllClasses(): Class[] | undefined {
@@ -76,5 +76,13 @@ export function useRegistrationOpen(): boolean | undefined {
   const { user } = useAuth()
   return useLiveData<boolean>(user ? 'settings:registrationOpen' : null, (emit) =>
     rtdb.subscribeToRegistrationOpen(emit)
+  ).data
+}
+
+/** Every Ustaz "I am in class" check-in of one day (live). */
+export function useTeacherCheckIns(date: string): TeacherCheckIn[] | undefined {
+  const { user } = useAuth()
+  return useLiveData<TeacherCheckIn[]>(user ? `teacherCheckIns:${date}` : null, (emit) =>
+    rtdb.subscribeToTeacherCheckIns(date, emit)
   ).data
 }

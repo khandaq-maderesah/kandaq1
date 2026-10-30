@@ -56,5 +56,10 @@
     "suspended": "{name} waa la hakiyay.",
     "reactivated": "{name} dib ayaa loo hawlgeliyay.",
     "updateFailed": "Madrasada lama cusboonaysiin karin. Fadlan isku day mar kale."
+  },
+  "reportsLink": {
+    "title": "Tirada ardayda, ustaasyada iyo fasallada",
+    "description": "Waxay u baahan yihiin diiwaanka madaris kasta, sidaa darteed waxay ku jiraan Warbixinnada oo marka aad weydiiso keliya ayaa la soo qaadaa.",
+    "action": "Fur warbixinnada"
   }
 }

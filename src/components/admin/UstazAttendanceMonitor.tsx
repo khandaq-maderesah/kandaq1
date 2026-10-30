@@ -1,13 +1,19 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import { useFormatter, useTranslations } from 'next-intl'
+import { toast } from 'sonner'
+import { Bell, CheckCircle2, ClipboardCheck, ClipboardX, Copy, DoorClosed, DoorOpen, MessageSquare, Phone, Search, Users } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { Phone, MessageSquare, Copy, Bell, CheckCircle2, AlertTriangle } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { EmptyState, StatCard } from '@/components/ui/page'
+import { useEthiopianDate } from '@/hooks/useEthiopianDate'
+import { useTeacherCheckIns } from '@/hooks/useTeacherData'
 import { isNotificationSupported, getNotificationPermission, requestNotificationPermission, showBrowserNotification } from '@/lib/pushNotification'
-import { classTeacherIds, hasTeacher } from '@/lib/classTeachers'
+import { buildPresenceRows, filterPresence, presenceSummary, type PresenceFilter } from '@/lib/teacherCheckIn'
 import type { Class, User, Attendance } from '@/types'
 
 interface Props {
@@ -16,108 +22,222 @@ interface Props {
   attendance: Attendance[]
 }
 
+const todayIso = () => new Date().toISOString().slice(0, 10)
+
+/**
+ * Who is in class: every Ustaz of every active class, whether they tapped
+ * "I am in class" on the chosen day, and whether the class's student
+ * attendance was taken. Absent Ustazes sort first so the admin can call them.
+ */
 export default function UstazAttendanceMonitor({ classes, users, attendance }: Props) {
-  const [filter, setFilter] = useState<'all' | 'missing' | 'submitted'>('all')
+  const t = useTranslations('ustazPresence.board')
+  const format = useFormatter()
+  const eth = useEthiopianDate()
+  const [date, setDate] = useState(todayIso)
+  const [filter, setFilter] = useState<PresenceFilter>('all')
+  const [query, setQuery] = useState('')
   const [permission, setPermission] = useState(getNotificationPermission())
 
-  const today = new Date().toISOString().slice(0, 10)
-  const attendedClassIds = useMemo(
-    () => new Set(attendance.filter((a) => a.date === today).map((a) => a.classId)),
-    [attendance, today]
+  const checkIns = useTeacherCheckIns(date)
+  const loading = checkIns === undefined
+
+  const rows = useMemo(
+    () => buildPresenceRows({ classes, users, checkIns: checkIns ?? [], attendance, date }),
+    [classes, users, checkIns, attendance, date]
   )
+  const summary = presenceSummary(rows)
+  const visible = filterPresence(rows, filter, query)
+  const isToday = date === todayIso()
+  const ethDate = eth.format(date)
+  const time = (ms: number) => format.dateTime(new Date(ms), { timeStyle: 'short' })
 
-  const rows = useMemo(() => {
-    const userById = new Map(users.map((u) => [u.uid, u]))
-    return classes
-      .filter((c) => c.isActive !== false && hasTeacher(c))
-      .map((c) => {
-        const leadId = classTeacherIds(c)[0]
-        const teacher = userById.get(leadId)
-        const submitted = attendedClassIds.has(c.id)
-        return {
-          classId: c.id,
-          className: c.name,
-          section: c.section || '',
-          teacherId: leadId,
-          teacherName: c.teacherName || teacher?.name || 'Unknown ustaz',
-          phone: teacher?.phone || '',
-          submitted,
-        }
-      })
-  }, [classes, users, attendedClassIds])
-
-  const filtered = rows.filter((r) =>
-    filter === 'all' ? true : filter === 'missing' ? !r.submitted : r.submitted
-  )
-
-  const submittedCount = rows.filter((r) => r.submitted).length
-  const missingCount = rows.length - submittedCount
-
-  const handleEnable = async () => {
-    const p = await requestNotificationPermission()
-    setPermission(p)
-  }
+  const handleEnable = async () => setPermission(await requestNotificationPermission())
 
   const handleTest = async () => {
     await showBrowserNotification({
-      title: 'KMMS: Missing Attendance Alert',
-      body: `${missingCount} Ustaz(es) haven't taken today's attendance`,
+      title: t('push.testTitle'),
+      body: t('push.testBody', { count: summary.notYet }),
       url: '/admin/attendance',
       tag: 'test',
     })
   }
 
+  const copyNumber = async (phone: string) => {
+    try {
+      await navigator.clipboard.writeText(phone)
+      toast.success(t('copied'))
+    } catch {
+      /* clipboard blocked: the number is still visible on the call link */
+    }
+  }
+
+  const filters: PresenceFilter[] = ['all', 'inClass', 'notYet']
+  const pushLabel =
+    permission === 'granted' ? t('push.enabled') : permission === 'denied' ? t('push.blocked') : t('push.prompt')
+
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-3 gap-4">
-        <Card><CardContent className="p-4"><p className="text-sm text-muted-foreground">Total</p><p className="text-2xl font-bold">{rows.length}</p></CardContent></Card>
-        <Card><CardContent className="p-4"><p className="text-sm text-muted-foreground">Submitted</p><p className="text-2xl font-bold text-green-600">{submittedCount}</p></CardContent></Card>
-        <Card><CardContent className="p-4"><p className="text-sm text-muted-foreground">Missing</p><p className="text-2xl font-bold text-red-600">{missingCount}</p></CardContent></Card>
-      </div>
+      <div className="rounded-xl border bg-card p-4 shadow-sm sm:p-5">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div className="space-y-2">
+            <Label htmlFor="presence-date">{t('date')}</Label>
+            <div className="flex flex-wrap items-center gap-2">
+              <Input
+                id="presence-date"
+                type="date"
+                value={date}
+                max={todayIso()}
+                onChange={(e) => setDate(e.target.value || todayIso())}
+                className="w-auto"
+              />
+              {!isToday && (
+                <Button type="button" size="sm" variant="outline" onClick={() => setDate(todayIso())}>
+                  {t('today')}
+                </Button>
+              )}
+            </div>
+            {ethDate && <p className="text-xs text-muted-foreground">{t('ethiopianDate', { date: ethDate })}</p>}
+          </div>
 
-      <div className="flex flex-wrap items-center gap-2">
-        {(['all', 'missing', 'submitted'] as const).map((f) => (
-          <Button key={f} size="sm" variant={filter === f ? 'default' : 'outline'} onClick={() => setFilter(f)}>
-            {f}
-          </Button>
-        ))}
-        <div className="ms-auto flex items-center gap-2">
-          <Badge variant={permission === 'granted' ? 'success' : permission === 'denied' ? 'destructive' : 'secondary'}>
-            {permission === 'granted' ? 'Enabled' : permission === 'denied' ? 'Blocked' : 'Prompt'}
-          </Badge>
-          {isNotificationSupported() && permission !== 'granted' && (
-            <Button size="sm" onClick={handleEnable}><Bell className="h-4 w-4" /> Enable Push</Button>
-          )}
-          {permission === 'granted' && (
-            <Button size="sm" variant="outline" onClick={handleTest}><Bell className="h-4 w-4" /> Test</Button>
-          )}
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge variant={permission === 'granted' ? 'success' : permission === 'denied' ? 'destructive' : 'secondary'}>
+              {pushLabel}
+            </Badge>
+            {isNotificationSupported() && permission !== 'granted' && permission !== 'denied' && (
+              <Button type="button" size="sm" onClick={handleEnable}>
+                <Bell /> {t('push.enable')}
+              </Button>
+            )}
+            {permission === 'granted' && (
+              <Button type="button" size="sm" variant="outline" onClick={handleTest}>
+                <Bell /> {t('push.test')}
+              </Button>
+            )}
+          </div>
         </div>
       </div>
 
-      <div className="space-y-2">
-        {filtered.map((r) => (
-          <Card key={r.classId} className={cn(!r.submitted && 'border-red-300 bg-red-50/40')}>
-            <CardContent className="flex flex-col gap-3 p-4 md:flex-row md:items-center md:justify-between">
-              <div className="min-w-0">
-                <p className="font-medium text-foreground">{r.teacherName}</p>
-                <p className="text-xs text-muted-foreground">{r.className}{r.section ? ` • ${r.section}` : ''}</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <Badge variant={r.submitted ? 'success' : 'destructive'}>
-                  {r.submitted ? <><CheckCircle2 className="h-3 w-3" /> Submitted</> : <><AlertTriangle className="h-3 w-3" /> Pending</>}
-                </Badge>
-                {r.phone && (
-                  <>
-                    <a href={`tel:${r.phone}`} className="inline-flex items-center gap-1 text-sm text-primary"><Phone className="h-4 w-4" /></a>
-                    <a href={`sms:${r.phone}`} className="inline-flex items-center gap-1 text-sm text-primary"><MessageSquare className="h-4 w-4" /></a>
-                    <button type="button" onClick={() => navigator.clipboard.writeText(r.phone)} className="inline-flex items-center gap-1 text-sm text-muted-foreground"><Copy className="h-4 w-4" /></button>
-                  </>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+      <div className="grid grid-cols-3 gap-3 sm:gap-4">
+        <StatCard label={t('stats.total')} value={format.number(summary.total)} icon={Users} onClick={() => setFilter('all')} />
+        <StatCard label={t('stats.inClass')} value={format.number(summary.inClass)} icon={DoorOpen} tone="success" onClick={() => setFilter('inClass')} />
+        <StatCard label={t('stats.notYet')} value={format.number(summary.notYet)} icon={DoorClosed} tone="destructive" onClick={() => setFilter('notYet')} />
       </div>
+
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div role="group" aria-label={t('filters.label')} className="inline-flex w-fit rounded-lg border bg-muted p-1">
+          {filters.map((f) => (
+            <button
+              key={f}
+              type="button"
+              aria-pressed={filter === f}
+              onClick={() => setFilter(f)}
+              className={cn(
+                'min-h-9 rounded-md px-3 text-sm font-medium transition-colors',
+                filter === f ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              {t(`filters.${f}`)}
+            </button>
+          ))}
+        </div>
+        <div className="relative sm:w-64">
+          <Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+          <Input
+            type="search"
+            aria-label={t('search')}
+            placeholder={t('searchPlaceholder')}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="ps-9"
+          />
+        </div>
+      </div>
+
+      {isToday && !loading && summary.total > 0 && summary.notYet === 0 && (
+        <p className="flex items-center gap-2 rounded-lg border border-success/30 bg-success/10 px-4 py-3 text-sm font-medium text-success" role="status">
+          <CheckCircle2 className="h-4 w-4" aria-hidden="true" /> {t('allIn')}
+        </p>
+      )}
+
+      {summary.total === 0 ? (
+        <EmptyState icon={Users} title={t('empty')} />
+      ) : visible.length === 0 ? (
+        <EmptyState icon={Search} title={t('emptyFilter')} />
+      ) : (
+        <ul className="space-y-2">
+          {visible.map((r) => {
+            const inClass = r.checkedInAt !== null
+            const name = r.teacherName || t('unknownUstaz')
+            return (
+              <li
+                key={r.key}
+                className={cn(
+                  'flex flex-col gap-3 rounded-xl border bg-card p-4 shadow-sm md:flex-row md:items-center md:justify-between',
+                  !inClass && !loading && 'border-destructive/40'
+                )}
+              >
+                <div className="flex min-w-0 items-center gap-3">
+                  <div
+                    className={cn(
+                      'flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold',
+                      inClass ? 'bg-success/10 text-success' : 'bg-muted text-muted-foreground'
+                    )}
+                    aria-hidden="true"
+                  >
+                    {name.trim().charAt(0).toUpperCase()}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="truncate font-medium text-foreground">{name}</p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      {r.className}
+                      {r.section ? ` · ${r.section}` : ''}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  {!loading && (
+                    <Badge variant={inClass ? 'success' : 'destructive'}>
+                      {inClass ? <DoorOpen /> : <DoorClosed />}
+                      {inClass ? t('badge.inClass', { time: time(r.checkedInAt as number) }) : t('badge.notYet')}
+                    </Badge>
+                  )}
+                  <Badge variant={r.attendanceTaken ? 'info' : 'secondary'}>
+                    {r.attendanceTaken ? <ClipboardCheck /> : <ClipboardX />}
+                    {r.attendanceTaken ? t('attendanceTaken') : t('attendanceMissing')}
+                  </Badge>
+                  {r.phone && (
+                    <div className="flex items-center gap-1">
+                      <a
+                        href={`tel:${r.phone}`}
+                        aria-label={t('call', { name })}
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-primary transition-colors hover:bg-accent"
+                      >
+                        <Phone className="h-4 w-4" />
+                      </a>
+                      <a
+                        href={`sms:${r.phone}`}
+                        aria-label={t('sms', { name })}
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-primary transition-colors hover:bg-accent"
+                      >
+                        <MessageSquare className="h-4 w-4" />
+                      </a>
+                      <button
+                        type="button"
+                        onClick={() => copyNumber(r.phone)}
+                        aria-label={t('copy')}
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent"
+                      >
+                        <Copy className="h-4 w-4" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </li>
+            )
+          })}
+        </ul>
+      )}
     </div>
   )
 }

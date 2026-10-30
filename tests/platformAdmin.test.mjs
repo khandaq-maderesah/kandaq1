@@ -2,7 +2,7 @@ import { test, describe } from 'node:test'
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
 
-const { computeSchoolFigures, computePlatformTotals, attendanceRate, dateDaysAgo, REPORT_CARDS } = await import('../src/lib/platformStats.ts')
+const { computeSchoolFigures, computePlatformTotals, attendanceRate, dateDaysAgo, REPORT_CARDS, reportNeeds } = await import('../src/lib/platformStats.ts')
 const { effectiveListsMode, resolveRegistrationOptions, DEFAULT_REGISTRATION_OPTIONS } = await import('../src/lib/registration.ts')
 
 const read = (p) => fs.readFileSync(new URL(`../${p}`, import.meta.url), 'utf8')
@@ -77,6 +77,22 @@ describe('Platform figures for the super admin', () => {
     assert.deepEqual([...REPORT_CARDS], ['overview', 'students', 'staff', 'classes', 'orphans', 'attendance'])
     assert.equal(dateDaysAgo(30, new Date('2026-10-31T10:00:00Z')), '2026-10-01')
   })
+
+  test('only the records the chosen cards show are read', () => {
+    // Ustazes and admins come from the live user list: nothing to read.
+    assert.deepEqual(reportNeeds(['staff']), { students: false, classes: false, attendance: false })
+    assert.deepEqual(reportNeeds(['students', 'orphans']), { students: true, classes: false, attendance: false })
+    assert.deepEqual(reportNeeds(['classes']), { students: false, classes: true, attendance: false })
+    assert.deepEqual(reportNeeds(['overview']), { students: true, classes: true, attendance: false })
+    assert.deepEqual(reportNeeds(['attendance']), { students: false, classes: false, attendance: true })
+    assert.deepEqual(reportNeeds([...REPORT_CARDS]), { students: true, classes: true, attendance: true })
+  })
+
+  test('the dashboard reads no medreseh records: the costly figures live in Reports', () => {
+    const page = read('src/app/superadmin/page.tsx')
+    assert.doesNotMatch(page, /usePlatformFigures/)
+    assert.match(page, /href="\/superadmin\/reports"/)
+  })
 })
 
 describe('Platform dropdown lists', () => {
@@ -130,7 +146,7 @@ describe('Menus and email changes', () => {
   test('the Reports page reads nothing until Generate report is pressed', () => {
     const page = read('src/app/superadmin/reports/page.tsx')
     assert.match(page, /usePlatformFigures\(\{ auto: false \}\)/)
-    assert.match(page, /await refresh\(\)\s+\/\/ Keep the cards/)
+    assert.match(page, /await refresh\(reportNeeds\(selected\)\)\s+\/\/ Keep the cards/)
     const hook = read('src/hooks/usePlatformFigures.ts')
     assert.match(hook, /if \(auto\) void load\(\)/)
   })

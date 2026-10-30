@@ -237,7 +237,7 @@ export default function AttendancePage() {
           [
             ['mark', ClipboardList, t('tabs.mark')],
             ['records', Calendar, t('tabs.records')],
-            ['ustaz-status', Users, 'Ustaz Status'],
+            ['ustaz-status', Users, t('tabs.ustaz')],
           ] as const
         ).map(([key, Icon, label]) => (
           <button

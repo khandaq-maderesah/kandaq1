@@ -1,11 +1,11 @@
 import { app, db } from '@/lib/firebase/config'
 import { getStorage, ref as storageRef, uploadBytes, deleteObject } from 'firebase/storage'
 import { BRANDING_FILES, brandingStoragePath, type BrandingFile, type PublicBranding } from '@/lib/branding'
-import { ref, get as rtdbGet, set, update, remove, onValue, query, orderByChild, equalTo, startAt, type QueryConstraint, type Unsubscribe, type DataSnapshot } from 'firebase/database'
-import type { User, Class, Student, Attendance, AbsentAlert, MissingAttendanceAlert, Exam, Announcement, School, ChangeRequest, DeletionReason, StudentArchive, SessionLog, WeeklyReport, StudentSupport } from '@/types'
+import { ref, get as rtdbGet, set, update, remove, onValue, query, orderByChild, equalTo, startAt, serverTimestamp, type QueryConstraint, type Unsubscribe, type DataSnapshot } from 'firebase/database'
+import type { User, Class, Student, Attendance, AbsentAlert, MissingAttendanceAlert, TeacherCheckIn, Exam, Announcement, School, ChangeRequest, DeletionReason, StudentArchive, SessionLog, WeeklyReport, StudentSupport } from '@/types'
 import { withTimeout } from '@/lib/asyncUtils'
 import { effectiveListsMode, normalizeRegistrationOptions, resolveRegistrationOptions, type ListsMode, type RegistrationOptions } from '@/lib/registration'
-import type { SchoolSnapshot } from '@/lib/platformStats'
+import { ALL_REPORT_NEEDS, type ReportNeeds, type SchoolSnapshot } from '@/lib/platformStats'
 
 /**
  * One-shot reads never hang.
@@ -498,6 +498,24 @@ export async function acknowledgeAbsentAlert(
   await set(sref(`absentAlerts/${studentId}`), defined(data))
 }
 
+// ==================== Ustaz check-ins ====================
+// "I am in class" taps, stored under teacherCheckIns/{date}_{classId}_{teacherId}.
+// The time is the server's, so a wrong phone clock cannot fake being on time.
+export async function createTeacherCheckIn(id: string, data: Omit<TeacherCheckIn, 'id' | 'checkedInAt'>): Promise<void> {
+  await set(sref(`teacherCheckIns/${id}`), { ...defined(data), checkedInAt: serverTimestamp() })
+}
+
+/** Live check-ins of one day (server-filtered by the indexed `date`). */
+export function subscribeToTeacherCheckIns(date: string, cb: (checkIns: TeacherCheckIn[]) => void): Unsubscribe {
+  return onValue(query(sref('teacherCheckIns'), orderByChild('date'), equalTo(date)), (snap) => {
+    const out: TeacherCheckIn[] = []
+    snap.forEach((child) => {
+      out.push({ ...(child.val() as object), id: child.key as string } as TeacherCheckIn)
+    })
+    cb(out)
+  })
+}
+
 // ==================== Missing Attendance Alerts ====================
 // Alerts created when a teacher has not marked attendance for their class on a given day.
 // Stored under missingAttendanceAlerts/{date}_{classId}.
@@ -634,9 +652,14 @@ export async function getSchoolsWithOwnLists(schoolIds: string[]): Promise<Recor
 
 /**
  * Super admin: each medreseh's students, classes and the last days of
- * attendance, read once. A medreseh that cannot be read is left out.
+ * attendance, read once. Only the parts in `needs` are read (the rest stay
+ * empty). A medreseh that cannot be read is left out.
  */
-export async function fetchSchoolSnapshots(schoolIds: string[], attendanceSince: string): Promise<Record<string, SchoolSnapshot>> {
+export async function fetchSchoolSnapshots(
+  schoolIds: string[],
+  attendanceSince: string,
+  needs: ReportNeeds = ALL_REPORT_NEEDS
+): Promise<Record<string, SchoolSnapshot>> {
   const out: Record<string, SchoolSnapshot> = {}
   const list = <T,>(snap: DataSnapshot): T[] => {
     const items: T[] = []
@@ -650,11 +673,15 @@ export async function fetchSchoolSnapshots(schoolIds: string[], attendanceSince:
       try {
         const base = `schoolData/${id}`
         const [students, classes, attendance] = await Promise.all([
-          get(ref(db, `${base}/students`)),
-          get(ref(db, `${base}/classes`)),
-          get(query(ref(db, `${base}/attendance`), orderByChild('date'), startAt(attendanceSince))),
+          needs.students ? get(ref(db, `${base}/students`)) : null,
+          needs.classes ? get(ref(db, `${base}/classes`)) : null,
+          needs.attendance ? get(query(ref(db, `${base}/attendance`), orderByChild('date'), startAt(attendanceSince))) : null,
         ])
-        out[id] = { students: list<Student>(students), classes: list<Class>(classes), attendance: list<Attendance>(attendance) }
+        out[id] = {
+          students: students ? list<Student>(students) : [],
+          classes: classes ? list<Class>(classes) : [],
+          attendance: attendance ? list<Attendance>(attendance) : [],
+        }
       } catch {
         // Not readable right now: this medreseh is shown as "not loaded".
       }
@@ -1206,6 +1233,8 @@ export const rtdb = {
   createAnnouncement,
   deleteAnnouncement,
   subscribeToAnnouncements,
+  createTeacherCheckIn,
+  subscribeToTeacherCheckIns,
   getAttendance,
   createAttendance,
   updateAttendance,

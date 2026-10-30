@@ -1,0 +1,56 @@
+{
+  "checkIn": {
+    "title": "Kutaa keessa jira",
+    "description": "Yeroo kutaa keessanii geessan button kana tuqaa, bulchaan akka jirtan beekuuf.",
+    "button": "Kutaa keessa jira",
+    "done": "{time} irraa kaasee kutaa keessa",
+    "saving": "Olkaa'aa jira…",
+    "offline": "Interneetii hin qabdan. Galmaa'uuf interneetitti walqunnamaa.",
+    "failed": "Galmaa'uun hin danda'amne. Mee irra deebi'ii yaalaa.",
+    "success": "{time} irratti galmaa'tan",
+    "allDone": "Har'a kutaalee keessan hundaaf galmaa'aniirtu."
+  },
+  "board": {
+    "title": "Argamuu Ustaazotaa",
+    "description": "Har'a eenyutu kutaa keessa jira, argamiinsi barattootaas kutaa eenyuutiif qabameera.",
+    "date": "Guyyaa",
+    "ethiopianDate": "Guyyaa Itoophiyaa: {date}",
+    "today": "Har'a",
+    "stats": {
+      "total": "Ustaazota eegaman",
+      "inClass": "Kutaa keessa",
+      "notYet": "Hin geenye"
+    },
+    "filters": {
+      "label": "Agarsiisi",
+      "all": "Hunda",
+      "inClass": "Kutaa keessa",
+      "notYet": "Hin geenye"
+    },
+    "search": "Barbaadi",
+    "searchPlaceholder": "Ustaazii yookaan kutaa",
+    "badge": {
+      "inClass": "Kutaa keessa · {time}",
+      "notYet": "Kutaa hin seenne"
+    },
+    "attendanceTaken": "Argamuun qabameera",
+    "attendanceMissing": "Argamuun hin qabamne",
+    "unknownUstaz": "Ustaaza hin beekamne",
+    "empty": "Kutaan ustaaza ramadame hin jiru.",
+    "emptyFilter": "Filannoo kanaan wal-simu hin jiru.",
+    "allIn": "Ustaazonni hundi kutaa keessa jiru.",
+    "call": "{name} bilbili",
+    "sms": "{name}f ergaa ergi",
+    "copy": "Lakkoofsa waraabi",
+    "copied": "Lakkoofsi waraabameera",
+    "push": {
+      "enable": "Beeksisa banaa",
+      "enabled": "Beeksisni banaadha",
+      "blocked": "Beeksisni dhorkameera",
+      "prompt": "Beeksisni cufaadha",
+      "test": "Beeksisa yaali",
+      "testTitle": "Argamuu Ustaazotaa",
+      "testBody": "{count, plural, one {Ustaazni #} other {Ustaazonni #}} kutaa hin seenne"
+    }
+  }
+}

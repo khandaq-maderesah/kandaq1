@@ -19,6 +19,7 @@ import { StudentAvatar } from '@/components/StudentAvatar'
 import { useStudentPhoto } from '@/hooks/useStudentPhoto'
 import { useParentPhotos } from '@/hooks/useParentPhotos'
 import { cn } from '@/lib/utils'
+import { isStudentOccupation } from '@/lib/registration'
 
 interface StudentDetailCardProps {
   student: Student
@@ -71,7 +72,10 @@ function FamilySection({ student }: { student: Student }) {
         <Field label={t('fields.kitabs')} value={student.kitabs} />
         <Field label={t('fields.lastYearLevel')} value={student.lastYearLevel} />
         <Field label={t('fields.lastYearResult')} value={student.lastYearResult} />
-        <Field label={t('fields.occupation')} value={student.occupation} />
+        <Field
+          label={t('fields.occupation')}
+          value={isStudentOccupation(student.occupation) ? t(`occupations.${student.occupation}`) : student.occupation}
+        />
         <Field label={t('fields.phone')} value={<PhoneValue phone={student.phone} />} />
         <Field label={t('fields.subCity')} value={student.subCity} />
         <Field label={t('fields.wereda')} value={student.wereda} />

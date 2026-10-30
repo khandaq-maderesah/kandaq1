@@ -8,8 +8,9 @@ import { useAuth } from '@/context/AuthContext'
 import { generateGroupSmsMessage, generateSmsMessage } from '@/lib/smsMessage'
 import { detectSmsPlatform, dominantLanguage, groupSmsHref, smsHref } from '@/lib/smsLink'
 import { useMyRequests } from '@/hooks/useRequestBadges'
-import { useMyAttendance, useMyClasses, useStudentsOfClasses } from '@/hooks/useTeacherData'
+import { useMyAttendance, useMyClasses, useStudentsOfClasses, useTeacherCheckIns } from '@/hooks/useTeacherData'
 import { OfflineNotice } from '@/components/OfflineNotice'
+import { CheckInCard } from '@/components/teacher/CheckInCard'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
@@ -34,6 +35,7 @@ export default function TeacherPage() {
   const liveClasses = useMyClasses()
   const liveStudents = useStudentsOfClasses(liveClasses)
   const liveAttendance = useMyAttendance()
+  const liveCheckIns = useTeacherCheckIns(todayIso())
   const classes = useMemo<Class[]>(() => liveClasses ?? [], [liveClasses])
   const students = useMemo<Student[]>(() => liveStudents ?? [], [liveStudents])
   const attendance = useMemo<Attendance[]>(() => liveAttendance ?? [], [liveAttendance])
@@ -196,6 +198,8 @@ export default function TeacherPage() {
           </Link>
         }
       />
+
+      {liveCheckIns !== undefined && <CheckInCard classes={classes} checkIns={liveCheckIns} />}
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label={t('stats.students')} value={totalStudents} icon={Users} />

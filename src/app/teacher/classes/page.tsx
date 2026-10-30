@@ -452,6 +452,11 @@ export default function TeacherClassesPage() {
             <form onSubmit={handleRegister} className="space-y-4">
               <fieldset disabled={formDisabled || saving} className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2 sm:col-span-2">
+                  <Label>{t('form.photo')}</Label>
+                  <StudentPhotoCapture value={photoUrl} onChange={setPhotoUrl} />
+                </div>
+
+                <div className="space-y-2 sm:col-span-2">
                   <Label htmlFor="cls">{t('form.class')}</Label>
                   {editing ? (
                     <>
@@ -549,11 +554,6 @@ export default function TeacherClassesPage() {
                   parentPhotos={parentPhotos}
                   onParentPhotoChange={(who, url) => setParentPhotos((cur) => ({ ...cur, [who]: url }))}
                 />
-
-                <div className="space-y-2 sm:col-span-2">
-                  <Label>{t('form.photo')}</Label>
-                  <StudentPhotoCapture value={photoUrl} onChange={setPhotoUrl} />
-                </div>
               </fieldset>
 
               {formError && (

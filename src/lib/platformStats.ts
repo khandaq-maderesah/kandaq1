@@ -41,6 +41,32 @@ export type PlatformTotals = Omit<SchoolFigures, 'schoolId' | 'name' | 'status' 
 export const REPORT_CARDS = ['overview', 'students', 'staff', 'classes', 'orphans', 'attendance'] as const
 export type ReportCard = (typeof REPORT_CARDS)[number]
 
+/** Which records a set of report cards has to read from every medreseh. */
+export interface ReportNeeds {
+  students: boolean
+  classes: boolean
+  attendance: boolean
+}
+
+export const ALL_REPORT_NEEDS: ReportNeeds = { students: true, classes: true, attendance: true }
+
+const CARD_NEEDS: Record<ReportCard, Partial<ReportNeeds>> = {
+  overview: { students: true, classes: true },
+  students: { students: true },
+  // Ustazes and admins come from the user list, which is already live.
+  staff: {},
+  classes: { classes: true },
+  orphans: { students: true },
+  attendance: { attendance: true },
+}
+
+/** Only what the chosen cards show is read: attendance is by far the largest part. */
+export function reportNeeds(cards: readonly ReportCard[]): ReportNeeds {
+  const needs: ReportNeeds = { students: false, classes: false, attendance: false }
+  for (const card of cards) Object.assign(needs, Object.fromEntries(Object.entries(CARD_NEEDS[card]).filter(([, v]) => v)))
+  return needs
+}
+
 export function attendanceRate(attended: number, absent: number): number | null {
   const total = attended + absent
   return total === 0 ? null : Math.round((attended / total) * 1000) / 10
