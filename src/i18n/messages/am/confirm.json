@@ -60,5 +60,14 @@
     "description": "የጻፉት ነገር አልተቀመጠም፤ ይጠፋል።",
     "confirm": "ጣል",
     "cancel": "ማረሜን ልቀጥል"
+  },
+  "saveAttendance": {
+    "title": "መገኘቱ ይቀመጥ?",
+    "description": "የ{className} የ{date} መገኘት ለ{count, plural, one {# ተማሪ} other {# ተማሪዎች}} ይመዘገባል። በኋላ ማረም ይችላሉ።",
+    "confirm": "አዎ፣ መገኘቱን አስቀምጥ",
+    "cancel": "እንደገና ልመልከት",
+    "pastDay": "ይህ የዛሬ መገኘት አይደለም፤ የ{date} እያስቀመጡ ነው።",
+    "unmarked": "{count, plural, one {# ተማሪ ምልክት የለውም፤ አይመዘገብም።} other {# ተማሪዎች ምልክት የላቸውም፤ አይመዘገቡም።}}",
+    "smsNext": "ቀጥሎ የቀሩ ተማሪዎችን ወላጆች መልዕክት እንዲልኩ ይጠየቃሉ።"
   }
 }

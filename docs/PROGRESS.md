@@ -1029,3 +1029,5 @@ Live check against https://mms.khendeq.com
 - Not covered: leaving a page through the app's own menu with unsaved attendance (only close/reload and class/day changes are guarded).
 - Tests: `tests/confirmations.test.mjs` (6).
 - Verified: `npm run verify` -> TypeScript PASS (5.68s), ESLint PASS (5.06s), unit tests PASS (9.10s); `node scripts/i18n-sync.mjs --check` -> All translations complete. No rules or data changed.
+
+- **Follow-up (2026-10-30)**: "I am in class" now asks for confirmation (it cannot be taken back). **Save attendance** asks first on both the Ustaz and admin screens (`SaveAttendanceConfirm`): class, day, a count per status, a warning when the day is not today or some students have no mark, and a note that the parents of absent students are texted next. The Ustaz's completeness checks (all marked, sessions answered) run before the dialog opens. Verified: `npm run verify` -> TypeScript PASS (4.60s), ESLint PASS (4.48s), unit tests PASS (6.89s); `node scripts/i18n-sync.mjs --check` -> All translations complete.

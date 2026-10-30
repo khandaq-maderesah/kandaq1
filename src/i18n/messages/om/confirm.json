@@ -60,5 +60,14 @@
     "description": "Waan barreessite hin kuufamne; ni badu.",
     "confirm": "Gatti",
     "cancel": "Fooyyessuu itti fufi"
+  },
+  "saveAttendance": {
+    "title": "Argamuu kuusta?",
+    "description": "Argamuun {className} guyyaa {date} {count, plural, one {barataa #} other {barattoota #}}f ni galmaa'a. Booda sirreessuu dandeessa.",
+    "confirm": "Eeyyee, argamuu kuusi",
+    "cancel": "Irra deebi'ii ilaali",
+    "pastDay": "Kun argamuu har'aa miti: guyyaa {date} kuusaa jirta.",
+    "unmarked": "{count, plural, one {Barataan # mallattoo hin qabu; hin galmaa'u.} other {Barattoonni # mallattoo hin qabne; hin galmaa'an.}}",
+    "smsNext": "Itti aansuun maatii barattoota hin dhufneef ergaa akka ergitu gaafatamta."
   }
 }

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useTranslations } from 'next-intl'
+import { useFormatter, useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import {
   Check,
@@ -24,6 +24,7 @@ import { useAuth } from '@/context/AuthContext'
 import { useOfflineAttendanceSync } from '@/hooks/useOfflineAttendanceSync'
 import { useAbsenceSmsLogs, useMyAttendance, useMyClasses, useStudentsOfClass } from '@/hooks/useTeacherData'
 import { AbsenceSmsDialog } from '@/components/teacher/AbsenceSmsDialog'
+import { SaveAttendanceConfirm } from '@/components/attendance/SaveAttendanceConfirm'
 import { absenceSmsId } from '@/lib/absenceSms'
 import { useUnsavedChangesWarning } from '@/hooks/useUnsavedChangesWarning'
 import { useMySessionLogs } from '@/hooks/useWeeklyReports'
@@ -112,6 +113,8 @@ export default function TeacherAttendancePage() {
   const [savedMap, setSavedMap] = useState<Record<string, AttendanceStatus>>({})
   const [saving, setSaving] = useState(false)
   const [smsOpen, setSmsOpen] = useState(false)
+  const [confirmSave, setConfirmSave] = useState(false)
+  const format = useFormatter()
   const smsLogs = useAbsenceSmsLogs(date)
   const loading = liveClasses === undefined
   const loadingStudents = !!classId && liveStudents === undefined
@@ -246,6 +249,24 @@ export default function TeacherAttendancePage() {
   const smsDone = !!smsLog && smsLog.absentCount >= absentStudents.length
   const offerSms = () => {
     if (absentStudents.length > 0 && !smsDone) setSmsOpen(true)
+  }
+
+  // The checks run before the "are you sure" so the Ustaz hears about a gap first, not after confirming.
+  const requestSave = () => {
+    if (!classId) return
+    if (marked === 0) {
+      toast.error(t('toast.nothingToSave'))
+      return
+    }
+    if (counts.unmarked > 0) {
+      toast.error(t('toast.incomplete', { count: counts.unmarked }))
+      return
+    }
+    if (!sessionsAnswered(answers)) {
+      toast.error(t('sessions.required'))
+      return
+    }
+    setConfirmSave(true)
   }
 
   const handleSave = async () => {
@@ -662,7 +683,7 @@ export default function TeacherAttendancePage() {
                         {smsDone ? tSms('saveBar.sent') : tSms('saveBar.send', { count: absentStudents.length })}
                       </Button>
                     )}
-                    <Button size="lg" onClick={handleSave} disabled={saving || !dirty || counts.unmarked > 0}>
+                    <Button size="lg" onClick={requestSave} disabled={saving || !dirty || counts.unmarked > 0}>
                       {saving ? <Loader2 className="animate-spin" /> : <Save />}
                       {t('saveBar.save')}
                     </Button>
@@ -674,6 +695,20 @@ export default function TeacherAttendancePage() {
         </>
       )}
 
+      <SaveAttendanceConfirm
+        open={confirmSave}
+        onOpenChange={setConfirmSave}
+        // Closes first, then saves: the save bar shows the progress and the SMS dialog opens afterwards.
+        onConfirm={() => {
+          setConfirmSave(false)
+          void handleSave()
+        }}
+        className={classes.find((c) => c.id === classId)?.name ?? ''}
+        dateLabel={format.dateTime(new Date(`${date}T00:00:00Z`), { dateStyle: 'medium', timeZone: 'UTC' })}
+        isToday={date === today()}
+        counts={counts}
+        unmarked={counts.unmarked}
+      />
       <AbsenceSmsDialog
         open={smsOpen}
         onOpenChange={setSmsOpen}

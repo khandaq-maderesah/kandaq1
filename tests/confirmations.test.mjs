@@ -41,6 +41,22 @@ describe('Confirmation dialogs', () => {
     assert.doesNotMatch(src, /onClick=\{\(\) => handleCheckIn\(c\)\}/)
   })
 
+  test('saving attendance asks first on both screens, after the Ustaz checks are done', () => {
+    const ustaz = read('src/app/teacher/attendance/page.tsx')
+    assert.match(ustaz, /onClick=\{requestSave\}/)
+    assert.match(ustaz, /<SaveAttendanceConfirm/)
+    assert.doesNotMatch(ustaz, /onClick=\{handleSave\}/)
+    // the completeness checks come before the dialog opens
+    assert.ok(ustaz.indexOf("t('sessions.required')") < ustaz.indexOf('setConfirmSave(true)'))
+    const admin = read('src/app/admin/attendance/page.tsx')
+    assert.match(admin, /onClick=\{\(\) => setConfirmSave\(true\)\}/)
+    assert.doesNotMatch(admin, /<Button onClick=\{handleSave\}/)
+    const dialog = read('src/components/attendance/SaveAttendanceConfirm.tsx')
+    assert.match(dialog, /pastDay/)
+    assert.match(dialog, /unmarked/)
+    assert.match(dialog, /smsNext/)
+  })
+
   test('a new student form with anything typed in asks before it is closed', () => {
     const src = read('src/app/admin/students/page.tsx')
     assert.match(src, /createDirty/)

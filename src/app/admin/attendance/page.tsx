@@ -22,6 +22,7 @@ import { useAllSessionLogs, useSessionLogMap } from '@/hooks/useWeeklyReports'
 import { sessionLogId } from '@/lib/weeklyReport'
 import { rtdb } from '@/lib/database'
 import { useUnsavedChangesWarning } from '@/hooks/useUnsavedChangesWarning'
+import { SaveAttendanceConfirm } from '@/components/attendance/SaveAttendanceConfirm'
 import { useAuth } from '@/context/AuthContext'
 import { cn, daysAgoISO } from '@/lib/utils'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -95,6 +96,7 @@ export default function AttendancePage() {
   const [saving, setSaving] = useState(false)
   // Marks entered but not saved yet: switching class or day would drop them.
   const [dirty, setDirty] = useState(false)
+  const [confirmSave, setConfirmSave] = useState(false)
   const [leave, setLeave] = useState<{ run: () => void } | null>(null)
   const [bulk, setBulk] = useState<AttendanceStatus | 'clear' | null>(null)
   // The Ustaz's daily report (Qur'an / Kitab done) for the chosen class and day, live.
@@ -256,11 +258,28 @@ export default function AttendancePage() {
     {} as Record<AttendanceStatus, number>
   )
   const markedCount = students.filter((s) => statusMap[s.id]).length
+  const saveCounts = STATUSES.reduce(
+    (acc, s) => ({ ...acc, [s]: students.filter((st) => statusMap[st.id] === s).length }),
+    {} as Record<AttendanceStatus, number>
+  )
   const bulkChanges = bulk && bulk !== 'clear' ? students.filter((s) => statusMap[s.id] && statusMap[s.id] !== bulk).length : 0
   const ethDate = eth.format(date)
 
   return (
     <div className="space-y-6">
+      <SaveAttendanceConfirm
+        open={confirmSave}
+        onOpenChange={setConfirmSave}
+        onConfirm={() => {
+          setConfirmSave(false)
+          void handleSave()
+        }}
+        className={classes.find((c) => c.id === classId)?.name ?? ''}
+        dateLabel={gDate(date)}
+        isToday={date === today()}
+        counts={saveCounts}
+        unmarked={students.length - markedCount}
+      />
       <ConfirmDialog
         open={leave !== null}
         onOpenChange={(o) => !o && setLeave(null)}
@@ -449,7 +468,7 @@ export default function AttendancePage() {
           )}
 
           <div className="flex justify-end">
-            <Button onClick={handleSave} disabled={saving || !classId || students.length === 0}>
+            <Button onClick={() => setConfirmSave(true)} disabled={saving || !classId || markedCount === 0}>
               {saving ? <Loader2 className="animate-spin" /> : <Save />}
               {t('mark.save')}
             </Button>

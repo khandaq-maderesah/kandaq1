@@ -60,5 +60,14 @@
     "description": "What you typed has not been saved and will be lost.",
     "confirm": "Discard",
     "cancel": "Keep editing"
+  },
+  "saveAttendance": {
+    "title": "Save attendance?",
+    "description": "Attendance for {className} on {date} will be recorded for {count, plural, one {# student} other {# students}}. You can still correct it later.",
+    "confirm": "Yes, save attendance",
+    "cancel": "Review again",
+    "pastDay": "This is not today's attendance: you are saving for {date}.",
+    "unmarked": "{count, plural, one {# student has no mark and will not be recorded.} other {# students have no mark and will not be recorded.}}",
+    "smsNext": "Next you will be asked to text the parents of the absent students."
   }
 }

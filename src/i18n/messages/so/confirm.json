@@ -60,5 +60,14 @@
     "description": "Waxa aad qortay lama keydin oo way luminayaan.",
     "confirm": "Iska tuur",
     "cancel": "Sii wad tafatirka"
+  },
+  "saveAttendance": {
+    "title": "Keydi ka-qaybgalka?",
+    "description": "Ka-qaybgalka {className} ee {date} waxaa loo diiwaangelinayaa {count, plural, one {# arday} other {# arday}}. Dabadeed waad sixi kartaa.",
+    "confirm": "Haa, keydi ka-qaybgalka",
+    "cancel": "Dib u eeg",
+    "pastDay": "Kani maaha ka-qaybgalka maanta: waxaad keydinaysaa {date}.",
+    "unmarked": "{count, plural, one {# arday calaamad ma leh lamana diiwaangelin doono.} other {# arday calaamad ma laha lamana diiwaangelin doonaan.}}",
+    "smsNext": "Marka xigta waxaa lagu weydiin doonaa inaad waalidka ardayda maqan u dirto SMS."
   }
 }
