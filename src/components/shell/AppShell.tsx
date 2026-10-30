@@ -5,8 +5,8 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { LogOut, Menu, UserRound } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { ArrowLeft, LogOut, Menu, UserRound } from 'lucide-react'
+import { Button, buttonVariants } from '@/components/ui/button'
 import { Dialog, DialogTitle, SheetContent } from '@/components/ui/dialog'
 import {
   DropdownMenu,
@@ -193,6 +193,29 @@ function UserMenu() {
 }
 
 /**
+ * Way out of a medreseh for the platform owner. Always visible in the top bar
+ * (not buried in the mobile drawer) while a superadmin is working inside a
+ * medreseh; the label collapses to an icon on small screens.
+ */
+function BackToAllSchools() {
+  const t = useTranslations('nav')
+  const pathname = usePathname()
+  const { user } = useAuth()
+  if (user?.role !== 'superadmin' || pathname.startsWith('/superadmin')) return null
+  return (
+    <Link
+      href="/superadmin"
+      aria-label={t('backToAllSchools')}
+      title={t('backToAllSchools')}
+      className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'shrink-0 px-2.5 sm:px-3')}
+    >
+      <ArrowLeft className="rtl:rotate-180" />
+      <span className="hidden sm:inline">{t('backToAllSchools')}</span>
+    </Link>
+  )
+}
+
+/**
  * The application frame for signed-in screens: sidebar navigation (drawer on
  * mobile), top bar with school name, notifications, language and user menu.
  */
@@ -241,6 +264,7 @@ export function AppShell({
           <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setMobileOpen(true)} aria-label={t('openMenu')}>
             <Menu />
           </Button>
+          <BackToAllSchools />
           <div className="min-w-0 flex-1">
             {school && <p className="truncate text-sm font-semibold text-foreground sm:text-base">{school.name}</p>}
           </div>
