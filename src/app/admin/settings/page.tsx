@@ -19,6 +19,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { PageHeader } from '@/components/ui/page'
 import { cn } from '@/lib/utils'
 import { BrandingEditor } from '@/components/branding/BrandingEditor'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 
 export default function SettingsPage() {
   const t = useTranslations('adminSettings')
@@ -133,6 +134,9 @@ export default function SettingsPage() {
     }
   }
 
+  const [confirmClose, setConfirmClose] = useState(false)
+  const tConfirm = useTranslations('confirm.closeRegistration')
+
   const handleToggleRegistration = async () => {
     setSavingRegister(true)
     const next = !registrationOpen
@@ -160,6 +164,16 @@ export default function SettingsPage() {
 
   return (
     <div className="max-w-3xl">
+      <ConfirmDialog
+        open={confirmClose}
+        onOpenChange={setConfirmClose}
+        destructive
+        title={tConfirm('title')}
+        description={tConfirm('description')}
+        confirmLabel={tConfirm('confirm')}
+        onConfirm={handleToggleRegistration}
+      />
+
       <PageHeader title={t('title')} description={t('description')} />
 
       <div className="space-y-6">
@@ -274,7 +288,7 @@ export default function SettingsPage() {
                 variant={registrationOpen ? 'outline' : 'default'}
                 className={cn('shrink-0', registrationOpen && 'text-destructive hover:text-destructive')}
                 disabled={savingRegister}
-                onClick={handleToggleRegistration}
+                onClick={registrationOpen ? () => setConfirmClose(true) : handleToggleRegistration}
               >
                 {savingRegister ? <Loader2 className="animate-spin" /> : registrationOpen ? <Lock /> : <UserPlus />}
                 {registrationOpen ? t('registration.close') : t('registration.open')}

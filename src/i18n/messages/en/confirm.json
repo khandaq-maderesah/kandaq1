@@ -1,0 +1,64 @@
+{
+  "logout": {
+    "title": "Sign out?",
+    "description": "You will need to sign in again to use the app.",
+    "pending": "{count, plural, one {# attendance record is} other {# attendance records are}} saved on this device and not sent yet. Connect to the internet and let {count, plural, one {it} other {them}} sync before you sign out.",
+    "confirm": "Sign out",
+    "cancel": "Stay signed in"
+  },
+  "deactivate": {
+    "title": "Deactivate {name}?",
+    "description": "{name} will not be able to sign in until you activate the account again. Nothing is deleted.",
+    "confirm": "Deactivate"
+  },
+  "withdraw": {
+    "title": "Withdraw this request?",
+    "description": "The admin will no longer see it. You can send a new request later.",
+    "confirm": "Withdraw request",
+    "cancel": "Keep request"
+  },
+  "discardAttendance": {
+    "title": "Discard unsaved attendance?",
+    "description": "Some marks are not saved yet. If you continue, they will be lost.",
+    "confirm": "Discard and continue",
+    "cancel": "Keep editing"
+  },
+  "bulkMarks": {
+    "title": "Replace the marks?",
+    "description": "{count, plural, one {# student already has a different mark and it} other {# students already have a different mark and they}} will be changed to \"{status}\". Nothing is saved until you press Save.",
+    "confirm": "Replace marks",
+    "cancel": "Keep my marks"
+  },
+  "clearMarks": {
+    "title": "Clear all marks?",
+    "description": "All {count} marks on this sheet will be removed. Attendance that is already saved stays as it is until you save again.",
+    "confirm": "Clear marks",
+    "cancel": "Keep my marks"
+  },
+  "closeRegistration": {
+    "title": "Close student registration?",
+    "description": "Ustazes will not be able to add new students until you open registration again.",
+    "confirm": "Close registration"
+  },
+  "platformLists": {
+    "title": "Save the lists for all medresehs?",
+    "description": "Every medreseh that uses the platform lists will see these choices in its forms right away.",
+    "confirm": "Save lists"
+  },
+  "usePlatformLists": {
+    "title": "Use the platform lists for {name}?",
+    "description": "The lists {name} edited are kept aside and the platform lists are used instead. You can allow its own lists again later.",
+    "confirm": "Use platform lists"
+  },
+  "removeLogo": {
+    "title": "Remove the logo?",
+    "description": "The default logo is used on the sign-in page and as the app icon until you upload a new one.",
+    "confirm": "Remove logo"
+  },
+  "discardForm": {
+    "title": "Discard this form?",
+    "description": "What you typed has not been saved and will be lost.",
+    "confirm": "Discard",
+    "cancel": "Keep editing"
+  }
+}

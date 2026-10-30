@@ -21,6 +21,8 @@ import { useLogout } from '@/hooks/useAuth'
 import { useRequestBadges } from '@/hooks/useRequestBadges'
 import { cn } from '@/lib/utils'
 import { signInPath } from '@/lib/brandMemory'
+import { getOfflineAttendanceQueue } from '@/lib/offlineAttendance'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { brandingAssetUrl } from '@/lib/branding'
 import { LanguageSwitcher } from './LanguageSwitcher'
 import { RefreshButton } from './RefreshButton'
@@ -133,6 +135,9 @@ function UserMenu() {
   const t = useTranslations()
   const { user } = useAuth()
   const logout = useLogout()
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  // Attendance saved on this device and not yet sent: signing out before it syncs would strand it.
+  const unsynced = confirmOpen ? getOfflineAttendanceQueue().length : 0
 
   const handleLogout = async () => {
     await logout()
@@ -141,6 +146,7 @@ function UserMenu() {
 
   if (!user) return null
   return (
+    <>
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button className="flex items-center gap-2 rounded-full p-0.5 pe-2 transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
@@ -162,11 +168,27 @@ function UserMenu() {
             <UserRound /> {t('nav.profile')}
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem onSelect={handleLogout} className="text-destructive focus:text-destructive [&_svg]:text-destructive">
+        <DropdownMenuItem onSelect={() => setConfirmOpen(true)} className="text-destructive focus:text-destructive [&_svg]:text-destructive">
           <LogOut /> {t('nav.signOut')}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+    <ConfirmDialog
+      open={confirmOpen}
+      onOpenChange={setConfirmOpen}
+      title={t('confirm.logout.title')}
+      description={t('confirm.logout.description')}
+      confirmLabel={t('confirm.logout.confirm')}
+      cancelLabel={t('confirm.logout.cancel')}
+      onConfirm={handleLogout}
+    >
+      {unsynced > 0 && (
+        <p className="rounded-lg border border-warning/30 bg-warning/10 p-3 text-sm text-warning" role="alert">
+          {t('confirm.logout.pending', { count: unsynced })}
+        </p>
+      )}
+    </ConfirmDialog>
+    </>
   )
 }
 

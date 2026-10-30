@@ -12,6 +12,7 @@ import adminTeachers from './adminTeachers.json'
 import auth from './auth.json'
 import branding from './branding.json'
 import common from './common.json'
+import confirm from './confirm.json'
 import dates from './dates.json'
 import exams from './exams.json'
 import landing from './landing.json'
@@ -46,6 +47,7 @@ const messages = {
   auth: auth,
   branding: branding,
   common: common,
+  confirm: confirm,
   dates: dates,
   exams: exams,
   landing: landing,

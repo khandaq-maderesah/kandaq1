@@ -53,6 +53,7 @@ import { LevelSelect } from '@/components/students/FamilyInfoFields'
 import { KitabsPicker } from '@/components/students/KitabsPicker'
 import { useRegistrationOptions } from '@/hooks/useRegistrationOptions'
 import { LOCALES, LOCALE_NAMES } from '@/i18n/config'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 
 const PER_PAGE = 10
 
@@ -146,6 +147,8 @@ export default function TeachersPage() {
 
   // Delete
   const [deleting, setDeleting] = useState<User | null>(null)
+  const tConfirm = useTranslations('confirm')
+  const [deactivating, setDeactivating] = useState<User | null>(null)
   const [deleteBusy, setDeleteBusy] = useState(false)
 
   const loadTeachers = async () => {
@@ -397,7 +400,7 @@ export default function TeachersPage() {
             <Mail /> {tc('changeEmail.action')}
           </DropdownMenuItem>
         )}
-        <DropdownMenuItem onSelect={() => toggleStatus(u)}>
+        <DropdownMenuItem onSelect={() => (u.status === 'active' ? setDeactivating(u) : toggleStatus(u))}>
           <Power /> {u.status === 'active' ? t('actions.deactivate') : t('actions.activate')}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
@@ -421,6 +424,16 @@ export default function TeachersPage() {
 
   return (
     <div>
+      <ConfirmDialog
+        open={!!deactivating}
+        onOpenChange={(o) => !o && setDeactivating(null)}
+        destructive
+        title={tConfirm('deactivate.title', { name: deactivating?.name ?? '' })}
+        description={tConfirm('deactivate.description', { name: deactivating?.name ?? '' })}
+        confirmLabel={tConfirm('deactivate.confirm')}
+        onConfirm={() => (deactivating ? toggleStatus(deactivating) : undefined)}
+      />
+
       <PageHeader
         title={t('title')}
         description={t('description')}

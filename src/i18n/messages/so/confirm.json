@@ -1,0 +1,64 @@
+{
+  "logout": {
+    "title": "Ka bax?",
+    "description": "Waxaad u baahan doontaa inaad mar kale gasho si aad app-ka u isticmaasho.",
+    "pending": "{count, plural, one {# diiwaan ka-qaybgal ah ayaa} other {# diiwaan ka-qaybgal ah ayaa}} ku keydsan qalabkan weli lama dirin. Ku xidh internetka oo ha isku waafaqo intaadan ka bixin.",
+    "confirm": "Ka bax",
+    "cancel": "Ku sii jir"
+  },
+  "deactivate": {
+    "title": "Joojin {name}?",
+    "description": "{name} ma geli karo ilaa aad xisaabta mar kale hawlgeliso. Waxba lama tirtirayo.",
+    "confirm": "Jooji"
+  },
+  "withdraw": {
+    "title": "Ka laabo codsigan?",
+    "description": "Maamuluhu mar dambe ma arki doono. Codsi cusub ayaad dib u soo dirsan kartaa.",
+    "confirm": "Ka laabo codsiga",
+    "cancel": "Codsiga ha sii jiro"
+  },
+  "discardAttendance": {
+    "title": "Iska tuur ka-qaybgalka aan la keydin?",
+    "description": "Calaamado qaarkood weli lama keydin. Haddii aad sii wadato way luminayaan.",
+    "confirm": "Iska tuur oo sii wad",
+    "cancel": "Sii wad tafatirka"
+  },
+  "bulkMarks": {
+    "title": "Beddel calaamadaha?",
+    "description": "{count, plural, one {# arday oo hore calaamad kale u lahaa} other {# arday oo hore calaamad kale u lahaa}} waxaa loo beddelayaa \"{status}\". Waxba lama keydinayo ilaa aad riixdo Keydi.",
+    "confirm": "Beddel calaamadaha",
+    "cancel": "Calaamadahayga ha jiraan"
+  },
+  "clearMarks": {
+    "title": "Nadiifi dhammaan calaamadaha?",
+    "description": "Dhammaan {count} calaamadood ee xaashidan waa la saari doonaa. Ka-qaybgalka hore loo keydiyay wuu sii jiri doonaa ilaa aad mar kale keydiso.",
+    "confirm": "Nadiifi calaamadaha",
+    "cancel": "Calaamadahayga ha jiraan"
+  },
+  "closeRegistration": {
+    "title": "Xidh diiwaangelinta ardayda?",
+    "description": "Ustaasyadu ma ku dari karaan arday cusub ilaa aad diiwaangelinta mar kale furto.",
+    "confirm": "Xidh diiwaangelinta"
+  },
+  "platformLists": {
+    "title": "Keydi liisaska dhammaan madrasadaha?",
+    "description": "Madrasad kasta oo isticmaasha liisaska guud wuxuu doorashooyinkan ku arki doonaa foomamkiisa isla markiiba.",
+    "confirm": "Keydi liisaska"
+  },
+  "usePlatformLists": {
+    "title": "U isticmaal liisaska guud {name}?",
+    "description": "Liisaska {name} wax ka beddeshay waa la dhigayaa dhinac, waxaana isticmaalayaa liisaska guud. Liisaskiisa gaarka ah dib ayaad u oggolaan kartaa.",
+    "confirm": "Isticmaal liisaska guud"
+  },
+  "removeLogo": {
+    "title": "Ka saar astaanta?",
+    "description": "Astaanta caadiga ah ayaa loo isticmaalayaa bogga gelitaanka iyo calaamadda app-ka ilaa aad mid cusub soo geliso.",
+    "confirm": "Ka saar astaanta"
+  },
+  "discardForm": {
+    "title": "Iska tuur foomkan?",
+    "description": "Waxa aad qortay lama keydin oo way luminayaan.",
+    "confirm": "Iska tuur",
+    "cancel": "Sii wad tafatirka"
+  }
+}

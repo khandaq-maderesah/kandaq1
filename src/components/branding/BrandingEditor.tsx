@@ -25,6 +25,7 @@ import {
   type BrandingFile,
 } from '@/lib/branding'
 import { LOGO_ACCEPT, LogoError, processLogo } from '@/lib/logoProcessing'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 
 /**
  * Edits the current madrasa's link (/m/{slug}), app name and logo. Used by
@@ -43,6 +44,8 @@ export function BrandingEditor() {
   const [slugError, setSlugError] = useState('')
   const [saving, setSaving] = useState(false)
   const [removing, setRemoving] = useState(false)
+  const [confirmRemove, setConfirmRemove] = useState(false)
+  const tConfirm = useTranslations('confirm.removeLogo')
 
   // Start from the saved branding (or sensible suggestions for a new setup).
   useEffect(() => {
@@ -253,7 +256,7 @@ export function BrandingEditor() {
                   <Upload /> {branding?.logoVersion || logo ? t('changeLogo') : t('uploadLogo')}
                 </Button>
                 {branding?.logoVersion && !logo && (
-                  <Button type="button" variant="ghost" onClick={resetToDefaultLogo} disabled={removing}>
+                  <Button type="button" variant="ghost" onClick={() => setConfirmRemove(true)} disabled={removing}>
                     {removing ? <Loader2 className="animate-spin" /> : <RotateCcw />} {t('removeLogo')}
                   </Button>
                 )}
@@ -267,6 +270,15 @@ export function BrandingEditor() {
           </Button>
         </form>
       </CardContent>
+      <ConfirmDialog
+        open={confirmRemove}
+        onOpenChange={setConfirmRemove}
+        destructive
+        title={tConfirm('title')}
+        description={tConfirm('description')}
+        confirmLabel={tConfirm('confirm')}
+        onConfirm={resetToDefaultLogo}
+      />
     </Card>
   )
 }

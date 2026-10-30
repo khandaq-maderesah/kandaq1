@@ -21,6 +21,7 @@ import { SessionChips } from '@/components/reports/WeeklyReportView'
 import { useAllSessionLogs, useSessionLogMap } from '@/hooks/useWeeklyReports'
 import { sessionLogId } from '@/lib/weeklyReport'
 import { rtdb } from '@/lib/database'
+import { useUnsavedChangesWarning } from '@/hooks/useUnsavedChangesWarning'
 import { useAuth } from '@/context/AuthContext'
 import { cn, daysAgoISO } from '@/lib/utils'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -33,6 +34,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { EmptyState, PageHeader, StatCard, TableContainer } from '@/components/ui/page'
 import { useEthiopianDate } from '@/hooks/useEthiopianDate'
 import type { Attendance, Class, Student, AttendanceStatus, User } from '@/types'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 
 const today = () => new Date().toISOString().slice(0, 10)
 
@@ -70,6 +72,7 @@ const STATUSES: AttendanceStatus[] = ['present', 'absent', 'late', 'excused']
 
 export default function AttendancePage() {
   const t = useTranslations('adminAttendance')
+  const tConfirm = useTranslations('confirm')
   const format = useFormatter()
   const eth = useEthiopianDate()
   const { user } = useAuth()
@@ -90,6 +93,10 @@ export default function AttendancePage() {
   const [statusMap, setStatusMap] = useState<Record<string, AttendanceStatus>>({})
   const [loadingStudents, setLoadingStudents] = useState(false)
   const [saving, setSaving] = useState(false)
+  // Marks entered but not saved yet: switching class or day would drop them.
+  const [dirty, setDirty] = useState(false)
+  const [leave, setLeave] = useState<{ run: () => void } | null>(null)
+  const [bulk, setBulk] = useState<AttendanceStatus | 'clear' | null>(null)
   // The Ustaz's daily report (Qur'an / Kitab done) for the chosen class and day, live.
   const sessionLogs = useSessionLogMap(useAllSessionLogs(true))
 
@@ -138,6 +145,7 @@ export default function AttendancePage() {
           map[r.studentId] = r.status
         })
         setStatusMap(map)
+        setDirty(false)
       } catch {
         toast.error(t('toast.studentsFailed'))
       } finally {
@@ -148,10 +156,12 @@ export default function AttendancePage() {
   }, [classId, date, t])
 
   const setStatus = (studentId: string, status: AttendanceStatus) => {
+    setDirty(true)
     setStatusMap((prev) => ({ ...prev, [studentId]: status }))
   }
 
   const markAll = (status: AttendanceStatus | null) => {
+    setDirty(true)
     if (status === null) {
       setStatusMap({})
       return
@@ -162,6 +172,21 @@ export default function AttendancePage() {
     })
     setStatusMap(map)
   }
+
+  const guard = (run: () => void) => (dirty ? setLeave({ run }) : run())
+
+  // "All present" etc. and "Clear" replace marks entered one by one: ask first.
+  const requestBulk = (status: AttendanceStatus | null) => {
+    if (status === null) {
+      if (students.some((s) => statusMap[s.id])) setBulk('clear')
+      else markAll(null)
+      return
+    }
+    if (students.some((s) => statusMap[s.id] && statusMap[s.id] !== status)) setBulk(status)
+    else markAll(status)
+  }
+
+  useUnsavedChangesWarning(dirty)
 
   const handleSave = async () => {
     if (!classId || !user) return
@@ -194,6 +219,7 @@ export default function AttendancePage() {
         }
       }
       toast.success(t('toast.saved'))
+      setDirty(false)
       await loadData(false) // quietly refresh records overview
     } catch {
       toast.error(t('toast.saveFailed'))
@@ -230,10 +256,41 @@ export default function AttendancePage() {
     {} as Record<AttendanceStatus, number>
   )
   const markedCount = students.filter((s) => statusMap[s.id]).length
+  const bulkChanges = bulk && bulk !== 'clear' ? students.filter((s) => statusMap[s.id] && statusMap[s.id] !== bulk).length : 0
   const ethDate = eth.format(date)
 
   return (
     <div className="space-y-6">
+      <ConfirmDialog
+        open={leave !== null}
+        onOpenChange={(o) => !o && setLeave(null)}
+        destructive
+        title={tConfirm('discardAttendance.title')}
+        description={tConfirm('discardAttendance.description')}
+        confirmLabel={tConfirm('discardAttendance.confirm')}
+        cancelLabel={tConfirm('discardAttendance.cancel')}
+        onConfirm={() => leave?.run()}
+      />
+      <ConfirmDialog
+        open={bulk !== null && bulk !== 'clear'}
+        onOpenChange={(o) => !o && setBulk(null)}
+        title={tConfirm('bulkMarks.title')}
+        description={tConfirm('bulkMarks.description', { count: bulkChanges, status: bulk && bulk !== 'clear' ? t(`status.${bulk}`) : '' })}
+        confirmLabel={tConfirm('bulkMarks.confirm')}
+        cancelLabel={tConfirm('bulkMarks.cancel')}
+        onConfirm={() => markAll(bulk && bulk !== 'clear' ? bulk : null)}
+      />
+      <ConfirmDialog
+        open={bulk === 'clear'}
+        onOpenChange={(o) => !o && setBulk(null)}
+        destructive
+        title={tConfirm('clearMarks.title')}
+        description={tConfirm('clearMarks.description', { count: markedCount })}
+        confirmLabel={tConfirm('clearMarks.confirm')}
+        cancelLabel={tConfirm('clearMarks.cancel')}
+        onConfirm={() => markAll(null)}
+      />
+
       <PageHeader title={t('title')} description={t('description')} />
 
       {/* Tabs */}
@@ -276,7 +333,14 @@ export default function AttendancePage() {
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="mark-class">{t('mark.class')}</Label>
-                <Select id="mark-class" value={classId} onChange={(e) => setClassId(e.target.value)}>
+                <Select
+                  id="mark-class"
+                  value={classId}
+                  onChange={(e) => {
+                    const next = e.target.value
+                    guard(() => setClassId(next))
+                  }}
+                >
                   {classes.map((c) => (
                     <option key={c.id} value={c.id}>
                       {[c.name, c.section, c.teacherName].filter(Boolean).join(' • ')}
@@ -286,7 +350,15 @@ export default function AttendancePage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="mark-date">{t('mark.date')}</Label>
-                <Input id="mark-date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+                <Input
+                  id="mark-date"
+                  type="date"
+                  value={date}
+                  onChange={(e) => {
+                    const next = e.target.value
+                    guard(() => setDate(next))
+                  }}
+                />
                 {ethDate && <p className="text-xs text-muted-foreground">{t('mark.ethiopianDate', { date: ethDate })}</p>}
               </div>
             </div>
@@ -301,16 +373,16 @@ export default function AttendancePage() {
               </div>
             )}
             <div className="mt-4 flex flex-wrap items-center gap-2 border-t pt-4">
-              <Button type="button" size="sm" variant="success" onClick={() => markAll('present')}>
+              <Button type="button" size="sm" variant="success" onClick={() => requestBulk('present')}>
                 <Check /> {t('mark.allPresent')}
               </Button>
-              <Button type="button" size="sm" variant="destructive" onClick={() => markAll('absent')}>
+              <Button type="button" size="sm" variant="destructive" onClick={() => requestBulk('absent')}>
                 <X /> {t('mark.allAbsent')}
               </Button>
-              <Button type="button" size="sm" variant="outline" onClick={() => markAll('excused')}>
+              <Button type="button" size="sm" variant="outline" onClick={() => requestBulk('excused')}>
                 <ShieldCheck /> {t('mark.allExcused')}
               </Button>
-              <Button type="button" size="sm" variant="ghost" onClick={() => markAll(null)}>
+              <Button type="button" size="sm" variant="ghost" onClick={() => requestBulk(null)}>
                 <RotateCcw /> {t('mark.clear')}
               </Button>
               {students.length > 0 && (

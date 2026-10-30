@@ -25,6 +25,7 @@ import { useOfflineAttendanceSync } from '@/hooks/useOfflineAttendanceSync'
 import { useAbsenceSmsLogs, useMyAttendance, useMyClasses, useStudentsOfClass } from '@/hooks/useTeacherData'
 import { AbsenceSmsDialog } from '@/components/teacher/AbsenceSmsDialog'
 import { absenceSmsId } from '@/lib/absenceSms'
+import { useUnsavedChangesWarning } from '@/hooks/useUnsavedChangesWarning'
 import { useMySessionLogs } from '@/hooks/useWeeklyReports'
 import {
   enqueueOfflineAttendance,
@@ -51,6 +52,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { EmptyState, PageHeader } from '@/components/ui/page'
 import { cn } from '@/lib/utils'
 import type { Class, Student, AttendanceStatus } from '@/types'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 
 const today = () => new Date().toISOString().slice(0, 10)
 
@@ -94,6 +96,7 @@ const STATUSES: {
 export default function TeacherAttendancePage() {
   const t = useTranslations('teacherAttendance')
   const tSms = useTranslations('absenceSms')
+  const tConfirm = useTranslations('confirm')
   const { user, offline } = useAuth()
   const { isOnline, pendingCount, isSyncing, syncNow, refreshPending } = useOfflineAttendanceSync()
   // Live, offline-first data shared with the other teacher screens: on screen
@@ -157,6 +160,10 @@ export default function TeacherAttendancePage() {
     students.some((s) => statusMap[s.id] !== savedMap[s.id]) ||
     answers.quran !== knownAnswers.quran ||
     answers.kitab !== knownAnswers.kitab
+  useUnsavedChangesWarning(dirty)
+  // Changing class or day throws away marks that are not saved: ask first.
+  const [leave, setLeave] = useState<{ run: () => void } | null>(null)
+  const guard = (run: () => void) => (dirty ? setLeave({ run }) : run())
   const dirtyRef = useRef(dirty)
   dirtyRef.current = dirty
   const scopeRef = useRef('')
@@ -201,6 +208,18 @@ export default function TeacherAttendancePage() {
     setStatusMap(map)
   }
 
+  // "All present" etc. and "Clear" replace marks the Ustaz may have entered one by one: ask first.
+  const [bulk, setBulk] = useState<AttendanceStatus | 'clear' | null>(null)
+  const requestBulk = (status: AttendanceStatus | null) => {
+    if (status === null) {
+      if (students.some((s) => statusMap[s.id])) setBulk('clear')
+      else markAll(null)
+      return
+    }
+    if (students.some((s) => statusMap[s.id] && statusMap[s.id] !== status)) setBulk(status)
+    else markAll(status)
+  }
+
   const counts = useMemo(() => {
     const c: Record<AttendanceStatus | 'unmarked', number> = {
       present: 0,
@@ -217,6 +236,7 @@ export default function TeacherAttendancePage() {
   }, [students, statusMap])
 
   const marked = students.length - counts.unmarked
+  const bulkChanges = bulk && bulk !== 'clear' ? students.filter((s) => statusMap[s.id] && statusMap[s.id] !== bulk).length : 0
 
   // Texting the parents of the absent students: asked right after saving, and
   // still reachable from the save bar. Done when the SMS app was opened for all
@@ -359,6 +379,36 @@ export default function TeacherAttendancePage() {
 
   return (
     <div>
+      <ConfirmDialog
+        open={leave !== null}
+        onOpenChange={(o) => !o && setLeave(null)}
+        destructive
+        title={tConfirm('discardAttendance.title')}
+        description={tConfirm('discardAttendance.description')}
+        confirmLabel={tConfirm('discardAttendance.confirm')}
+        cancelLabel={tConfirm('discardAttendance.cancel')}
+        onConfirm={() => leave?.run()}
+      />
+      <ConfirmDialog
+        open={bulk !== null && bulk !== 'clear'}
+        onOpenChange={(o) => !o && setBulk(null)}
+        title={tConfirm('bulkMarks.title')}
+        description={tConfirm('bulkMarks.description', { count: bulkChanges, status: bulk && bulk !== 'clear' ? t(`status.${bulk}`) : '' })}
+        confirmLabel={tConfirm('bulkMarks.confirm')}
+        cancelLabel={tConfirm('bulkMarks.cancel')}
+        onConfirm={() => markAll(bulk && bulk !== 'clear' ? bulk : null)}
+      />
+      <ConfirmDialog
+        open={bulk === 'clear'}
+        onOpenChange={(o) => !o && setBulk(null)}
+        destructive
+        title={tConfirm('clearMarks.title')}
+        description={tConfirm('clearMarks.description', { count: marked })}
+        confirmLabel={tConfirm('clearMarks.confirm')}
+        cancelLabel={tConfirm('clearMarks.cancel')}
+        onConfirm={() => markAll(null)}
+      />
+
       <PageHeader title={t('title')} description={t('description')} />
 
       {/* Offline & Sync Status Banner */}
@@ -419,7 +469,11 @@ export default function TeacherAttendancePage() {
           <div className="grid gap-4 rounded-xl border bg-card p-4 shadow-sm sm:grid-cols-2 sm:p-5">
             <div className="space-y-2">
               <Label htmlFor="att-class">{t('filters.class')}</Label>
-              <Select id="att-class" value={classId} onChange={(e) => setClassChoice(e.target.value)} className="h-11">
+              <Select id="att-class" value={classId} onChange={(e) => {
+                  const next = e.target.value
+                  guard(() => setClassChoice(next))
+                }}
+                className="h-11">
                 <option value="" disabled>
                   {t('filters.classPlaceholder')}
                 </option>
@@ -437,7 +491,10 @@ export default function TeacherAttendancePage() {
                 type="date"
                 value={date}
                 max={today()}
-                onChange={(e) => setDate(e.target.value || today())}
+                onChange={(e) => {
+                  const next = e.target.value || today()
+                  guard(() => setDate(next))
+                }}
                 className="h-11"
               />
             </div>
@@ -522,16 +579,16 @@ export default function TeacherAttendancePage() {
               {/* Bulk actions */}
               <div className="mt-4 flex flex-wrap items-center gap-2">
                 <span className="text-sm text-muted-foreground">{t('markAll.label')}</span>
-                <Button type="button" size="sm" variant="outline" onClick={() => markAll('present')}>
+                <Button type="button" size="sm" variant="outline" onClick={() => requestBulk('present')}>
                   <Check /> {t('markAll.present')}
                 </Button>
-                <Button type="button" size="sm" variant="outline" onClick={() => markAll('absent')}>
+                <Button type="button" size="sm" variant="outline" onClick={() => requestBulk('absent')}>
                   <X /> {t('markAll.absent')}
                 </Button>
-                <Button type="button" size="sm" variant="outline" onClick={() => markAll('excused')}>
+                <Button type="button" size="sm" variant="outline" onClick={() => requestBulk('excused')}>
                   <ShieldCheck /> {t('markAll.excused')}
                 </Button>
-                <Button type="button" size="sm" variant="ghost" onClick={() => markAll(null)}>
+                <Button type="button" size="sm" variant="ghost" onClick={() => requestBulk(null)}>
                   <RotateCcw /> {t('markAll.clear')}
                 </Button>
               </div>

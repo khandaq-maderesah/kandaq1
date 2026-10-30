@@ -75,6 +75,7 @@ import { saveSupportIfChanged } from '@/lib/studentSupport'
 import { StudentAvatar } from '@/components/StudentAvatar'
 import { StudentDetailCard } from '@/components/StudentDetailCard'
 import { AdminArchiveDialog } from '@/components/requests/StudentChangeDialogs'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 
 const PER_PAGE = 10
 
@@ -482,6 +483,14 @@ export default function StudentsPage() {
   // The help assessment as loaded for the student being edited (to save only real changes).
   const loadedSupport = useRef<SupportDetails | null>(emptySupport())
   const editToken = useRef(0)
+
+  const tConfirm = useTranslations('confirm')
+  // A new student with anything typed in: closing the dialog would lose it.
+  const [discardOpen, setDiscardOpen] = useState(false)
+  const createDirty =
+    !editingId &&
+    (name.trim() !== '' || gender !== '' || age !== '' || photoUrl !== '' || JSON.stringify(family) !== JSON.stringify(emptyRegistration()))
+  const requestCloseForm = () => (createDirty ? setDiscardOpen(true) : setFormOpen(false))
 
   const resetForm = () => {
     editToken.current++
@@ -917,10 +926,28 @@ export default function StudentsPage() {
         </>
       )}
 
+      <ConfirmDialog
+        open={discardOpen}
+        onOpenChange={setDiscardOpen}
+        destructive
+        title={tConfirm('discardForm.title')}
+        description={tConfirm('discardForm.description')}
+        confirmLabel={tConfirm('discardForm.confirm')}
+        cancelLabel={tConfirm('discardForm.cancel')}
+        onConfirm={() => {
+          setFormOpen(false)
+          resetForm()
+        }}
+      />
+
       {/* Create / edit / move */}
       <Dialog
         open={formOpen}
         onOpenChange={(o) => {
+          if (!o && createDirty) {
+            setDiscardOpen(true)
+            return
+          }
           setFormOpen(o)
           if (!o) resetForm()
         }}
@@ -1015,7 +1042,7 @@ export default function StudentsPage() {
               />
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setFormOpen(false)}>
+              <Button type="button" variant="outline" onClick={requestCloseForm}>
                 {tc('actions.cancel')}
               </Button>
               <Button type="submit" disabled={saving || rollTaken}>

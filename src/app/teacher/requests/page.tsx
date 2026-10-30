@@ -12,6 +12,7 @@ import { OfflineNotice } from '@/components/OfflineNotice'
 import { useAuth } from '@/context/AuthContext'
 import { markRequestUpdatesSeen, useMyRequests } from '@/hooks/useRequestBadges'
 import { cancelChangeRequest } from '@/lib/database'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 
 export default function TeacherRequestsPage() {
   const t = useTranslations('requests')
@@ -35,6 +36,9 @@ export default function TeacherRequestsPage() {
     [requests]
   )
 
+  const [withdrawing, setWithdrawing] = useState<string | null>(null)
+  const tConfirm = useTranslations('confirm.withdraw')
+
   const withdraw = async (id: string) => {
     setBusy(id)
     try {
@@ -49,6 +53,16 @@ export default function TeacherRequestsPage() {
 
   return (
     <div>
+      <ConfirmDialog
+        open={withdrawing !== null}
+        onOpenChange={(o) => !o && setWithdrawing(null)}
+        title={tConfirm('title')}
+        description={tConfirm('description')}
+        confirmLabel={tConfirm('confirm')}
+        cancelLabel={tConfirm('cancel')}
+        onConfirm={() => (withdrawing ? withdraw(withdrawing) : undefined)}
+      />
+
       <PageHeader title={t('teacher.title')} description={t('teacher.description')} />
       {requests === undefined && offline ? (
         <OfflineNotice />
@@ -68,7 +82,7 @@ export default function TeacherRequestsPage() {
               request={r}
               actions={
                 r.status === 'pending' ? (
-                  <Button variant="outline" onClick={() => withdraw(r.id)} disabled={busy === r.id}>
+                  <Button variant="outline" onClick={() => setWithdrawing(r.id)} disabled={busy === r.id}>
                     <Undo2 /> {t('teacher.cancelRequest')}
                   </Button>
                 ) : undefined

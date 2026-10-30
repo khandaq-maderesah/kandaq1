@@ -1018,3 +1018,14 @@ Live check against https://mms.khendeq.com
 - Files: `src/lib/absenceSms.ts`, `src/components/teacher/AbsenceSmsDialog.tsx`, `src/components/admin/UnsentSms{List,Banner,Notifier}.tsx`, `src/hooks/useUnsentAbsenceSms.ts`, `src/app/teacher/attendance/page.tsx`, `src/components/requests/*`, `src/app/admin/requests/page.tsx`, `src/lib/database/index.ts`, `database.rules.json`, translations (new `absenceSms`).
 - Tests: new `tests/absenceSms.test.mjs` (12).
 - Verified: `npm run verify` -> TypeScript PASS (5.93s), ESLint PASS (6.43s), unit tests PASS (6.22s); `node scripts/i18n-sync.mjs --check` -> All translations complete. Rules deployed (`firebase deploy --only database`). No existing data touched (new empty node), so no backup was taken.
+
+---
+
+## [2026-10-30] Task 6.15 - "Are you sure?" audit
+
+- Already confirmed before: delete class / user / announcement / exam, archive and purge a student, reject or approve a request, suspend a medreseh, clear stale absences.
+- Added a shared `ConfirmDialog` (`src/components/ui/confirm-dialog.tsx`): the action button names exactly what happens, red when destructive, safe choice focused first, cannot be dismissed while working. Texts in the new `confirm` namespace (en/am/ar/om/so).
+- Now asking first: sign out (also warns when attendance saved on the device is not yet synced); deactivate a user (activating stays one tap); withdraw a request; change class or day with unsaved attendance (admin and Ustaz) plus the browser's own warning on close/reload; "All present/absent/excused" when it would replace different marks, and "Clear"; close student registration; remove the medreseh logo; save platform lists for all medresehs; switch a medreseh back to the platform lists; close the new-student form with anything typed in.
+- Not covered: leaving a page through the app's own menu with unsaved attendance (only close/reload and class/day changes are guarded).
+- Tests: `tests/confirmations.test.mjs` (6).
+- Verified: `npm run verify` -> TypeScript PASS (5.68s), ESLint PASS (5.06s), unit tests PASS (9.10s); `node scripts/i18n-sync.mjs --check` -> All translations complete. No rules or data changed.

@@ -1,0 +1,64 @@
+{
+  "logout": {
+    "title": "Ba'uu?",
+    "description": "Appii fayyadamuuf deebi'anii seenuu qabda.",
+    "pending": "{count, plural, one {Galmeen argamuu #} other {Galmeewwan argamuu #}} meeshaa kana irra kuufameera, ammallee hin ergamne. Utuu hin ba'in interneetitti walqunnamiitii akka ergamu godhi.",
+    "confirm": "Ba'i",
+    "cancel": "Seenee haa turu"
+  },
+  "deactivate": {
+    "title": "{name} dhorki?",
+    "description": "Hanga herregni deebi'ee banamutti {name} seenuu hin danda'u. Homtuu hin haqamu.",
+    "confirm": "Dhorki"
+  },
+  "withdraw": {
+    "title": "Gaaffii kana haqi?",
+    "description": "Bulchaan boodaan hin argu. Gaaffii haaraa booda ergi.",
+    "confirm": "Gaaffii haqi",
+    "cancel": "Gaaffiin haa jiraatu"
+  },
+  "discardAttendance": {
+    "title": "Argamuu hin kuufamne gatta?",
+    "description": "Mallattoowwan tokko tokko ammallee hin kuufamne. Yoo itti fufte ni badu.",
+    "confirm": "Gatii itti fufi",
+    "cancel": "Fooyyessuu itti fufi"
+  },
+  "bulkMarks": {
+    "title": "Mallattoowwan bakka buusa?",
+    "description": "{count, plural, one {Barataan # mallattoo adda ta'e qaba; gara} other {Barattoonni # mallattoo adda ta'e qabu; gara}} \"{status}\" geeddarama. Hanga Kuusu tuqxutti homtuu hin kuufamu.",
+    "confirm": "Mallattoo bakka buusi",
+    "cancel": "Mallattoon koo haa turu"
+  },
+  "clearMarks": {
+    "title": "Mallattoo hunda haqxa?",
+    "description": "Mallattoon {count} fuula kana irra jiru hundi ni haqama. Argamuun duraan kuufame hanga deebi'ee kuuftutti akkuma jirutti tura.",
+    "confirm": "Mallattoo haqi",
+    "cancel": "Mallattoon koo haa turu"
+  },
+  "closeRegistration": {
+    "title": "Galmee barattootaa cufta?",
+    "description": "Hanga galmee deebi'ee baniitti ustaazonni barattoota haaraa dabaluu hin danda'an.",
+    "confirm": "Galmee cufi"
+  },
+  "platformLists": {
+    "title": "Tarreewwan madrasoota hundaaf kuusta?",
+    "description": "Madrasni tarree waliigalaa fayyadamu hundi filannoowwan kana fooramsa isaa keessatti battalumatti arga.",
+    "confirm": "Tarreewwan kuusi"
+  },
+  "usePlatformLists": {
+    "title": "Tarree waliigalaa {name}f fayyadamta?",
+    "description": "Tarreewwan {name} gulaale cinatti kuufamu; tarreewwan waliigalaa bakka isaanii ni fayyadama. Booda tarree ofii deebi'ee eyyamuu dandeessa.",
+    "confirm": "Tarree waliigalaa fayyadami"
+  },
+  "removeLogo": {
+    "title": "Mallattoo (logo) buqqista?",
+    "description": "Hanga haaraa fe'utti mallattoon durtii fuula seensaa fi mallattoo appii ta'ee tajaajila.",
+    "confirm": "Mallattoo buqqisi"
+  },
+  "discardForm": {
+    "title": "Fooyya kana gatta?",
+    "description": "Waan barreessite hin kuufamne; ni badu.",
+    "confirm": "Gatti",
+    "cancel": "Fooyyessuu itti fufi"
+  }
+}

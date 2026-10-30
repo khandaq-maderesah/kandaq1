@@ -14,6 +14,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Skeleton } from '@/components/ui/skeleton'
 import { EmptyState, PageHeader } from '@/components/ui/page'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 
 export default function SuperadminListsPage() {
   const t = useTranslations('superadminTools.lists')
@@ -53,8 +54,11 @@ export default function SuperadminListsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [idsKey])
 
-  const save = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const [confirmSave, setConfirmSave] = useState(false)
+  const [switchTo, setSwitchTo] = useState<School | null>(null)
+  const tConfirm = useTranslations('confirm')
+
+  const save = async () => {
     if (!text) return
     setSaving(true)
     try {
@@ -85,6 +89,23 @@ export default function SuperadminListsPage() {
 
   return (
     <div>
+      <ConfirmDialog
+        open={confirmSave}
+        onOpenChange={setConfirmSave}
+        title={tConfirm('platformLists.title')}
+        description={tConfirm('platformLists.description')}
+        confirmLabel={tConfirm('platformLists.confirm')}
+        onConfirm={save}
+      />
+      <ConfirmDialog
+        open={switchTo !== null}
+        onOpenChange={(o) => !o && setSwitchTo(null)}
+        title={tConfirm('usePlatformLists.title', { name: switchTo?.name ?? '' })}
+        description={tConfirm('usePlatformLists.description', { name: switchTo?.name ?? '' })}
+        confirmLabel={tConfirm('usePlatformLists.confirm')}
+        onConfirm={() => (switchTo ? setMode(switchTo, 'platform') : undefined)}
+      />
+
       <PageHeader title={t('title')} description={t('description')} />
 
       <section className="mb-8 rounded-xl border bg-card p-4 shadow-sm">
@@ -93,7 +114,13 @@ export default function SuperadminListsPage() {
           {t('platformTitle')}
         </h2>
         <p className="mb-4 text-sm text-muted-foreground">{t('platformDescription')}</p>
-        <form onSubmit={save} className="space-y-4">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            if (text) setConfirmSave(true)
+          }}
+          className="space-y-4"
+        >
           <div className="grid gap-4 sm:grid-cols-2">
             {REGISTRATION_LIST_KEYS.map((key) => (
               <div key={key} className="space-y-2">
@@ -149,9 +176,7 @@ export default function SuperadminListsPage() {
                     size="sm"
                     variant="outline"
                     disabled={busyId === s.id}
-                    onClick={async () => {
-                      await setMode(s, mode === 'own' ? 'platform' : 'own')
-                    }}
+                    onClick={() => (mode === 'own' ? setSwitchTo(s) : void setMode(s, 'own'))}
                   >
                     {busyId === s.id && <Loader2 className="animate-spin" />}
                     {mode === 'own' ? t('usePlatform') : t('allowOwn')}
