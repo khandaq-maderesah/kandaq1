@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { Check, Inbox, Loader2, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
+import { Select } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { Skeleton } from '@/components/ui/skeleton'
 import { EmptyState, PageHeader } from '@/components/ui/page'
@@ -20,6 +21,7 @@ import {
 import { RequestCard } from '@/components/requests/RequestCard'
 import { useAuth } from '@/context/AuthContext'
 import { useSchoolRequests } from '@/hooks/useRequestBadges'
+import { useAllClasses } from '@/hooks/useTeacherData'
 import { approveChangeRequest, rejectChangeRequest } from '@/lib/database'
 import { cn } from '@/lib/utils'
 import type { ChangeRequest } from '@/types'
@@ -37,9 +39,11 @@ export default function AdminRequestsPage() {
   const tc = useTranslations('common')
   const { user } = useAuth()
   const requests = useSchoolRequests(true)
+  const allClasses = useAllClasses()
   const [tab, setTab] = useState<'pending' | 'history'>('pending')
   const [decision, setDecision] = useState<Decision>(null)
   const [note, setNote] = useState('')
+  const [targetClassId, setTargetClassId] = useState('')
   const [saving, setSaving] = useState(false)
 
   const { pending, history } = useMemo(() => {
@@ -55,6 +59,8 @@ export default function AdminRequestsPage() {
 
   const open = (request: ChangeRequest, action: 'approve' | 'reject') => {
     setNote('')
+    // An older request may already name a class; otherwise the admin chooses.
+    setTargetClassId(request.toClassId ?? '')
     setDecision({ request, action })
   }
 
@@ -64,7 +70,7 @@ export default function AdminRequestsPage() {
     const reviewer = { uid: user.uid, name: user.name }
     try {
       if (decision.action === 'approve') {
-        await approveChangeRequest(decision.request, reviewer, note.trim() || undefined)
+        await approveChangeRequest(decision.request, reviewer, note.trim() || undefined, targetClassId || undefined)
         toast.success(t('admin.approved'))
       } else {
         await rejectChangeRequest(decision.request, reviewer, note.trim() || undefined)
@@ -81,6 +87,10 @@ export default function AdminRequestsPage() {
 
   const list = tab === 'pending' ? pending : history
   const req = decision?.request
+  const needsClass = decision?.action === 'approve' && req?.type === 'student_transfer'
+  // Every active class except the one the student is in now.
+  const classOptions = (allClasses ?? []).filter((c) => c.isActive !== false && c.id !== req?.classId)
+  const chosenClass = classOptions.find((c) => c.id === targetClassId)
 
   return (
     <div>
@@ -161,10 +171,32 @@ export default function AdminRequestsPage() {
                       name: req?.studentName ?? '',
                       gender: req?.studentGender ?? 'male',
                       from: req?.className ?? '',
-                      to: req?.toClassName ?? '',
+                      to: chosenClass?.name ?? '…',
                     })}
             </DialogDescription>
           </DialogHeader>
+          {needsClass && (
+            <div className="space-y-2">
+              <Label htmlFor="review-class">{t('dialog.targetClass')}</Label>
+              {classOptions.length === 0 ? (
+                <p className="rounded-lg bg-muted p-3 text-sm text-muted-foreground">{t('dialog.noOtherClasses')}</p>
+              ) : (
+                <>
+                  <Select id="review-class" required value={targetClassId} onChange={(e) => setTargetClassId(e.target.value)}>
+                    <option value="" disabled>
+                      {t('dialog.targetClassPlaceholder')}
+                    </option>
+                    {classOptions.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.section ? `${c.name} · ${c.section}` : c.name}
+                      </option>
+                    ))}
+                  </Select>
+                  <p className="text-xs text-muted-foreground">{t('admin.chooseClassHint')}</p>
+                </>
+              )}
+            </div>
+          )}
           <div className="space-y-2">
             <Label htmlFor="review-note">{t('admin.noteOptional')}</Label>
             <Textarea id="review-note" maxLength={1000} value={note} onChange={(e) => setNote(e.target.value)} />
@@ -176,7 +208,7 @@ export default function AdminRequestsPage() {
             <Button
               variant={decision?.action === 'reject' ? 'default' : req?.type === 'student_delete' ? 'destructive' : 'default'}
               onClick={decide}
-              disabled={saving}
+              disabled={saving || (needsClass && !chosenClass)}
             >
               {saving && <Loader2 className="animate-spin" />}
               {decision?.action === 'approve' ? tc('actions.approve') : tc('actions.reject')}

@@ -4,6 +4,7 @@ import { useAuth } from '@/context/AuthContext'
 import { AbsenceAlertBell } from '@/components/AbsenceAlertBell'
 import { AttendanceReminderBell } from '@/components/AttendanceReminderBell'
 import { AnnouncementBell } from '@/components/AnnouncementBell'
+import { UnsentSmsNotifier } from '@/components/admin/UnsentSmsNotifier'
 import { AppShell } from './AppShell'
 import { adminNav, superadminBackItem, superadminNav, teacherNav, type NavSection } from './nav'
 
@@ -21,6 +22,7 @@ export function RoleShell({ children }: { children: React.ReactNode }) {
         : adminNav
     actions = (
       <>
+        <UnsentSmsNotifier />
         <AttendanceReminderBell dark={false} />
         <AbsenceAlertBell dark={false} />
         <AnnouncementBell dark={false} />

@@ -43,7 +43,7 @@ export interface NavItem {
   label: NavLabel
   icon: LucideIcon
   /** Which badge counter (if any) to show next to this item. */
-  badge?: 'pendingRequests' | 'requestUpdates' | 'missingReports'
+  badge?: 'pendingRequests' | 'requestUpdates' | 'missingReports' | 'unsentSms'
   /** Match only the exact path (for section roots like /admin). */
   exact?: boolean
 }
@@ -70,7 +70,7 @@ export const adminNav: NavSection[] = [
     title: 'academics',
     items: [
       { href: '/admin/classes', label: 'classes', icon: SchoolIcon },
-      { href: '/admin/attendance', label: 'attendance', icon: ClipboardCheck },
+      { href: '/admin/attendance', label: 'attendance', icon: ClipboardCheck, badge: 'unsentSms' },
       { href: '/admin/exams', label: 'results', icon: FileText },
       { href: '/admin/weekly-reports', label: 'weeklyReports', icon: CalendarCheck, badge: 'missingReports' },
       { href: '/admin/reports', label: 'reports', icon: BarChart3 },

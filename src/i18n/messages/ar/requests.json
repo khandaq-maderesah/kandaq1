@@ -15,7 +15,7 @@
     "deleteTitle": "طلب حذف {name}",
     "deleteDescription": "يتطلّب هذا الطلب موافقة مسؤول المدرسة، ويبقى الطالب في فصلك إلى حين ذلك.",
     "transferTitle": "طلب نقل {name}",
-    "transferDescription": "يتطلّب هذا النقل موافقة مسؤول المدرسة، ويبقى الطالب في {className} إلى حين ذلك.",
+    "transferDescription": "يقرّر مشرف المدرسة ما إذا كان الطالب سيُنقل وإلى أي فصل. وإلى ذلك الحين يبقى الطالب في {className}.",
     "adminDeleteTitle": "حذف {name}",
     "adminDeleteDescription": "سيُنقل الطالب إلى قائمة الطلاب المحذوفين مع ذكر هذا السبب، ويمكن استعادته لاحقًا.",
     "reasonCategory": "السبب",
@@ -58,7 +58,9 @@
     "rejected": "تم رفض الطلب.",
     "errorStudentMissing": "لم يعد هذا الطالب موجودًا.",
     "errorAlreadyArchived": "هذا الطالب محذوف بالفعل.",
-    "errorClassMissing": "لم يعد الفصل المطلوب النقل إليه موجودًا."
+    "errorClassMissing": "لم يعد الفصل المطلوب النقل إليه موجودًا.",
+    "chooseClassHint": "ترك الأستاذ اختيار الفصل لك. اختر الفصل الذي سيُنقل إليه الطالب.",
+    "classToBeChosen": "يختار المشرف الفصل"
   },
   "teacher": {
     "title": "طلباتي",

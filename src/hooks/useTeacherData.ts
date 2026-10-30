@@ -15,7 +15,7 @@ import { useAuth } from '@/context/AuthContext'
 import { rtdb } from '@/lib/database'
 import { useLiveData, useLiveDataMany } from '@/lib/dataStore'
 import { isClassTeacher } from '@/lib/classTeachers'
-import type { Attendance, Class, Exam, Student, TeacherCheckIn } from '@/types'
+import type { AbsenceSmsLog, Attendance, Class, Exam, Student, TeacherCheckIn } from '@/types'
 
 /** Every class of the current school (live). */
 export function useAllClasses(): Class[] | undefined {
@@ -84,5 +84,13 @@ export function useTeacherCheckIns(date: string): TeacherCheckIn[] | undefined {
   const { user } = useAuth()
   return useLiveData<TeacherCheckIn[]>(user ? `teacherCheckIns:${date}` : null, (emit) =>
     rtdb.subscribeToTeacherCheckIns(date, emit)
+  ).data
+}
+
+/** The absence-SMS records of the days on/after `since` (live). */
+export function useAbsenceSmsLogs(since: string): AbsenceSmsLog[] | undefined {
+  const { user } = useAuth()
+  return useLiveData<AbsenceSmsLog[]>(user ? `absenceSms:${since}` : null, (emit) =>
+    rtdb.subscribeToAbsenceSmsSince(since, emit)
   ).data
 }

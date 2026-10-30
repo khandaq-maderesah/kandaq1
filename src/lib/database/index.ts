@@ -2,7 +2,7 @@ import { app, db } from '@/lib/firebase/config'
 import { getStorage, ref as storageRef, uploadBytes, deleteObject } from 'firebase/storage'
 import { BRANDING_FILES, brandingStoragePath, type BrandingFile, type PublicBranding } from '@/lib/branding'
 import { ref, get as rtdbGet, set, update, remove, onValue, query, orderByChild, equalTo, startAt, serverTimestamp, type QueryConstraint, type Unsubscribe, type DataSnapshot } from 'firebase/database'
-import type { User, Class, Student, Attendance, AbsentAlert, MissingAttendanceAlert, TeacherCheckIn, Exam, Announcement, School, ChangeRequest, DeletionReason, StudentArchive, SessionLog, WeeklyReport, StudentSupport } from '@/types'
+import type { User, Class, Student, Attendance, AbsentAlert, MissingAttendanceAlert, TeacherCheckIn, AbsenceSmsLog, Exam, Announcement, School, ChangeRequest, DeletionReason, StudentArchive, SessionLog, WeeklyReport, StudentSupport } from '@/types'
 import { withTimeout } from '@/lib/asyncUtils'
 import { effectiveListsMode, normalizeRegistrationOptions, resolveRegistrationOptions, type ListsMode, type RegistrationOptions } from '@/lib/registration'
 import { ALL_REPORT_NEEDS, type ReportNeeds, type SchoolSnapshot } from '@/lib/platformStats'
@@ -511,6 +511,23 @@ export function subscribeToTeacherCheckIns(date: string, cb: (checkIns: TeacherC
     const out: TeacherCheckIn[] = []
     snap.forEach((child) => {
       out.push({ ...(child.val() as object), id: child.key as string } as TeacherCheckIn)
+    })
+    cb(out)
+  })
+}
+
+// ==================== Absence SMS follow-up ====================
+// One record per class and day, written when the Ustaz opens the SMS app for the absent students' parents.
+export async function setAbsenceSms(id: string, data: Omit<AbsenceSmsLog, 'id' | 'sentAt'>): Promise<void> {
+  await set(sref(`absenceSms/${id}`), { ...defined(data), sentAt: serverTimestamp() })
+}
+
+/** Live records of the days on/after `date` (server-filtered by the indexed `date`). */
+export function subscribeToAbsenceSmsSince(date: string, cb: (logs: AbsenceSmsLog[]) => void): Unsubscribe {
+  return onValue(query(sref('absenceSms'), orderByChild('date'), startAt(date)), (snap) => {
+    const out: AbsenceSmsLog[] = []
+    snap.forEach((child) => {
+      out.push({ ...(child.val() as object), id: child.key as string } as AbsenceSmsLog)
     })
     cb(out)
   })
@@ -1064,7 +1081,13 @@ export function subscribeToMyChangeRequests(uid: string, cb: (requests: ChangeRe
 }
 
 /** Applies a pending request (archive or move the student) and closes it. */
-export async function approveChangeRequest(request: ChangeRequest, reviewer: Actor, note?: string): Promise<void> {
+export async function approveChangeRequest(
+  request: ChangeRequest,
+  reviewer: Actor,
+  note?: string,
+  /** student_transfer: the class the admin chose (the Ustaz does not choose one). */
+  targetClassId?: string
+): Promise<void> {
   const now = new Date().toISOString()
   const student = await getStudent(request.studentId)
   if (!student) throw new Error('STUDENT_NOT_FOUND')
@@ -1095,9 +1118,12 @@ export async function approveChangeRequest(request: ChangeRequest, reviewer: Act
     updates[`students/${request.studentId}/updatedAt`] = now
     updates[`audit/${newId('audit')}`] = auditEntry(reviewer, 'approve_delete', 'student', request.studentId, `${request.studentName}: ${request.reason}`)
   } else {
-    const target = request.toClassId ? await getClass(request.toClassId) : null
-    if (!target || !request.toClassId) throw new Error('CLASS_NOT_FOUND')
-    updates[`students/${request.studentId}/classId`] = request.toClassId
+    const toClassId = targetClassId ?? request.toClassId
+    const target = toClassId ? await getClass(toClassId) : null
+    if (!target || !toClassId) throw new Error('CLASS_NOT_FOUND')
+    updates[`requests/${request.id}/toClassId`] = toClassId
+    updates[`requests/${request.id}/toClassName`] = target.name
+    updates[`students/${request.studentId}/classId`] = toClassId
     updates[`students/${request.studentId}/className`] = target.name
     updates[`students/${request.studentId}/section`] = target.section ?? null
     updates[`students/${request.studentId}/updatedAt`] = now
@@ -1235,6 +1261,8 @@ export const rtdb = {
   subscribeToAnnouncements,
   createTeacherCheckIn,
   subscribeToTeacherCheckIns,
+  setAbsenceSms,
+  subscribeToAbsenceSmsSince,
   getAttendance,
   createAttendance,
   updateAttendance,

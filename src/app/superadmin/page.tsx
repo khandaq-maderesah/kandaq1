@@ -14,7 +14,6 @@ import {
   Link2,
   Loader2,
   LogIn,
-  Mail,
   MapPin,
   Pencil,
   PauseCircle,
@@ -23,6 +22,7 @@ import {
   Plus,
   Search,
   Upload,
+  UserCheck,
   UserPlus,
   Users,
 } from 'lucide-react'
@@ -506,11 +506,9 @@ export default function SuperAdminPage() {
                   <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
                     {admins.map((a) => (
                       <li key={a.uid} className="flex min-w-0 items-center gap-2">
-                        <Mail className="h-4 w-4 shrink-0" />
-                        <span className="min-w-0 flex-1 truncate" dir="ltr">
-                          {a.email}
-                        </span>
-                        <Button size="icon-sm" variant="ghost" onClick={() => setEmailTarget(a)} aria-label={`${tc('changeEmail.action')}: ${a.email}`}>
+                        <UserCheck className="h-4 w-4 shrink-0" />
+                        <span className="min-w-0 flex-1 truncate">{a.name}</span>
+                        <Button size="icon-sm" variant="ghost" onClick={() => setEmailTarget(a)} aria-label={`${tc('changeEmail.action')}: ${a.name}`}>
                           <Pencil />
                         </Button>
                       </li>

@@ -174,6 +174,16 @@
             ".validate": "newData.hasChildren(['date', 'classId', 'teacherId', 'checkedInAt']) && newData.child('date').isString() && newData.child('date').val().length === 10"
           }
         },
+        "absenceSms": {
+          ".read": "auth != null && (root.child('users/' + auth.uid).child('role').val() === 'superadmin' || (root.child('users/' + auth.uid).child('schoolId').val() === $schoolId && root.child('users/' + auth.uid).child('status').val() !== 'inactive' && root.child('schoolInfo/' + $schoolId + '/status').val() === 'active'))",
+          ".indexOn": [
+            "date"
+          ],
+          "$id": {
+            ".write": "auth != null && ((root.child('users/' + auth.uid).child('role').val() === 'superadmin' || ((root.child('users/' + auth.uid).child('schoolId').val() === $schoolId && root.child('users/' + auth.uid).child('status').val() !== 'inactive' && root.child('schoolInfo/' + $schoolId + '/status').val() === 'active') && root.child('users/' + auth.uid).child('role').val() === 'admin')) || ((root.child('users/' + auth.uid).child('schoolId').val() === $schoolId && root.child('users/' + auth.uid).child('status').val() !== 'inactive' && root.child('schoolInfo/' + $schoolId + '/status').val() === 'active') && newData.child('teacherId').val() === auth.uid && newData.child('classId').val() != null && $id === newData.child('date').val() + '_' + newData.child('classId').val() && newData.child('sentAt').val() === now && (root.child('schoolData/' + $schoolId + '/classes/' + newData.child('classId').val() + '/teacherId').val() === auth.uid || root.child('schoolData/' + $schoolId + '/classes/' + newData.child('classId').val() + '/teacherIds/' + auth.uid).val() === true)))",
+            ".validate": "newData.hasChildren(['date', 'classId', 'teacherId', 'absentCount', 'sentAt']) && newData.child('date').isString() && newData.child('date').val().length === 10 && newData.child('absentCount').isNumber()"
+          }
+        },
         "adminPushTokens": {
           ".read": "auth != null && (root.child('users/' + auth.uid).child('role').val() === 'superadmin' || ((root.child('users/' + auth.uid).child('schoolId').val() === $schoolId && root.child('users/' + auth.uid).child('status').val() !== 'inactive' && root.child('schoolInfo/' + $schoolId + '/status').val() === 'active') && root.child('users/' + auth.uid).child('role').val() === 'admin'))",
           "$tokenId": {

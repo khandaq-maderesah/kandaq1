@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl'
 import { ArrowRightLeft, Clock, MoreVertical, Phone, Search, Trash2, UserPlus, Users } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { useMyRequests } from '@/hooks/useRequestBadges'
-import { useAllClasses, useMyClasses, useStudentsOfClasses } from '@/hooks/useTeacherData'
+import { useMyClasses, useStudentsOfClasses } from '@/hooks/useTeacherData'
 import { OfflineNotice } from '@/components/OfflineNotice'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -108,7 +108,6 @@ export default function TeacherStudentsPage() {
   const [deleteTarget, setDeleteTarget] = useState<Student | null>(null)
   const [transferTarget, setTransferTarget] = useState<Student | null>(null)
 
-  const allClasses = useAllClasses()
   const myRequests = useMyRequests(user?.uid)
   const pendingIds = useMemo(
     () => new Set((myRequests ?? []).filter((r) => r.status === 'pending').map((r) => r.studentId)),
@@ -328,7 +327,6 @@ export default function TeacherStudentsPage() {
       />
       <RequestTransferDialog
         student={transferTarget}
-        classes={(allClasses ?? []).filter((c) => c.isActive !== false)}
         open={!!transferTarget}
         onOpenChange={(open) => !open && setTransferTarget(null)}
       />

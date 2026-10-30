@@ -337,6 +337,22 @@ export interface AbsentAlert {
 export type ReminderAudience = 'admin' | 'teacher'
 
 /**
+ * Proof that an Ustaz opened the SMS app to text the parents of a class's
+ * absent students that day. Stored under absenceSms/{date}_{classId}.
+ */
+export interface AbsenceSmsLog {
+  id: string
+  date: string // YYYY-MM-DD
+  classId: string
+  teacherId: string
+  teacherName: string
+  /** Students marked absent when the Ustaz texted; a later increase is owed a new text. */
+  absentCount: number
+  /** Server time (ms since epoch) of the tap. */
+  sentAt: number
+}
+
+/**
  * An Ustaz's "I am in class" tap for one class on one day.
  * Stored under teacherCheckIns/{date}_{classId}_{teacherId}.
  */

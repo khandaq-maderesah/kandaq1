@@ -15,7 +15,7 @@
     "deleteTitle": "Gaaffii {name} haquuf",
     "deleteDescription": "Kana bulchaan madarasaa raggaasisuu qaba. Hanga sanaatti barataan kutaa keessan keessa tura.",
     "transferTitle": "Gaaffii {name} dabarsuuf",
-    "transferDescription": "Dabarsa kana bulchaan madarasaa raggaasisuu qaba. Hanga sanaatti barataan {className} keessa tura.",
+    "transferDescription": "Bulchaan madarasaa barataan kun dabarfamuu fi kutaa kam akka dabarfamu murteessa. Hanga sanaatti barataan {className} keessa tura.",
     "adminDeleteTitle": "{name} haquu",
     "adminDeleteDescription": "Barataan sababa kana waliin gara Barattoota haqamanitti ni ce'a. Booda deebisuu ni dandeessu.",
     "reasonCategory": "Sababa",
@@ -58,7 +58,9 @@
     "rejected": "Gaaffiin didameera.",
     "errorStudentMissing": "Barataan kun kana booda hin jiru.",
     "errorAlreadyArchived": "Barataan kun duraanuu haqameera.",
-    "errorClassMissing": "Kutaan itti dabarsamu kun kana booda hin jiru."
+    "errorClassMissing": "Kutaan itti dabarsamu kun kana booda hin jiru.",
+    "chooseClassHint": "Ustaazni kutaa filachuu siif dhiise. Kutaa barataan kun itti dabarfamu filadhu.",
+    "classToBeChosen": "Kutaa bulchaan filata"
   },
   "teacher": {
     "title": "Gaaffiiwwan koo",

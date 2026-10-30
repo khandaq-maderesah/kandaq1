@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/dialog'
 import { useAuth } from '@/context/AuthContext'
 import { archiveStudent, createChangeRequest } from '@/lib/database'
-import { DELETION_REASONS, type Class, type DeletionReason, type Student } from '@/types'
+import { DELETION_REASONS, type DeletionReason, type Student } from '@/types'
 
 /** Minimum length of the written explanation for any delete/move request. */
 export const MIN_REASON_LENGTH = 10
@@ -173,43 +173,37 @@ export function RequestDeleteDialog({
   )
 }
 
-/** Teacher asks to move a student to another class (admin approval needed). */
+/**
+ * Ustaz asks to move a student. The Ustaz does not pick a class: the admin
+ * decides whether the student moves and where, when approving.
+ */
 export function RequestTransferDialog({
   student,
-  classes,
   open,
   onOpenChange,
 }: {
   student: StudentLike | null
-  /** All active classes of the school. */
-  classes: Pick<Class, 'id' | 'name' | 'section' | 'isActive'>[]
   open: boolean
   onOpenChange: (open: boolean) => void
 }) {
   const t = useTranslations('requests')
   const tc = useTranslations('common')
   const { user } = useAuth()
-  const id = useId()
-  const [target, setTarget] = useState('')
   const [details, setDetails] = useState('')
   const [submitted, setSubmitted] = useState(false)
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     if (open) {
-      setTarget('')
       setDetails('')
       setSubmitted(false)
     }
   }, [open])
 
-  const options = classes.filter((c) => c.id !== student?.classId && c.isActive !== false)
-
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
     setSubmitted(true)
-    const to = options.find((c) => c.id === target)
-    if (!student || !user || !to || details.trim().length < MIN_REASON_LENGTH) return
+    if (!student || !user || details.trim().length < MIN_REASON_LENGTH) return
     setSaving(true)
     try {
       await createChangeRequest({
@@ -220,8 +214,6 @@ export function RequestTransferDialog({
         classId: student.classId,
         className: student.className ?? '',
         section: student.section,
-        toClassId: to.id,
-        toClassName: to.name,
         reason: details.trim(),
         requestedBy: user.uid,
         requestedByName: user.name,
@@ -245,38 +237,19 @@ export function RequestTransferDialog({
               {t('dialog.transferDescription', { className: student?.className ?? '' })}
             </DialogDescription>
           </DialogHeader>
-          {options.length === 0 ? (
-            <p className="rounded-lg bg-muted p-3 text-sm text-muted-foreground">{t('dialog.noOtherClasses')}</p>
-          ) : (
-            <>
-              <div className="space-y-2">
-                <Label htmlFor={`${id}-class`}>{t('dialog.targetClass')}</Label>
-                <Select id={`${id}-class`} required value={target} onChange={(e) => setTarget(e.target.value)}>
-                  <option value="" disabled>
-                    {t('dialog.targetClassPlaceholder')}
-                  </option>
-                  {options.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.section ? `${c.name} · ${c.section}` : c.name}
-                    </option>
-                  ))}
-                </Select>
-              </div>
-              <ReasonFields
-                category=""
-                onCategory={() => {}}
-                details={details}
-                onDetails={setDetails}
-                showCategory={false}
-                showError={submitted}
-              />
-            </>
-          )}
+          <ReasonFields
+            category=""
+            onCategory={() => {}}
+            details={details}
+            onDetails={setDetails}
+            showCategory={false}
+            showError={submitted}
+          />
           <DialogFooter>
             <Button variant="outline" onClick={() => onOpenChange(false)}>
               {tc('actions.cancel')}
             </Button>
-            <Button type="submit" disabled={saving || options.length === 0}>
+            <Button type="submit" disabled={saving}>
               {saving && <Loader2 className="animate-spin" />}
               {t('dialog.submitRequest')}
             </Button>

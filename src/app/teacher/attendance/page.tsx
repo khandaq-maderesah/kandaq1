@@ -8,6 +8,7 @@ import {
   ClipboardCheck,
   Clock,
   Loader2,
+  MessageSquare,
   RefreshCw,
   RotateCcw,
   Save,
@@ -21,7 +22,9 @@ import {
 import { rtdb } from '@/lib/database'
 import { useAuth } from '@/context/AuthContext'
 import { useOfflineAttendanceSync } from '@/hooks/useOfflineAttendanceSync'
-import { useMyAttendance, useMyClasses, useStudentsOfClass } from '@/hooks/useTeacherData'
+import { useAbsenceSmsLogs, useMyAttendance, useMyClasses, useStudentsOfClass } from '@/hooks/useTeacherData'
+import { AbsenceSmsDialog } from '@/components/teacher/AbsenceSmsDialog'
+import { absenceSmsId } from '@/lib/absenceSms'
 import { useMySessionLogs } from '@/hooks/useWeeklyReports'
 import {
   enqueueOfflineAttendance,
@@ -90,6 +93,7 @@ const STATUSES: {
 
 export default function TeacherAttendancePage() {
   const t = useTranslations('teacherAttendance')
+  const tSms = useTranslations('absenceSms')
   const { user, offline } = useAuth()
   const { isOnline, pendingCount, isSyncing, syncNow, refreshPending } = useOfflineAttendanceSync()
   // Live, offline-first data shared with the other teacher screens: on screen
@@ -104,6 +108,8 @@ export default function TeacherAttendancePage() {
   const [statusMap, setStatusMap] = useState<Record<string, AttendanceStatus>>({})
   const [savedMap, setSavedMap] = useState<Record<string, AttendanceStatus>>({})
   const [saving, setSaving] = useState(false)
+  const [smsOpen, setSmsOpen] = useState(false)
+  const smsLogs = useAbsenceSmsLogs(date)
   const loading = liveClasses === undefined
   const loadingStudents = !!classId && liveStudents === undefined
 
@@ -212,6 +218,16 @@ export default function TeacherAttendancePage() {
 
   const marked = students.length - counts.unmarked
 
+  // Texting the parents of the absent students: asked right after saving, and
+  // still reachable from the save bar. Done when the SMS app was opened for all
+  // of them (a later absentee is owed a new text).
+  const absentStudents = useMemo(() => students.filter((s) => statusMap[s.id] === 'absent'), [students, statusMap])
+  const smsLog = (smsLogs ?? []).find((l) => l.id === absenceSmsId(date, classId))
+  const smsDone = !!smsLog && smsLog.absentCount >= absentStudents.length
+  const offerSms = () => {
+    if (absentStudents.length > 0 && !smsDone) setSmsOpen(true)
+  }
+
   const handleSave = async () => {
     if (!classId) return
     if (marked === 0) {
@@ -256,6 +272,7 @@ export default function TeacherAttendancePage() {
       refreshPending()
       setSaving(false)
       toast.success(t('offline.savedLocally'))
+      offerSms()
       return
     }
 
@@ -289,6 +306,7 @@ export default function TeacherAttendancePage() {
       )
       setSavedMap(statusMap)
       toast.success(t('toast.saved'))
+      offerSms()
     } catch {
       // Network failed during save: fallback to offline device queue
       students.forEach((s) => {
@@ -313,6 +331,7 @@ export default function TeacherAttendancePage() {
       setSavedMap(statusMap)
       refreshPending()
       toast.warning(t('offline.savedAfterConnectionLoss'))
+      offerSms()
     } finally {
       setSaving(false)
     }
@@ -579,16 +598,33 @@ export default function TeacherAttendancePage() {
                       {dirty ? t('saveBar.unsaved') : t('saveBar.allSaved')}
                     </p>
                   </div>
-                  <Button size="lg" onClick={handleSave} disabled={saving || !dirty || counts.unmarked > 0} className="shrink-0">
-                    {saving ? <Loader2 className="animate-spin" /> : <Save />}
-                    {t('saveBar.save')}
-                  </Button>
+                  <div className="flex shrink-0 items-center gap-2">
+                    {!dirty && absentStudents.length > 0 && (
+                      <Button type="button" size="lg" variant={smsDone ? 'ghost' : 'outline'} onClick={() => setSmsOpen(true)}>
+                        {smsDone ? <Check className="text-success" /> : <MessageSquare />}
+                        {smsDone ? tSms('saveBar.sent') : tSms('saveBar.send', { count: absentStudents.length })}
+                      </Button>
+                    )}
+                    <Button size="lg" onClick={handleSave} disabled={saving || !dirty || counts.unmarked > 0}>
+                      {saving ? <Loader2 className="animate-spin" /> : <Save />}
+                      {t('saveBar.save')}
+                    </Button>
+                  </div>
                 </div>
               </div>
             </>
           )}
         </>
       )}
+
+      <AbsenceSmsDialog
+        open={smsOpen}
+        onOpenChange={setSmsOpen}
+        classId={classId}
+        className={classes.find((c) => c.id === classId)?.name ?? ''}
+        date={date}
+        absent={absentStudents}
+      />
     </div>
   )
 }

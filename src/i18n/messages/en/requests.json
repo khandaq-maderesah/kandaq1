@@ -15,7 +15,7 @@
     "deleteTitle": "Request to delete {name}",
     "deleteDescription": "A medreseh admin must approve this. Until then the student stays in your class.",
     "transferTitle": "Request to move {name}",
-    "transferDescription": "A medreseh admin must approve this move. Until then the student stays in {className}.",
+    "transferDescription": "A medreseh admin decides whether to move this student and to which class. Until then the student stays in {className}.",
     "adminDeleteTitle": "Delete {name}",
     "adminDeleteDescription": "The student will be moved to Deleted students with this reason. You can restore them later.",
     "reasonCategory": "Reason",
@@ -58,7 +58,9 @@
     "rejected": "Request rejected.",
     "errorStudentMissing": "This student no longer exists.",
     "errorAlreadyArchived": "This student is already deleted.",
-    "errorClassMissing": "The target class no longer exists."
+    "errorClassMissing": "The target class no longer exists.",
+    "chooseClassHint": "The Ustaz leaves the class to you. Choose where this student moves.",
+    "classToBeChosen": "Class chosen by the admin"
   },
   "teacher": {
     "title": "My requests",

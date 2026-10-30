@@ -1,0 +1,35 @@
+{
+  "dialog": {
+    "title": "U sheeg waalidka",
+    "description": "{count, plural, one {# arday ayaa} other {# arday ayaa}} maqnaa {className}. Hadda waalidka u dir SMS.",
+    "sendAll": "U dir SMS dhammaan waalidka ({count})",
+    "sendAllHint": "Hal fariin kooxeed oo ka timaadda app-kaaga fariimaha",
+    "sendOne": "Dir SMS",
+    "opened": "SMS waa la furay",
+    "noPhone": "Lambar taleefan ma jiro",
+    "later": "Hadda maaha",
+    "close": "Xidh",
+    "leaveWarning": "Haddii aad xidho adigoon dirin, maamuluhu waa la ogeysiin doonaa in SMS-ka aan la dirin.",
+    "allDone": "Waa dhammaaday. Maamuluhu wuu arki karaa in waalidka la ogeysiiyay.",
+    "nobodyReachable": "Mid ka mid ah ardaydan ma laha lambar taleefan waalid oo la keydiyay, sidaa darteed cid loo diro ma jirto. Ku dar lambarrada liiska ardayda.",
+    "recordFailed": "Lama diiwaangelin karin in SMS-ka la diray. Fadlan hubi xiriirkaaga."
+  },
+  "saveBar": {
+    "sent": "Waalidka waa la ogeysiiyay",
+    "send": "U dir waalidka maqan ({count})",
+    "pending": "SMS weli lama dirin"
+  },
+  "admin": {
+    "title": "SMS maqnaansho oo aan la dirin",
+    "description": "Ustaasyadani waxay diiwaangeliyeen arday maqan laakiin waalidka SMS ma ay dirin.",
+    "count": "{count, plural, one {# ustaas} other {# ustaas}}",
+    "days": "{count, plural, one {# maalin} other {# maalmood}}",
+    "absent": "{count, plural, one {# arday oo maqan} other {# arday oo maqan}}",
+    "saved": "La keydiyay {time}",
+    "allSent": "Ustaas kasta wuxuu waalidka u diray SMS-ka maqnaanshaha.",
+    "banner": "{count, plural, one {# fasal} other {# fasal}} waxay leeyihiin arday maqan oo waalidkood aan la ogeysiin.",
+    "view": "Eeg yaa",
+    "notifyTitle": "SMS maqnaansho oo aan la dirin",
+    "notifyBody": "{count, plural, one {# fasal} other {# fasal}}: waalidka ardayda maqan lama ogeysiin."
+  }
+}

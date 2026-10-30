@@ -15,7 +15,7 @@
     "deleteTitle": "የመሰረዝ ጥያቄ፦ {name}",
     "deleteDescription": "ይህ በመድረሳው አስተዳዳሪ መጽደቅ አለበት። እስከዚያው ድረስ ተማሪው በክፍልዎ ውስጥ ይቆያል።",
     "transferTitle": "የማዛወር ጥያቄ፦ {name}",
-    "transferDescription": "ይህ ዝውውር በመድረሳው አስተዳዳሪ መጽደቅ አለበት። እስከዚያው ድረስ ተማሪው በ{className} ውስጥ ይቆያል።",
+    "transferDescription": "ተማሪው ይዛወር እንደሆነና ወደ የትኛው ክፍል እንደሚዛወር የመድረሳ አስተዳዳሪው ይወስናል። እስከዚያው ተማሪው በ{className} ይቆያል።",
     "adminDeleteTitle": "ተማሪ መሰረዝ፦ {name}",
     "adminDeleteDescription": "ተማሪው ከዚህ ምክንያት ጋር ወደ «የተሰረዙ ተማሪዎች» ይዛወራል። በኋላ ወደነበረበት መመለስ ይችላሉ።",
     "reasonCategory": "ምክንያት",
@@ -58,7 +58,9 @@
     "rejected": "ጥያቄው ውድቅ ተደርጓል።",
     "errorStudentMissing": "ይህ ተማሪ ከእንግዲህ በመዝገብ ውስጥ የለም።",
     "errorAlreadyArchived": "ይህ ተማሪ አስቀድሞ ተሰርዟል።",
-    "errorClassMissing": "የሚዛወርበት ክፍል ከእንግዲህ የለም።"
+    "errorClassMissing": "የሚዛወርበት ክፍል ከእንግዲህ የለም።",
+    "chooseClassHint": "ኡስታዙ ክፍሉን ለእርስዎ ትተዋል። ተማሪው የሚዛወርበትን ክፍል ይምረጡ።",
+    "classToBeChosen": "ክፍሉን አስተዳዳሪው ይመርጣል"
   },
   "teacher": {
     "title": "የእኔ ጥያቄዎች",

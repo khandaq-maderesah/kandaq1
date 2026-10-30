@@ -1,0 +1,35 @@
+{
+  "dialog": {
+    "title": "Tell the parents",
+    "description": "{count, plural, one {# student was} other {# students were}} absent in {className}. Send the parents an SMS now.",
+    "sendAll": "Send SMS to all parents ({count})",
+    "sendAllHint": "One group text from your SMS app",
+    "sendOne": "Send SMS",
+    "opened": "SMS opened",
+    "noPhone": "No phone number",
+    "later": "Not now",
+    "close": "Close",
+    "leaveWarning": "If you close this without sending, the admin will be told that the SMS was not sent.",
+    "allDone": "Done. The admin can see that the parents were texted.",
+    "nobodyReachable": "None of these students has a parent phone number saved, so there is nobody to text. Add the numbers in the student list.",
+    "recordFailed": "Could not record that the SMS was sent. Please check your connection."
+  },
+  "saveBar": {
+    "sent": "Parents texted",
+    "send": "Text absent parents ({count})",
+    "pending": "SMS not sent yet"
+  },
+  "admin": {
+    "title": "Absence SMS not sent",
+    "description": "These Ustazes saved absent students but did not send the SMS to the parents.",
+    "count": "{count, plural, one {# Ustaz} other {# Ustazes}}",
+    "days": "{count, plural, one {# day} other {# days}}",
+    "absent": "{count, plural, one {# absent student} other {# absent students}}",
+    "saved": "Saved {time}",
+    "allSent": "Every Ustaz sent the absence SMS to the parents.",
+    "banner": "{count, plural, one {# class has} other {# classes have}} absent students whose parents were not texted.",
+    "view": "See who",
+    "notifyTitle": "Absence SMS not sent",
+    "notifyBody": "{count, plural, one {# class} other {# classes}}: parents of absent students were not texted."
+  }
+}

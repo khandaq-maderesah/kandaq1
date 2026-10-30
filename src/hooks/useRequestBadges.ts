@@ -6,6 +6,7 @@ import { useLiveData } from '@/lib/dataStore'
 import { rtdb, subscribeToChangeRequests, subscribeToMyChangeRequests } from '@/lib/database'
 import { reportWeekFor } from '@/lib/weeklyReport'
 import { missingReportClasses, useAllWeeklyReports } from '@/hooks/useWeeklyReports'
+import { useUnsentAbsenceSms } from '@/hooks/useUnsentAbsenceSms'
 import type { ChangeRequest, Class } from '@/types'
 
 const SEEN_EVENT = 'khandaq:request-updates-seen'
@@ -46,6 +47,7 @@ export function useMyRequests(uid: string | undefined) {
  *  - pendingRequests: requests waiting for a school admin
  *  - requestUpdates:  a teacher's requests decided since they last looked
  *  - missingReports:  classes whose weekly report for the due week is not submitted (admin)
+ *  - unsentSms:       class days where the Ustaz did not text the parents of absent students (admin)
  */
 export function useRequestBadges() {
   const { user, isAdmin, isTeacher } = useAuth()
@@ -53,6 +55,7 @@ export function useRequestBadges() {
   const myRequests = useMyRequests(isTeacher ? user?.uid : undefined)
   const classes = useLiveData<Class[]>(isAdmin ? 'classes' : null, (emit) => rtdb.subscribeToClasses(emit)).data
   const weeklyReports = useAllWeeklyReports(isAdmin)
+  const unsentSms = useUnsentAbsenceSms(isAdmin).rows.length
   const [seen, setSeen] = useState('')
 
   useEffect(() => {
@@ -69,11 +72,12 @@ export function useRequestBadges() {
       requestUpdates: (myRequests ?? []).filter(
         (r) => (r.status === 'approved' || r.status === 'rejected') && (r.reviewedAt ?? '') > seen
       ).length,
+      unsentSms,
       missingReports:
         classes && weeklyReports
           ? missingReportClasses(classes, weeklyReports, reportWeekFor(new Date().toISOString().slice(0, 10))).length
           : 0,
     }),
-    [schoolRequests, myRequests, seen, classes, weeklyReports]
+    [schoolRequests, myRequests, seen, classes, weeklyReports, unsentSms]
   )
 }

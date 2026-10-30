@@ -1,0 +1,35 @@
+{
+  "dialog": {
+    "title": "Maatii beeksisaa",
+    "description": "Kutaa {className} keessatti {count, plural, one {barataan #} other {barattoonni #}} hin dhufne. Amma maatiif ergaa ergaa.",
+    "sendAll": "Maatii hundaaf ergaa ergi ({count})",
+    "sendAllHint": "Ergaa gareetiin tokko appii ergaa keessanii irraa",
+    "sendOne": "Ergaa ergi",
+    "opened": "Ergaan banameera",
+    "noPhone": "Lakkoofsi bilbilaa hin jiru",
+    "later": "Amma miti",
+    "close": "Cufi",
+    "leaveWarning": "Utuu hin ergin yoo cufte, bulchaan ergaan akka hin ergamne beeksifama.",
+    "allDone": "Xumurameera. Bulchaan maatiin akka beeksifame arguu danda'a.",
+    "nobodyReachable": "Barattoota kana keessaa tokkoof illee lakkoofsi bilbilaa maatii hin kaa'amne, kanaaf kan ergaa itti ergamu hin jiru. Lakkoofsa tarree barattootaa keessatti dabali.",
+    "recordFailed": "Ergaan ergamuu isaa galmeessuun hin danda'amne. Walqunnamtii kee ilaali."
+  },
+  "saveBar": {
+    "sent": "Maatiin beeksifameera",
+    "send": "Maatii hin dhufneef ergaa ergi ({count})",
+    "pending": "Ergaan ammallee hin ergamne"
+  },
+  "admin": {
+    "title": "Ergaan hin dhufnee hin ergamne",
+    "description": "Ustaazonni kunniin barattoota hin dhufne galmeessan garuu maatiif ergaa hin ergine.",
+    "count": "{count, plural, one {Ustaaza #} other {Ustaazota #}}",
+    "days": "{count, plural, one {guyyaa #} other {guyyoota #}}",
+    "absent": "{count, plural, one {barataa hin dhufne #} other {barattoota hin dhufne #}}",
+    "saved": "{time} galmaa'e",
+    "allSent": "Ustaazonni hundi maatiif ergaa erganiiru.",
+    "banner": "{count, plural, one {Kutaan #} other {Kutaaleen #}} barattoota hin dhufne kan maatiin isaanii hin beeksifamne qaba.",
+    "view": "Eenyu akka ta'e ilaali",
+    "notifyTitle": "Ergaan hin dhufnee hin ergamne",
+    "notifyBody": "{count, plural, one {Kutaa #} other {Kutaalee #}}: maatiin barattoota hin dhufne hin beeksifamne."
+  }
+}

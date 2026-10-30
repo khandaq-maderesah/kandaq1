@@ -118,6 +118,11 @@ export default function AttendancePage() {
     loadData(true)
   }, [loadData])
 
+  // The "SMS not sent" banner and device notification link straight to the Ustaz tab.
+  useEffect(() => {
+    if (window.location.hash === '#ustaz') setTab('ustaz-status')
+  }, [])
+
   // Load students + existing attendance for the selected class/date (admin can mark any class).
   useEffect(() => {
     const loadClassData = async () => {

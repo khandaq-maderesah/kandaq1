@@ -20,7 +20,7 @@ import {
 import { rtdb } from '@/lib/database'
 import { useAuth } from '@/context/AuthContext'
 import { useMyRequests } from '@/hooks/useRequestBadges'
-import { useAllClasses, useMyClasses, useRegistrationOpen, useStudentsOfClasses } from '@/hooks/useTeacherData'
+import { useMyClasses, useRegistrationOpen, useStudentsOfClasses } from '@/hooks/useTeacherData'
 import { useRegistrationOptions } from '@/hooks/useRegistrationOptions'
 import { FamilyInfoFields, useMissingFieldsMessage } from '@/components/students/FamilyInfoFields'
 import {
@@ -144,7 +144,6 @@ export default function TeacherClassesPage() {
   const [deleteTarget, setDeleteTarget] = useState<Student | null>(null)
   const [transferTarget, setTransferTarget] = useState<Student | null>(null)
 
-  const allClasses = useAllClasses()
   const myRequests = useMyRequests(user?.uid)
   const pendingIds = useMemo(
     () => new Set((myRequests ?? []).filter((r) => r.status === 'pending').map((r) => r.studentId)),
@@ -649,7 +648,6 @@ export default function TeacherClassesPage() {
       />
       <RequestTransferDialog
         student={transferTarget}
-        classes={(allClasses ?? []).filter((c) => c.isActive !== false)}
         open={!!transferTarget}
         onOpenChange={(open) => !open && setTransferTarget(null)}
       />

@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label'
 import { EmptyState, StatCard } from '@/components/ui/page'
 import { useEthiopianDate } from '@/hooks/useEthiopianDate'
 import { useTeacherCheckIns } from '@/hooks/useTeacherData'
+import { UnsentSmsList } from '@/components/admin/UnsentSmsList'
 import { isNotificationSupported, getNotificationPermission, requestNotificationPermission, showBrowserNotification } from '@/lib/pushNotification'
 import { buildPresenceRows, filterPresence, presenceSummary, type PresenceFilter } from '@/lib/teacherCheckIn'
 import type { Class, User, Attendance } from '@/types'
@@ -77,6 +78,8 @@ export default function UstazAttendanceMonitor({ classes, users, attendance }: P
 
   return (
     <div className="space-y-4">
+      <UnsentSmsList />
+
       <div className="rounded-xl border bg-card p-4 shadow-sm sm:p-5">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div className="space-y-2">

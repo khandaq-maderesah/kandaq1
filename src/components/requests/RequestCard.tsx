@@ -45,7 +45,11 @@ export function RequestCard({ request, actions }: { request: ChangeRequest; acti
             {!isDelete && (
               <>
                 <ArrowRight className="h-3.5 w-3.5 text-muted-foreground rtl:rotate-180" aria-label={t('admin.to')} />
-                <span className="font-medium">{request.toClassName}</span>
+                {request.toClassName ? (
+                  <span className="font-medium">{request.toClassName}</span>
+                ) : (
+                  <span className="text-muted-foreground">{t('admin.classToBeChosen')}</span>
+                )}
               </>
             )}
           </dd>
