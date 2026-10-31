@@ -38,7 +38,6 @@
     "title": "Students in {name}",
     "description": "Tap Edit to update a student. To delete or move one, use the actions menu.",
     "roll": "Roll {roll}",
-    "age": "{age, plural, one {# year} other {# years}}",
     "edit": "Edit {name}",
     "empty": "No students in this class yet.",
     "emptyHint": "Add the first student with the form."

@@ -38,7 +38,6 @@
     "title": "Ardayda {name}",
     "description": "Taabo Wax ka beddel si aad xogta arday u cusboonaysiiso. Si aad u tirtirto ama u wareejiso, isticmaal liiska ficillada.",
     "roll": "Lambar {roll}",
-    "age": "{age, plural, one {# sano} other {# sano}}",
     "edit": "Wax ka beddel {name}",
     "empty": "Weli fasalkan arday kuma jiro.",
     "emptyHint": "Ku dar ardayga ugu horreeya adigoo isticmaalaya foomka."

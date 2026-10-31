@@ -38,7 +38,6 @@
     "title": "Barattoota {name}",
     "description": "Barataa haaromsuuf \"Gulaali\" tuqaa. Barataa haquuf ykn dabarsuuf baafata gochaalee fayyadamaa.",
     "roll": "Lakk. {roll}",
-    "age": "{age, plural, one {Waggaa #} other {Waggaa #}}",
     "edit": "{name} gulaali",
     "empty": "Ammaaf kutaa kana keessa barataan hin jiru.",
     "emptyHint": "Barataa jalqabaa unka kanaan dabalaa."

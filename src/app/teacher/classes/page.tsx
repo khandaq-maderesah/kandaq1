@@ -603,14 +603,9 @@ export default function TeacherClassesPage() {
                       <StudentAvatar photoUrl={s.photoUrl} studentId={s.id} name={s.name} size="sm" />
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-medium text-foreground">{s.name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {[
-                            s.rollNumber ? t('list.roll', { roll: s.rollNumber }) : null,
-                            s.age ? t('list.age', { age: s.age }) : null,
-                          ]
-                            .filter(Boolean)
-                            .join(' · ')}
-                        </p>
+                        {s.rollNumber && (
+                          <p className="text-xs text-muted-foreground">{t('list.roll', { roll: s.rollNumber })}</p>
+                        )}
                         {pending && (
                           <div className="mt-1">
                             <PendingBadge />
