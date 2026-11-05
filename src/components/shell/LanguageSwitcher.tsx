@@ -20,12 +20,12 @@ import { cn } from '@/lib/utils'
 /** Language picker. A signed-in user's choice is saved to their profile. */
 export function LanguageSwitcher({ className, showLabel = false }: { className?: string; showLabel?: boolean }) {
   const t = useTranslations('common')
-  const { locale, setLocale } = useLocaleSettings()
+  const { locale, chooseLocale } = useLocaleSettings()
   const { user } = useAuth()
 
   const change = (value: string) => {
     if (!isLocale(value) || value === locale) return
-    setLocale(value)
+    chooseLocale(value, user?.uid ?? null)
     if (user) {
       updateUser(user.uid, { language: value }).catch(() => {
         /* the local choice still applies */

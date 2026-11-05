@@ -1,14 +1,18 @@
 'use client'
 
-import { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { NextIntlClientProvider, IntlErrorCode, type IntlError } from 'next-intl'
 import enMessages from './messages/en'
 import {
   DEFAULT_LOCALE,
+  LOCALE_CHOOSER_KEY,
   LOCALE_DIR,
   LOCALE_STORAGE_KEY,
+  SIGNED_OUT_CHOOSER,
   detectBrowserLocale,
   isLocale,
+  localeFromAccount,
+  localeRetryDelayMs,
   type Locale,
 } from './config'
 
@@ -39,13 +43,26 @@ async function loadMessages(locale: Locale): Promise<Messages> {
   return withFallback(enMessages, mod.default) as Messages
 }
 
-function readStoredLocale(): Locale | null {
+function readSetting(key: string): string | null {
   try {
-    const v = localStorage.getItem(LOCALE_STORAGE_KEY)
-    return isLocale(v) ? v : null
+    return localStorage.getItem(key)
   } catch {
     return null
   }
+}
+
+function writeSetting(key: string, value: string | null) {
+  try {
+    if (value === null) localStorage.removeItem(key)
+    else localStorage.setItem(key, value)
+  } catch {
+    /* ignore */
+  }
+}
+
+function readStoredLocale(): Locale | null {
+  const v = readSetting(LOCALE_STORAGE_KEY)
+  return isLocale(v) ? v : null
 }
 
 function applyDocumentLocale(locale: Locale) {
@@ -55,7 +72,13 @@ function applyDocumentLocale(locale: Locale) {
 
 interface LocaleContextValue {
   locale: Locale
-  setLocale: (locale: Locale) => void
+  /** The person at this device picked a language; `uid` is null when signed out. */
+  chooseLocale: (locale: Locale, uid: string | null) => void
+  /**
+   * Applies a profile just read from the server. Never pass a cached profile:
+   * it can be older than the person's last choice.
+   */
+  applyAccountLocale: (uid: string, saved: unknown) => void
 }
 
 const LocaleContext = createContext<LocaleContextValue | undefined>(undefined)
@@ -79,17 +102,26 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   // until the stored language is known) to avoid a hydration mismatch and a
   // flash of English for other-language users.
   const [ready, setReady] = useState(false)
+  // A language file that failed to load, waiting for another try.
+  const [retry, setRetry] = useState<{ locale: Locale; attempt: number } | null>(null)
+  // Files load at different speeds: only the latest request may take effect.
+  const latestSwitch = useRef(0)
 
-  const switchTo = useCallback(async (next: Locale) => {
+  const switchTo = useCallback(async (next: Locale, attempt = 0) => {
+    const id = ++latestSwitch.current
+    setRetry(null)
     try {
       const loaded = await loadMessages(next)
+      if (id !== latestSwitch.current) return
       setMessages(loaded)
       setLocaleState(next)
       applyDocumentLocale(next)
     } catch (err) {
+      if (id !== latestSwitch.current) return
       console.error('Failed to load translations for', next, err)
+      setRetry({ locale: next, attempt: attempt + 1 })
     } finally {
-      setReady(true)
+      if (id === latestSwitch.current) setReady(true)
     }
   }, [])
 
@@ -97,20 +129,45 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
     switchTo(readStoredLocale() ?? detectBrowserLocale())
   }, [switchTo])
 
-  const setLocale = useCallback(
-    (next: Locale) => {
-      try {
-        localStorage.setItem(LOCALE_STORAGE_KEY, next)
-      } catch {
-        /* ignore */
-      }
+  // On a weak connection the file can fail to arrive. The app stays usable in
+  // English meanwhile, and the language comes back without a reload.
+  useEffect(() => {
+    if (!retry) return
+    const again = () => switchTo(retry.locale, retry.attempt)
+    const timer = navigator.onLine ? setTimeout(again, localeRetryDelayMs(retry.attempt)) : undefined
+    window.addEventListener('online', again)
+    return () => {
+      clearTimeout(timer)
+      window.removeEventListener('online', again)
+    }
+  }, [retry, switchTo])
+
+  const chooseLocale = useCallback(
+    (next: Locale, uid: string | null) => {
+      writeSetting(LOCALE_STORAGE_KEY, next)
+      writeSetting(LOCALE_CHOOSER_KEY, uid ?? SIGNED_OUT_CHOOSER)
+      switchTo(next)
+    },
+    [switchTo]
+  )
+
+  const applyAccountLocale = useCallback(
+    (uid: string, saved: unknown) => {
+      const chosenBy = readSetting(LOCALE_CHOOSER_KEY)
+      if (chosenBy === SIGNED_OUT_CHOOSER) writeSetting(LOCALE_CHOOSER_KEY, uid)
+      const next = localeFromAccount(chosenBy, uid, saved)
+      if (!next) return
+      // The device no longer shows the previous person's pick.
+      writeSetting(LOCALE_CHOOSER_KEY, null)
+      if (next === readStoredLocale()) return
+      writeSetting(LOCALE_STORAGE_KEY, next)
       switchTo(next)
     },
     [switchTo]
   )
 
   return (
-    <LocaleContext.Provider value={{ locale, setLocale }}>
+    <LocaleContext.Provider value={{ locale, chooseLocale, applyAccountLocale }}>
       <NextIntlClientProvider
         locale={locale}
         messages={messages}

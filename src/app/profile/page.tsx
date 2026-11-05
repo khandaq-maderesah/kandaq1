@@ -25,7 +25,7 @@ export default function ProfilePage() {
   const t = useTranslations('profile')
   const tc = useTranslations('common')
   const { user, school, loading } = useAuth()
-  const { locale, setLocale } = useLocaleSettings()
+  const { locale, chooseLocale } = useLocaleSettings()
   const router = useRouter()
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
@@ -70,7 +70,7 @@ export default function ProfilePage() {
 
   const handleLanguageChange = async (value: string) => {
     if (!isLocale(value) || value === locale) return
-    setLocale(value)
+    chooseLocale(value, user?.uid ?? null)
     if (!user) return
     try {
       await rtdb.updateUser(user.uid, { language: value })

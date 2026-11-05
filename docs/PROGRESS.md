@@ -1048,3 +1048,15 @@ Live check against https://mms.khendeq.com
 
 - **Follow-up (2026-10-31)**: the "Offline" pill (`NetworkStatus`) covered the sticky Save bar of the attendance and report screens, worst in the languages whose offline sentence is long (am 33, ar 43, om 58, so 57 characters). It now sits at the top under the app bar (`top-[4.25rem]`, `z-[25]`) and shows a short label in every language (new `common.offline.short`); the full sentence is the tooltip and the screen-reader text. The Oromo offline sentence was corrected. Test: `tests/networkStatus.test.mjs` (4). Verified: `npm run verify` -> TypeScript PASS, ESLint PASS, unit tests PASS; `node scripts/i18n-sync.mjs --check` -> All translations complete.
 
+---
+
+## [2026-11-05] Fix - the language turned to English by itself
+
+- **Reported**: users saw the app change to English while working, for example while adding students.
+- **Cause 1, old profile**: on every start the language on the profile replaced the device's language, including a cached copy of the profile that is not updated when the language changes (used when offline, on a slow connection, or when the 2-second start timer fires). A failed save of the choice had the same effect on the next start.
+- **Cause 2, language file not arriving**: each language except English is a separate download. When it failed (the service worker gives up after 8 seconds), the app stayed in English until the next reload, with no retry.
+- **Fix**: a language picked on the device now stays (`khandaq_locale_chosen_by` records who picked it). The profile only fills in on a first sign-in on a device or on a phone last set by another person (`localeFromAccount`), and only a profile just read from the server counts; the cached paths no longer touch the language. A failed language file is retried (2s, 4s, 8s... at most once a minute, and when the connection returns), without losing what is typed in a form. If two language files load at once, only the latest request applies.
+- Files: `src/i18n/config.ts`, `src/i18n/I18nProvider.tsx`, `src/context/AuthContext.tsx`, `src/components/shell/LanguageSwitcher.tsx`, `src/app/profile/page.tsx`, `scripts/verify.mjs`.
+- Checked and ruled out: no translation is missing in am/ar/om/so (`node scripts/i18n-sync.mjs --check`).
+- Tests: new `tests/localePreference.test.mjs` (10). The retry and the start-up order are checked by reading the source, not in a real browser.
+- Verified: `npm run verify` -> TypeScript PASS (24.25s), ESLint PASS (21.90s), unit tests PASS (14.41s); `node scripts/i18n-sync.mjs --check` -> All translations complete. No rules or data changed.

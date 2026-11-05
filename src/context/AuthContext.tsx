@@ -15,7 +15,6 @@ import type { PublicBranding } from '@/lib/branding'
 import { rememberBrandSlug } from '@/lib/brandMemory'
 import type { School, User } from '@/types'
 import { useLocaleSettings } from '@/i18n/I18nProvider'
-import { isLocale } from '@/i18n/config'
 import { withTimeout } from '@/lib/asyncUtils'
 import { clearLiveDataCache } from '@/lib/dataStore'
 import { announceOfflineHome } from '@/lib/offlineHome'
@@ -213,7 +212,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const [branding, setBranding] = useState<PublicBranding | null>(null)
   const [brandingTick, setBrandingTick] = useState(0)
-  const { setLocale } = useLocaleSettings()
+  const { applyAccountLocale } = useLocaleSettings()
 
   // The device's connection state, kept live so the UI can say "offline"
   // instead of looking frozen.
@@ -234,14 +233,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       window.removeEventListener('offline', update)
     }
   }, [])
-
-  // A signed-in user's saved language wins over this browser's choice.
-  const applyProfileLocale = useCallback(
-    (profile: User) => {
-      if (isLocale(profile.language)) setLocale(profile.language)
-    },
-    [setLocale]
-  )
 
   const applySchool = useCallback((next: School | null) => {
     setCurrentSchoolId(next?.id ?? null)
@@ -301,7 +292,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             if (cachedUserStr) {
               const profile = JSON.parse(cachedUserStr) as User
               setUser(profile)
-              applyProfileLocale(profile)
               const cachedSchoolStr = localStorage.getItem('kmms_last_active_school')
               if (cachedSchoolStr) {
                 applySchool(JSON.parse(cachedSchoolStr) as School)
@@ -341,7 +331,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               if (cachedSchoolStr) {
                 applySchool(JSON.parse(cachedSchoolStr) as School)
               }
-              applyProfileLocale(profile)
             } catch {
               /* ignore */
             }
@@ -367,7 +356,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             if (resolvedSchool) {
               applySchool(resolvedSchool)
             }
-            applyProfileLocale(profile)
+            applyAccountLocale(profile.uid, profile.language)
             setUser(profile)
           }
         } catch (error) {
@@ -388,7 +377,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               if (cachedSchoolStr) {
                 applySchool(JSON.parse(cachedSchoolStr) as School)
               }
-              applyProfileLocale(profile)
             } catch {
               await clearSession()
             }
@@ -424,7 +412,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       clearTimeout(safetyTimer)
       unsubscribe()
     }
-  }, [applySchool, applyProfileLocale, clearSession])
+  }, [applySchool, applyAccountLocale, clearSession])
 
   // Load the public branding whenever the current school changes.
   useEffect(() => {
@@ -488,7 +476,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await update(userRef, { lastLogin: new Date().toISOString() }).catch(() => {
         /* ignore background lastLogin error */
       })
-      applyProfileLocale(profile)
+      applyAccountLocale(profile.uid, profile.language)
       setUser(profile)
     }
 
