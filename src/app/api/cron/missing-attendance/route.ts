@@ -1,12 +1,16 @@
 import { NextResponse } from 'next/server'
 import { runMissingAttendanceCheckServer } from '@/lib/attendanceReminderServer'
+import { sendAdminUnsentSmsPushes } from '@/lib/attendancePushServer'
 
 export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
 
 /**
  * Scheduled endpoint (Google Cloud Scheduler, or Vercel Cron).
  * The client-side scheduler handles the case where the app is open; this route
  * guarantees the reminders fire at the set times even when nobody is logged in.
+ * The same evening run also sends each admin a push notification listing the
+ * Ustazes who saved absent students but did not text the parents.
  *
  * Env vars:
  *   - CRON_SECRET (required)         -> requests must carry
@@ -32,7 +36,12 @@ export async function GET(request: Request) {
 
   try {
     const result = await runMissingAttendanceCheckServer()
-    return NextResponse.json(result)
+    // A failed notification must not hide the result of the reminder check.
+    const adminSmsPush = await sendAdminUnsentSmsPushes().catch((err) => {
+      console.error('Admin unsent-SMS push failed:', err)
+      return { ok: false, configured: true, schools: [] }
+    })
+    return NextResponse.json({ ...result, adminSmsPush })
   } catch (err) {
     console.error('Missing attendance cron failed:', err)
     return NextResponse.json(

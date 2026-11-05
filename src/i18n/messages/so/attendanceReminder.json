@@ -1,0 +1,40 @@
+{
+  "push": {
+    "title": "Waa waqtigii xaadiriska la qaadayo",
+    "body": "{classes}: xaadiriska weli lama qaadin. Qorraxdu waxay dhacaysaa qiyaastii hal saac iyo badh gudahood.",
+    "action": "Qaado xaadiriska"
+  },
+  "banner": {
+    "title": "Xaadiriska weli lama qaadin",
+    "body": "{classes}: fadlan qaado xaadiriska maanta ka hor intaysan qorraxdu dhicin.",
+    "action": "Qaado xaadiriska"
+  },
+  "card": {
+    "title": "Xusuusinta xaadiriska",
+    "offDescription": "Maalin kasta qiyaastii hal saac iyo badh ka hor qorrax-dhaca (maanta {time} ku dhawaad) taleefankan ka hel ogeysiis haddii aadan qaadin xaadiriska. Taabo si bogga xaadiriska loo furo.",
+    "onDescription": "Xusuusintu waa shaqaynaysaa taleefankan. Haddii xaadiriska la qaadin, ogeysiis ayaad heli doontaa qiyaastii hal saac iyo badh ka hor qorrax-dhaca (maanta {time} ku dhawaad). Axadaha waxba lama diro.",
+    "enable": "Shid xusuusinta",
+    "disable": "Demi",
+    "test": "Tusaale muuji",
+    "blocked": "Ogeysiisyada app-kan waa la xannibay. Ka oggolow dejinta browser-ka ama taleefanka, kadibna halkan ku soo laabo.",
+    "unsupported": "Browser-kani ma muujin karo ogeysiisyada xusuusinta. Xusuusintu weli waxay ka muuqataa dawaca sare.",
+    "needsInstall": "iPhone ama iPad, marka hore ku dar app-ka Home Screen (Share, kadibna “Add to Home Screen”), kadibna halkaas ka fur si aad u shido xusuusinta.",
+    "testTitle": "Xusuusin tijaabo ah",
+    "testBody": "Sidaas ayay u egtahay xusuusinta xaadiriska. Taabo “Qaado xaadiriska” si bogga loo furo.",
+    "enabled": "Xusuusintu waa shidan tahay.",
+    "disabled": "Xusuusintu waa dansan tahay.",
+    "failed": "Xusuusinta lama beddeli karin. Fadlan mar kale isku day."
+  },
+  "adminSms": {
+    "title": "Waalidka lama ogeysiin",
+    "body": "{ustazes}: ma ay u dirin SMS waalidka ardayda maqan.",
+    "action": "Eeg yaa"
+  },
+  "adminCard": {
+    "title": "Ogeysiisyada taleefankan",
+    "offDescription": "Fiidkasta saacadda {time}, hel ogeysiis liis ka dhigan ustaasyada aan u dirin SMS waalidka ardayda maqan. Taabo si aad u aragto yaa.",
+    "onDescription": "Ogeysiisyadu waa shidan yihiin taleefankan. Fiidkasta saacadda {time} waxaa laguu sheegi doonaa ustaasyada aan SMS u dirin waalidka ardayda maqan.",
+    "testTitle": "Ogeysiis tijaabo ah",
+    "testBody": "Sidaas ayuu u egyahay ogeysiiska. Taabo “Eeg yaa” si liiska loo furo."
+  }
+}

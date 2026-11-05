@@ -485,7 +485,7 @@ describe('Offline boot repair: the service worker can serve a bootable page offl
     const stores = new Map()
     function cacheFor(name) {
       if (!stores.has(name)) {
-        const map = name === 'khendeq-medresah-v5' ? store : new Map()
+        const map = name === 'khendeq-medresah-v6' ? store : new Map()
         stores.set(name, {
           map,
           async put(request, response) {
@@ -632,7 +632,7 @@ describe('Offline boot repair: the service worker can serve a bootable page offl
     assert.ok(sw.store.has(ORIGIN + '/teacher/classes'), 'Area pages must be precached after sign-in')
     assert.ok(sw.store.has(ORIGIN + '/teacher/requests'), 'Area pages must be precached after sign-in')
     assert.ok(
-      sw.cacheFor('khendeq-medresah-rsc-v5').map.has(ORIGIN + '/teacher/classes'),
+      sw.cacheFor('khendeq-medresah-rsc-v6').map.has(ORIGIN + '/teacher/classes'),
       'Area RSC payloads must be precached after sign-in'
     )
   })
@@ -643,7 +643,7 @@ describe('Offline boot repair: the service worker can serve a bootable page offl
     await sw.dispatch('message', { data: { type: 'CLEAR_HOME' } })
     const response = await sw.fetchEvent(navigation('/'))
     assert.equal(response.status, 200, 'Without a home the landing page is served normally')
-    assert.equal(sw.cacheFor('khendeq-medresah-rsc-v5').map.size, 0)
+    assert.equal(sw.cacheFor('khendeq-medresah-rsc-v6').map.size, 0)
   })
 
   test('a home screen outside the app areas is refused', async () => {
@@ -661,7 +661,7 @@ describe('Offline boot repair: the service worker can serve a bootable page offl
     sw.fetchCalls.length = 0
     // Later, offline, with a different ?_rsc marker.
     const offline = runServiceWorker({ online: false })
-    const rsc = offline.cacheFor('khendeq-medresah-rsc-v5')
+    const rsc = offline.cacheFor('khendeq-medresah-rsc-v6')
     await rsc.put(ORIGIN + '/teacher/classes', new Response('flight:cached', { headers: { 'Content-Type': 'text/x-component' } }))
     const served = await offline.fetchEvent({ ...rscFetch('/teacher/classes'), url: ORIGIN + '/teacher/classes?_rsc=zzzz' })
     assert.equal(served.status, 200)
@@ -672,7 +672,7 @@ describe('Offline boot repair: the service worker can serve a bootable page offl
 
   test('a prefetch never replaces a full RSC payload already cached', async () => {
     const sw = runServiceWorker({ online: true })
-    const rsc = sw.cacheFor('khendeq-medresah-rsc-v5')
+    const rsc = sw.cacheFor('khendeq-medresah-rsc-v6')
     await rsc.put(ORIGIN + '/teacher/classes', new Response('flight:full', { headers: { 'Content-Type': 'text/x-component' } }))
     await sw.fetchEvent(rscFetch('/teacher/classes', true))
     assert.match(await (await rsc.match(ORIGIN + '/teacher/classes')).text(), /flight:full/)

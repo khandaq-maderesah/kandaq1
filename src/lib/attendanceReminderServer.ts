@@ -1,28 +1,14 @@
 import { getAdminApp } from '@/lib/firebase/admin'
 import { getDatabase, type Database } from 'firebase-admin/database'
-import { ADMIN_NOTIFY_TIME, TEACHER_NOTIFY_TIME } from '@/lib/reminderConstants'
+import { ADMIN_NOTIFY_TIME } from '@/lib/reminderConstants'
+import { DEFAULT_TIMEZONE, teacherReminderTime, zonedClock } from '@/lib/sunset'
 import { classTeacherIds } from '@/lib/classTeachers'
 import type { Class, Attendance, User, MissingAttendanceAlert } from '@/types'
 
-const DEFAULT_TIMEZONE = 'Africa/Addis_Ababa'
-
 /** Local wall-clock date/time split for the configured timezone. */
 function localParts(timeZone: string, now: Date = new Date()) {
-  const fmt = new Intl.DateTimeFormat('en-CA', {
-    timeZone,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    hourCycle: 'h23',
-  })
-  const parts = fmt.formatToParts(now)
-  const get = (t: string) => parts.find((p) => p.type === t)?.value ?? ''
-  const date = `${get('year')}-${get('month')}-${get('day')}`
-  const hhmm = `${get('hour')}:${get('minute')}`
-  const day = new Date(`${date}T00:00:00`).getDay()
-  return { date, hhmm, day }
+  const { date, time, weekday } = zonedClock(now, timeZone)
+  return { date, hhmm: time, day: weekday }
 }
 
 export interface SchoolCheckResult {
@@ -45,7 +31,7 @@ export interface ServerCheckResult {
 /**
  * Runs the "teacher did not take attendance" check for every active school on
  * the server using the Firebase Admin SDK. Intended to be invoked by a
- * scheduled cron so the admin (18:30) and teacher (18:00) reminders fire even
+ * scheduled cron so the admin (18:30) and Ustaz (1.5 hours before sunset) reminders fire even
  * when nobody has the app open. Each school uses its own timezone.
  */
 export async function runMissingAttendanceCheckServer(): Promise<ServerCheckResult> {
@@ -132,7 +118,7 @@ async function checkSchool(
   const existingById = new Map(existing.map((a) => [a.id, a]))
 
   const adminDue = hhmm >= ADMIN_NOTIFY_TIME
-  const teacherDue = hhmm >= TEACHER_NOTIFY_TIME
+  const teacherDue = hhmm >= teacherReminderTime(date, timeZone)
   const nowIso = now.toISOString()
 
   for (const c of classes) {

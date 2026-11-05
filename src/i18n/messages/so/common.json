@@ -46,7 +46,8 @@
     "waiting": "Xiriir la filayaa…",
     "banner": "Ma offline ahaad — isbeddelku waxaa lagu keydiyay qalabka",
     "notCached": "Weli lama heli karo adigoo offline ah",
-    "notCachedHint": "Fur shaashaddan hal mar adigoo internet haysta, ka dib waxay shaqayn doontaa adigoo offline ah."
+    "notCachedHint": "Fur shaashaddan hal mar adigoo internet haysta, ka dib waxay shaqayn doontaa adigoo offline ah.",
+    "short": "Internet ma jiro"
   },
   "status": {
     "loading": "Waa la soo rarayaa…",

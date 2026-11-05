@@ -353,6 +353,17 @@ export interface AbsenceSmsLog {
 }
 
 /**
+ * One device a user (Ustaz or admin) allowed notifications on (a Web Push subscription).
+ * Stored under pushSubs/{uid}/{id}; only that user and the server read it.
+ */
+export interface PushSubscriptionRecord {
+  endpoint: string
+  keys: { p256dh: string; auth: string }
+  /** Language of the app on that device, so the reminder is written in it. */
+  language?: string
+}
+
+/**
  * An Ustaz's "I am in class" tap for one class on one day.
  * Stored under teacherCheckIns/{date}_{classId}_{teacherId}.
  */

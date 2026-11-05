@@ -3,6 +3,7 @@ import { classTeacherIds } from '@/lib/classTeachers'
 import type { Class, Attendance, User, MissingAttendanceAlert } from '@/types'
 import { showBrowserNotification } from './pushNotification'
 import { ADMIN_NOTIFY_TIME, TEACHER_NOTIFY_TIME, CHECK_INTERVAL_MS } from './reminderConstants'
+import { isTeacherReminderDue } from './sunset'
 
 export { ADMIN_NOTIFY_TIME, TEACHER_NOTIFY_TIME, CHECK_INTERVAL_MS }
 
@@ -14,7 +15,7 @@ export { ADMIN_NOTIFY_TIME, TEACHER_NOTIFY_TIME, CHECK_INTERVAL_MS }
 // Every CHECK_INTERVAL_MS the scheduler scans active classes and writes a
 // reminder record for any class that has NO attendance saved for today.
 //
-//   - Teacher is flagged at TEACHER_NOTIFY_TIME (18:00) -> teacher sees the alert
+//   - Teacher is flagged an hour and a half before sunset (lib/sunset.ts) -> teacher sees the alert
 //   - Admin is flagged at ADMIN_NOTIFY_TIME      (18:30) -> admin sees the alert
 //
 // Reminders are generated every day EXCEPT Sunday. Once the teacher saves
@@ -105,7 +106,8 @@ export async function runMissingAttendanceCheck(
   attendance: Attendance[],
   users: User[],
   now: Date = new Date(),
-  existing?: MissingAttendanceAlert[]
+  existing?: MissingAttendanceAlert[],
+  timeZone?: string
 ): Promise<void> {
   // No reminders on Sundays.
   if (isSunday(now)) return
@@ -117,7 +119,7 @@ export async function runMissingAttendanceCheck(
   )
 
   const adminDue = isPastHHMM(ADMIN_NOTIFY_TIME, now)
-  const teacherDue = isPastHHMM(TEACHER_NOTIFY_TIME, now)
+  const teacherDue = isTeacherReminderDue(now, timeZone)
   const nowIso = now.toISOString()
   let changed = false
   const missingNames: string[] = []

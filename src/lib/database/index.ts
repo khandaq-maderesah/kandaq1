@@ -2,7 +2,7 @@ import { app, db } from '@/lib/firebase/config'
 import { getStorage, ref as storageRef, uploadBytes, deleteObject } from 'firebase/storage'
 import { BRANDING_FILES, brandingStoragePath, type BrandingFile, type PublicBranding } from '@/lib/branding'
 import { ref, get as rtdbGet, set, update, remove, onValue, query, orderByChild, equalTo, startAt, serverTimestamp, type QueryConstraint, type Unsubscribe, type DataSnapshot } from 'firebase/database'
-import type { User, Class, Student, Attendance, AbsentAlert, MissingAttendanceAlert, TeacherCheckIn, AbsenceSmsLog, Exam, Announcement, School, ChangeRequest, DeletionReason, StudentArchive, SessionLog, WeeklyReport, StudentSupport } from '@/types'
+import type { User, Class, Student, Attendance, AbsentAlert, MissingAttendanceAlert, TeacherCheckIn, AbsenceSmsLog, PushSubscriptionRecord, Exam, Announcement, School, ChangeRequest, DeletionReason, StudentArchive, SessionLog, WeeklyReport, StudentSupport } from '@/types'
 import { withTimeout } from '@/lib/asyncUtils'
 import { effectiveListsMode, normalizeRegistrationOptions, resolveRegistrationOptions, type ListsMode, type RegistrationOptions } from '@/lib/registration'
 import { ALL_REPORT_NEEDS, type ReportNeeds, type SchoolSnapshot } from '@/lib/platformStats'
@@ -531,6 +531,15 @@ export function subscribeToAbsenceSmsSince(date: string, cb: (logs: AbsenceSmsLo
     })
     cb(out)
   })
+}
+
+// A device where a user (Ustaz or admin) allowed push notifications (Web Push). One record per device.
+export async function setPushSubscription(uid: string, id: string, data: PushSubscriptionRecord): Promise<void> {
+  await set(sref(`pushSubs/${uid}/${id}`), { ...defined(data), savedAt: serverTimestamp() })
+}
+
+export async function removePushSubscription(uid: string, id: string): Promise<void> {
+  await remove(sref(`pushSubs/${uid}/${id}`))
 }
 
 // ==================== Missing Attendance Alerts ====================
@@ -1262,6 +1271,8 @@ export const rtdb = {
   createTeacherCheckIn,
   subscribeToTeacherCheckIns,
   setAbsenceSms,
+  setPushSubscription,
+  removePushSubscription,
   subscribeToAbsenceSmsSince,
   getAttendance,
   createAttendance,

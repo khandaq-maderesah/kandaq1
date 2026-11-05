@@ -204,12 +204,12 @@ describe('Service worker v5 routing helpers', () => {
   })
 
   test('the three caches are versioned together and old ones are purged', () => {
-    assert.equal(consts.CACHE, 'khendeq-medresah-v5')
-    assert.equal(consts.RSC_CACHE, 'khendeq-medresah-rsc-v5')
-    assert.equal(consts.STATE_CACHE, 'khendeq-medresah-state-v5')
+    assert.equal(consts.CACHE, 'khendeq-medresah-v6')
+    assert.equal(consts.RSC_CACHE, 'khendeq-medresah-rsc-v6')
+    assert.equal(consts.STATE_CACHE, 'khendeq-medresah-state-v6')
     assert.match(source, /const keep = \[CACHE, RSC_CACHE, STATE_CACHE\]/)
     const registrar = fs.readFileSync(path.join(ROOT, 'src', 'components', 'ServiceWorkerRegistrar.tsx'), 'utf8')
-    assert.match(registrar, /const SW_VERSION = 'v5'/)
+    assert.match(registrar, /const SW_VERSION = 'v6'/)
   })
 
   test('the start pages are the ones redirected to the home screen', () => {

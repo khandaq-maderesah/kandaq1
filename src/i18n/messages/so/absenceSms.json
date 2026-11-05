@@ -12,12 +12,22 @@
     "leaveWarning": "Haddii aad xidho adigoon dirin, maamuluhu waa la ogeysiin doonaa in SMS-ka aan la dirin.",
     "allDone": "Waa dhammaaday. Maamuluhu wuu arki karaa in waalidka la ogeysiiyay.",
     "nobodyReachable": "Mid ka mid ah ardaydan ma laha lambar taleefan waalid oo la keydiyay, sidaa darteed cid loo diro ma jirto. Ku dar lambarrada liiska ardayda.",
-    "recordFailed": "Lama diiwaangelin karin in SMS-ka la diray. Fadlan hubi xiriirkaaga."
+    "recordFailed": "Lama diiwaangelin karin in SMS-ka la diray. Fadlan hubi xiriirkaaga.",
+    "descriptionLateOnly": "{count, plural, one {# arday ayaa} other {# arday ayaa}} daahay {className}. Waxaad u diri kartaa waalidkood SMS.",
+    "absentHeading": "Maqan ({count})",
+    "lateHeading": "Soo daahay ({count})",
+    "lateToggle": "U dir SMS waalidka ardayda soo daahay sidoo kale",
+    "lateToggleHint": "{count, plural, one {# arday ayaa} other {# arday ayaa}} soo daahay. Waalidkoodu waxay heli doonaan fariin ka duwan: in ilmahoodu daahay. Tani waa ikhtiyaari.",
+    "sendAllLate": "U dir SMS waalidka soo daahay ({count})",
+    "sendAllLateHint": "Hal fariin kooxeed oo leh fariinta “daahitaanka”",
+    "lateDone": "Waa dhammaaday. Waalidka ardayda soo daahay waa la ogeysiiyay.",
+    "lateNobodyReachable": "Mid ka mid ah ardayda soo daahay ma laha lambar taleefan waalid oo la keydiyay."
   },
   "saveBar": {
     "sent": "Waalidka waa la ogeysiiyay",
     "send": "U dir waalidka maqan ({count})",
-    "pending": "SMS weli lama dirin"
+    "pending": "SMS weli lama dirin",
+    "sendLate": "U dir waalidka soo daahay ({count})"
   },
   "admin": {
     "title": "SMS maqnaansho oo aan la dirin",

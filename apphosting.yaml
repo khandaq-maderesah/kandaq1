@@ -27,6 +27,12 @@ env:
   - variable: NEXT_PUBLIC_FIREBASE_DATABASE_URL
     value: "https://khendeq-8e17f-default-rtdb.europe-west1.firebasedatabase.app"
 
+  # Public half of the Web Push key pair (Ustaz attendance reminders). The
+  # private half is the vapid-private-key secret below. Needed at BUILD time
+  # because Next.js inlines NEXT_PUBLIC_*.
+  - variable: NEXT_PUBLIC_VAPID_PUBLIC_KEY
+    value: "BPQv115U10e2Nz8yhwxB4udvLB_h-i7H-6osDeQwFCG32b1C0abdf5uJ_lsBikht8cIMD0ab_BqYmEi_8xdqrOc"
+
   - variable: APP_TIMEZONE
     value: Africa/Addis_Ababa
     availability:
@@ -36,5 +42,12 @@ env:
   # Stored in Google Secret Manager (created by scripts/gcp-setup.ps1).
   - variable: CRON_SECRET
     secret: cron-secret
+    availability:
+      - RUNTIME
+
+  # Secret half of the Web Push key pair, used by /api/cron/attendance-push.
+  # Stored in Google Secret Manager (see scripts/gcp-setup.ps1).
+  - variable: VAPID_PRIVATE_KEY
+    secret: vapid-private-key
     availability:
       - RUNTIME

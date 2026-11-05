@@ -11,6 +11,7 @@ import { useMyRequests } from '@/hooks/useRequestBadges'
 import { useMyAttendance, useMyClasses, useStudentsOfClasses, useTeacherCheckIns } from '@/hooks/useTeacherData'
 import { OfflineNotice } from '@/components/OfflineNotice'
 import { CheckInCard } from '@/components/teacher/CheckInCard'
+import { AttendanceReminderCard } from '@/components/teacher/AttendanceReminderCard'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
@@ -198,6 +199,8 @@ export default function TeacherPage() {
           </Link>
         }
       />
+
+      <AttendanceReminderCard classes={classes} attendance={attendance} />
 
       {liveCheckIns !== undefined && <CheckInCard classes={classes} checkIns={liveCheckIns} />}
 

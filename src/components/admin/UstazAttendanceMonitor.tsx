@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react'
 import { useFormatter, useTranslations } from 'next-intl'
 import { toast } from 'sonner'
-import { Bell, CheckCircle2, ClipboardCheck, ClipboardX, Copy, DoorClosed, DoorOpen, MessageSquare, Phone, Search, Users } from 'lucide-react'
+import { CheckCircle2, ClipboardCheck, ClipboardX, Copy, DoorClosed, DoorOpen, MessageSquare, Phone, Search, Users } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -13,7 +13,7 @@ import { EmptyState, StatCard } from '@/components/ui/page'
 import { useEthiopianDate } from '@/hooks/useEthiopianDate'
 import { useTeacherCheckIns } from '@/hooks/useTeacherData'
 import { UnsentSmsList } from '@/components/admin/UnsentSmsList'
-import { isNotificationSupported, getNotificationPermission, requestNotificationPermission, showBrowserNotification } from '@/lib/pushNotification'
+import { AdminPushOptIn } from '@/components/admin/AdminPushOptIn'
 import { buildPresenceRows, filterPresence, presenceSummary, type PresenceFilter } from '@/lib/teacherCheckIn'
 import type { Class, User, Attendance } from '@/types'
 
@@ -37,7 +37,6 @@ export default function UstazAttendanceMonitor({ classes, users, attendance }: P
   const [date, setDate] = useState(todayIso)
   const [filter, setFilter] = useState<PresenceFilter>('all')
   const [query, setQuery] = useState('')
-  const [permission, setPermission] = useState(getNotificationPermission())
 
   const checkIns = useTeacherCheckIns(date)
   const loading = checkIns === undefined
@@ -52,17 +51,6 @@ export default function UstazAttendanceMonitor({ classes, users, attendance }: P
   const ethDate = eth.format(date)
   const time = (ms: number) => format.dateTime(new Date(ms), { timeStyle: 'short' })
 
-  const handleEnable = async () => setPermission(await requestNotificationPermission())
-
-  const handleTest = async () => {
-    await showBrowserNotification({
-      title: t('push.testTitle'),
-      body: t('push.testBody', { count: summary.notYet }),
-      url: '/admin/attendance',
-      tag: 'test',
-    })
-  }
-
   const copyNumber = async (phone: string) => {
     try {
       await navigator.clipboard.writeText(phone)
@@ -73,12 +61,10 @@ export default function UstazAttendanceMonitor({ classes, users, attendance }: P
   }
 
   const filters: PresenceFilter[] = ['all', 'inClass', 'notYet']
-  const pushLabel =
-    permission === 'granted' ? t('push.enabled') : permission === 'denied' ? t('push.blocked') : t('push.prompt')
-
   return (
     <div className="space-y-4">
       <UnsentSmsList />
+      <AdminPushOptIn />
 
       <div className="rounded-xl border bg-card p-4 shadow-sm sm:p-5">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -102,21 +88,6 @@ export default function UstazAttendanceMonitor({ classes, users, attendance }: P
             {ethDate && <p className="text-xs text-muted-foreground">{t('ethiopianDate', { date: ethDate })}</p>}
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge variant={permission === 'granted' ? 'success' : permission === 'denied' ? 'destructive' : 'secondary'}>
-              {pushLabel}
-            </Badge>
-            {isNotificationSupported() && permission !== 'granted' && permission !== 'denied' && (
-              <Button type="button" size="sm" onClick={handleEnable}>
-                <Bell /> {t('push.enable')}
-              </Button>
-            )}
-            {permission === 'granted' && (
-              <Button type="button" size="sm" variant="outline" onClick={handleTest}>
-                <Bell /> {t('push.test')}
-              </Button>
-            )}
-          </div>
         </div>
       </div>
 

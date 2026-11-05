@@ -115,3 +115,71 @@ export function generateGroupSmsMessage(
       return `${school ? `ከ ${school.nameAm || school.name}` : 'ከ ኸንደቅ መድረሳ'}\n\nየተከበራችሁ ወላጆች፣ ዛሬ ልጃችሁ መድረሳ አለመምጣቱን/አለመምጣቷን እናሳውቃለን።`
   }
 }
+
+/**
+ * Build the SMS text sent to a student's parent when a student came LATE (not
+ * absent). It is worded differently from the absence message: the child did
+ * come, only after class had started. Same name, gender and language rules as
+ * `generateSmsMessage`.
+ */
+export function generateLateSmsMessage(
+  studentName: string,
+  gender?: string,
+  language?: string,
+  school?: { name: string; nameAm?: string } | null
+): string {
+  const isFemale = normalizeGender(gender) === 'female'
+  const schoolName = school?.name ?? 'Khendeq'
+
+  switch (language as ParentLanguage) {
+    case 'Afaan Oromoo': {
+      const name = latin(studentName)
+      const isVowel = ['a', 'e', 'i', 'o', 'u'].includes(name.slice(-1).toLowerCase())
+      const subject = isVowel ? `${name}n` : name
+      const from = school ? `${school.name} irraa` : 'Madarasaa Khendeq irraa'
+      return `${from}\n\nKabajamtoota maatii ${isFemale ? 'barattuu' : 'barataa'} ${name}, guyyaa har'aa ${subject} madarasaa dhufuu irratti turtii akka ${isFemale ? 'godhte' : 'godhe'} isin beeksifna.`
+    }
+
+    case 'Somali': {
+      const name = latin(studentName)
+      return `Ka socota ${schoolName}\n\nWaalidka sharafta leh ee ${isFemale ? 'ardayda' : 'ardayga'} ${name}, waxaan idin ogeysiinaynaa in ${name} maanta madrasada ${isFemale ? 'ay ku soo daahday' : 'uu ku soo daahay'}.`
+    }
+
+    case 'Arabic':
+      return isFemale
+        ? `من ${schoolName}\n\nحضرة وليّ أمر الطالبة ${studentName} المحترم،\nنودّ إعلامكم بأنّ ${studentName} تأخّرت عن الحضور إلى المدرسة اليوم.`
+        : `من ${schoolName}\n\nحضرة وليّ أمر الطالب ${studentName} المحترم،\nنودّ إعلامكم بأنّ ${studentName} تأخّر عن الحضور إلى المدرسة اليوم.`
+
+    case 'English': {
+      const name = latin(studentName)
+      return `From ${schoolName}\n\nDear parent or guardian of ${name}, we would like to let you know that ${name} was late to the medreseh today.`
+    }
+
+    default: {
+      const from = school ? `ከ ${school.nameAm || school.name}` : 'ከ ኸንደቅ መድረሳ'
+      return isFemale
+        ? `${from}\n\nየተከበራችሁ የ${studentName} ወላጆች፣ ዛሬ ${studentName} መድረሳ ዘግይታ መምጣቷን እናሳውቃለን።`
+        : `${from}\n\nየተከበራችሁ የ${studentName} ወላጆች፣ ዛሬ ${studentName} መድረሳ ዘግይቶ መምጣቱን እናሳውቃለን።`
+    }
+  }
+}
+
+/** The late message for a group text to several parents at once (no student name). */
+export function generateLateGroupSmsMessage(
+  language?: string,
+  school?: { name: string; nameAm?: string } | null
+): string {
+  const schoolName = school?.name ?? 'Khendeq'
+  switch (language as ParentLanguage) {
+    case 'Afaan Oromoo':
+      return `${school ? `${school.name} irraa` : 'Madarasaa Khendeq irraa'}\n\nKabajamtoota maatii, guyyaa har'aa mucaan keessan madarasaa dhufuu irratti turtii akka godhe isin beeksifna.`
+    case 'Somali':
+      return `Ka socota ${schoolName}\n\nWaalidka sharafta leh, waxaan idin ogeysiinaynaa in ilmahiinu maanta madrasada ku soo daahay.`
+    case 'Arabic':
+      return `من ${schoolName}\n\nحضرة وليّ الأمر المحترم،\nنودّ إعلامكم بأنّ ابنكم/ابنتكم تأخّر عن الحضور إلى المدرسة اليوم.`
+    case 'English':
+      return `From ${schoolName}\n\nDear parent or guardian, we would like to let you know that your child was late to the medreseh today.`
+    default:
+      return `${school ? `ከ ${school.nameAm || school.name}` : 'ከ ኸንደቅ መድረሳ'}\n\nየተከበራችሁ ወላጆች፣ ዛሬ ልጃችሁ መድረሳ ዘግይቶ መምጣቱን/ዘግይታ መምጣቷን እናሳውቃለን።`
+  }
+}

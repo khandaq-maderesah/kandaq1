@@ -1,0 +1,40 @@
+{
+  "push": {
+    "title": "Yeroon argama galmeessuu ga'eera",
+    "body": "{classes}: argamni hin galmaa'ne. Aduun lixuuf sa'aatii tokkoo fi walakkaa ga'a.",
+    "action": "Argama galmeessi"
+  },
+  "banner": {
+    "title": "Argamni ammallee hin galmoofne",
+    "body": "{classes}: maaloo argama har'aa aduun lixuu dura galmeessaa.",
+    "action": "Argama galmeessi"
+  },
+  "card": {
+    "title": "Yaadachiisa argamaa",
+    "offDescription": "Argama yoo hin galmoofne guyyaa guyyaan aduun lixuu sa'aatii tokkoo fi walakkaa dura (har'a naannoo {time}) bilbila kana irratti beeksisa argadhu. Yoo tuqxe fuulli argamaa banama.",
+    "onDescription": "Yaadachiisni bilbila kana irratti ni hojjeta. Argamni yoo hin galmoofne aduun lixuu sa'aatii tokkoo fi walakkaa dura (har'a naannoo {time}) beeksisni isiniif ergama. Dilbata homtu hin ergamu.",
+    "enable": "Yaadachiisa banii",
+    "disable": "Dhiisi",
+    "test": "Fakkeenya agarsiisi",
+    "blocked": "Beeksisni appii kanaaf dhorkameera. Qindaa'ina brawuzarii ykn bilbilaa keessatti eeyyamaa, achiis as deebi'aa.",
+    "unsupported": "Brawuzarri kun beeksisa yaadachiisaa agarsiisuu hin danda'u. Yaadachiisni mallattoo kolfaa gubbaa irratti ammayyuu ni mul'ata.",
+    "needsInstall": "iPhone ykn iPad irratti duraan appii kana Fuula Jalqabaatti dabalaa (Qoodi, achiis “Add to Home Screen”), achiis achirraa banaatii yaadachiisa banaa.",
+    "testTitle": "Yaadachiisa qorannoo",
+    "testBody": "Yaadachiisni argamaa akkasuma ni fakkaata. Fuula banuuf “Argama galmeessi” tuqaa.",
+    "enabled": "Yaadachiisni banameera.",
+    "disabled": "Yaadachiisni cufameera.",
+    "failed": "Yaadachiisa jijjiiruun hin danda'amne. Maaloo irra deebi'aa yaalaa."
+  },
+  "adminSms": {
+    "title": "Maatiin hin beeksifamne",
+    "body": "{ustazes}: maatii barattoota hin dhufneef ergaa hin erginne.",
+    "action": "Eenyu akka ta'e ilaali"
+  },
+  "adminCard": {
+    "title": "Beeksisa bilbila kanaaf",
+    "offDescription": "Galgala hundumaa sa'aatii {time} irratti, ustaazota maatii barattoota hin dhufneef ergaa hin erginne tarreessu beeksisa argadhu. Yoo tuqxe eenyu akka ta'e ni argita.",
+    "onDescription": "Beeksisni bilbila kana irratti ni hojjeta. Galgala hundumaa sa'aatii {time} irratti ustaazonni maatii barattoota hin dhufneef ergaa hin erginne isiniif ni himamu.",
+    "testTitle": "Beeksisa qorannoo",
+    "testBody": "Beeksisni akkasuma ni fakkaata. Tarree banuuf “Eenyu akka ta'e ilaali” tuqaa."
+  }
+}

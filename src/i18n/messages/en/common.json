@@ -40,7 +40,8 @@
     "waiting": "Waiting for a connection…",
     "banner": "Offline",
     "notCached": "Not available offline yet",
-    "notCachedHint": "Open this screen once while connected and it will work offline from then on."
+    "notCachedHint": "Open this screen once while connected and it will work offline from then on.",
+    "short": "Offline"
   },
   "status": {
     "loading": "Loading…",

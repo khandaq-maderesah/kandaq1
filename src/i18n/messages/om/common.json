@@ -38,9 +38,10 @@
     "description": "KMMS hin qofti fayyaa dhaabbataa qabu. Yaan hin barbadaa qabu hin dhaabbataa kanaa keessatti fudhatama. Ayyana yoo fudhatama yookaan dhaabbataa deebi’ee tureetti ofi.",
     "retry": "Irra deebi’ii yaali",
     "waiting": "Dhaabbataa eegamaa…",
-    "banner": "Maqaan dhaabbataa — jijjiiramaan kanaa keessatti fudhatama",
+    "banner": "Interneetii hin qabdu — jijjiiramni meeshaa kana irratti ni kuufama",
     "notCached": "Amma interneetii malee hin argamu",
-    "notCachedHint": "Yeroo interneetiin jirutti fuula kana al tokko bani; sana booda interneetii malee hojjeta."
+    "notCachedHint": "Yeroo interneetiin jirutti fuula kana al tokko bani; sana booda interneetii malee hojjeta.",
+    "short": "Interneetii hin jiru"
   },
   "status": {
     "loading": "Fe'aa jira…",

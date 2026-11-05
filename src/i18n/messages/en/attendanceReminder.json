@@ -1,0 +1,40 @@
+{
+  "push": {
+    "title": "Time to take attendance",
+    "body": "{classes}: attendance hasn't been taken yet. Sunset is in about an hour and a half.",
+    "action": "Take attendance"
+  },
+  "banner": {
+    "title": "Attendance not taken yet",
+    "body": "{classes}: please take today's attendance before sunset.",
+    "action": "Take attendance"
+  },
+  "card": {
+    "title": "Attendance reminder",
+    "offDescription": "Get a notification on this phone every day about an hour and a half before sunset (around {time} today) if you haven't taken attendance. Tap it to open the attendance page.",
+    "onDescription": "Reminders are on for this phone. If attendance isn't taken, you'll be notified about an hour and a half before sunset (around {time} today). Nothing is sent on Sundays.",
+    "enable": "Turn on reminders",
+    "disable": "Turn off",
+    "test": "Show a test",
+    "blocked": "Notifications are blocked for this app. Allow them in your browser or phone settings, then come back here.",
+    "unsupported": "This browser can't show reminder notifications. The reminder still appears in the bell at the top.",
+    "needsInstall": "On iPhone or iPad, first add this app to your Home Screen (Share, then “Add to Home Screen”), then open it from there to turn on reminders.",
+    "testTitle": "Test reminder",
+    "testBody": "This is how the attendance reminder looks. Tap “Take attendance” to open the page.",
+    "enabled": "Reminders are on.",
+    "disabled": "Reminders are off.",
+    "failed": "Couldn't change reminders. Please try again."
+  },
+  "adminSms": {
+    "title": "Parents not texted",
+    "body": "{ustazes} did not text the parents of absent students.",
+    "action": "See who"
+  },
+  "adminCard": {
+    "title": "Notifications for this phone",
+    "offDescription": "Every evening at {time}, get a notification listing the Ustazes who didn't text the parents of absent students. Tap it to see who.",
+    "onDescription": "Notifications are on for this phone. Every evening at {time} you'll be told which Ustazes didn't text the parents of absent students.",
+    "testTitle": "Test notification",
+    "testBody": "This is how the notification looks. Tap “See who” to open the list."
+  }
+}

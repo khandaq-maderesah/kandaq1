@@ -1,4 +1,4 @@
-// KMMS service worker - offline-first app shell (v5).
+// KMMS service worker - offline-first app shell (v6).
 //
 // Guarantees:
 //  1. A cold offline start can BOOT: every cached HTML shell is stored together
@@ -22,11 +22,11 @@
 //     response instead of an empty body that breaks hydration without a trace.
 //  6. A friendly, branded offline page is the last resort for navigations.
 // Keep in sync with SW_VERSION in src/components/ServiceWorkerRegistrar.tsx.
-const CACHE = 'khendeq-medresah-v5'
+const CACHE = 'khendeq-medresah-v6'
 // RSC payloads live apart from documents: both are looked up by page path.
-const RSC_CACHE = 'khendeq-medresah-rsc-v5'
+const RSC_CACHE = 'khendeq-medresah-rsc-v6'
 // Tiny key/value state (the home screen path) that must survive worker restarts.
-const STATE_CACHE = 'khendeq-medresah-state-v5'
+const STATE_CACHE = 'khendeq-medresah-state-v6'
 const HOME_KEY = '/__kmms/home'
 const OFFLINE_URL = '/offline.html'
 const NAV_TIMEOUT_MS = 3000
@@ -303,31 +303,55 @@ self.addEventListener('activate', function (event) {
   )
 })
 
+// Push notifications (the server sends JSON: title, body, url, tag, action, lang).
+// `action` is the label of a button; the button and a tap on the notification
+// itself both open `url` (for the attendance reminder: the Ustaz's attendance page).
 self.addEventListener('push', (event) => {
-  const data = event.data ? event.data.json() : {}
-  const title = data.title || 'KMMS Notification'
+  let data = {}
+  try {
+    data = event.data ? event.data.json() : {}
+  } catch (e) {
+    data = { body: event.data ? event.data.text() : '' }
+  }
+  const url = data.url || '/admin/attendance'
   const options = {
     body: data.body || '',
     icon: '/icons/icon-192.png',
     badge: '/icons/icon-192.png',
-    data: data.url || '/admin/attendance',
+    data: { url: url },
+    // Same tag = a repeat replaces the earlier notification instead of stacking.
+    tag: data.tag || undefined,
+    lang: data.lang || undefined,
+    // Stays until the Ustaz acts on it, so a reminder is not missed.
+    requireInteraction: true,
+    actions: data.action ? [{ action: 'open', title: data.action }] : [],
   }
-  event.waitUntil(event.registration.showNotification(title, options))
+  event.waitUntil(event.registration.showNotification(data.title || 'KMMS Notification', options))
 })
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close()
-  const targetUrl = event.notification.data || '/admin/attendance'
+  const stored = event.notification.data
+  const path = (typeof stored === 'string' ? stored : stored && stored.url) || '/admin/attendance'
+  const target = new URL(path, self.location.origin).href
   event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(async (windowClients) => {
+      // Already open on that page: just bring it forward.
       for (const client of windowClients) {
-        if (client.url.includes(targetUrl) && 'focus' in client) {
-          return client.focus()
+        if (client.url === target && 'focus' in client) return client.focus()
+      }
+      // The app is open somewhere else: take that window to the page.
+      for (const client of windowClients) {
+        if (client.url.indexOf(self.location.origin) === 0 && 'navigate' in client) {
+          try {
+            const navigated = await client.navigate(target)
+            if (navigated) return navigated.focus()
+          } catch (e) {
+            // fall through to a new window
+          }
         }
       }
-      if (clients.openWindow) {
-        return clients.openWindow(targetUrl)
-      }
+      if (clients.openWindow) return clients.openWindow(target)
     })
   )
 })

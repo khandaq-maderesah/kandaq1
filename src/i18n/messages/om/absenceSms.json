@@ -12,12 +12,22 @@
     "leaveWarning": "Utuu hin ergin yoo cufte, bulchaan ergaan akka hin ergamne beeksifama.",
     "allDone": "Xumurameera. Bulchaan maatiin akka beeksifame arguu danda'a.",
     "nobodyReachable": "Barattoota kana keessaa tokkoof illee lakkoofsi bilbilaa maatii hin kaa'amne, kanaaf kan ergaa itti ergamu hin jiru. Lakkoofsa tarree barattootaa keessatti dabali.",
-    "recordFailed": "Ergaan ergamuu isaa galmeessuun hin danda'amne. Walqunnamtii kee ilaali."
+    "recordFailed": "Ergaan ergamuu isaa galmeessuun hin danda'amne. Walqunnamtii kee ilaali.",
+    "descriptionLateOnly": "Kutaa {className} keessatti {count, plural, one {barataan #} other {barattoonni #}} turtii godhan. Maatii isaaniif ergaa erguu dandeessu.",
+    "absentHeading": "Hin dhufne ({count})",
+    "lateHeading": "Turtii godhan ({count})",
+    "lateToggle": "Maatii barattoota turtii godhanii illee ergaa ergi",
+    "lateToggleHint": "{count, plural, one {Barataan #} other {Barattoonni #}} turtii godhan. Maatiin isaanii ergaa adda ta'e ni argatu: mucaan isaanii turtii godhee akka dhufe. Kun filannoodha.",
+    "sendAllLate": "Maatii turtii godhanii ergaa ergi ({count})",
+    "sendAllLateHint": "Ergaa gareetiin tokko, ergaa “turtii” qabu",
+    "lateDone": "Xumurameera. Maatiin barattoota turtii godhanii ergaa argataniiru.",
+    "lateNobodyReachable": "Barattoota turtii godhan keessaa tokkoof illee lakkoofsi bilbilaa maatii hin kaa'amne."
   },
   "saveBar": {
     "sent": "Maatiin beeksifameera",
     "send": "Maatii hin dhufneef ergaa ergi ({count})",
-    "pending": "Ergaan ammallee hin ergamne"
+    "pending": "Ergaan ammallee hin ergamne",
+    "sendLate": "Maatii turtii godhanii ergi ({count})"
   },
   "admin": {
     "title": "Ergaan hin dhufnee hin ergamne",

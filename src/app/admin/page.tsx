@@ -49,6 +49,7 @@ import {
 } from '@/components/ui/dialog'
 import { StudentAvatar } from '@/components/StudentAvatar'
 import { UnsentSmsBanner } from '@/components/admin/UnsentSmsBanner'
+import { AdminPushOptIn } from '@/components/admin/AdminPushOptIn'
 import { StudentDetailCard } from '@/components/StudentDetailCard'
 import { generateGroupSmsMessage, generateSmsMessage } from '@/lib/smsMessage'
 import { detectSmsPlatform, dominantLanguage, groupSmsHref, uniquePhones } from '@/lib/smsLink'
@@ -569,6 +570,7 @@ export default function AdminPage() {
       />
 
       <UnsentSmsBanner />
+      <AdminPushOptIn />
 
       {/* KPI row — selecting a card shows its list below (no redirect). */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-6">

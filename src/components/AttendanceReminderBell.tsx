@@ -24,7 +24,7 @@ export function AttendanceReminderBell(
   const t = useTranslations('notifications')
   const tc = useTranslations('common')
   const format = useFormatter()
-  const { user, offline } = useAuth()
+  const { user, offline, school } = useAuth()
   const [open, setOpen] = useState(false)
   const [savingId, setSavingId] = useState('')
   const containerRef = useRef<HTMLDivElement>(null)
@@ -52,6 +52,7 @@ export function AttendanceReminderBell(
   const usersRef = useRef<User[]>([])
   const alertsRef = useRef<MissingAttendanceAlert[]>([])
   const runningRef = useRef(false)
+  const timeZoneRef = useRef(school?.timezone)
 
   useEffect(() => {
     classesRef.current = classesData.data ?? []
@@ -65,6 +66,9 @@ export function AttendanceReminderBell(
   useEffect(() => {
     alertsRef.current = alertsData.data ?? []
   }, [alertsData.data])
+  useEffect(() => {
+    timeZoneRef.current = school?.timezone
+  }, [school?.timezone])
 
   const runCheck = useCallback(async () => {
     if (runningRef.current) return
@@ -75,7 +79,8 @@ export function AttendanceReminderBell(
         attendanceRef.current,
         usersRef.current,
         new Date(),
-        alertsRef.current
+        alertsRef.current,
+        timeZoneRef.current
       )
     } catch (e) {
       console.error('Missing attendance reminder check failed', e)

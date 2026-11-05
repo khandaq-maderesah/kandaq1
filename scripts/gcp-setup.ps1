@@ -116,6 +116,16 @@ if ($LASTEXITCODE -ne 0) {
 # Grants both the build and the runtime service accounts access.
 Run "firebase apphosting:secrets:grantaccess cron-secret --backend $BackendId --location $Region --project $ProjectId --non-interactive"
 
+# --- 6b. VAPID private key (Ustaz push notifications) ----------------------
+# The matching public key is NEXT_PUBLIC_VAPID_PUBLIC_KEY in apphosting.yaml.
+# Create a pair with:  node -e "console.log(require('web-push').generateVAPIDKeys())"
+Step 'Checking secret vapid-private-key'
+gcloud secrets describe vapid-private-key --project $ProjectId *> $null
+if ($LASTEXITCODE -ne 0) {
+  throw 'Secret vapid-private-key is missing. Create it from the privateKey of a generated VAPID pair (and put the publicKey in apphosting.yaml).'
+}
+Run "firebase apphosting:secrets:grantaccess vapid-private-key --backend $BackendId --location $Region --project $ProjectId --non-interactive"
+
 if ($SkipDeploy) { Write-Host "`nSetup done (deploy skipped)."; exit 0 }
 
 # --- 7. Deploy rules + app -------------------------------------------------
@@ -148,7 +158,29 @@ $headerFlag = if ($verb -eq 'create') { '--headers' } else { '--update-headers' 
   --attempt-deadline 300s --format=none
 if ($LASTEXITCODE -ne 0) { throw 'Failed to create/update the Cloud Scheduler job' }
 
+# --- 9. Cloud Scheduler jobs for the Ustaz attendance push ------------------
+# Two runs an evening, Monday to Saturday (Addis Ababa): 16:45 and 17:10. The
+# reminder time moves with the sun between about 16:30 and 17:20 (1.5 hours
+# before sunset); each run sends to every Ustaz whose time has come or is due
+# within ~12 minutes, once a day each (see isPushDue in src/lib/attendancePush.ts).
+$pushUrl = "$url/api/cron/attendance-push"
+foreach ($job in @(@{ Name = 'attendance-push-early'; Schedule = '45 16 * * 1-6' }, @{ Name = 'attendance-push-late'; Schedule = '10 17 * * 1-6' })) {
+  Step "Ensuring Cloud Scheduler job $($job.Name)"
+  $pushVerb = 'create'
+  gcloud scheduler jobs describe $job.Name --location $SchedulerRegion --project $ProjectId *> $null
+  if ($LASTEXITCODE -eq 0) { $pushVerb = 'update' }
+  $pushHeaderFlag = if ($pushVerb -eq 'create') { '--headers' } else { '--update-headers' }
+  & gcloud scheduler jobs $pushVerb http $job.Name `
+    --project $ProjectId --location $SchedulerRegion `
+    --schedule $job.Schedule --time-zone 'Africa/Addis_Ababa' `
+    --uri $pushUrl --http-method GET `
+    $pushHeaderFlag "Authorization=Bearer $secretValue" `
+    --attempt-deadline 120s --format=none
+  if ($LASTEXITCODE -ne 0) { throw "Failed to create/update the $($job.Name) Cloud Scheduler job" }
+}
+
 Write-Host "`nAll done." -ForegroundColor Green
 Write-Host "  App:  $url"
 Write-Host "  Cron: $cronUrl (daily 18:30 Africa/Addis_Ababa)"
+Write-Host "  Push:  $pushUrl (16:45 and 17:10 Addis Ababa, Mon-Sat)"
 Write-Host "  Test the cron now with: gcloud scheduler jobs run missing-attendance --location $SchedulerRegion"

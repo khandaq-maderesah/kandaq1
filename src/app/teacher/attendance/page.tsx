@@ -26,6 +26,7 @@ import { useAbsenceSmsLogs, useMyAttendance, useMyClasses, useStudentsOfClass } 
 import { AbsenceSmsDialog } from '@/components/teacher/AbsenceSmsDialog'
 import { SaveAttendanceConfirm } from '@/components/attendance/SaveAttendanceConfirm'
 import { absenceSmsId } from '@/lib/absenceSms'
+import { readLateSmsPreference } from '@/lib/lateSmsPreference'
 import { useUnsavedChangesWarning } from '@/hooks/useUnsavedChangesWarning'
 import { useMySessionLogs } from '@/hooks/useWeeklyReports'
 import {
@@ -247,8 +248,10 @@ export default function TeacherAttendancePage() {
   const absentStudents = useMemo(() => students.filter((s) => statusMap[s.id] === 'absent'), [students, statusMap])
   const smsLog = (smsLogs ?? []).find((l) => l.id === absenceSmsId(date, classId))
   const smsDone = !!smsLog && smsLog.absentCount >= absentStudents.length
+  // Late students are optional: the dialog also opens for them only if the Ustaz chose to text them.
+  const lateStudents = useMemo(() => students.filter((s) => statusMap[s.id] === 'late'), [students, statusMap])
   const offerSms = () => {
-    if (absentStudents.length > 0 && !smsDone) setSmsOpen(true)
+    if ((absentStudents.length > 0 && !smsDone) || (lateStudents.length > 0 && readLateSmsPreference())) setSmsOpen(true)
   }
 
   // The checks run before the "are you sure" so the Ustaz hears about a gap first, not after confirming.
@@ -683,6 +686,11 @@ export default function TeacherAttendancePage() {
                         {smsDone ? tSms('saveBar.sent') : tSms('saveBar.send', { count: absentStudents.length })}
                       </Button>
                     )}
+                    {!dirty && absentStudents.length === 0 && lateStudents.length > 0 && (
+                      <Button type="button" size="lg" variant="outline" onClick={() => setSmsOpen(true)}>
+                        <MessageSquare /> {tSms('saveBar.sendLate', { count: lateStudents.length })}
+                      </Button>
+                    )}
                     <Button size="lg" onClick={requestSave} disabled={saving || !dirty || counts.unmarked > 0}>
                       {saving ? <Loader2 className="animate-spin" /> : <Save />}
                       {t('saveBar.save')}
@@ -716,6 +724,7 @@ export default function TeacherAttendancePage() {
         className={classes.find((c) => c.id === classId)?.name ?? ''}
         date={date}
         absent={absentStudents}
+        late={lateStudents}
       />
     </div>
   )
